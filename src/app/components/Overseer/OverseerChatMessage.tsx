@@ -3,9 +3,11 @@ import useStore from '@stores/store';
 import {
   AgentStep,
   IOverseerAssistantMessage,
+  IOverseerNavigateSuggestion,
   IOverseerUserMessage,
 } from '@stores/overseer/types';
 import { motion } from 'framer-motion';
+import { MapPin } from 'lucide-react';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import AgentThinkingSteps from './AgentThinkingSteps';
@@ -15,6 +17,7 @@ interface OverseerChatMessageProps {
   message: IOverseerUserMessage | IOverseerAssistantMessage;
   className?: string;
   toolActivitySteps?: AgentStep[];
+  navigateSuggestion?: IOverseerNavigateSuggestion | null;
 }
 
 /**
@@ -26,6 +29,7 @@ const OverseerChatMessage: React.FC<OverseerChatMessageProps> = ({
   message,
   className,
   toolActivitySteps,
+  navigateSuggestion,
 }) => {
   const profileImage = useStore((state) => state.auth.user?.profileImage);
   const firstName = useStore((state) => state.auth.user?.firstName);
@@ -202,8 +206,36 @@ const OverseerChatMessage: React.FC<OverseerChatMessageProps> = ({
             />
           )}
         </div>
+        {navigateSuggestion && <NavigateChip navigate={navigateSuggestion} />}
       </div>
     </motion.div>
+  );
+};
+
+/**
+ * Red-themed navigation chip (matching Lovable mockup).
+ * Clicking triggers the section highlight overlay.
+ */
+const NavigateChip: React.FC<{ navigate: IOverseerNavigateSuggestion }> = ({
+  navigate,
+}) => {
+  const setHighlightedSection = useStore(
+    (state) => state.overseer.setHighlightedSection,
+  );
+
+  return (
+    <button
+      onClick={() => setHighlightedSection(navigate.sectionId)}
+      className='mt-1 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors'
+      style={{
+        background: 'rgba(163,13,19,0.15)',
+        borderColor: 'rgba(163,13,19,0.3)',
+        color: 'rgba(255,180,180,0.9)',
+      }}
+    >
+      <MapPin className='h-3 w-3' />
+      {navigate.sectionName}
+    </button>
   );
 };
 

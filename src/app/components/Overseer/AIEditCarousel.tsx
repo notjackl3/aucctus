@@ -19,6 +19,7 @@ interface AIEditCarouselProps {
   isLoading?: boolean;
   onActiveEditChange?: (edit: IAiEditingSuggestion) => void;
   readOnly?: boolean;
+  resolutionStatus?: 'applied' | 'declined';
 }
 
 type EditStatus = 'pending' | 'accepted' | 'rejected';
@@ -31,6 +32,7 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
   isLoading,
   onActiveEditChange,
   readOnly,
+  resolutionStatus,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [statuses, setStatuses] = useState<Record<number, EditStatus>>(() =>
@@ -83,6 +85,7 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
   if (!current) return null;
 
   const currentStatus = statuses[currentIndex];
+  const showResolutionBadge = readOnly && resolutionStatus;
 
   return (
     <div className='space-y-2'>
@@ -102,6 +105,24 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
             <span className='text-[11px] font-medium text-white/90'>
               Proposed Changes · {currentIndex + 1}/{edits.length}
             </span>
+            {showResolutionBadge && (
+              <div
+                className={cn(
+                  'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-medium uppercase tracking-[0.08em]',
+                  resolutionStatus === 'applied'
+                    ? 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200/80'
+                    : 'border-red-400/20 bg-red-500/10 text-red-200/80',
+                )}
+              >
+                <DynamicIcon
+                  variant={resolutionStatus === 'applied' ? 'check' : 'closeX'}
+                  width={9}
+                  height={9}
+                  className='stroke-current'
+                />
+                {resolutionStatus}
+              </div>
+            )}
           </div>
           <div className='flex items-center gap-1'>
             <button

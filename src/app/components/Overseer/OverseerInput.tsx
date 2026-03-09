@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 import OverseerMentionMenu from './OverseerMentionMenu';
-import { Paperclip, Send, X } from 'lucide-react';
+import { Paperclip, Send, Square, X } from 'lucide-react';
 
 interface OverseerInputProps {
   value: string;
@@ -26,6 +26,8 @@ interface OverseerInputProps {
   maxImages?: number;
   conceptItems?: MentionItem[];
   personaItems?: MentionItem[];
+  isThinking?: boolean;
+  onCancel?: () => void;
 }
 
 /**
@@ -48,6 +50,8 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
   maxImages = 4,
   conceptItems,
   personaItems,
+  isThinking = false,
+  onCancel,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -96,10 +100,10 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
   }, [value]);
 
   const handleSubmit = useCallback(() => {
-    if ((value.trim() || pendingImages.length > 0) && !disabled) {
+    if (value.trim() || pendingImages.length > 0 || isThinking) {
       onSubmit();
     }
-  }, [value, disabled, onSubmit, pendingImages.length]);
+  }, [value, onSubmit, pendingImages.length, isThinking]);
 
   const handleMentionSelect = useCallback(
     (item: MentionItem) => {
@@ -276,19 +280,29 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
           rows={1}
           className='no-focus-ring max-h-[72px] flex-1 resize-none overflow-y-auto bg-transparent text-sm text-white outline-none placeholder:text-white/25 disabled:cursor-not-allowed disabled:opacity-50'
         />
-        <button
-          onClick={handleSubmit}
-          disabled={(!value.trim() && pendingImages.length === 0) || disabled}
-          className={cn(
-            'rounded-lg p-1.5 transition-all',
-            (value.trim() || pendingImages.length > 0) && !disabled
-              ? 'bg-white/15 text-white hover:bg-white/20'
-              : 'text-white/20',
-          )}
-          aria-label='Send message'
-        >
-          <Send size={14} className='stroke-current' />
-        </button>
+        {isThinking ? (
+          <button
+            onClick={onCancel}
+            className='rounded-lg bg-red-500/20 p-1.5 text-red-300 transition-all hover:bg-red-500/30 hover:text-red-200'
+            aria-label='Stop generation'
+          >
+            <Square size={12} className='fill-current' />
+          </button>
+        ) : (
+          <button
+            onClick={handleSubmit}
+            disabled={(!value.trim() && pendingImages.length === 0) || disabled}
+            className={cn(
+              'rounded-lg p-1.5 transition-all',
+              (value.trim() || pendingImages.length > 0) && !disabled
+                ? 'bg-white/15 text-white hover:bg-white/20'
+                : 'text-white/20',
+            )}
+            aria-label='Send message'
+          >
+            <Send size={14} className='stroke-current' />
+          </button>
+        )}
       </div>
     </div>
   );

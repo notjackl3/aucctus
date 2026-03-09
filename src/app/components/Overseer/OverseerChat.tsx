@@ -6,6 +6,7 @@ import {
   IOverseerAssistantMessage,
   IOverseerEditSuggestionMessage,
   IOverseerEditSuggestions,
+  IOverseerNavigateSuggestion,
 } from '@stores/overseer/types';
 import React, { useEffect, useRef } from 'react';
 import AgentThinkingSteps from './AgentThinkingSteps';
@@ -16,6 +17,7 @@ interface OverseerChatProps {
   messages: OverseerMessage[];
   className?: string;
   editSuggestions?: IOverseerEditSuggestions | null;
+  navigateSuggestion?: IOverseerNavigateSuggestion | null;
   onConfirmEdits?: (selectedEdits: IAiEditingSuggestion[]) => void;
   onCancelEdits?: () => void;
   isApplyingEdits?: boolean;
@@ -32,6 +34,7 @@ const OverseerChat: React.FC<OverseerChatProps> = ({
   messages,
   className,
   editSuggestions,
+  navigateSuggestion,
   onConfirmEdits,
   onCancelEdits,
   isApplyingEdits,
@@ -61,19 +64,41 @@ const OverseerChat: React.FC<OverseerChatProps> = ({
       )}
     >
       {/* Messages */}
-      {messages.map((message) =>
-        message.role === 'edit_suggestion' ? (
-          <AIEditCarousel
-            key={message.uuid}
-            edits={
-              (message as IOverseerEditSuggestionMessage).editSuggestions.edits
-            }
-            reply={
-              (message as IOverseerEditSuggestionMessage).editSuggestions.reply
-            }
-            readOnly
-          />
-        ) : (
+      {messages.map((message) => {
+        if (message.role === 'edit_suggestion') {
+          const editSuggestionMessage =
+            message as IOverseerEditSuggestionMessage;
+          const resolutionStatus: 'applied' | 'declined' | undefined =
+            editSuggestionMessage.resolution ??
+            (editSuggestionMessage.applied ? 'applied' : undefined);
+
+          return (
+            <AIEditCarousel
+              key={message.uuid}
+              edits={editSuggestionMessage.editSuggestions.edits}
+              reply={editSuggestionMessage.editSuggestions.reply}
+              readOnly
+              resolutionStatus={resolutionStatus}
+            />
+          );
+        }
+
+        // Attach navigate chip only to the LAST navigate-response message
+        // to avoid showing stale chips on earlier navigate messages
+        const isLastNavigateMsg =
+          message.role === 'assistant' &&
+          (message as IOverseerAssistantMessage).isNavigateResponse &&
+          message.uuid ===
+            [...messages]
+              .reverse()
+              .find(
+                (m) =>
+                  m.role === 'assistant' &&
+                  (m as IOverseerAssistantMessage).isNavigateResponse,
+              )?.uuid;
+        const showNavigateChip = isLastNavigateMsg && navigateSuggestion;
+
+        return (
           <OverseerChatMessage
             key={message.uuid}
             message={message}
@@ -82,9 +107,12 @@ const OverseerChat: React.FC<OverseerChatProps> = ({
                 ? (message as IOverseerAssistantMessage).toolActivitySteps
                 : undefined
             }
+            navigateSuggestion={
+              showNavigateChip ? navigateSuggestion : undefined
+            }
           />
-        ),
-      )}
+        );
+      })}
 
       {/* Edit suggestions as carousel */}
       {hasEditSuggestions && onConfirmEdits && onCancelEdits && (

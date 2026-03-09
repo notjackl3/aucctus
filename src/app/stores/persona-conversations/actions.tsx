@@ -6,6 +6,7 @@ import type {
 } from '@libs/api/types/socketMessages/inbound';
 import type { IOutboundMention } from '@libs/api/types/socketMessages/outbound';
 import telemetry from '@libs/telemetry';
+import type { AgentStep } from '@stores/overseer/types';
 import { produce } from 'immer';
 import { v4 as uuidv4 } from 'uuid';
 import type { IStoreApi } from '../store';
@@ -41,6 +42,8 @@ export interface IPersonaConversationActions {
   addAssistantMessage: (message: IPersonaAssistantMessage) => void;
   addErrorMessage: (message: IPersonaErrorMessage) => void;
   agentIsThinking: (value: boolean, thinkingMessage?: string) => void;
+  addToolActivityStep: (label: string, detail?: string, icon?: string) => void;
+  clearToolActivitySteps: () => void;
   addMention: (mention: IOutboundMention) => void;
   clearMentions: () => void;
 }
@@ -58,6 +61,7 @@ export function clearConversation(
       state.isPersonaTyping = false;
       state.currentStreamingContent = undefined;
       state.currentStreamingUuid = undefined;
+      state.toolActivitySteps = [];
       state.currentMessage = resetCurrentMessage
         ? undefined
         : state.currentMessage;
@@ -80,6 +84,7 @@ export function setConversation(
       state.thinkingMessage = undefined;
       state.currentStreamingContent = undefined;
       state.currentStreamingUuid = undefined;
+      state.toolActivitySteps = [];
     }),
   );
 }
@@ -350,6 +355,12 @@ export function addAssistantMessage(
       state.thinkingMessage = undefined;
       state.currentStreamingContent = undefined;
       state.currentStreamingUuid = undefined;
+
+      // Mark all tool activity steps as done
+      for (const step of state.toolActivitySteps) {
+        step.status = 'done';
+      }
+      state.toolActivitySteps = [];
     }),
   );
 
@@ -375,6 +386,64 @@ export function addErrorMessage(
       state.thinkingMessage = undefined;
       state.currentStreamingContent = undefined;
       state.currentStreamingUuid = undefined;
+    }),
+  );
+}
+
+export function addToolActivityStep(
+  this: IStoreApi<IPersonaConversationState>,
+  label: string,
+  detail?: string,
+  icon?: string,
+) {
+  const { set } = this;
+  const validIcons: AgentStep['icon'][] = [
+    'search',
+    'scan',
+    'analyze',
+    'synthesize',
+  ];
+  const stepIcon = validIcons.includes(icon as AgentStep['icon'])
+    ? (icon as AgentStep['icon'])
+    : 'search';
+
+  set(
+    produce((state: IPersonaConversationState) => {
+      // Mark previous active steps as done
+      for (const step of state.toolActivitySteps) {
+        if (step.status === 'active') {
+          step.status = 'done';
+        }
+      }
+
+      // Deduplicate: if a step with the same label exists, update it
+      const existing = state.toolActivitySteps.find((s) => s.label === label);
+      if (existing) {
+        existing.status = 'active';
+        existing.detail = detail;
+        existing.icon = stepIcon;
+      } else {
+        state.toolActivitySteps.push({
+          id: uuidv4(),
+          label,
+          detail,
+          status: 'active',
+          icon: stepIcon,
+        });
+      }
+    }),
+  );
+}
+
+export function clearToolActivitySteps(
+  this: IStoreApi<IPersonaConversationState>,
+) {
+  const { set } = this;
+  set(
+    produce((state: IPersonaConversationState) => {
+      for (const step of state.toolActivitySteps) {
+        step.status = 'done';
+      }
     }),
   );
 }

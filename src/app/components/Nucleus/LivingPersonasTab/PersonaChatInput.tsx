@@ -14,6 +14,7 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -296,20 +297,40 @@ const PersonaChatInput = React.forwardRef<
     const [isEmpty, setIsEmpty] = useState(true);
     const [selectedIndex, setSelectedIndex] = useState(0);
     const mentionTriggerPosRef = useRef<number | null>(null);
+    const [chipUuids, setChipUuids] = useState<Set<string>>(new Set());
 
     useImperativeHandle(ref, () => ({
       focus: () => editorRef.current?.focus(),
     }));
 
+    // Filter out results already tagged as chips in the editor
+    const filteredResults = useMemo(
+      () => mentionResults.filter((r) => !chipUuids.has(r.uuid)),
+      [mentionResults, chipUuids],
+    );
+
     // Reset selected index when results change
     useEffect(() => {
       setSelectedIndex(0);
-    }, [mentionResults]);
+    }, [filteredResults]);
 
     const checkEmpty = useCallback(() => {
       if (!editorRef.current) return;
       const text = editorRef.current.textContent ?? '';
       setIsEmpty(text.trim().length === 0);
+    }, []);
+
+    const updateChipUuids = useCallback(() => {
+      if (!editorRef.current) return;
+      const chips = editorRef.current.querySelectorAll(
+        `[${MENTION_CHIP_ATTR}]`,
+      );
+      const uuids = new Set<string>();
+      chips.forEach((chip) => {
+        const uuid = chip.getAttribute(MENTION_UUID_ATTR);
+        if (uuid) uuids.add(uuid);
+      });
+      setChipUuids(uuids);
     }, []);
 
     const handleSubmit = useCallback(() => {
@@ -322,6 +343,7 @@ const PersonaChatInput = React.forwardRef<
       // Clear editor
       editorRef.current.innerHTML = '';
       setIsEmpty(true);
+      setChipUuids(new Set());
       onMentionQueryChange(null);
       mentionTriggerPosRef.current = null;
     }, [disabled, onSubmit, onMentionQueryChange]);
@@ -366,8 +388,9 @@ const PersonaChatInput = React.forwardRef<
 
     const handleInput = useCallback(() => {
       checkEmpty();
+      updateChipUuids();
       detectMentionQuery();
-    }, [checkEmpty, detectMentionQuery]);
+    }, [checkEmpty, updateChipUuids, detectMentionQuery]);
 
     const insertMention = useCallback(
       (result: IMentionSearchResult) => {
@@ -417,8 +440,9 @@ const PersonaChatInput = React.forwardRef<
         onMentionQueryChange(null);
         mentionTriggerPosRef.current = null;
         checkEmpty();
+        updateChipUuids();
       },
-      [onMentionQueryChange, checkEmpty],
+      [onMentionQueryChange, checkEmpty, updateChipUuids],
     );
 
     const handleMentionSelect = useCallback(
@@ -432,8 +456,8 @@ const PersonaChatInput = React.forwardRef<
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (showMentionDropdown) {
-          const concepts = mentionResults.filter((r) => r.type === 'concept');
-          const personas = mentionResults.filter((r) => r.type === 'persona');
+          const concepts = filteredResults.filter((r) => r.type === 'concept');
+          const personas = filteredResults.filter((r) => r.type === 'persona');
           const flatResults = [...concepts, ...personas];
 
           if (e.key === 'ArrowDown') {
@@ -471,7 +495,7 @@ const PersonaChatInput = React.forwardRef<
       },
       [
         showMentionDropdown,
-        mentionResults,
+        filteredResults,
         selectedIndex,
         handleMentionSelect,
         handleSubmit,
@@ -495,7 +519,7 @@ const PersonaChatInput = React.forwardRef<
         <AnimatePresence>
           {showMentionDropdown && (
             <MentionDropdown
-              results={mentionResults}
+              results={filteredResults}
               isSearching={isMentionSearching}
               onSelect={handleMentionSelect}
               onClose={() => {

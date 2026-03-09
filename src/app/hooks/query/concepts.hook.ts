@@ -72,6 +72,7 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
       queryOptions.sort,
       queryOptions.properties, // Use the JSON-encoded properties array for cache key
       queryOptions.uuids, // Comma-separated UUIDs filter
+      queryOptions.reportStatusAggregate, // Report status aggregate filter
     ],
     queryFn: () => api.concept.getConcepts(queryOptions),
     enabled: queryOptions.enabled ?? true,

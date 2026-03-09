@@ -661,9 +661,13 @@ export class PersonaApi extends ApiService {
   /**
    * Search for mentionable items (concepts and personas).
    */
-  searchMentions(query: string, type?: 'concept' | 'persona' | 'all') {
+  searchMentions(
+    query: string,
+    type?: 'concept' | 'persona' | 'all',
+    excludePersona?: string,
+  ) {
     return this.get<IMentionSearchResponse>(
-      endpoints.mentionSearch(query, type),
+      endpoints.mentionSearch(query, type, excludePersona),
     );
   }
 

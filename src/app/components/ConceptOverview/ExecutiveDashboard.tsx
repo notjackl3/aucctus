@@ -299,10 +299,12 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   return (
     <div data-section-id='overview' className={`space-y-8 ${className}`}>
       {/* Gut Check Banner */}
-      <GutCheckBanner
-        recommendation={conceptOverview?.shouldWeDoThis}
-        isLoading={isLoadingOverview}
-      />
+      <div data-section-id='gut_check'>
+        <GutCheckBanner
+          recommendation={conceptOverview?.shouldWeDoThis}
+          isLoading={isLoadingOverview}
+        />
+      </div>
 
       {/* Hero Section with Concept Image and Value Prop */}
       <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>

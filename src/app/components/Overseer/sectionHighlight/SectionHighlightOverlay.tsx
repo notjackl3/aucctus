@@ -4,7 +4,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useParams } from 'react-router-dom';
-import { resolveRouteForSection, resolveSectionElement } from './sectionMap';
+import {
+  ACCOUNT_LEVEL_SECTIONS,
+  resolveRouteForSection,
+  resolveSectionElement,
+} from './sectionMap';
 
 interface OverlayRect {
   top: number;
@@ -16,6 +20,9 @@ interface OverlayRect {
 const SectionHighlightOverlay: React.FC = () => {
   const highlightedSectionId = useStore(
     (state) => state.overseer.highlightedSectionId,
+  );
+  const setHighlightedSection = useStore(
+    (state) => state.overseer.setHighlightedSection,
   );
   const [rect, setRect] = useState<OverlayRect | null>(null);
   const rafRef = useRef<number>(0);
@@ -54,6 +61,22 @@ const SectionHighlightOverlay: React.FC = () => {
       return;
     }
 
+    // Account-level pages: navigate-only, no glow highlight
+    if (ACCOUNT_LEVEL_SECTIONS.has(highlightedSectionId)) {
+      const targetRoute = resolveRouteForSection(highlightedSectionId);
+      if (targetRoute && currentRoute !== targetRoute) {
+        navigate(targetRoute);
+        // Clear after navigation settles to unblock the auto-close guard in Private.tsx
+        setTimeout(() => setHighlightedSection(null), 500);
+      } else {
+        // Already on the right route — clear immediately
+        setHighlightedSection(null);
+      }
+      setRect(null);
+      prevSectionRef.current = highlightedSectionId;
+      return;
+    }
+
     const targetRoute = resolveRouteForSection(highlightedSectionId);
     const needsNavigation =
       targetRoute && currentRoute !== targetRoute && conceptId;
@@ -81,7 +104,14 @@ const SectionHighlightOverlay: React.FC = () => {
     );
 
     return () => clearTimeout(timeout);
-  }, [highlightedSectionId, updateRect, navigate, conceptId, currentRoute]);
+  }, [
+    highlightedSectionId,
+    updateRect,
+    navigate,
+    conceptId,
+    currentRoute,
+    setHighlightedSection,
+  ]);
 
   // Keep position updated on scroll/resize via RAF-throttled listener
   useEffect(() => {

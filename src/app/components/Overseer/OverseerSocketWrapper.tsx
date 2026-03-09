@@ -20,6 +20,9 @@ const OverseerSocketWrapper: React.FC = () => {
   const handleEditSuggestions = useStore(
     (state) => state.overseer.handleEditSuggestions,
   );
+  const handleNavigateSuggestion = useStore(
+    (state) => state.overseer.handleNavigateSuggestion,
+  );
   const agentIsThinking = useStore((state) => state.overseer.agentIsThinking);
   const handleError = useStore((state) => state.overseer.handleError);
   const addToolActivityStep = useStore(
@@ -46,6 +49,8 @@ const OverseerSocketWrapper: React.FC = () => {
   // Ref for synthesis delay timeout
   const synthesisTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
+  const isCancellingState = useStore((state) => state.overseer.isCancelling);
+
   // Clear timeout on unmount
   useEffect(() => {
     return () => {
@@ -54,6 +59,14 @@ const OverseerSocketWrapper: React.FC = () => {
       }
     };
   }, []);
+
+  // Clear synthesis timeout when cancel is triggered
+  useEffect(() => {
+    if (isCancellingState && synthesisTimeoutRef.current) {
+      clearTimeout(synthesisTimeoutRef.current);
+      synthesisTimeoutRef.current = undefined;
+    }
+  }, [isCancellingState]);
 
   // Handle handshake response
   useSocketEvent('overseer.handshake', (handshake) => {
@@ -137,6 +150,39 @@ const OverseerSocketWrapper: React.FC = () => {
         message.detail,
         message.icon,
       );
+    }
+  });
+
+  // Handle navigate suggestion — finalize tool steps with synthesis delay before showing
+  useSocketEvent('overseer.navigate.suggestion', (message) => {
+    if (message.conceptUuid === currentIdentifier) {
+      // Clear any previous pending synthesis timeout
+      if (synthesisTimeoutRef.current) {
+        clearTimeout(synthesisTimeoutRef.current);
+      }
+
+      const hasSteps =
+        useStore.getState().overseer.toolActivitySteps.length > 0;
+
+      const suggestion = {
+        explanation: message.content.explanation,
+        sectionId: message.content.sectionId,
+        sectionName: message.content.sectionName,
+        suggestedQuestions: message.content.suggestedQuestions ?? [],
+      };
+
+      if (hasSteps) {
+        // Start synthesis phase — shows "Synthesizing findings" with spinner
+        clearToolActivitySteps();
+
+        // Delay the navigate suggestion by 2 seconds so synthesis step is visible
+        synthesisTimeoutRef.current = setTimeout(() => {
+          finalizeSynthesisStep();
+          handleNavigateSuggestion(suggestion);
+        }, 2000);
+      } else {
+        handleNavigateSuggestion(suggestion);
+      }
     }
   });
 

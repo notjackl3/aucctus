@@ -62,7 +62,6 @@ const NucleusPage: React.FC = () => {
 
   // Check if current user is admin
   const isAdmin = user?.role.toLowerCase() === 'admin';
-  const showLivingPersonas = useMemo(() => isAucctusAdmin(user), [user]);
   const isDebugModeEnabled = useDebugMode();
 
   // Hook for generating nucleus report
@@ -115,22 +114,18 @@ const NucleusPage: React.FC = () => {
         label: 'Company Context',
         icon: <Building2 className='h-4 w-4' />,
       },
-      ...(showLivingPersonas
-        ? [
-            {
-              id: 'living-personas' as const,
-              label: 'Living Personas',
-              icon: <Users className='h-4 w-4' />,
-            },
-          ]
-        : []),
+      {
+        id: 'living-personas' as const,
+        label: 'Living Personas',
+        icon: <Users className='h-4 w-4' />,
+      },
       {
         id: 'decision-making',
         label: 'Decision Making',
         icon: <Scale className='h-4 w-4' />,
       },
     ],
-    [showLivingPersonas],
+    [],
   );
 
   // Handle openScoringConfig URL param by switching to decision-making tab
@@ -659,7 +654,7 @@ const NucleusPage: React.FC = () => {
                 reportUuid={nucleusReport?.uuid || ''}
                 overviewStatus={nucleusReport?.overviewStatus}
                 isAdmin={isAdmin}
-                isAucctusAdmin={showLivingPersonas}
+                isAucctusAdmin={isAucctusAdmin(user)}
                 onNavigateToCategory={(categoryId) => {
                   // Switch to intelligence section and expand the category
                   const newParams = new URLSearchParams(searchParams);
@@ -687,7 +682,7 @@ const NucleusPage: React.FC = () => {
           )}
 
           {/* Living Personas Tab */}
-          {showLivingPersonas && activeTab === 'living-personas' && (
+          {activeTab === 'living-personas' && (
             <div data-tab='living-personas'>
               <LivingPersonasTab />
             </div>

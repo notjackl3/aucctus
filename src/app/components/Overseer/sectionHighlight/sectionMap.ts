@@ -3,7 +3,28 @@ import { AppPath } from '@routes/routes';
 /**
  * Maps section IDs to the concept sub-route that renders them.
  */
+/**
+ * Account-level page IDs that map to top-level routes (no concept context needed).
+ */
+export const ACCOUNT_LEVEL_SECTIONS = new Set([
+  'nucleus',
+  'watchtower',
+  'competitor_assessment',
+  'idea_playground',
+  'innovation_pipeline',
+  'concept_bank',
+  'settings',
+]);
+
 const SECTION_TO_ROUTE: Record<string, AppPath> = {
+  // Account-level pages
+  nucleus: AppPath.Nucleus,
+  watchtower: AppPath.Watchtower,
+  competitor_assessment: AppPath.CompetitorAssessment,
+  idea_playground: AppPath.IdeaPlayground,
+  innovation_pipeline: AppPath.InnovationPipeline,
+  concept_bank: AppPath.ConceptBank,
+  settings: AppPath.Settings,
   // Overview
   overview: AppPath.ConceptOverview,
   concept_title: AppPath.ConceptOverview,
@@ -12,6 +33,7 @@ const SECTION_TO_ROUTE: Record<string, AppPath> = {
   concept_problem_statement: AppPath.ConceptOverview,
   what_is_this: AppPath.ConceptOverview,
   should_we_do_this: AppPath.ConceptOverview,
+  gut_check: AppPath.ConceptOverview,
   differentiators: AppPath.ConceptOverview,
   rights_to_win: AppPath.ConceptOverview,
   regenerate_image: AppPath.ConceptOverview,
@@ -69,6 +91,7 @@ const SECTION_FALLBACK_MAP: Record<string, string> = {
   concept_title: 'overview',
   what_is_this: 'concept_overview',
   should_we_do_this: 'concept_overview',
+  gut_check: 'gut_check',
   differentiators: 'differentiators',
   rights_to_win: 'rights_to_win',
   regenerate_image: 'overview',

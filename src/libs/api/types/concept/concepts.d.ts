@@ -375,6 +375,7 @@ export interface IConceptQueryOptions extends IPageQueryOptions {
   properties?: string; // JSON-encoded array of property filters with AND logic
   pageSize?: number; // Number of results per page (default: 20)
   uuids?: string; // Comma-separated UUIDs to filter by (e.g., "uuid1,uuid2,uuid3")
+  reportStatusAggregate?: string; // Filter by report status aggregate (e.g., "complete")
   enabled?: boolean; // Whether the query should execute (default: true)
   // Legacy single-property filter (deprecated, use properties instead)
   property_key?: string;

@@ -1,13 +1,16 @@
 import { Lens, lens } from '@dhmk/zustand-lens';
 import { IBaseMessage, IInboundChatMessage } from '@libs/api/types';
 import type { IOutboundMention } from '@libs/api/types/socketMessages/outbound';
+import type { AgentStep } from '@stores/overseer/types';
 import type { IAppStore } from '../store';
 import {
   IPersonaConversationActions,
   addAssistantMessage,
   addErrorMessage,
+  addToolActivityStep,
   agentIsThinking,
   clearConversation,
+  clearToolActivitySteps,
   handleHandshake,
   handleStream,
   sendMessage,
@@ -56,6 +59,7 @@ export interface IPersonaConversationState extends IPersonaConversationActions {
   isPersonaTyping: boolean;
   thinkingMessage?: string;
   selectedMentions: IOutboundMention[];
+  toolActivitySteps: AgentStep[];
 }
 
 export const initialPersonaConversationState = {
@@ -68,6 +72,7 @@ export const initialPersonaConversationState = {
   isPersonaTyping: false,
   thinkingMessage: undefined as string | undefined,
   selectedMentions: [] as IOutboundMention[],
+  toolActivitySteps: [] as AgentStep[],
 };
 
 const personaConversationSlice: Lens<IPersonaConversationState, IAppStore> = (
@@ -89,6 +94,8 @@ const personaConversationSlice: Lens<IPersonaConversationState, IAppStore> = (
     addAssistantMessage: addAssistantMessage.bind(actionContext),
     addErrorMessage: addErrorMessage.bind(actionContext),
     agentIsThinking: agentIsThinking.bind(actionContext),
+    addToolActivityStep: addToolActivityStep.bind(actionContext),
+    clearToolActivitySteps: clearToolActivitySteps.bind(actionContext),
     addMention: addMention.bind(actionContext),
     clearMentions: clearMentions.bind(actionContext),
   };

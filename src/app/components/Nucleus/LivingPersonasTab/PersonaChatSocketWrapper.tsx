@@ -5,6 +5,7 @@ import type {
   IPersonaChatHandshakeMessage,
   IPersonaChatInboundMessage,
   IPersonaChatStreamEvent,
+  IPersonaChatToolActivityMessage,
   IPersonaChatTypingMessage,
 } from '@libs/api/types/socketMessages/inbound';
 import telemetry from '@libs/telemetry';
@@ -28,6 +29,9 @@ const PersonaChatSocketWrapper: React.FC = () => {
   );
   const handleStream = useStore(
     (state) => state.personaConversations.handleStream,
+  );
+  const addToolActivityStep = useStore(
+    (state) => state.personaConversations.addToolActivityStep,
   );
   const personaUuid = useStore(
     (state) => state.personaConversations.personaUuid,
@@ -120,6 +124,19 @@ const PersonaChatSocketWrapper: React.FC = () => {
         agentIsThinking(data.isTyping);
       },
       [personaUuid, agentIsThinking],
+    ),
+  );
+
+  // Handle tool activity notifications
+  useSocketEvent(
+    'living_personas.chat.tool.activity',
+    React.useCallback(
+      (data: IPersonaChatToolActivityMessage) => {
+        if (data.personaUuid !== personaUuid) return;
+        agentIsThinking(true, data.activityMessage);
+        addToolActivityStep(data.activityMessage, data.detail, data.icon);
+      },
+      [personaUuid, agentIsThinking, addToolActivityStep],
     ),
   );
 

@@ -43,6 +43,7 @@ export interface IOverseerAssistantMessage {
   timestamp: string;
   toolActivitySteps?: AgentStep[];
   sources?: Array<{ name: string; url: string }>;
+  isNavigateResponse?: boolean;
 }
 
 /**
@@ -56,6 +57,17 @@ export interface IOverseerEditSuggestionMessage {
   editSuggestions: IOverseerEditSuggestions;
   timestamp: string;
   applied?: boolean;
+  resolution?: 'applied' | 'declined';
+}
+
+/**
+ * Navigate suggestion from the /navigate command
+ */
+export interface IOverseerNavigateSuggestion {
+  explanation: string;
+  sectionId: string;
+  sectionName: string;
+  suggestedQuestions?: string[];
 }
 
 export type OverseerMessage =
@@ -98,7 +110,7 @@ export interface IOverseerPendingSelection {
 /**
  * Feature toggle identifiers
  */
-export type OverseerFeature = 'web' | 'nucleus' | 'aiEdit';
+export type OverseerFeature = 'web' | 'nucleus' | 'aiEdit' | 'navigate';
 
 /**
  * Agent thinking step (from tool activity events)
@@ -109,6 +121,17 @@ export interface AgentStep {
   detail?: string;
   status: 'pending' | 'active' | 'done';
   icon?: 'search' | 'scan' | 'analyze' | 'synthesize';
+}
+
+/**
+ * Queued message waiting to be sent after the current agent run completes
+ */
+export interface IOverseerQueuedMessage {
+  uuid: string;
+  content: string;
+  images: IOverseerPendingImage[];
+  mentions: MentionItem[];
+  activeFeatures: Set<OverseerFeature>;
 }
 
 /**
@@ -167,6 +190,7 @@ export interface IOverseerActions {
   handleEditSuggestions: (suggestions: IOverseerEditSuggestions) => void;
   clearEditSuggestions: () => void;
   setEditSuggestions: (suggestions: IOverseerEditSuggestions | null) => void;
+  handleNavigateSuggestion: (suggestion: IOverseerNavigateSuggestion) => void;
   agentIsThinking: (value: boolean, thinkingMessage?: string) => void;
   handleError: (error: { message: string; code: string }) => void;
   clearError: () => void;
@@ -190,6 +214,11 @@ export interface IOverseerActions {
   setHistoryLoading: (value: boolean) => void;
   handleConversationName: (params: { sessionId: string; name: string }) => void;
   loadConversation: (conversation: IOverseerConversationDetail) => void;
+  // Cancel & queue actions
+  cancelCurrentRun: () => void;
+  processQueuedMessage: () => void;
+  clearMessageQueue: () => void;
+  toggleQueuePaused: () => void;
   // Image actions
   addImage: (file: File) => void;
   removeImage: (id: string) => void;
@@ -238,6 +267,9 @@ export interface IOverseerState extends IOverseerActions {
   // Edit suggestions state
   editSuggestions: IOverseerEditSuggestions | null;
 
+  // Navigate suggestion state
+  navigateSuggestion: IOverseerNavigateSuggestion | null;
+
   // Section highlight state
   highlightedSectionId: string | null;
 
@@ -265,4 +297,13 @@ export interface IOverseerState extends IOverseerActions {
 
   // Tool activity steps (agent thinking)
   toolActivitySteps: AgentStep[];
+
+  // Message queue (sent sequentially after each run completes)
+  messageQueue: IOverseerQueuedMessage[];
+
+  // Queue paused — prevents auto-processing of queued messages
+  isQueuePaused: boolean;
+
+  // Cancel state
+  isCancelling: boolean;
 }

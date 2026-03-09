@@ -173,6 +173,18 @@ export interface IOverseerToolActivityMessage extends BaseSocketEvent {
   icon?: 'search' | 'scan' | 'analyze' | 'synthesize';
 }
 
+export interface IOverseerNavigateSuggestionMessage extends BaseSocketEvent {
+  type: 'overseer.navigate.suggestion';
+  conceptUuid: string;
+  sessionId: string;
+  content: {
+    explanation: string;
+    sectionId: string;
+    sectionName: string;
+    suggestedQuestions?: string[];
+  };
+}
+
 export interface IOverseerEditSuggestionMessage extends BaseSocketEvent {
   type: 'overseer.edit.suggestion';
   conceptUuid: string;
@@ -1374,6 +1386,7 @@ export type InboundSocketEvent<C = {}> =
   | IOverseerSuggestedQuestionsMessage
   | IOverseerErrorMessage
   | IOverseerToolActivityMessage
+  | IOverseerNavigateSuggestionMessage
   | IOverseerEditSuggestionMessage
   | IOverseerConversationNameMessage
   | ILivingPersonasDocumentProcessingProgressMessage
@@ -1385,7 +1398,8 @@ export type InboundSocketEvent<C = {}> =
   | IPersonaChatInboundMessage
   | IPersonaChatStreamEvent
   | IPersonaChatTypingMessage
-  | IPersonaChatErrorMessage;
+  | IPersonaChatErrorMessage
+  | IPersonaChatToolActivityMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];
 
@@ -1433,6 +1447,17 @@ export interface IPersonaChatErrorMessage extends BaseSocketEvent {
   message: string;
   personaUuid: string;
   sessionId?: string;
+}
+
+export interface IPersonaChatToolActivityMessage extends BaseSocketEvent {
+  type: 'living_personas.chat.tool.activity';
+  sessionId: string;
+  personaUuid: string;
+  accountUuid: string;
+  toolName: string;
+  activityMessage: string;
+  detail?: string;
+  icon?: string;
 }
 
 // ----------------

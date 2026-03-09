@@ -1296,9 +1296,12 @@ export class Endpoints {
   }
 
   // Mention search
-  static mentionSearch(query: string, type?: string) {
-    const base = `/api/v1/mentions/search?q=${encodeURIComponent(query)}`;
-    return type ? `${base}&type=${type}` : base;
+  static mentionSearch(query: string, type?: string, excludePersona?: string) {
+    let url = `/api/v1/mentions/search?q=${encodeURIComponent(query)}`;
+    if (type) url += `&type=${type}`;
+    if (excludePersona)
+      url += `&exclude_persona=${encodeURIComponent(excludePersona)}`;
+    return url;
   }
 
   // ============================================

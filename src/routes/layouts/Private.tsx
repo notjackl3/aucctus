@@ -31,18 +31,23 @@ const PrivateLayout = () => {
   const { isEnabled, pageContext } = useOverseerRouteConfig();
   const isOverseerEnabled = isEnabled;
 
-  // Close Overseer panel when page context changes to prevent stale state
+  // Close Overseer panel when page context changes to prevent stale state,
+  // unless the Overseer itself triggered the navigation (highlighted section is set)
+  const highlightedSectionId = useStore(
+    (state) => state.overseer.highlightedSectionId,
+  );
   const prevPageContext = useRef(pageContext);
   useEffect(() => {
     if (
       prevPageContext.current &&
       prevPageContext.current !== pageContext &&
-      isOpen
+      isOpen &&
+      !highlightedSectionId
     ) {
       closeOverseer();
     }
     prevPageContext.current = pageContext;
-  }, [pageContext, isOpen, closeOverseer]);
+  }, [pageContext, isOpen, closeOverseer, highlightedSectionId]);
 
   const shouldApplyDockPadding = isOverseerEnabled && isOpen && isDocked;
 
@@ -57,6 +62,7 @@ const PrivateLayout = () => {
     page: 1,
     pageSize: 199,
     enabled: isSearchBarVisible,
+    reportStatusAggregate: 'complete',
   });
   const conceptItems: MentionItem[] = useMemo(() => {
     if (!conceptPage?.results) return [];

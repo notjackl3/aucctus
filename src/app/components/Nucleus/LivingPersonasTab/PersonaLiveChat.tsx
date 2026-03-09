@@ -52,6 +52,7 @@ import React, {
 import { v4 as uuidv4 } from 'uuid';
 import PersonaChatSocketWrapper from './PersonaChatSocketWrapper';
 import PersonaConversationSidebar from './PersonaConversationSidebar';
+import PersonaThinkingSteps from './PersonaThinkingSteps';
 
 /** Chat message type */
 export type MessageRole = 'user' | 'assistant';
@@ -221,6 +222,9 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
     const isPersonaTyping = useStore(
       (state) => state.personaConversations.isPersonaTyping,
     );
+    const toolActivitySteps = useStore(
+      (state) => state.personaConversations.toolActivitySteps,
+    );
     const currentStreamingContent = useStore(
       (state) => state.personaConversations.currentStreamingContent,
     );
@@ -248,7 +252,7 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
     const { sessions, isLoading: isLoadingConversations } =
       useChatSessions(personaUuid);
     const { results: mentionResults, isSearching: isMentionSearching } =
-      useMentionSearch(mentionQuery);
+      useMentionSearch(mentionQuery, undefined, personaUuid);
 
     // Loading messages for first interaction
     const loadingMessages = useMemo(() => {
@@ -646,7 +650,9 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
                   className='aucctus-border-primary h-6 w-6 rounded-full border transition-all duration-300'
                 />
                 <div className='aucctus-bg-secondary ml-4 h-fit max-w-[70%] space-y-2 rounded-lg p-4'>
-                  {isFirstMessage ? (
+                  {toolActivitySteps.length > 0 ? (
+                    <PersonaThinkingSteps steps={toolActivitySteps} />
+                  ) : isFirstMessage ? (
                     <div className='flex items-center gap-3'>
                       <div className='flex gap-1'>
                         <Loading isSmall />

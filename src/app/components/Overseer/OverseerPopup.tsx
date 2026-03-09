@@ -9,7 +9,7 @@ import {
   useConcepts,
 } from '@hooks/query/concepts.hook';
 import { usePersonas } from '@hooks/query/persona.hook';
-import { useOverseerConversations } from '@hooks/query/overseerHistory.hook';
+import { useOverseerConversationsInfinite } from '@hooks/query/overseerHistory.hook';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, {
   useCallback,
@@ -29,7 +29,10 @@ import OverseerSuggestedQuestions from './OverseerSuggestedQuestions';
 import {
   ChevronLeft,
   History,
+  Pause,
+  Play,
   CornerDownRight,
+  Loader2,
   PanelRightClose,
   PanelRightOpen,
   Plus,
@@ -63,6 +66,7 @@ const FEATURE_BUTTONS: {
   { key: 'web', label: 'Web Search', icon: 'globe' },
   { key: 'nucleus', label: 'Nucleus', icon: 'compass-03' },
   { key: 'aiEdit', label: 'AI Edit', icon: 'edit' },
+  { key: 'navigate', label: 'Navigate', icon: 'map-pin' },
 ];
 
 const formatHistoryDate = (dateStr: string) => {
@@ -90,6 +94,9 @@ const OverseerPopup: React.FC = () => {
     (state) => state.overseer.suggestedQuestions,
   );
   const editSuggestions = useStore((state) => state.overseer.editSuggestions);
+  const navigateSuggestion = useStore(
+    (state) => state.overseer.navigateSuggestion,
+  );
   const currentMessage = useStore((state) => state.overseer.currentMessage);
   const isThinking = useStore((state) => state.overseer.isThinking);
   const hasError = useStore((state) => state.overseer.hasError);
@@ -101,6 +108,16 @@ const OverseerPopup: React.FC = () => {
   const historyItems = useStore((state) => state.overseer.historyItems);
   const toolActivitySteps = useStore(
     (state) => state.overseer.toolActivitySteps,
+  );
+
+  const messageQueue = useStore((state) => state.overseer.messageQueue);
+  const isQueuePaused = useStore((state) => state.overseer.isQueuePaused);
+  const cancelCurrentRun = useStore((state) => state.overseer.cancelCurrentRun);
+  const clearMessageQueue = useStore(
+    (state) => state.overseer.clearMessageQueue,
+  );
+  const toggleQueuePaused = useStore(
+    (state) => state.overseer.toggleQueuePaused,
   );
 
   const close = useStore((state) => state.overseer.close);
@@ -137,13 +154,18 @@ const OverseerPopup: React.FC = () => {
   const { mutate: aiEditConcept, isLoading: isApplyingEdits } =
     useConceptAiEditing();
 
-  // Fetch global conversation history for the current user
-  const { data: fetchedHistory, isLoading: historyLoading } =
-    useOverseerConversations({ enabled: isOpen });
+  // Fetch global conversation history for the current user (infinite pagination)
+  const {
+    items: fetchedHistory,
+    isLoading: historyLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useOverseerConversationsInfinite({ enabled: isOpen });
 
   // Merge React Query data with store placeholders (new conversations not yet in API)
   const mergedHistory = useMemo(() => {
-    const apiItems = fetchedHistory ?? [];
+    const apiItems = fetchedHistory;
     // Keep only placeholders that aren't already in the API response
     const newPlaceholders = historyItems.filter(
       (item) => !apiItems.some((api) => api.uuid === item.uuid),
@@ -156,6 +178,7 @@ const OverseerPopup: React.FC = () => {
     page: 1,
     pageSize: 199,
     enabled: isOpen,
+    reportStatusAggregate: 'complete',
   });
   const conceptItems: MentionItem[] = useMemo(() => {
     if (!conceptPage?.results) return [];
@@ -765,49 +788,72 @@ const OverseerPopup: React.FC = () => {
                           No conversations yet
                         </div>
                       ) : (
-                        Object.entries(groupedHistory).map(
-                          ([dateLabel, chats], groupIdx) => (
-                            <div key={dateLabel}>
-                              {groupIdx > 0 && (
-                                <div className='mx-2 my-2 border-t border-white/[0.06]' />
-                              )}
-                              <div className='mb-1 px-3 pt-1 text-[10px] font-medium uppercase tracking-widest text-white/20'>
-                                {dateLabel}
-                              </div>
-                              {chats.map((chat, chatIdx) => (
-                                <div key={chat.uuid}>
-                                  {chatIdx > 0 && (
-                                    <div className='mx-3 border-t border-white/[0.04]' />
-                                  )}
-                                  <button
-                                    onClick={async () => {
-                                      try {
-                                        const detail =
-                                          await api.overseer.getConversation(
-                                            chat.uuid,
-                                          );
-                                        loadConversation(detail);
-                                      } catch {
-                                        setShowHistory(false);
-                                      }
-                                    }}
-                                    className='w-full truncate px-3 py-2.5 text-left text-[12px] font-light text-white/50 transition-all duration-200 hover:bg-white/[0.05] hover:text-white/85'
-                                  >
-                                    {chat.name === null ? (
-                                      <span className='inline-flex items-center gap-1 text-white/30'>
-                                        <span className='inline-block h-1 w-1 animate-pulse rounded-full bg-white/40' />
-                                        <span className='inline-block h-1 w-1 animate-pulse rounded-full bg-white/40 [animation-delay:0.2s]' />
-                                        <span className='inline-block h-1 w-1 animate-pulse rounded-full bg-white/40 [animation-delay:0.4s]' />
-                                      </span>
-                                    ) : (
-                                      chat.name
-                                    )}
-                                  </button>
+                        <>
+                          {Object.entries(groupedHistory).map(
+                            ([dateLabel, chats], groupIdx) => (
+                              <div key={dateLabel}>
+                                {groupIdx > 0 && (
+                                  <div className='mx-2 my-2 border-t border-white/[0.06]' />
+                                )}
+                                <div className='mb-1 px-3 pt-1 text-[10px] font-medium uppercase tracking-widest text-white/20'>
+                                  {dateLabel}
                                 </div>
-                              ))}
+                                {chats.map((chat, chatIdx) => (
+                                  <div key={chat.uuid}>
+                                    {chatIdx > 0 && (
+                                      <div className='mx-3 border-t border-white/[0.04]' />
+                                    )}
+                                    <button
+                                      onClick={async () => {
+                                        try {
+                                          const detail =
+                                            await api.overseer.getConversation(
+                                              chat.uuid,
+                                            );
+                                          loadConversation(detail);
+                                        } catch {
+                                          setShowHistory(false);
+                                        }
+                                      }}
+                                      className='w-full truncate px-3 py-2.5 text-left text-[12px] font-light text-white/50 transition-all duration-200 hover:bg-white/[0.05] hover:text-white/85'
+                                    >
+                                      {chat.name === null ? (
+                                        <span className='inline-flex items-center gap-1 text-white/30'>
+                                          <span className='inline-block h-1 w-1 animate-pulse rounded-full bg-white/40' />
+                                          <span className='inline-block h-1 w-1 animate-pulse rounded-full bg-white/40 [animation-delay:0.2s]' />
+                                          <span className='inline-block h-1 w-1 animate-pulse rounded-full bg-white/40 [animation-delay:0.4s]' />
+                                        </span>
+                                      ) : (
+                                        chat.name
+                                      )}
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            ),
+                          )}
+                          {hasNextPage && (
+                            <div className='px-3 py-3'>
+                              <button
+                                onClick={() => fetchNextPage()}
+                                disabled={isFetchingNextPage}
+                                className='flex w-full items-center justify-center gap-2 rounded-lg py-2 text-[11px] font-medium text-white/30 transition-all hover:bg-white/[0.05] hover:text-white/60 disabled:pointer-events-none'
+                              >
+                                {isFetchingNextPage ? (
+                                  <>
+                                    <Loader2
+                                      size={12}
+                                      className='animate-spin stroke-current'
+                                    />
+                                    Loading…
+                                  </>
+                                ) : (
+                                  'Load older conversations'
+                                )}
+                              </button>
                             </div>
-                          ),
-                        )
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
@@ -912,6 +958,7 @@ const OverseerPopup: React.FC = () => {
                       messages={messages}
                       className='min-h-[120px] flex-1'
                       editSuggestions={editSuggestions}
+                      navigateSuggestion={navigateSuggestion}
                       onConfirmEdits={handleConfirmEdits}
                       onCancelEdits={handleCancelEdits}
                       isApplyingEdits={isApplyingEdits}
@@ -963,12 +1010,76 @@ const OverseerPopup: React.FC = () => {
                         </div>
                       )}
 
+                    {/* Queue panel — shown above input when messages are queued */}
+                    {messageQueue.length > 0 && (
+                      <div className='mx-4 mt-1 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2.5'>
+                        <div className='mb-1.5 flex items-center justify-between'>
+                          <div className='flex items-center gap-2'>
+                            <span className='text-[13px] font-medium text-white/60'>
+                              Queue
+                            </span>
+                            <span className='flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white/10 px-1 text-[10px] font-medium text-white/50'>
+                              {messageQueue.length}
+                            </span>
+                          </div>
+                          <div className='flex items-center gap-1'>
+                            <button
+                              onClick={toggleQueuePaused}
+                              className={cn(
+                                'rounded-full p-1 transition-colors',
+                                isQueuePaused
+                                  ? 'bg-white/15 text-white/70 hover:bg-white/20'
+                                  : 'text-white/30 hover:bg-white/10 hover:text-white/60',
+                              )}
+                              aria-label={
+                                isQueuePaused
+                                  ? 'Resume processing queued messages'
+                                  : 'Pause processing queued messages'
+                              }
+                              title={
+                                isQueuePaused
+                                  ? 'Resume processing queued messages'
+                                  : 'Pause processing queued messages'
+                              }
+                            >
+                              {isQueuePaused ? (
+                                <Play size={12} className='fill-current' />
+                              ) : (
+                                <Pause size={12} className='fill-current' />
+                              )}
+                            </button>
+                            <button
+                              onClick={clearMessageQueue}
+                              className='rounded p-0.5 text-white/30 transition-colors hover:bg-white/10 hover:text-white/60'
+                              aria-label='Clear queue'
+                            >
+                              <X size={14} className='stroke-current' />
+                            </button>
+                          </div>
+                        </div>
+                        <div className='space-y-1'>
+                          {messageQueue.map((item) => (
+                            <div
+                              key={item.uuid}
+                              className='flex items-center gap-2 rounded-lg px-1 py-1'
+                            >
+                              <span className='truncate text-[13px] text-white/80'>
+                                {item.content}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Input area with mention menu */}
                     <OverseerInput
                       value={currentMessage}
                       onChange={setCurrentMessage}
                       onSubmit={handleSubmitMessage}
-                      disabled={isThinking && !hasEditSuggestions}
+                      disabled={hasEditSuggestions}
+                      isThinking={isThinking}
+                      onCancel={cancelCurrentRun}
                       mentions={mentions}
                       onMentionSelect={addMention}
                       onMentionRemove={removeMention}
@@ -978,9 +1089,13 @@ const OverseerPopup: React.FC = () => {
                       conceptItems={conceptItems}
                       personaItems={personaItems}
                       placeholder={
-                        selectedText && selectedText.trim().length > 0
-                          ? 'Ask anything about the selected content'
-                          : 'Ask anything or type @ to tag'
+                        isThinking
+                          ? messageQueue.length > 0
+                            ? 'Type to queue another, or Enter to send queue now...'
+                            : 'Type to queue a follow-up...'
+                          : selectedText && selectedText.trim().length > 0
+                            ? 'Ask anything about the selected content'
+                            : 'Ask anything or type @ to tag'
                       }
                     />
 
@@ -991,10 +1106,13 @@ const OverseerPopup: React.FC = () => {
                           key={feat.key}
                           onClick={() => toggleFeature(feat.key)}
                           className={cn(
-                            'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors',
-                            activeFeatures.has(feat.key)
-                              ? 'border-blue-400/40 bg-blue-500/20 text-blue-300'
-                              : 'border-white/10 text-white/40 hover:bg-white/[0.08] hover:text-white/80',
+                            'flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors',
+                            feat.key === 'navigate' &&
+                              activeFeatures.has(feat.key)
+                              ? 'border-red-400/40 bg-red-500/20 text-red-300'
+                              : activeFeatures.has(feat.key)
+                                ? 'border-blue-400/40 bg-blue-500/20 text-blue-300'
+                                : 'border-white/10 text-white/40 hover:bg-white/[0.08] hover:text-white/80',
                           )}
                           title={feat.label}
                         >

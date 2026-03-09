@@ -74,8 +74,8 @@ export const personaKeys = {
     [...personaKeys.all, 'starterPrompts', uuid] as const,
   conversationSearch: (uuid: string, message?: string, page?: number) =>
     [...personaKeys.all, 'conversationSearch', uuid, message, page] as const,
-  mentionSearch: (query: string, type?: string) =>
-    ['mentionSearch', query, type] as const,
+  mentionSearch: (query: string, type?: string, excludePersona?: string) =>
+    ['mentionSearch', query, type, excludePersona] as const,
 };
 
 // ============================================
@@ -950,11 +950,16 @@ export const usePersonaConversationSearch = (
 export const useMentionSearch = (
   query: string | null,
   type?: 'concept' | 'persona' | 'all',
+  excludePersona?: string,
 ) => {
   const searchQuery = useQuery({
-    queryKey: personaKeys.mentionSearch(query ?? '', type),
+    queryKey: personaKeys.mentionSearch(query ?? '', type, excludePersona),
     queryFn: async (): Promise<IMentionSearchResponse> => {
-      return await api.persona.searchMentions(query ?? '', type);
+      return await api.persona.searchMentions(
+        query ?? '',
+        type,
+        excludePersona,
+      );
     },
     enabled: query !== null, // Enabled when query is not null (empty string returns recent items)
     staleTime: STALE_TIMES.short,
