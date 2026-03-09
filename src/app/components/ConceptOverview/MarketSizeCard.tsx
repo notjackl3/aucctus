@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { executiveDashboardUIText } from './config';
 import ProgressBar from './ProgressBar';
-import { Globe } from 'lucide-react';
+import { CircleDollarSign, Globe } from 'lucide-react';
 
 interface MarketSizeData {
   tam: string;
@@ -12,6 +12,11 @@ interface MarketSizeData {
   growthTrajectory: null;
 }
 
+interface ImpactSizeData {
+  formattedValue: string;
+  summary: string | null;
+}
+
 interface MarketSizeCardProps {
   currentCardIndex: number;
   progress: number;
@@ -19,6 +24,8 @@ interface MarketSizeCardProps {
   onCardClick: (index: number) => void;
   conceptId?: string;
   marketSizeData: MarketSizeData | null;
+  impactSizeData?: ImpactSizeData | null;
+  isCostSavings?: boolean;
   isLoadingFinancial: boolean;
 }
 
@@ -29,6 +36,8 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
   onCardClick,
   conceptId,
   marketSizeData,
+  impactSizeData,
+  isCostSavings,
   isLoadingFinancial,
 }) => {
   const navigate = useNavigate();
@@ -46,25 +55,81 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
 
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Globe className='aucctus-stroke-tertiary h-4 w-4' />
+            {isCostSavings ? (
+              <CircleDollarSign className='aucctus-stroke-tertiary h-4 w-4' />
+            ) : (
+              <Globe className='aucctus-stroke-tertiary h-4 w-4' />
+            )}
             <h3 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
-              {executiveDashboardUIText.marketSize.title}
+              {isCostSavings
+                ? executiveDashboardUIText.impactSizing.title
+                : executiveDashboardUIText.marketSize.title}
             </h3>
           </div>
           <button
             onClick={() =>
               navigate(
-                `/concept/${conceptId}/financial-projection?tab=market-sizing`,
+                isCostSavings
+                  ? `/concept/${conceptId}/financial-projection?tab=impact-sizing`
+                  : `/concept/${conceptId}/financial-projection?tab=market-sizing`,
               )
             }
             className='aucctus-bg-primary-hover aucctus-text-sm-medium aucctus-text-secondary-hover rounded-lg px-3 py-1.5'
           >
-            {executiveDashboardUIText.marketSize.detailsButton}
+            {isCostSavings
+              ? executiveDashboardUIText.impactSizing.detailsButton
+              : executiveDashboardUIText.marketSize.detailsButton}
           </button>
         </div>
 
-        {marketSizeData && marketSizeData.marketSummary ? (
-          // Two-column layout: Summary + Visualization
+        {isCostSavings && impactSizeData ? (
+          // Cost-savings mode: Summary + Savings metric
+          <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
+            {/* Left - Impact Sizing Summary Text */}
+            <div className='flex flex-col justify-start px-2 py-2'>
+              {isLoadingFinancial ? (
+                <div className='aucctus-text-lg aucctus-text-secondary'>
+                  Loading impact data...
+                </div>
+              ) : impactSizeData.summary ? (
+                <p className='aucctus-text-md-semibold aucctus-text-primary'>
+                  {impactSizeData.summary}
+                </p>
+              ) : (
+                <p className='aucctus-text-md aucctus-text-tertiary'>
+                  Cost savings impact analysis based on operational assumptions.
+                </p>
+              )}
+            </div>
+
+            {/* Right - Savings Metric (single row: icon | label → value) */}
+            <div className='flex min-h-0 flex-col items-center justify-center'>
+              <div className='w-full max-w-[260px]'>
+                <div className='aucctus-border-brand aucctus-bg-brand-secondary rounded-lg border p-4'>
+                  <div className='flex items-center justify-between'>
+                    <div className='flex items-center gap-2'>
+                      <CircleDollarSign className='aucctus-stroke-brand-primary h-4 w-4' />
+                      <span className='aucctus-text-sm-semibold aucctus-text-brand-primary'>
+                        Savings
+                      </span>
+                    </div>
+                    <div className='aucctus-header-xs-bold aucctus-text-brand-primary'>
+                      {impactSizeData.formattedValue}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : isCostSavings ? (
+          // Cost-savings mode but no data available
+          <div className='flex flex-1 items-center justify-center'>
+            <p className='aucctus-text-md aucctus-text-tertiary'>
+              Impact sizing data not yet available.
+            </p>
+          </div>
+        ) : marketSizeData && marketSizeData.marketSummary ? (
+          // Revenue mode: Two-column layout with Summary + TAM/SAM/SOM
           <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
             {/* Left - Market Summary Text */}
             <div className='flex flex-col justify-start px-2 py-2'>
@@ -109,7 +174,7 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
             </div>
           </div>
         ) : (
-          // Single-column layout: Visualization only (expanded)
+          // Revenue mode: Single-column TAM/SAM/SOM (no summary)
           <div className='flex flex-1 items-center justify-center px-4 py-2'>
             <div className='relative aspect-square w-full max-w-[280px] overflow-hidden rounded-tl-xl bg-gray-100 shadow-inner'>
               {/* TAM - Outer square */}

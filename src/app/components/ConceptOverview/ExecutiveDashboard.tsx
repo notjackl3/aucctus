@@ -1,5 +1,4 @@
 import { Badge, ConceptReportSkeletons } from '@components';
-import { useDebugMode } from '@hooks/debug-mode.hook';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
 import {
@@ -12,13 +11,16 @@ import {
   useUpdateConceptImageSettings,
 } from '@hooks/query/concepts.hook';
 import { useFinancialProjectionV2 } from '@hooks/query/financialProjections.hook';
+import {
+  buildExpression,
+  evaluateExpression,
+} from '@pages/Concept/Report/FinancialProjections/shared/expressionBuilder';
 import { AppPath } from '@routes/routes';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { EXECUTIVE_DASHBOARD_CONFIG, executiveDashboardUIText } from './config';
 
 import images from '@assets/img';
 import BusinessModelCard from './BusinessModelCard';
-import ConceptVideoGeneration from './ConceptVideoGeneration';
 import CustomerProfilesCard from './CustomerProfilesCard';
 import DifferentiatorsCard from './DifferentiatorsCard';
 import EcosystemCard from './EcosystemCard';
@@ -48,9 +50,6 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-
-  // Debug mode check
-  const isDebugMode = useDebugMode();
 
   // Image upload and settings mutations
   const uploadMutation = useUploadConceptCustomImage(conceptUuid || '');
@@ -107,6 +106,14 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
       ? conceptOverview.rightsToWin
       : [];
 
+  // Format currency values for dashboard cards
+  const formatCurrency = useCallback((value: number) => {
+    if (value >= 1e9) return `$${(value / 1e9).toFixed(2)}B`;
+    if (value >= 1e6) return `$${(value / 1e6).toFixed(2)}M`;
+    if (value >= 1e3) return `$${(value / 1e3).toFixed(2)}K`;
+    return `$${value.toFixed(2)}`;
+  }, []);
+
   // Transform financial projection data for market sizing
   const marketSizeData = React.useMemo(() => {
     if (
@@ -116,14 +123,6 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     ) {
       return null;
     }
-
-    // Format currency values
-    const formatCurrency = (value: number) => {
-      if (value >= 1e9) return `$${(value / 1e9).toFixed(2)}B`;
-      if (value >= 1e6) return `$${(value / 1e6).toFixed(2)}M`;
-      if (value >= 1e3) return `$${(value / 1e3).toFixed(2)}K`;
-      return `$${value.toFixed(2)}`;
-    };
 
     // Get market sizing data - specifically look for "top_down" methodology first
     const topDownMarketSizing = financialProjectionV2.marketSizings.find(
@@ -151,7 +150,52 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     }
 
     return null;
-  }, [financialProjectionV2, executiveSummaries, conceptOverview]);
+  }, [
+    financialProjectionV2,
+    executiveSummaries,
+    conceptOverview,
+    formatCurrency,
+  ]);
+
+  // Determine if this is a cost-savings concept
+  const isCostSavings = concept?.financialProjectionType === 'cost_savings';
+
+  // Transform financial projection data for impact sizing (cost-saving concepts)
+  const impactSizeData = React.useMemo(() => {
+    if (
+      !isCostSavings ||
+      !financialProjectionV2 ||
+      !financialProjectionV2.impactSizings ||
+      financialProjectionV2.impactSizings.length === 0
+    ) {
+      return null;
+    }
+
+    const impactSizing = financialProjectionV2.impactSizings[0];
+    if (
+      !impactSizing.assumptionEntries ||
+      impactSizing.assumptionEntries.length === 0
+    ) {
+      return null;
+    }
+
+    const sortedEntries = [...impactSizing.assumptionEntries].sort(
+      (a, b) => a.order - b.order,
+    );
+
+    const expression = buildExpression(sortedEntries);
+    const calculatedValue = evaluateExpression(expression, 'impact sizing');
+
+    return {
+      formattedValue: formatCurrency(calculatedValue),
+      summary: executiveSummaries?.financialMarketSizeCostSavings || null,
+    };
+  }, [
+    isCostSavings,
+    financialProjectionV2,
+    executiveSummaries,
+    formatCurrency,
+  ]);
 
   const handleCardClick = useCallback((index: number) => {
     setCurrentCardIndex(index);
@@ -174,8 +218,106 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     });
   }, [updateSettings]);
 
-  // Total number of cards
-  const totalCards = 6;
+  // Build card renderers array — conditionally exclude Business Model for cost-savings
+  const cardRenderers = useMemo(() => {
+    const cards: ((commonProps: {
+      currentCardIndex: number;
+      progress: number;
+      totalCards: number;
+      onCardClick: (index: number) => void;
+    }) => React.ReactNode)[] = [
+      (props) => (
+        <MarketSizeCard
+          {...props}
+          conceptId={conceptId}
+          marketSizeData={marketSizeData}
+          impactSizeData={impactSizeData}
+          isCostSavings={isCostSavings}
+          isLoadingFinancial={isLoadingFinancial}
+        />
+      ),
+      (props) => (
+        <TrendsDriversCard
+          {...props}
+          conceptId={conceptId}
+          conceptUuid={conceptUuid}
+          marketForces={marketForces}
+          isLoadingMarketForces={isLoadingMarketForces}
+          executiveSummary={executiveSummaries?.marketScanTrendsDrivers}
+        />
+      ),
+      (props) => (
+        <EcosystemCard
+          {...props}
+          conceptId={conceptId}
+          conceptUuid={conceptUuid}
+          marketScan={marketScan}
+          isLoadingMarketScan={isLoadingMarketScan}
+          executiveSummary={executiveSummaries?.marketScanEcosystem}
+          concept={concept}
+        />
+      ),
+    ];
+
+    // Only include Business Model card for revenue concepts
+    if (!isCostSavings) {
+      cards.push((props) => (
+        <BusinessModelCard
+          {...props}
+          conceptId={conceptId}
+          conceptUuid={conceptUuid}
+          financialProjectionV2={financialProjectionV2}
+          isLoadingFinancial={isLoadingFinancial}
+          executiveSummary={executiveSummaries?.financialBusinessModel}
+        />
+      ));
+    }
+
+    cards.push(
+      (props) => (
+        <CustomerProfilesCard
+          {...props}
+          conceptUuid={conceptUuid}
+          conceptId={conceptId}
+          customerProfiles={customerProfiles}
+          isLoadingCustomerProfiles={isLoadingCustomerProfiles}
+          executiveSummary={executiveSummaries?.customerProfiles}
+        />
+      ),
+      (props) => (
+        <KeyAssumptionsCard
+          {...props}
+          conceptId={conceptId}
+          conceptUuid={conceptUuid}
+          categoryMetrics={assumptionsCategoryMetrics}
+          isLoadingAssumptions={isLoadingAssumptions}
+          executiveSummary={executiveSummaries?.keyAssumptions}
+        />
+      ),
+    );
+
+    return cards;
+  }, [
+    isCostSavings,
+    conceptId,
+    conceptUuid,
+    marketSizeData,
+    impactSizeData,
+    isLoadingFinancial,
+    marketForces,
+    isLoadingMarketForces,
+    executiveSummaries,
+    marketScan,
+    isLoadingMarketScan,
+    concept,
+    financialProjectionV2,
+    customerProfiles,
+    isLoadingCustomerProfiles,
+    assumptionsCategoryMetrics,
+    isLoadingAssumptions,
+  ]);
+
+  const totalCards = cardRenderers.length;
 
   // Auto-progression logic
   useEffect(() => {
@@ -216,75 +358,8 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
       onCardClick: handleCardClick,
     };
 
-    switch (currentCardIndex) {
-      case 0:
-        return (
-          <MarketSizeCard
-            {...commonProps}
-            conceptId={conceptId}
-            marketSizeData={marketSizeData}
-            isLoadingFinancial={isLoadingFinancial}
-          />
-        );
-      case 1:
-        return (
-          <TrendsDriversCard
-            {...commonProps}
-            conceptId={conceptId}
-            conceptUuid={conceptUuid}
-            marketForces={marketForces}
-            isLoadingMarketForces={isLoadingMarketForces}
-            executiveSummary={executiveSummaries?.marketScanTrendsDrivers}
-          />
-        );
-      case 2:
-        return (
-          <EcosystemCard
-            {...commonProps}
-            conceptId={conceptId}
-            conceptUuid={conceptUuid}
-            marketScan={marketScan}
-            isLoadingMarketScan={isLoadingMarketScan}
-            executiveSummary={executiveSummaries?.marketScanEcosystem}
-            concept={concept}
-          />
-        );
-      case 3:
-        return (
-          <BusinessModelCard
-            {...commonProps}
-            conceptId={conceptId}
-            conceptUuid={conceptUuid}
-            financialProjectionV2={financialProjectionV2}
-            isLoadingFinancial={isLoadingFinancial}
-            executiveSummary={executiveSummaries?.financialBusinessModel}
-          />
-        );
-      case 4:
-        return (
-          <CustomerProfilesCard
-            {...commonProps}
-            conceptUuid={conceptUuid}
-            conceptId={conceptId}
-            customerProfiles={customerProfiles}
-            isLoadingCustomerProfiles={isLoadingCustomerProfiles}
-            executiveSummary={executiveSummaries?.customerProfiles}
-          />
-        );
-      case 5:
-        return (
-          <KeyAssumptionsCard
-            {...commonProps}
-            conceptId={conceptId}
-            conceptUuid={conceptUuid}
-            categoryMetrics={assumptionsCategoryMetrics}
-            isLoadingAssumptions={isLoadingAssumptions}
-            executiveSummary={executiveSummaries?.keyAssumptions}
-          />
-        );
-      default:
-        return null;
-    }
+    const renderer = cardRenderers[currentCardIndex];
+    return renderer ? renderer(commonProps) : null;
   };
 
   // Show skeleton loading state while fetching data or when section is pending
@@ -422,35 +497,6 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           )}
         </div>
       </div>
-
-      {/* Concept Video Generation - Debug Mode Only */}
-      {isDebugMode && conceptUuid && (
-        <div className='mt-8'>
-          <ConceptVideoGeneration
-            conceptUuid={conceptUuid}
-            existingVideoUrl={
-              (conceptOverview as any)?.conceptVideoUrl as string | undefined
-            }
-            videoStatus={
-              (conceptOverview as any)?.videoStatus as
-                | 'generating'
-                | 'complete'
-                | 'error'
-                | undefined
-            }
-            videoGenerationStage={
-              (conceptOverview as any)?.videoGenerationStage as
-                | string
-                | undefined
-            }
-            videoGenerationProgress={
-              (conceptOverview as any)?.videoGenerationProgress as
-                | number
-                | undefined
-            }
-          />
-        </div>
-      )}
     </div>
   );
 };

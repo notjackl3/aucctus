@@ -857,28 +857,6 @@ export const useConceptExecutiveSummaries = (conceptUuid?: string) => {
   return { ...query, executiveSummaries: query.data };
 };
 
-export const useConceptVideoGenerate = (conceptUuid: string) => {
-  return useMutation({
-    mutationFn: async () => {
-      return await api.concept.generateConceptVideo(conceptUuid);
-    },
-    onSuccess: () => {
-      // Query will be invalidated when WebSocket completion message is received
-      toast.success(
-        'Video Generation Started',
-        'Your concept video is being generated',
-      );
-    },
-    onError: (e) => {
-      const message = utils.osiris.parseFormError(e);
-      toast.error(
-        'Video Generation Failed',
-        message || 'Unable to start video generation',
-      );
-    },
-  });
-};
-
 export const useConceptMagicShareLatest = (conceptUuid?: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptMagicShareLatest, conceptUuid],

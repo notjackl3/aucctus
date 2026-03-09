@@ -118,12 +118,6 @@ export class ConceptApi extends ApiService {
     );
   }
 
-  generateConceptVideo(conceptUuid: string) {
-    return this.post<{ detail: string; task_id: string }>(
-      endpoints.conceptVideoGenerate(conceptUuid),
-    );
-  }
-
   getConceptMagicShareLatest(conceptUuid: string) {
     return this.get<IConceptMagicShareLatest>(
       endpoints.conceptMagicShareLatest(conceptUuid),

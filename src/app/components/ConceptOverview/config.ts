@@ -30,6 +30,11 @@ export interface IExecutiveDashboardUIText {
     title: string;
     detailsButton: string;
   };
+  impactSizing: {
+    title: string;
+    detailsButton: string;
+    resultLabel: string;
+  };
   conceptVisualization: {
     altText: string;
     badgeText: string;
@@ -47,6 +52,11 @@ export const executiveDashboardUIText: IExecutiveDashboardUIText = {
   marketSize: {
     title: 'Market Size',
     detailsButton: 'Details',
+  },
+  impactSizing: {
+    title: 'Impact Sizing',
+    detailsButton: 'Details',
+    resultLabel: 'Annual Cost Savings Potential',
   },
   conceptVisualization: {
     altText: 'Concept Visualization',

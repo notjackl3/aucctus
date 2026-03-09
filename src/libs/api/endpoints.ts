@@ -188,10 +188,6 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/executive-summaries`;
   }
 
-  static conceptVideoGenerate(conceptUuid: string) {
-    return `api/v2/concept/${conceptUuid}/video/generate`;
-  }
-
   static conceptCustomerProfiles(
     conceptUuid: string,
     version: 'v1' | 'v2' = 'v1',
