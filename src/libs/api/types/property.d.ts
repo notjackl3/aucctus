@@ -39,6 +39,8 @@ export interface IPropertyDefinition {
   displayOrder: number;
   isActive: boolean;
   icon?: string; // Icon variant for column header (e.g., "star-01", "lightbulb")
+  keyWasAdjusted?: boolean; // True if the key was auto-renamed to avoid conflicts
+  originalKey?: string; // The original key before adjustment (if adjusted)
   createdAt: string;
   updatedAt: string;
 }

@@ -123,20 +123,23 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
   const [shakeField, setShakeField] = useState<string | null>(null);
   const [editingOption, setEditingOption] = useState<string | null>(null); // Track which option is being edited
   const [editingValue, setEditingValue] = useState(''); // The current value being edited
-
   // Refs for scrolling to error fields
   const nameRef = useRef<HTMLDivElement>(null);
   const optionsRef = useRef<HTMLDivElement>(null);
   const rangeRef = useRef<HTMLDivElement>(null);
 
   // Auto-generate key from name (always, even when name changes)
+  // Reserved key conflicts (e.g. "priority") are handled server-side with automatic renaming.
   useEffect(() => {
     if (!existingProperty && formData.name) {
       const generatedKey = formData.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '_')
         .replace(/^_+|_+$/g, '');
-      setFormData((prev) => ({ ...prev, key: generatedKey }));
+      setFormData((prev) => ({
+        ...prev,
+        key: generatedKey,
+      }));
     }
   }, [formData.name, existingProperty]);
 

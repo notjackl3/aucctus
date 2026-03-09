@@ -45,7 +45,7 @@ export const useCreatePropertyDefinition = () => {
       onError: (error: any) => {
         toast.error(
           'Creation Failed',
-          error?.response?.data?.message || 'Failed to create property',
+          error?.response?.data?.detail || 'Failed to create property',
         );
       },
     },
@@ -79,7 +79,7 @@ export const useUpdatePropertyDefinition = () => {
       onError: (error: any) => {
         toast.error(
           'Update Failed',
-          error?.response?.data?.message || 'Failed to update property',
+          error?.response?.data?.detail || 'Failed to update property',
         );
       },
     },
@@ -109,7 +109,7 @@ export const useDeletePropertyDefinition = () => {
       onError: (error: any) => {
         toast.error(
           'Deletion Failed',
-          error?.response?.data?.message || 'Failed to delete property',
+          error?.response?.data?.detail || 'Failed to delete property',
         );
       },
     },
@@ -145,7 +145,7 @@ export const useUpdateConceptProperty = () => {
       onError: (error: any, variables) => {
         toast.error(
           'Update Failed',
-          error?.response?.data?.message || `Failed to update ${variables.key}`,
+          error?.response?.data?.detail || `Failed to update ${variables.key}`,
         );
       },
     },
@@ -182,7 +182,7 @@ export const useReorderPropertyColumns = (accountUuid?: string) => {
       onError: (error: any) => {
         toast.error(
           'Reorder Failed',
-          error?.response?.data?.message || 'Failed to reorder columns',
+          error?.response?.data?.detail || 'Failed to reorder columns',
         );
 
         // Invalidate to sync local state with backend on error
