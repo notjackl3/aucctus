@@ -27,7 +27,7 @@ import { cn } from '@libs/utils/react';
 import { FunctionComponent, useCallback, useMemo } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import ConceptReportSocketWrapper from './ConceptReportSocketWrapper';
-import { AlertTriangle, Sparkles } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 const { SkeletonBlock } = ConceptReportSkeletons;
 
@@ -189,21 +189,6 @@ const ConceptReport: FunctionComponent = () => {
     [conceptIdentifier, navigate],
   );
 
-  const onMagicShareClick = useCallback(() => {
-    openModal(
-      Modal.MagicShare,
-      {
-        conceptUuid,
-      },
-      {
-        position: 'center',
-        shouldCloseOnOverlayClick: true,
-        shouldCloseOnEscape: true,
-        modalClassName: 'max-w-xl',
-      },
-    );
-  }, [openModal, conceptUuid]);
-
   const changeConceptStatus = useCallback(
     (value: string) => {
       if (!conceptIdentifier) return;
@@ -278,19 +263,6 @@ const ConceptReport: FunctionComponent = () => {
                   conceptIdentifier={conceptIdentifier}
                 />
               )}
-            {!concept?.isHistoricalVersion && (
-              <>
-                <button
-                  onClick={onMagicShareClick}
-                  className='flex items-center gap-2 rounded-lg px-4 py-2 text-white transition-opacity hover:opacity-90'
-                  style={{ backgroundColor: '#120C0C' }}
-                  aria-label='Magic Share'
-                >
-                  <Sparkles className='h-4 w-4 fill-white stroke-white' />
-                  Magic Share
-                </button>
-              </>
-            )}
           </div>
         </div>
         <div className='flex h-full w-full max-w-[1200px] flex-col flex-wrap items-start gap-6 self-stretch'>
