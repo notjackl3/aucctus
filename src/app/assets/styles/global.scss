@@ -538,8 +538,8 @@ select:focus {
   inset: 0;
   border-radius: inherit;
   background: linear-gradient(180deg,
-    rgba(255, 255, 255, 0.25) 0%,
-    transparent 20%);
+      rgba(255, 255, 255, 0.25) 0%,
+      transparent 20%);
   pointer-events: none;
 }
 
@@ -568,9 +568,9 @@ select:focus {
   inset: 0;
   border-radius: inherit;
   background: linear-gradient(180deg,
-    rgba(255, 255, 255, 0.3) 0%,
-    rgba(255, 255, 255, 0.05) 15%,
-    transparent 35%);
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.05) 15%,
+      transparent 35%);
   pointer-events: none;
 }
 
@@ -580,9 +580,12 @@ select:focus {
 }
 
 @keyframes glass-shimmer {
-  0%, 100% {
+
+  0%,
+  100% {
     background: rgba(255, 255, 255, 0.12);
   }
+
   50% {
     background: rgba(255, 255, 255, 0.16);
   }
@@ -651,7 +654,8 @@ select:focus {
   border: 0.5px solid rgba(255, 255, 255, 0.28);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.42),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    inset 0 0 12px 2px rgba(255, 255, 255, 0.08);
 }
 
 /* Static radial gradient + prismatic tint for rim refraction */
@@ -688,6 +692,7 @@ select:focus {
   box-shadow:
     inset 0 1px 0 rgba(255, 200, 200, 0.45),
     inset 0 -1px 0 rgba(185, 28, 28, 0.08),
+    inset 0 0 12px 2px rgba(255, 220, 220, 0.07),
     0 0 20px rgba(239, 68, 68, 0.08);
 }
 
@@ -716,9 +721,6 @@ select:focus {
   backdrop-filter: blur(var(--lg-rim-blur)) saturate(var(--lg-rim-saturate));
   -webkit-backdrop-filter: blur(var(--lg-rim-blur)) saturate(var(--lg-rim-saturate));
   border: 0.5px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 0 30px rgba(107, 70, 193, 0.06),
-    0 0 60px rgba(59, 130, 246, 0.04);
 }
 
 .liquid-glass-modal-rim-animated::before {
@@ -849,6 +851,7 @@ select:focus {
   -webkit-backdrop-filter: blur(12px) saturate(var(--lg-rim-saturate));
   border: 0.5px solid rgba(255, 255, 255, 0.12);
   box-shadow:
+    inset 0 0 12px 2px rgba(255, 255, 255, 0.06),
     0 0 30px rgba(107, 70, 193, 0.06),
     0 0 60px rgba(59, 130, 246, 0.04);
 }
@@ -858,14 +861,12 @@ select:focus {
   position: absolute;
   inset: -50%;
   border-radius: inherit;
-  background: conic-gradient(
-    from 0deg,
-    hsl(0 12% 29% / 0.06),
-    hsl(200 98% 86% / 0.04),
-    hsl(233 86% 67% / 0.06),
-    hsl(283 86% 60% / 0.04),
-    hsl(0 12% 29% / 0.06)
-  );
+  background: conic-gradient(from 0deg,
+      hsl(0 12% 29% / 0.06),
+      hsl(200 98% 86% / 0.04),
+      hsl(233 86% 67% / 0.06),
+      hsl(283 86% 60% / 0.04),
+      hsl(0 12% 29% / 0.06));
   opacity: 0.15;
   animation: overseer-rim-rotate 8s linear infinite;
   pointer-events: none;
@@ -876,12 +877,10 @@ select:focus {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.03) 2%,
-    transparent 10%
-  );
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.03) 2%,
+      transparent 10%);
   pointer-events: none;
 }
 
@@ -913,16 +912,35 @@ select:focus {
 }
 
 @keyframes overseer-rim-rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes overseer-orb-loop {
-  0%   { transform: translate(-70px, -70px); }
-  25%  { transform: translate(calc(100% - 70px), -70px); }
-  50%  { transform: translate(calc(100% - 70px), calc(100% - 70px)); }
-  75%  { transform: translate(-70px, calc(100% - 70px)); }
-  100% { transform: translate(-70px, -70px); }
+  0% {
+    transform: translate(-70px, -70px);
+  }
+
+  25% {
+    transform: translate(calc(100% - 70px), -70px);
+  }
+
+  50% {
+    transform: translate(calc(100% - 70px), calc(100% - 70px));
+  }
+
+  75% {
+    transform: translate(-70px, calc(100% - 70px));
+  }
+
+  100% {
+    transform: translate(-70px, -70px);
+  }
 }
 
 /* Dark gradient surface for Overseer floating panel */
@@ -1001,8 +1019,9 @@ select:focus {
 
   border: 0.5px solid rgba(255, 255, 255, 0.18);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.52),
     inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    inset 0 0 12px 2px rgba(255, 255, 255, 0.08),
     0 0 30px rgba(120, 60, 50, 0.05),
     0 0 60px rgba(100, 50, 45, 0.03);
 }

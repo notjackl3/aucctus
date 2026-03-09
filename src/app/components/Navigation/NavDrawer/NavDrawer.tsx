@@ -79,7 +79,7 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
           to={
             account?.hasConcepts || account?.hasSeeds
               ? AppPath.ConceptBank
-              : AppPath.IncubateConcept
+              : playgroundPath
           }
           title='Concepts'
           icon='lightbulb'
