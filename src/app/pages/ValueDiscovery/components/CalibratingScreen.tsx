@@ -1,7 +1,36 @@
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 
-export const CalibratingScreen = () => {
+interface CalibratingScreenProps {
+  companyRecognitionMessage?: string;
+}
+
+export const CalibratingScreen = ({
+  companyRecognitionMessage,
+}: CalibratingScreenProps) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  // Typing effect for recognition message
+  useEffect(() => {
+    if (!companyRecognitionMessage) return;
+
+    setIsTyping(true);
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < companyRecognitionMessage.length) {
+        setDisplayedText(companyRecognitionMessage.slice(0, i + 1));
+        i++;
+      } else {
+        clearInterval(interval);
+        setIsTyping(false);
+      }
+    }, 25);
+
+    return () => clearInterval(interval);
+  }, [companyRecognitionMessage]);
+
   return (
     <div className='flex min-h-screen items-center justify-center px-6 py-12'>
       <div className='aucctus-bg-secondary aucctus-border-secondary flex w-full max-w-md flex-col items-center rounded-2xl border px-8 py-16 shadow-2xl backdrop-blur-2xl'>
@@ -26,12 +55,37 @@ export const CalibratingScreen = () => {
           </div>
         </motion.div>
 
-        <h2 className='aucctus-text-primary mb-2 text-xl font-semibold'>
-          Agents Calibrating
-        </h2>
+        <AnimatePresence mode='wait'>
+          {companyRecognitionMessage ? (
+            <motion.div
+              key='recognition'
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className='mb-6 text-center'
+            >
+              <p className='aucctus-text-primary text-base font-medium leading-relaxed'>
+                {displayedText}
+                {isTyping && (
+                  <span className='ml-0.5 inline-block h-4 w-0.5 animate-pulse bg-primary-600' />
+                )}
+              </p>
+            </motion.div>
+          ) : (
+            <motion.h2
+              key='default'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className='aucctus-text-primary mb-2 text-xl font-semibold'
+            >
+              Agents Calibrating
+            </motion.h2>
+          )}
+        </AnimatePresence>
 
         <p className='aucctus-text-tertiary mb-8 text-center text-sm'>
-          Let us ask you a few questions about your innovation process.
+          {companyRecognitionMessage
+            ? 'Preparing your first question...'
+            : 'Let us ask you a few questions about your innovation process.'}
         </p>
 
         {/* Pulsing dots */}

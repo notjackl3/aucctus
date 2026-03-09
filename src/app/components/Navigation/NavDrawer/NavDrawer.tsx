@@ -105,14 +105,6 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
             collapsed={collapsed}
           />
         )}
-        {isAdmin && (
-          <NavButton
-            to={AppPath.ValueDiscovery}
-            title='Value Discovery'
-            icon='sparkles'
-            collapsed={collapsed}
-          />
-        )}
         {/* Competitor Assessment - disabled, feature dormant */}
         {/* {isAdmin && (
           <NavButton

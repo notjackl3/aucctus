@@ -15,7 +15,6 @@ export const LeadCaptureScreen = ({
 }: LeadCaptureScreenProps) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
 
   const canSubmit = name.trim().length > 0 && email.trim().length > 0;
@@ -27,7 +26,6 @@ export const LeadCaptureScreen = ({
     onSubmit({
       lead_name: name.trim(),
       lead_email: email.trim(),
-      lead_company: company.trim() || undefined,
       lead_role: role.trim() || undefined,
     });
   };
@@ -54,11 +52,11 @@ export const LeadCaptureScreen = ({
           />
         </div>
         <h2 className='aucctus-text-primary mb-2 text-2xl font-semibold'>
-          Almost there!
+          Unlock Your AI Innovation Roadmap
         </h2>
         <p className='aucctus-text-tertiary text-sm'>
-          Tell us a bit about yourself so we can personalize your executive
-          briefing.
+          Your personalized analysis is being generated. Enter your details to
+          unlock the results.
         </p>
       </div>
 
@@ -91,19 +89,6 @@ export const LeadCaptureScreen = ({
 
         <div>
           <label className='aucctus-text-secondary mb-1.5 block text-sm font-medium'>
-            Company
-          </label>
-          <input
-            type='text'
-            value={company}
-            onChange={(e) => setCompany(e.target.value)}
-            placeholder='Acme Corp'
-            className={inputClasses}
-          />
-        </div>
-
-        <div>
-          <label className='aucctus-text-secondary mb-1.5 block text-sm font-medium'>
             Role
           </label>
           <input
@@ -124,7 +109,7 @@ export const LeadCaptureScreen = ({
               (!canSubmit || isLoading) && 'cursor-not-allowed opacity-50',
             )}
           >
-            <span>{isLoading ? 'Submitting...' : 'Generate My Briefing'}</span>
+            <span>{isLoading ? 'Submitting...' : 'Unlock My Roadmap'}</span>
             <DynamicIcon
               variant={isLoading ? 'refresh' : 'sparkles'}
               height={18}

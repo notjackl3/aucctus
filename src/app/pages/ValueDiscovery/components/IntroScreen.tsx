@@ -12,21 +12,21 @@ interface IntroScreenProps {
 const features = [
   {
     icon: 'message-chat-square',
-    title: 'Innovation Audit',
-    description: 'AI maps your innovation',
-    subDescription: 'workflows & processes',
+    title: 'AI Innovation Roadmap',
+    description: 'Personalized deployment',
+    subDescription: 'analysis for your business',
   },
   {
     icon: 'target-04',
-    title: 'Workflow Ratings',
-    description: 'Score each workflow for',
-    subDescription: 'AI acceleration potential',
+    title: 'Engine Recommendations',
+    description: 'Scored AI engines calibrated',
+    subDescription: 'to your innovation process',
   },
   {
     icon: 'route',
-    title: 'Actionable Roadmap',
-    description: 'Personalized plan mapped',
-    subDescription: 'to Aucctus capabilities',
+    title: 'Actionable Priorities',
+    description: 'Lowest-hanging fruit with',
+    subDescription: 'clear next steps',
   },
 ];
 
@@ -211,8 +211,8 @@ export const IntroScreen = ({ onStart, isLoading }: IntroScreenProps) => {
         transition={{ delay: 1.4, duration: 0.6 }}
         className='mt-6 max-w-md text-center text-xs text-white/30'
       >
-        Answer 5-10 adaptive questions and receive a personalized innovation AI
-        acceleration briefing
+        Answer a few quick questions and receive a personalized AI innovation
+        deployment analysis
       </motion.p>
     </div>
   );

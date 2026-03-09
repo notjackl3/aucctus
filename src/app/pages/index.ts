@@ -12,7 +12,6 @@ import IdeaSubmissions from './IdeaSubmissions';
 import InnovationPipeline from './InnovationPipeline';
 import { WatchtowerPage } from './Watchtower';
 import { CompetitorAssessmentPage } from './CompetitorAssessment';
-import { ValueDiscoveryPage } from './ValueDiscovery';
 
 const Page = {
   Auth,
@@ -28,7 +27,6 @@ const Page = {
   Testing: TestingPages,
   WatchtowerPage,
   CompetitorAssessmentPage,
-  ValueDiscoveryPage,
 };
 
 export default Page;

@@ -1,5 +1,5 @@
 // ==========================================
-// Value Discovery Types
+// Value Discovery Types (V2)
 // ==========================================
 
 // --- Question ---
@@ -16,10 +16,6 @@ export interface IQuestion {
 }
 
 // --- Start Assessment ---
-
-export interface IStartAssessmentPayload {
-  company_name: string;
-}
 
 export interface IStartAssessmentResponse {
   assessmentUuid: string;
@@ -41,49 +37,47 @@ export interface ISubmitAnswerResponse {
 export interface ILeadCapturePayload {
   lead_name: string;
   lead_email: string;
-  lead_company?: string;
   lead_role?: string;
 }
 
-// --- Briefing ---
+// --- V2 Briefing Types ---
 
-export interface IInnovationWorkflowRating {
-  workflowName: string;
-  currentScore: number;
-  aiOpportunityScore: number;
+export interface ICompanyProfile {
+  companyName: string;
+  industryTag: string;
+  estimatedRevenue: string;
+  estimatedEmployees: string;
+  innovationMaturity: string;
+  aiReadiness: string;
+}
+
+export interface IRecommendedEngine {
+  innovationStage: string;
+  engineName: string;
   description: string;
-  recommendation: string;
+  impactScore: number;
+  feasibilityScore: number;
+  strategicValueScore: number;
+  totalScore: number;
+  priorityRank: number;
 }
 
-export interface IGap {
-  area: string;
-  description: string;
-  severity: 'critical' | 'significant' | 'moderate';
-  evidence: string;
-}
-
-export interface IAucctusCapabilityMapping {
-  need: string;
-  aucctusCapability: string;
-  howItHelps: string;
-}
-
-export interface IActionableNextStep {
-  stepNumber: number;
+export interface ILowestHangingFruit {
   title: string;
+  engineName: string;
   description: string;
-  timeline: string;
+  whyNow: string;
+  titanBuildHook: string;
 }
 
 export interface IExecutiveBriefing {
-  executiveSummary: string;
-  aiReadinessScore: number;
-  innovationWorkflowRatings: IInnovationWorkflowRating[];
-  innovationBottlenecks: IGap[];
-  aucctusCapabilityMapping: IAucctusCapabilityMapping[];
-  actionableNextSteps: IActionableNextStep[];
-  keyInsight: string;
+  companyProfile?: ICompanyProfile;
+  narrativeSummary?: string;
+  recommendedEngines?: IRecommendedEngine[];
+  lowestHangingFruit?: ILowestHangingFruit;
 }
+
+// --- Briefing Response ---
 
 export interface IBriefingResponse {
   status: 'pending' | 'generating' | 'completed' | 'failed';
@@ -102,31 +96,5 @@ export interface IQuestionStatusResponse {
   status: 'waiting' | 'ready' | 'complete';
   question?: IQuestion;
   questionNumber: number;
-}
-
-// --- Assessment Detail ---
-
-export interface IResponseDetail {
-  uuid: string;
-  questionOrder: number;
-  questionText: string;
-  questionType: string;
-  questionOptions?: IQuestionOption[];
-  answerText: string;
-  answerSelections?: string[];
-}
-
-export interface IAssessmentDetail {
-  uuid: string;
-  status: string;
-  companyName: string;
-  industry: string;
-  leadName: string;
-  leadEmail: string;
-  leadCompany: string;
-  leadRole: string;
-  briefing?: IExecutiveBriefing;
-  responses: IResponseDetail[];
-  createdAt: string;
-  completedAt?: string;
+  companyRecognitionMessage?: string;
 }

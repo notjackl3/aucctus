@@ -7,7 +7,7 @@ interface ProgressBarProps {
 
 export const ProgressBar = ({
   questionNumber,
-  estimatedTotal = 8,
+  estimatedTotal = 4,
 }: ProgressBarProps) => {
   const progress = Math.min((questionNumber / estimatedTotal) * 100, 100);
 

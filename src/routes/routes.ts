@@ -45,7 +45,6 @@ export enum AppPath {
   Watchtower = '/watchtower',
 
   /* Value Discovery */
-  ValueDiscovery = '/value-discovery',
   Discover = '/discover',
 
   /* Competitor Assessment */

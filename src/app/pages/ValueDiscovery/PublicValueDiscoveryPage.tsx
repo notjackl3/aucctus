@@ -29,6 +29,7 @@ import { useQueryClient } from 'react-query';
 type Step =
   | 'intro'
   | 'calibrating'
+  | 'recognition'
   | 'questioning'
   | 'lead_capture'
   | 'generating'
@@ -50,6 +51,9 @@ const PublicValueDiscoveryPage = () => {
   const [briefing, setBriefing] = useState<IExecutiveBriefing | null>(null);
   const [captchaToken, setCaptchaToken] = useState('');
   const [isPollingQuestions, setIsPollingQuestions] = useState(false);
+  const [companyRecognitionMessage, setCompanyRecognitionMessage] =
+    useState('');
+  const [isPollingBriefing, setIsPollingBriefing] = useState(false);
 
   const turnstileRef = useRef<TurnstileInstance>(null);
   const queryClient = useQueryClient();
@@ -72,30 +76,53 @@ const PublicValueDiscoveryPage = () => {
       setIsPollingQuestions(false);
       setCurrentQuestion(questionStatus.question);
       setQuestionNumber(questionStatus.questionNumber);
-      setStep((prev) =>
-        prev === 'calibrating' || prev === 'intro' ? 'questioning' : prev,
-      );
+
+      if (
+        questionStatus.questionNumber === 1 &&
+        questionStatus.companyRecognitionMessage
+      ) {
+        setCompanyRecognitionMessage(questionStatus.companyRecognitionMessage);
+        setStep((prev) =>
+          prev === 'calibrating' || prev === 'intro' ? 'recognition' : prev,
+        );
+      } else {
+        setStep((prev) =>
+          prev === 'calibrating' || prev === 'intro' ? 'questioning' : prev,
+        );
+      }
     } else if (questionStatus.status === 'complete') {
       setIsPollingQuestions(false);
+      // Briefing is already generating on the backend, start polling for it
+      setIsPollingBriefing(true);
       setStep('lead_capture');
     }
   }, [questionStatus]);
 
-  // Poll briefing status when generating
-  const { briefingData } = usePublicBriefing(
-    assessmentUuid,
-    step === 'generating',
-  );
+  // Auto-transition from recognition to questioning after typewriter finishes + pause
+  useEffect(() => {
+    if (step !== 'recognition' || !companyRecognitionMessage) return;
+    const typewriterMs = companyRecognitionMessage.length * 25;
+    const timeout = setTimeout(
+      () => setStep('questioning'),
+      typewriterMs + 1500,
+    );
+    return () => clearTimeout(timeout);
+  }, [step, companyRecognitionMessage]);
+
+  // Poll briefing status when generating or lead_capture (briefing runs in parallel)
+  const { briefingData } = usePublicBriefing(assessmentUuid, isPollingBriefing);
 
   // Watch for briefing completion
   useEffect(() => {
-    if (
-      briefingData?.status === 'completed' &&
-      briefingData.briefing &&
-      step === 'generating'
-    ) {
+    if (briefingData?.status === 'completed' && briefingData.briefing) {
       setBriefing(briefingData.briefing);
-      setStep('results');
+      setIsPollingBriefing(false);
+
+      // If user has already submitted lead info, go straight to results
+      if (step === 'generating') {
+        setStep('results');
+      }
+      // If still on lead_capture, they'll go to results after submitting
     }
   }, [briefingData, step]);
 
@@ -130,13 +157,13 @@ const PublicValueDiscoveryPage = () => {
         delay: 5000,
         stage: 'generating',
         progress: 40,
-        message: 'Generating executive briefing...',
+        message: 'Generating your AI roadmap...',
       },
       {
         delay: 15000,
         stage: 'completing',
         progress: 70,
-        message: 'Finalizing recommendations...',
+        message: 'Scoring engine recommendations...',
       },
       {
         delay: 25000,
@@ -206,7 +233,14 @@ const PublicValueDiscoveryPage = () => {
 
     try {
       await submitLead({ assessmentUuid, data });
-      setStep('generating');
+
+      // If briefing is already complete, go straight to results
+      if (briefing) {
+        setStep('results');
+      } else {
+        // Briefing is still generating — show generating screen
+        setStep('generating');
+      }
     } catch {
       /* toast shown by mutation.onError */
     }
@@ -225,6 +259,8 @@ const PublicValueDiscoveryPage = () => {
     setBriefing(null);
     setCaptchaToken('');
     setIsPollingQuestions(false);
+    setIsPollingBriefing(false);
+    setCompanyRecognitionMessage('');
     turnstileRef.current?.reset();
   };
 
@@ -262,7 +298,7 @@ const PublicValueDiscoveryPage = () => {
             </motion.div>
           )}
 
-          {step === 'calibrating' && (
+          {(step === 'calibrating' || step === 'recognition') && (
             <motion.div
               key='calibrating'
               variants={pageVariants}
@@ -271,7 +307,11 @@ const PublicValueDiscoveryPage = () => {
               exit='exit'
               transition={{ duration: 0.3 }}
             >
-              <CalibratingScreen />
+              <CalibratingScreen
+                companyRecognitionMessage={
+                  step === 'recognition' ? companyRecognitionMessage : undefined
+                }
+              />
             </motion.div>
           )}
 

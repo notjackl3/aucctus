@@ -915,29 +915,6 @@ export class Endpoints {
     return `/api/v1/watchtower/signals/${signalUuid}/tracking`;
   }
 
-  // Value Discovery Endpoints
-  static valueDiscoveryStart = '/api/v1/value-discovery/start';
-
-  static valueDiscoveryAnswer(assessmentUuid: string) {
-    return `/api/v1/value-discovery/${assessmentUuid}/answer`;
-  }
-
-  static valueDiscoveryLead(assessmentUuid: string) {
-    return `/api/v1/value-discovery/${assessmentUuid}/lead`;
-  }
-
-  static valueDiscoveryBriefing(assessmentUuid: string) {
-    return `/api/v1/value-discovery/${assessmentUuid}/briefing`;
-  }
-
-  static valueDiscoveryBriefingExport(assessmentUuid: string) {
-    return `/api/v1/value-discovery/${assessmentUuid}/briefing/export`;
-  }
-
-  static valueDiscoveryAssessment(assessmentUuid: string) {
-    return `/api/v1/value-discovery/${assessmentUuid}`;
-  }
-
   // Value Discovery Public Endpoints (no auth required)
   static valueDiscoveryPublicStart = '/api/value-discovery/public/start';
 
