@@ -17,6 +17,7 @@ export type AllEditableConceptSections =
   | 'differentiators'
   | 'rights_to_win'
   // Trends subsections
+  | 'trends_full'
   | 'trends_analysis'
   | 'trends_key_findings'
   | 'trends_priority_insights'
@@ -29,6 +30,7 @@ export type AllEditableConceptSections =
   | 'ecosystem_v2_crowdedness'
   | 'ecosystem_v2_future_predictions'
   // Financial subsections
+  | 'financial_projection_full'
   | 'savings_method'
   | 'savings'
   | 'target_savings_areas'

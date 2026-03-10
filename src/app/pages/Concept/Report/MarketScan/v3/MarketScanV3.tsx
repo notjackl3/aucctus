@@ -80,6 +80,9 @@ const MarketScanV3: React.FC = () => {
 
   const [selectedRadarCategory, setSelectedRadarCategory] =
     useState<IMarketForceV3 | null>(null);
+  const highlightedSectionId = useStore(
+    (state) => state.overseer.highlightedSectionId,
+  );
   const [activeTab, setActiveTab] = useState<string>('trends-drivers');
 
   // Handle URL query parameter for tab selection
@@ -89,6 +92,16 @@ const MarketScanV3: React.FC = () => {
       setActiveTab(tabFromUrl);
     }
   }, [searchParams]);
+
+  // Switch to the correct sub-tab when a section is highlighted via AI editing
+  useEffect(() => {
+    if (!highlightedSectionId) return;
+    if (highlightedSectionId.startsWith('ecosystem_v2')) {
+      setActiveTab('ecosystem');
+    } else if (highlightedSectionId.startsWith('trends')) {
+      setActiveTab('trends-drivers');
+    }
+  }, [highlightedSectionId]);
 
   // Update selected categories when data is loaded
   useEffect(() => {

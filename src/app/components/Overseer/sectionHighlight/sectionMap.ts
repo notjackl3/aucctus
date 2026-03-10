@@ -39,6 +39,7 @@ const SECTION_TO_ROUTE: Record<string, AppPath> = {
   regenerate_image: AppPath.ConceptOverview,
   // Market Scan
   market_scan: AppPath.ConceptMarketScan,
+  trends_full: AppPath.ConceptMarketScan,
   trends_market_forces: AppPath.ConceptMarketScan,
   trends_priority_insights: AppPath.ConceptMarketScan,
   trends_analysis: AppPath.ConceptMarketScan,
@@ -52,6 +53,7 @@ const SECTION_TO_ROUTE: Record<string, AppPath> = {
   ecosystem_v2: AppPath.ConceptMarketScan,
   // Financial Projection
   financial_projection: AppPath.ConceptFinancialProjection,
+  financial_projection_full: AppPath.ConceptFinancialProjection,
   business_model: AppPath.ConceptFinancialProjection,
   pricing: AppPath.ConceptFinancialProjection,
   distribution_channels: AppPath.ConceptFinancialProjection,
@@ -97,6 +99,7 @@ const SECTION_FALLBACK_MAP: Record<string, string> = {
   regenerate_image: 'overview',
   overview: 'overview',
   // Trends
+  trends_full: 'market_scan',
   trends_market_forces: 'trends_market_forces',
   trends_priority_insights: 'trends_priority_insights',
   trends_analysis: 'trends_analysis',
@@ -111,6 +114,7 @@ const SECTION_FALLBACK_MAP: Record<string, string> = {
   ecosystem_v2_future_predictions: 'ecosystem_v2_future_predictions',
   ecosystem_v2: 'ecosystem_v2',
   // Financial
+  financial_projection_full: 'financial_projection',
   business_model: 'business_model',
   pricing: 'pricing',
   distribution_channels: 'distribution_channels',
