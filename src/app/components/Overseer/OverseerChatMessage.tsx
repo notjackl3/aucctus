@@ -1,11 +1,11 @@
 import { cn } from '@libs/utils/react';
-import useStore from '@stores/store';
 import {
   AgentStep,
   IOverseerAssistantMessage,
   IOverseerNavigateSuggestion,
   IOverseerUserMessage,
 } from '@stores/overseer/types';
+import useStore from '@stores/store';
 import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
 import React from 'react';

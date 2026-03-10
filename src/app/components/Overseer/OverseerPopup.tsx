@@ -1,5 +1,6 @@
 import api from '@libs/api';
 import { IAiEditingSuggestion, IConceptReportEdit } from '@libs/api/types';
+import { isAucctusAdmin } from '@libs/utils/account';
 import { cn } from '@libs/utils/react';
 import useStore from '@stores/store';
 import { MentionItem, OverseerFeature } from '@stores/overseer/types';
@@ -94,6 +95,8 @@ const OverseerPopup: React.FC = () => {
     (state) => state.overseer.suggestedQuestions,
   );
   const editSuggestions = useStore((state) => state.overseer.editSuggestions);
+  const user = useStore((state) => state.auth.user);
+  const isAdmin = useMemo(() => isAucctusAdmin(user), [user]);
   const navigateSuggestion = useStore(
     (state) => state.overseer.navigateSuggestion,
   );
@@ -1101,7 +1104,9 @@ const OverseerPopup: React.FC = () => {
 
                     {/* Feature toggle buttons (no border-t — matches Lovable) */}
                     <div className='flex items-center gap-1.5 px-4 py-2'>
-                      {FEATURE_BUTTONS.map((feat) => (
+                      {FEATURE_BUTTONS.filter(
+                        (feat) => feat.key !== 'navigate' || isAdmin,
+                      ).map((feat) => (
                         <button
                           key={feat.key}
                           onClick={() => toggleFeature(feat.key)}
