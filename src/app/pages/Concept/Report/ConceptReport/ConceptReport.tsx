@@ -27,7 +27,7 @@ import { cn } from '@libs/utils/react';
 import { FunctionComponent, useCallback, useMemo } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import ConceptReportSocketWrapper from './ConceptReportSocketWrapper';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Share2 } from 'lucide-react';
 
 const { SkeletonBlock } = ConceptReportSkeletons;
 
@@ -108,6 +108,15 @@ const ConceptReport: FunctionComponent = () => {
   const status = useMemo(() => concept?.status || 'new', [concept]);
   const { mutate: updateConcept } = useConceptUpdate();
   const { openModal, closeModal } = useModal();
+
+  const userEmail = useStore((state) => state.auth.user?.email);
+  const isMagicShareUser = useMemo(() => {
+    if (!userEmail) return false;
+    return (
+      userEmail.endsWith('@aucctus.com') ||
+      userEmail.endsWith('@disruptiveedge.com')
+    );
+  }, [userEmail]);
 
   const setActiveConcept = useStore(
     (state) => state.conceptReport.setActiveConcept,
@@ -255,6 +264,19 @@ const ConceptReport: FunctionComponent = () => {
             </div>
           )}
           <div className='flex gap-4'>
+            {concept && !concept.isHistoricalVersion && isMagicShareUser && (
+              <button
+                onClick={() =>
+                  openModal(Modal.MagicShare, {
+                    conceptUuid,
+                  })
+                }
+                className='btn btn-secondary flex items-center gap-2'
+              >
+                <Share2 size={16} />
+                Magic Share
+              </button>
+            )}
             {concept &&
               !concept.isHistoricalVersion &&
               FEATURE_CONCEPT_VERSIONING && (
