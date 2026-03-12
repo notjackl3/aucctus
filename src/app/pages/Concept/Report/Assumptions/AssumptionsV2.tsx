@@ -1,15 +1,14 @@
 import React from 'react';
 import AssumptionsTable from './AssumptionsTable';
-import { useOutletContext } from 'react-router-dom';
-import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
 import { useConceptExecutiveSummaries } from '@hooks/query/concepts.hook';
 import ExecutiveSummaryBanner from '@components/ConceptOverview/ExecutiveSummaryBanner';
 import { AssumptionCategory, IAssumptionV2 } from '@libs/api/types';
 import { AssumptionsTableSkeleton } from '@components/Skeleton/ConceptReport';
+import { useConceptReportContext } from '../ConceptReport/ConceptReportContext';
 
 const AssumptionsV2: React.FC = () => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept, isReadOnly } = useConceptReportContext();
   const [selectedCategory, setSelectedCategory] =
     React.useState<AssumptionCategory>('desirability');
 
@@ -57,6 +56,7 @@ const AssumptionsV2: React.FC = () => {
           categoryMetrics={categoryMetrics}
           selectedCategory={selectedCategory}
           onCategoryChange={handleCategoryChange}
+          isReadOnly={isReadOnly}
         />
       )}
     </div>

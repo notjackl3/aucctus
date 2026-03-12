@@ -110,6 +110,7 @@ export interface ITestDetails {
   // Note: Backend returns as 'comprehensive_recommendations' but gets auto-converted to camelCase
   comprehensiveRecommendations?: IComprehensiveEditRecommendation[];
   collateralRegenerationStatus?: ICollateralRegenerationStatus;
+  profileBasisStale?: boolean;
 }
 
 export interface ITestDetailsCreate {

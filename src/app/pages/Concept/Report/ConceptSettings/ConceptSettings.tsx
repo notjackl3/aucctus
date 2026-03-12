@@ -8,8 +8,6 @@ import {
 import { isMultiSelectQuestion } from '@libs/api/utils/typeGuards';
 import { snakeToTitleCase } from '@libs/utils/string';
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { ClarifyingQuestion } from './components/ClarifyingQuestion';
 import { IgnitionQuestion } from './components/IgnitionQuestion';
 import { IdeaPlaygroundSeedDisplay } from './components/IdeaPlaygroundSeedDisplay';
@@ -21,6 +19,7 @@ import { AppPath } from '@routes/routes';
 import utils from '@libs/utils';
 
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+import { useConceptReportContext } from '../ConceptReport/ConceptReportContext';
 
 /**
  * Parse watchtower signal description to extract structured data.
@@ -116,7 +115,7 @@ const formatAnswer = (
 };
 
 const ConceptSettings: React.FC = () => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept, isReadOnly } = useConceptReportContext();
   const { seedDraft, isLoading } = useSeed(concept.seedUuid || '');
   const navigate = useNavigate();
   const { resetQuestionnaire, setIsNewSeed } = useConceptIncubationStore();
@@ -221,17 +220,19 @@ const ConceptSettings: React.FC = () => {
       <div className='mx-0'>
         <div className='no-scrollbar mt-4 flex flex-1 flex-col gap-6'>
           {/* Clone Concept Seed Button - Always visible if seedDraft exists */}
-          {seedDraft && !(isWatchtowerSeed || isEmployeeSubmissionSeed) && (
-            <div className='flex items-center justify-end'>
-              <button
-                onClick={handleCloneConceptSeed}
-                className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-                disabled={isLoading || isCloning}
-              >
-                {isCloning ? 'Cloning...' : 'Clone Concept Seed'}
-              </button>
-            </div>
-          )}
+          {!isReadOnly &&
+            seedDraft &&
+            !(isWatchtowerSeed || isEmployeeSubmissionSeed) && (
+              <div className='flex items-center justify-end'>
+                <button
+                  onClick={handleCloneConceptSeed}
+                  className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+                  disabled={isLoading || isCloning}
+                >
+                  {isCloning ? 'Cloning...' : 'Clone Concept Seed'}
+                </button>
+              </div>
+            )}
 
           {/* Idea Playground Seed Display - Full visualization for IDEA_PLAYGROUND seeds */}
           {isIdeaPlaygroundSeed && (

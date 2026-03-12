@@ -1,15 +1,14 @@
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
 import { useGenerateFinancialProjection } from '@hooks/query/financialProjections.hook';
 import FinancialProjectionsV2 from './FinancialProjections/FinancialProjectionsV2';
 import FinancialProjectionsV1 from './FinancialProjectionsV1';
 import { VersionUpgradeBanner } from '@components';
-import { IConceptReportContext } from './ConceptReport/ConceptReport';
 import { toast } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
+import { useConceptReportContext } from './ConceptReport/ConceptReportContext';
 
 const FinancialProjectionsWrapper: React.FC = () => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept, isReadOnly } = useConceptReportContext();
   const { mutate: generateFinancialProjection, isLoading } =
     useGenerateFinancialProjection();
 
@@ -38,7 +37,7 @@ const FinancialProjectionsWrapper: React.FC = () => {
   return (
     <>
       {/* Show upgrade banner if not v2 */}
-      {!shouldRenderV2 && (
+      {!isReadOnly && !shouldRenderV2 && (
         <VersionUpgradeBanner
           onUpgrade={handleUpgrade}
           isLoading={isLoading}
@@ -47,7 +46,7 @@ const FinancialProjectionsWrapper: React.FC = () => {
       )}
 
       {/* Show debug mode banner if debug mode is enabled */}
-      {isDebugModeEnabled && (
+      {!isReadOnly && isDebugModeEnabled && (
         <VersionUpgradeBanner
           onUpgrade={handleDebugModeGenerate}
           isLoading={isLoading}

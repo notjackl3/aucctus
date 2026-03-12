@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import {
   useConceptOverview,
   useGenerateConceptOverview,
@@ -8,12 +8,12 @@ import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import OverviewDetails from './OverviewDetails';
 import { ConceptOverview } from '@components';
 import { VersionUpgradeBanner, toast } from '@components';
-import { IConceptReportContext } from './ConceptReport/ConceptReport';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 import { AppPath } from '@routes/routes';
+import { useConceptReportContext } from './ConceptReport/ConceptReportContext';
 
 const OverviewWrapper: React.FC = () => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept, isReadOnly } = useConceptReportContext();
   const { mutate: generateOverview, isLoading } = useGenerateConceptOverview();
   const [searchParams, setSearchParams] = useSearchParams();
   const hasTriggeredGeneration = useRef(false);
@@ -109,7 +109,7 @@ const OverviewWrapper: React.FC = () => {
   return (
     <>
       {/* Show upgrade banner if not v2 */}
-      {shouldRenderBanner && (
+      {!isReadOnly && shouldRenderBanner && (
         <VersionUpgradeBanner
           onUpgrade={handleUpgrade}
           isLoading={isLoading}
@@ -118,7 +118,7 @@ const OverviewWrapper: React.FC = () => {
       )}
 
       {/* Show debug mode banner if debug mode is enabled */}
-      {isDebugModeEnabled && (
+      {!isReadOnly && isDebugModeEnabled && (
         <VersionUpgradeBanner
           onUpgrade={handleDebugModeGenerate}
           isLoading={isLoading}

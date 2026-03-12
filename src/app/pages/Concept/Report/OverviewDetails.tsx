@@ -6,8 +6,7 @@ import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
 import { FunctionComponent, useMemo, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { IConceptReportContext } from './ConceptReport/ConceptReport';
+import { useConceptReportContext } from './ConceptReport/ConceptReportContext';
 
 const OverviewDetails: FunctionComponent = () => {
   const activeConceptUuid = useStore(
@@ -16,7 +15,7 @@ const OverviewDetails: FunctionComponent = () => {
 
   // Track page time for analytics
 
-  const { navigateToTab, concept } = useOutletContext<IConceptReportContext>();
+  const { navigateToTab, concept } = useConceptReportContext();
   const isDebugModeEnabled = useDebugMode();
 
   const { profiles, isLoading: isCustomerProfilesLoading } =

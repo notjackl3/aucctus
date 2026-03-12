@@ -22,10 +22,9 @@ import {
 } from '@hooks/query/concepts.hook';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 import { useSearchParams } from 'react-router-dom';
-import { useOutletContext } from 'react-router-dom';
 import { IMarketForceV3 } from '@libs/api/types/concept/marketScan';
-import { IConceptReportContext } from '../../ConceptReport/ConceptReport';
 import { Globe, TrendingUp } from 'lucide-react';
+import { useConceptReportContext } from '../../ConceptReport/ConceptReportContext';
 
 const { ExecutiveSummarySkeleton, MarketScanSkeleton, EcosystemV2Skeleton } =
   ConceptReportSkeletons;
@@ -34,7 +33,7 @@ const MarketScanV3: React.FC = () => {
   const activeConceptUuid = useStore(
     (state) => state.conceptReport.conceptUuid,
   );
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept, isReadOnly } = useConceptReportContext();
   const [searchParams] = useSearchParams();
   const isDebugModeEnabled = useDebugMode();
 
@@ -280,7 +279,7 @@ const MarketScanV3: React.FC = () => {
   return (
     <div data-section-id='market_scan' className='flex flex-1 flex-col gap-4'>
       {/* Debug mode banner - regenerates only the active section */}
-      {isDebugModeEnabled && (
+      {!isReadOnly && isDebugModeEnabled && (
         <VersionUpgradeBanner
           onUpgrade={handleDebugModeGenerate}
           isLoading={isDebugGenerating}

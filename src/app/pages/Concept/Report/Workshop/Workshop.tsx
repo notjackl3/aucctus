@@ -5,16 +5,15 @@ import type { IDynamicComponent } from '@libs/api/types/dynamicComponent.d';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import type { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { Eye, FileCode, Layers } from 'lucide-react';
+import { useConceptReportContext } from '../ConceptReport/ConceptReportContext';
 
 /**
  * Workshop page for testing dynamic component generation.
  * Allows users to generate React components from concept reports using Claude CLI.
  */
 const Workshop: React.FC = () => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept } = useConceptReportContext();
   const conceptUuid = concept?.uuid || '';
 
   const {

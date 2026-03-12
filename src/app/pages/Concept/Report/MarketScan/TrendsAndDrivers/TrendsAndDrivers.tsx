@@ -1,12 +1,11 @@
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { SkeletonBlock } from '@components/Skeleton/ConceptReport';
 import { useEditMarketScan } from '@hooks/concepts/editable.hook';
 import { useConceptMarketScan } from '@hooks/query/concepts.hook';
 import TrendAndDriverCard from '../components/TrendAndDriverCard';
 import useStore from '@stores/store';
-import { IConceptReportContext } from '../../ConceptReport/ConceptReport';
+import { useConceptReportContext } from '../../ConceptReport/ConceptReportContext';
 
 /**
  * Skeleton for TrendsAndDrivers section
@@ -38,7 +37,7 @@ const TrendsAndDriversSkeleton: React.FC = () => (
 );
 
 const TrendsAndDrivers: React.FC = () => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept } = useConceptReportContext();
   const activeConceptUuid = useStore(
     (state) => state.conceptReport.conceptUuid ?? '',
   );

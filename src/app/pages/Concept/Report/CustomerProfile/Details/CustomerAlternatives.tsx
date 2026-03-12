@@ -40,15 +40,15 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
   }
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-lg border shadow-sm'>
+    <div className='aucctus-bg-primary aucctus-border-secondary flex h-full flex-col overflow-hidden rounded-lg border shadow-sm'>
       <SectionHeader
-        icon={'clipboard' as any}
+        icon='clipboard'
         iconClass={MAIN_ICON_STROKE}
         iconBgClass='aucctus-bg-primary aucctus-border-secondary'
         title='Current Alternatives'
         noDivider={true}
       />
-      <div className='flex h-full flex-col px-4 py-2'>
+      <div className='flex min-h-0 flex-1 flex-col px-4 py-2'>
         <p className='aucctus-text-secondary aucctus-text-sm mb-6'>
           Products and solutions the customer currently uses instead of our
           offering

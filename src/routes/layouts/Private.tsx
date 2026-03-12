@@ -2,6 +2,7 @@ import AucctusSocketBootstrap from '@bootstraps/aucctusSocket.bootstrap';
 import NavDrawer from '@components/Navigation/NavDrawer/NavDrawer';
 import { FloatingSearchBar } from '@components/Overseer/FloatingSearchBar';
 import { OverseerProvider } from '@context/OverseerProvider';
+import { useAccountBranding } from '@hooks/query/accountBranding.hook';
 import { useConcepts } from '@hooks/query/concepts.hook';
 import { usePersonas } from '@hooks/query/persona.hook';
 import { useOverseerRouteConfig } from '@hooks/useOverseerRouteConfig';
@@ -56,6 +57,9 @@ const PrivateLayout = () => {
     location.pathname !== '/playground' &&
     !location.pathname.startsWith('/concept/incubate') &&
     !isOpen;
+
+  // Fetch branding for floating search bar orb colors
+  const { branding } = useAccountBranding();
 
   // Fetch concepts for @mention menu in the floating search bar
   const { data: conceptPage } = useConcepts({
@@ -145,6 +149,7 @@ const PrivateLayout = () => {
           rightOffset={dockWidth}
           conceptItems={conceptItems}
           personaItems={personaItems}
+          brandColors={branding?.colors}
         />
       </div>
     </AucctusSocketBootstrap>

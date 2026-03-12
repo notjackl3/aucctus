@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConceptReportContext } from '@pages/Concept/Report/ConceptReport/ConceptReportContext';
 import { executiveDashboardUIText } from './config';
 import ProgressBar from './ProgressBar';
 import { CircleDollarSign, Globe } from 'lucide-react';
@@ -41,6 +42,23 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
   isLoadingFinancial,
 }) => {
   const navigate = useNavigate();
+  const { isReadOnly, navigateToTab } = useConceptReportContext();
+
+  const handleDetailsClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (isReadOnly) {
+        navigateToTab('financial');
+      } else {
+        navigate(
+          isCostSavings
+            ? `/concept/${conceptId}/financial-projection?tab=impact-sizing`
+            : `/concept/${conceptId}/financial-projection?tab=market-sizing`,
+        );
+      }
+    },
+    [navigate, conceptId, isCostSavings, isReadOnly, navigateToTab],
+  );
 
   return (
     <div className='aucctus-bg-primary aucctus-border-secondary h-full min-h-[350px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
@@ -67,13 +85,7 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
             </h3>
           </div>
           <button
-            onClick={() =>
-              navigate(
-                isCostSavings
-                  ? `/concept/${conceptId}/financial-projection?tab=impact-sizing`
-                  : `/concept/${conceptId}/financial-projection?tab=market-sizing`,
-              )
-            }
+            onClick={handleDetailsClick}
             className='aucctus-bg-primary-hover aucctus-text-sm-medium aucctus-text-secondary-hover rounded-lg px-3 py-1.5'
           >
             {isCostSavings

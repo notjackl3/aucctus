@@ -1,4 +1,4 @@
-import { Badge, ConceptReportSkeletons } from '@components';
+import { ConceptReportSkeletons } from '@components';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
 import {
@@ -7,8 +7,6 @@ import {
   useConceptMarketScan,
   useConceptOverview,
   useMarketScanMarketForcesV3,
-  useUploadConceptCustomImage,
-  useUpdateConceptImageSettings,
 } from '@hooks/query/concepts.hook';
 import { useFinancialProjectionV2 } from '@hooks/query/financialProjections.hook';
 import {
@@ -19,14 +17,11 @@ import { AppPath } from '@routes/routes';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { EXECUTIVE_DASHBOARD_CONFIG, executiveDashboardUIText } from './config';
 
-import images from '@assets/img';
 import BusinessModelCard from './BusinessModelCard';
 import CustomerProfilesCard from './CustomerProfilesCard';
 import DifferentiatorsCard from './DifferentiatorsCard';
 import EcosystemCard from './EcosystemCard';
 import GutCheckBanner from './GutCheckBanner';
-import ImageUploadButton from './ImageUploadButton';
-import ImageToggleControls from './ImageToggleControls';
 import InfoSectionCard from './InfoSectionCard';
 import KeyAssumptionsCard from './KeyAssumptionsCard';
 import MarketSizeCard from './MarketSizeCard';
@@ -50,10 +45,6 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-
-  // Image upload and settings mutations
-  const uploadMutation = useUploadConceptCustomImage(conceptUuid || '');
-  const updateSettings = useUpdateConceptImageSettings(conceptUuid || '');
 
   // Centralized data fetching - load all data for the cards
   const { conceptOverview, isLoading: isLoadingOverview } =
@@ -211,113 +202,8 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     setProgress(0);
   }, []);
 
-  const handleRevertToAI = useCallback(() => {
-    updateSettings.mutate({
-      useCustomImage: false,
-      customImageUrl: undefined,
-    });
-  }, [updateSettings]);
-
-  // Build card renderers array — conditionally exclude Business Model for cost-savings
-  const cardRenderers = useMemo(() => {
-    const cards: ((commonProps: {
-      currentCardIndex: number;
-      progress: number;
-      totalCards: number;
-      onCardClick: (index: number) => void;
-    }) => React.ReactNode)[] = [
-      (props) => (
-        <MarketSizeCard
-          {...props}
-          conceptId={conceptId}
-          marketSizeData={marketSizeData}
-          impactSizeData={impactSizeData}
-          isCostSavings={isCostSavings}
-          isLoadingFinancial={isLoadingFinancial}
-        />
-      ),
-      (props) => (
-        <TrendsDriversCard
-          {...props}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-          marketForces={marketForces}
-          isLoadingMarketForces={isLoadingMarketForces}
-          executiveSummary={executiveSummaries?.marketScanTrendsDrivers}
-        />
-      ),
-      (props) => (
-        <EcosystemCard
-          {...props}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-          marketScan={marketScan}
-          isLoadingMarketScan={isLoadingMarketScan}
-          executiveSummary={executiveSummaries?.marketScanEcosystem}
-          concept={concept}
-        />
-      ),
-    ];
-
-    // Only include Business Model card for revenue concepts
-    if (!isCostSavings) {
-      cards.push((props) => (
-        <BusinessModelCard
-          {...props}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-          financialProjectionV2={financialProjectionV2}
-          isLoadingFinancial={isLoadingFinancial}
-          executiveSummary={executiveSummaries?.financialBusinessModel}
-        />
-      ));
-    }
-
-    cards.push(
-      (props) => (
-        <CustomerProfilesCard
-          {...props}
-          conceptUuid={conceptUuid}
-          conceptId={conceptId}
-          customerProfiles={customerProfiles}
-          isLoadingCustomerProfiles={isLoadingCustomerProfiles}
-          executiveSummary={executiveSummaries?.customerProfiles}
-        />
-      ),
-      (props) => (
-        <KeyAssumptionsCard
-          {...props}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-          categoryMetrics={assumptionsCategoryMetrics}
-          isLoadingAssumptions={isLoadingAssumptions}
-          executiveSummary={executiveSummaries?.keyAssumptions}
-        />
-      ),
-    );
-
-    return cards;
-  }, [
-    isCostSavings,
-    conceptId,
-    conceptUuid,
-    marketSizeData,
-    impactSizeData,
-    isLoadingFinancial,
-    marketForces,
-    isLoadingMarketForces,
-    executiveSummaries,
-    marketScan,
-    isLoadingMarketScan,
-    concept,
-    financialProjectionV2,
-    customerProfiles,
-    isLoadingCustomerProfiles,
-    assumptionsCategoryMetrics,
-    isLoadingAssumptions,
-  ]);
-
-  const totalCards = cardRenderers.length;
+  // Total number of cards (cost-savings concepts skip BusinessModelCard)
+  const totalCards = useMemo(() => (isCostSavings ? 5 : 6), [isCostSavings]);
 
   // Auto-progression logic
   useEffect(() => {
@@ -347,7 +233,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
 
     return () => clearInterval(progressTimer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAutoPlaying, totalCards]); // Intentionally exclude currentCardIndex to avoid restarting timer
+  }, [isAutoPlaying, totalCards, isCostSavings]); // Intentionally exclude currentCardIndex to avoid restarting timer
 
   // Render current card based on index
   const renderCurrentCard = () => {
@@ -358,8 +244,104 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
       onCardClick: handleCardClick,
     };
 
-    const renderer = cardRenderers[currentCardIndex];
-    return renderer ? renderer(commonProps) : null;
+    switch (currentCardIndex) {
+      case 0:
+        return (
+          <MarketSizeCard
+            {...commonProps}
+            conceptId={conceptId}
+            marketSizeData={marketSizeData}
+            impactSizeData={impactSizeData}
+            isCostSavings={isCostSavings}
+            isLoadingFinancial={isLoadingFinancial}
+          />
+        );
+      case 1:
+        return (
+          <TrendsDriversCard
+            {...commonProps}
+            conceptId={conceptId}
+            conceptUuid={conceptUuid}
+            marketForces={marketForces}
+            isLoadingMarketForces={isLoadingMarketForces}
+            executiveSummary={executiveSummaries?.marketScanTrendsDrivers}
+          />
+        );
+      case 2:
+        return (
+          <EcosystemCard
+            {...commonProps}
+            conceptId={conceptId}
+            conceptUuid={conceptUuid}
+            marketScan={marketScan}
+            isLoadingMarketScan={isLoadingMarketScan}
+            executiveSummary={executiveSummaries?.marketScanEcosystem}
+            concept={concept}
+          />
+        );
+      case 3:
+        if (isCostSavings) {
+          return (
+            <CustomerProfilesCard
+              {...commonProps}
+              conceptUuid={conceptUuid}
+              conceptId={conceptId}
+              customerProfiles={customerProfiles}
+              isLoadingCustomerProfiles={isLoadingCustomerProfiles}
+              executiveSummary={executiveSummaries?.customerProfiles}
+            />
+          );
+        }
+        return (
+          <BusinessModelCard
+            {...commonProps}
+            conceptId={conceptId}
+            conceptUuid={conceptUuid}
+            financialProjectionV2={financialProjectionV2}
+            isLoadingFinancial={isLoadingFinancial}
+            executiveSummary={executiveSummaries?.financialBusinessModel}
+          />
+        );
+      case 4:
+        if (isCostSavings) {
+          return (
+            <KeyAssumptionsCard
+              {...commonProps}
+              conceptId={conceptId}
+              conceptUuid={conceptUuid}
+              categoryMetrics={assumptionsCategoryMetrics}
+              isLoadingAssumptions={isLoadingAssumptions}
+              executiveSummary={executiveSummaries?.keyAssumptions}
+            />
+          );
+        }
+        return (
+          <CustomerProfilesCard
+            {...commonProps}
+            conceptUuid={conceptUuid}
+            conceptId={conceptId}
+            customerProfiles={customerProfiles}
+            isLoadingCustomerProfiles={isLoadingCustomerProfiles}
+            executiveSummary={executiveSummaries?.customerProfiles}
+          />
+        );
+      case 5:
+        if (!isCostSavings) {
+          return (
+            <KeyAssumptionsCard
+              {...commonProps}
+              conceptId={conceptId}
+              conceptUuid={conceptUuid}
+              categoryMetrics={assumptionsCategoryMetrics}
+              isLoadingAssumptions={isLoadingAssumptions}
+              executiveSummary={executiveSummaries?.keyAssumptions}
+            />
+          );
+        }
+        return null;
+      default:
+        return null;
+    }
   };
 
   // Show skeleton loading state while fetching data or when section is pending
@@ -381,90 +363,41 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         />
       </div>
 
-      {/* Hero Section with Concept Image and Value Prop */}
-      <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
-        {/* Left - Concept Image */}
-        <div className='flex items-start justify-center'>
-          <div className='aucctus-border-primary relative h-[420px] w-full overflow-hidden rounded-xl border shadow-lg'>
-            {/* Gradient overlay */}
-            <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent' />
-
-            {/* Concept image */}
-            <img
-              src={
-                conceptOverview?.useCustomImage &&
-                conceptOverview?.customImageUrl
-                  ? conceptOverview.customImageUrl
-                  : conceptOverview?.conceptImageUrl ||
-                    images.aiExplorationsBackground
-              }
-              alt={executiveDashboardUIText.conceptVisualization.altText}
-              className='relative z-10 h-full w-full object-cover'
-              loading='eager'
-            />
-
-            {/* Image controls overlay */}
-            <div className='absolute right-4 top-4 z-20'>
-              <div className='flex flex-col gap-2'>
-                <ImageUploadButton
-                  conceptUuid={conceptUuid || ''}
-                  isCustomActive={!!conceptOverview?.customImageUrl}
-                  uploadMutation={uploadMutation}
-                />
-                {conceptOverview?.useCustomImage &&
-                  conceptOverview?.customImageUrl && (
-                    <ImageToggleControls
-                      isReverting={updateSettings.isLoading}
-                      onRevertToAI={handleRevertToAI}
-                    />
-                  )}
-              </div>
-            </div>
-
-            {/* Badge */}
-            <div className='absolute bottom-4 left-4 right-4 z-20'>
-              <Badge.Default
-                value={executiveDashboardUIText.conceptVisualization.badgeText}
-                classNameBadge='aucctus-bg-primary aucctus-text-primary aucctus-border-primary'
-              />
-            </div>
-          </div>
+      {/* Info Cards — 3-column inline row */}
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
+        <div data-section-id='concept_value_proposition' className='h-full'>
+          <InfoSectionCard
+            iconVariant='target'
+            title={executiveDashboardUIText.sections.valueProposition}
+            content={
+              conceptOverview?.valueProposition ||
+              'No value proposition available'
+            }
+            className='aucctus-bg-primary'
+          />
         </div>
 
-        {/* Right - What is it, Value Proposition and Problem Statement */}
-        <div className='space-y-6'>
-          <div data-section-id='concept_overview'>
-            <InfoSectionCard
-              iconVariant='lightbulb'
-              title={executiveDashboardUIText.sections.whatIsIt}
-              content={
-                conceptOverview?.whatIsThis ||
-                'No product description available'
-              }
-            />
-          </div>
+        <div data-section-id='concept_problem_statement' className='h-full'>
+          <InfoSectionCard
+            iconVariant='alert-triangle'
+            title={executiveDashboardUIText.sections.problemStatement}
+            content={
+              conceptOverview?.problemStatement ||
+              'No problem statement available'
+            }
+            className='aucctus-bg-primary'
+          />
+        </div>
 
-          <div data-section-id='concept_value_proposition'>
-            <InfoSectionCard
-              iconVariant='target'
-              title={executiveDashboardUIText.sections.valueProposition}
-              content={
-                conceptOverview?.valueProposition ||
-                'No value proposition available'
-              }
-            />
-          </div>
-
-          <div data-section-id='concept_problem_statement'>
-            <InfoSectionCard
-              iconVariant='alert-triangle'
-              title={executiveDashboardUIText.sections.problemStatement}
-              content={
-                conceptOverview?.problemStatement ||
-                'No problem statement available'
-              }
-            />
-          </div>
+        <div data-section-id='concept_overview' className='h-full'>
+          <InfoSectionCard
+            iconVariant='lightbulb'
+            title={executiveDashboardUIText.sections.whatIsIt}
+            content={
+              conceptOverview?.whatIsThis || 'No product description available'
+            }
+            className='aucctus-bg-primary'
+          />
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import telemetry from '@libs/telemetry';
 import PriorityIndicator from './components/PriorityIndicator';
 import SectionHeader from './components/SectionHeader';
 import { Plus } from 'lucide-react';
+import { useConceptReportContext } from '../../ConceptReport/ConceptReportContext';
 
 export interface Pain {
   text: string;
@@ -32,6 +33,7 @@ const PainPoints: React.FC<PainPointsProps> = ({
   customerProfileUuid,
   pains: initialPains,
 }) => {
+  const { isReadOnly } = useConceptReportContext();
   const [isAdding, setIsAdding] = useState(false);
 
   const painsQuery = useCustomerPainsList(customerProfileUuid || '');
@@ -106,7 +108,7 @@ const PainPoints: React.FC<PainPointsProps> = ({
   const handleAddComplete = React.useCallback(() => setIsAdding(false), []);
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-lg border shadow-sm'>
+    <div className='aucctus-bg-primary aucctus-border-secondary flex h-full flex-col overflow-hidden rounded-lg border shadow-sm'>
       <SectionHeader
         icon='alert-circle'
         iconClass={PRIORITY_COLOR_ICON}
@@ -114,18 +116,20 @@ const PainPoints: React.FC<PainPointsProps> = ({
         title='Pain Points'
         noDivider={true}
         rightAction={
-          <button
-            className='aucctus-bg-secondary-hover flex items-center justify-center rounded-full p-2 transition-colors disabled:opacity-50'
-            aria-label='Add pain point'
-            onClick={handleStartAdding}
-            disabled={isAdding}
-          >
-            <Plus />
-          </button>
+          !isReadOnly ? (
+            <button
+              className='aucctus-bg-secondary-hover flex items-center justify-center rounded-full p-2 transition-colors disabled:opacity-50'
+              aria-label='Add pain point'
+              onClick={handleStartAdding}
+              disabled={isAdding}
+            >
+              <Plus />
+            </button>
+          ) : undefined
         }
       />
 
-      <div className='px-4 py-2'>
+      <div className='min-h-0 flex-1 px-4 py-2'>
         <p className='aucctus-text-secondary aucctus-text-sm mb-6'>
           Issues and challenges affecting your customer
         </p>
@@ -152,6 +156,7 @@ const PainPoints: React.FC<PainPointsProps> = ({
               iconColorClass={PRIORITY_COLOR_ICON}
               iconBgClass={PRIORITY_COLOR_ICON_BG}
               iconSize='md'
+              isReadOnly={isReadOnly}
             />
           </div>
         </div>

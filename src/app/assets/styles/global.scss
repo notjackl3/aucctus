@@ -1158,3 +1158,109 @@ select:focus {
 .Toastify__close-button {
   display: none !important;
 }
+
+/* ============================================
+   CONCEPT NAV BAR — Slim frosted pill
+   ============================================ */
+.concept-nav-bar {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid hsl(var(--border) / 0.2);
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.dark .concept-nav-bar {
+  background: hsl(var(--muted) / 0.3);
+  border: 1px solid hsl(var(--border) / 0.4);
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.concept-nav-indicator {
+  overflow: hidden;
+  background: transparent;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Gradient border layer — softened with blur */
+.concept-nav-indicator::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    var(--nav-brand-1, hsla(152, 100%, 33%, 0.35)) 0%,
+    var(--nav-brand-2, hsla(75, 75%, 43%, 0.3)) 35%,
+    var(--nav-brand-3, hsla(27, 94%, 55%, 0.3)) 70%,
+    var(--nav-brand-4, hsla(152, 80%, 40%, 0.25)) 100%
+  );
+  filter: blur(1.5px);
+  z-index: 0;
+}
+
+/* White fill with soft brand-tinted inner shadow */
+.concept-nav-indicator::after {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  border-radius: calc(var(--radius) - 1.5px);
+  background: rgba(255, 255, 255, 0.93);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow:
+    inset 0 2px 6px var(--nav-brand-4, hsla(152, 80%, 40%, 0.08)),
+    inset 0 -2px 6px var(--nav-brand-3, hsla(27, 94%, 55%, 0.06)),
+    inset 3px 0 8px var(--nav-brand-2, hsla(75, 75%, 43%, 0.05)),
+    inset -3px 0 8px var(--nav-brand-1, hsla(152, 100%, 33%, 0.05));
+  z-index: 0;
+}
+
+.dark .concept-nav-indicator {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.dark .concept-nav-indicator::before {
+  background: linear-gradient(
+    135deg,
+    var(--nav-brand-1, hsla(152, 100%, 33%, 0.25)) 0%,
+    var(--nav-brand-2, hsla(75, 75%, 43%, 0.2)) 35%,
+    var(--nav-brand-3, hsla(27, 94%, 55%, 0.2)) 70%,
+    var(--nav-brand-4, hsla(152, 80%, 40%, 0.15)) 100%
+  );
+}
+
+.dark .concept-nav-indicator::after {
+  background: rgba(20, 20, 25, 0.9);
+  box-shadow:
+    inset 0 2px 6px var(--nav-brand-4, hsla(152, 80%, 40%, 0.06)),
+    inset 0 -2px 6px var(--nav-brand-3, hsla(27, 94%, 55%, 0.04)),
+    inset 3px 0 8px var(--nav-brand-2, hsla(75, 75%, 43%, 0.04)),
+    inset -3px 0 8px var(--nav-brand-1, hsla(152, 100%, 33%, 0.04));
+}
+
+/* Hide orbs — no longer used */
+.concept-nav-orb {
+  display: none;
+}
+
+/* Sticky concept nav banner */
+.sticky-concept-nav {
+  background: hsla(0, 0%, 100%, 0.82);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border: 1px solid hsla(220, 13%, 91%, 0.6);
+  box-shadow: 0 2px 12px hsla(0, 0%, 0%, 0.06), 0 4px 16px hsla(0, 0%, 0%, 0.03);
+}
+
+.dark .sticky-concept-nav {
+  background: hsla(220, 13%, 9%, 0.85);
+  border-color: hsla(220, 13%, 20%, 0.4);
+}

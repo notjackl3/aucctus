@@ -1,103 +1,162 @@
-import {
-  Container,
-  Loading,
-  Modal,
-  Select,
-  ConceptReportSkeletons,
-} from '@components';
-import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
+import { ConceptReportSkeletons, Loading, Modal, toast } from '@components';
+import ConceptVersionsDropdown from '@components/Button/Dropdown/ConceptVersionsDropdown';
+import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
+import ConceptHero from '@components/ConceptReport/ConceptHero';
+import type { ConceptTab } from '@components/ConceptReport/ConceptNavigation';
+import ConceptNavigation from '@components/ConceptReport/ConceptNavigation';
+import StickyConceptNav from '@components/ConceptReport/StickyConceptNav';
+import { useModal } from '@context/ModalContextProvider';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
+import { useAccountBranding } from '@hooks/query/accountBranding.hook';
 import {
   useCancelConceptVersionRevert,
   useCommitConceptVersionRevert,
   useConcept,
-  useConceptUpdate,
+  useConceptOverview,
   useTrackConceptView,
+  useUpdateConceptImageSettings,
+  useUploadConceptCustomImage,
 } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
-import { useEffect, useRef } from 'react';
-import { ConceptStatus, IConcept } from '@libs/api/types';
+import { hexToHsla } from '@libs/utils/color';
+import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
-import { toast } from '@components';
-import ConceptVersionsButton from '@components/Button/ConceptVersionsButton';
-import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
-import { useModal } from '@context/ModalContextProvider';
-import { cn } from '@libs/utils/react';
-import { FunctionComponent, useCallback, useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  AlertTriangle,
+  BarChart3,
+  BookOpen,
+  ClockArrowDown,
+  DollarSign,
+  FlaskConical,
+  Globe,
+  Settings,
+  Share2,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
+import {
+  ConceptReportContext,
+  type IConceptReportContext,
+} from './ConceptReportContext';
 import ConceptReportSocketWrapper from './ConceptReportSocketWrapper';
-import { AlertTriangle, Share2 } from 'lucide-react';
+import ShareReportDialog from './ShareReportDialog';
 
 const { SkeletonBlock } = ConceptReportSkeletons;
 
-export interface IConceptReportContext {
-  navigateToTab: (tab: string) => void;
-  concept: IConcept;
-}
+export type { IConceptReportContext };
 
-type TabTitles =
+type TabKey =
   | 'OVERVIEW'
-  | 'MARKET SCAN'
-  | 'FINANCIAL PROJECTION'
-  | 'CUSTOMER PROFILE'
+  | 'TRENDS'
+  | 'ECOSYSTEM'
+  | 'FINANCIAL'
+  | 'CUSTOMERS'
   | 'ASSUMPTIONS'
-  | 'WORKSHOP'
-  | 'CONTEXT'
   | 'TESTING';
 
 // Map tab labels to section keys in reportStatusBySection
-const TAB_TO_SECTION_MAP: Partial<Record<TabTitles, string>> = {
+const TAB_TO_SECTION_MAP: Partial<Record<TabKey, string>> = {
   OVERVIEW: 'overview',
-  'MARKET SCAN': 'ecosystem',
-  'FINANCIAL PROJECTION': 'financialProjection',
-  'CUSTOMER PROFILE': 'customerProfiles',
+  TRENDS: 'trends',
+  ECOSYSTEM: 'ecosystem',
+  FINANCIAL: 'financialProjection',
+  CUSTOMERS: 'customerProfiles',
   ASSUMPTIONS: 'assumptions',
 };
 
-// Base tabs - Testing will be added dynamically based on concept version
-const CONCEPT_TABS: { label: TabTitles; value: AppPath; icon: string }[] = [
+// Base tabs with icons
+const CONCEPT_TABS: {
+  label: string;
+  value: AppPath;
+  icon: React.FC<{ className?: string }>;
+  tabKey?: TabKey;
+}[] = [
   {
     label: 'OVERVIEW',
     value: AppPath.ConceptOverview,
-    icon: 'presentation-chart',
+    icon: BarChart3,
+    tabKey: 'OVERVIEW',
   },
   {
-    label: 'MARKET SCAN',
-    value: AppPath.ConceptMarketScan,
-    icon: 'search-md',
+    label: 'TRENDS',
+    value: AppPath.ConceptTrends,
+    icon: TrendingUp,
+    tabKey: 'TRENDS',
   },
   {
-    label: 'FINANCIAL PROJECTION',
+    label: 'ECOSYSTEM',
+    value: AppPath.ConceptEcosystem,
+    icon: Globe,
+    tabKey: 'ECOSYSTEM',
+  },
+  {
+    label: 'FINANCIAL',
     value: AppPath.ConceptFinancialProjection,
-    icon: 'trendup',
+    icon: DollarSign,
+    tabKey: 'FINANCIAL',
   },
   {
-    label: 'CUSTOMER PROFILE',
+    label: 'CUSTOMERS',
     value: AppPath.ConceptCustomerProfile,
-    icon: 'users-03',
+    icon: Users,
+    tabKey: 'CUSTOMERS',
   },
   {
     label: 'ASSUMPTIONS',
     value: AppPath.ConceptKeyAssumptions,
-    icon: 'book-open',
+    icon: BookOpen,
+    tabKey: 'ASSUMPTIONS',
   },
-  // TODO: Re-activate Workshop tab when ready
-  // {
-  //   label: 'WORKSHOP',
-  //   value: AppPath.ConceptWorkshop,
-  //   icon: 'filecode',
-  // },
-  { label: 'CONTEXT', value: AppPath.ConceptSettings, icon: 'globe' },
 ];
 
-const ConceptReport: FunctionComponent = () => {
+interface ConceptReportProps {
+  isReadOnly?: boolean;
+}
+
+const ConceptReport: FunctionComponent<ConceptReportProps> = ({
+  isReadOnly = false,
+}) => {
   const { id: conceptIdentifier } = useParams();
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
   const { title: titleEdit } = useEditConcept();
   const { mutate: trackConceptView } = useTrackConceptView();
   const hasTrackedView = useRef(false);
+  const navSentinelRef = useRef<HTMLDivElement>(null);
+
+  const [showVersions, setShowVersions] = useState(false);
+  const [versionsDropdownPos, setVersionsDropdownPos] = useState({
+    top: 0,
+    right: 0,
+  });
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const versionsRef = useRef<HTMLDivElement>(null);
+  const versionsHideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { branding } = useAccountBranding();
+
+  const navBrandStyles = useMemo(() => {
+    const colors = branding?.colors;
+    if (!colors || Object.keys(colors).length === 0) return undefined;
+    const values = Object.values(colors);
+    return {
+      '--nav-brand-1': values[0] ? hexToHsla(values[0], 0.35) : undefined,
+      '--nav-brand-2': values[1] ? hexToHsla(values[1], 0.3) : undefined,
+      '--nav-brand-3': values[2] ? hexToHsla(values[2], 0.3) : undefined,
+      '--nav-brand-4': values[3] ? hexToHsla(values[3], 0.25) : undefined,
+    } as React.CSSProperties;
+  }, [branding?.colors]);
 
   const {
     concept,
@@ -105,18 +164,14 @@ const ConceptReport: FunctionComponent = () => {
     isFetching: isConceptFetching,
   } = useConcept(conceptIdentifier);
   const conceptUuid = useMemo(() => concept?.uuid || '', [concept]);
-  const status = useMemo(() => concept?.status || 'new', [concept]);
-  const { mutate: updateConcept } = useConceptUpdate();
   const { openModal, closeModal } = useModal();
 
-  const userEmail = useStore((state) => state.auth.user?.email);
-  const isMagicShareUser = useMemo(() => {
-    if (!userEmail) return false;
-    return (
-      userEmail.endsWith('@aucctus.com') ||
-      userEmail.endsWith('@disruptiveedge.com')
-    );
-  }, [userEmail]);
+  // Fetch concept overview for the hero image and description
+  const { conceptOverview } = useConceptOverview(conceptUuid || undefined);
+
+  // Image upload mutations
+  const uploadMutation = useUploadConceptCustomImage(conceptUuid);
+  const updateSettings = useUpdateConceptImageSettings(conceptUuid);
 
   const setActiveConcept = useStore(
     (state) => state.conceptReport.setActiveConcept,
@@ -129,42 +184,113 @@ const ConceptReport: FunctionComponent = () => {
   const { mutate: cancelConceptVersionRevert, isLoading: isCancelling } =
     useCancelConceptVersionRevert();
 
-  // Build tabs dynamically based on concept feature version
+  const handleRevertToAI = useCallback(() => {
+    updateSettings.mutate({
+      useCustomImage: false,
+      customImageUrl: undefined,
+    });
+  }, [updateSettings]);
+
+  // Resolve concept image
+  const conceptImageUrl = useMemo(() => {
+    if (conceptOverview?.useCustomImage && conceptOverview?.customImageUrl) {
+      return conceptOverview.customImageUrl;
+    }
+    return conceptOverview?.conceptImageUrl || concept?.conceptImageUrl;
+  }, [conceptOverview, concept]);
+
+  // Preload hero image so the browser fetches it before ConceptHero mounts
+  useEffect(() => {
+    if (!conceptImageUrl) return;
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = conceptImageUrl;
+    document.head.appendChild(link);
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, [conceptImageUrl]);
+
+  // Hero description
+  const heroDescription = useMemo(
+    () => conceptOverview?.whatIsThis || concept?.summary || '',
+    [conceptOverview, concept],
+  );
+
+  // Build tabs dynamically
   const conceptTabs = useMemo(() => {
-    const tabs = [...CONCEPT_TABS];
+    const tabs: {
+      label: string;
+      value: string;
+      icon: React.FC<{ className?: string }>;
+      tabKey?: TabKey;
+      onAction?: (e: React.MouseEvent) => void;
+    }[] = [...CONCEPT_TABS];
 
     // Add Testing tab if concept has assumptions v2
     if (concept?.featureVersions?.assumptions === 'v2') {
-      const contextIndex = tabs.findIndex((tab) => tab.label === 'CONTEXT');
-      tabs.splice(contextIndex, 0, {
+      tabs.push({
         label: 'TESTING',
         value: AppPath.ConceptTesting,
-        icon: 'beaker',
+        icon: FlaskConical,
+        tabKey: 'TESTING',
       });
     }
 
-    // Filter out Context tab if concept doesn't have seed
-    const filteredTabs = tabs.filter(
-      (v) => !(v.label === 'CONTEXT' && !concept?.hasSeed),
-    );
+    // Add Versioning tab (icon only) if feature enabled and not historical
+    if (FEATURE_CONCEPT_VERSIONING && !concept?.isHistoricalVersion) {
+      tabs.push({
+        label: '',
+        value: 'versions',
+        icon: ClockArrowDown,
+        onAction: (e: React.MouseEvent) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          setVersionsDropdownPos({
+            top: rect.bottom + 10,
+            right: window.innerWidth - rect.right,
+          });
+          setShowVersions((v) => !v);
+        },
+      });
+    }
+
+    // Add Share tab (icon only)
+    tabs.push({
+      label: '',
+      value: 'share',
+      icon: Share2,
+      onAction: () => setShowShareDialog(true),
+    });
+
+    // Add Settings tab (icon only, no label) if concept has seed
+    if (concept?.hasSeed) {
+      tabs.push({
+        label: '',
+        value: AppPath.ConceptSettings,
+        icon: Settings,
+      });
+    }
 
     // Add isLoading state based on section status
-    return filteredTabs.map((tab) => {
-      const sectionKey = TAB_TO_SECTION_MAP[tab.label];
+    return tabs.map((tab) => {
+      const sectionKey = tab.tabKey
+        ? TAB_TO_SECTION_MAP[tab.tabKey]
+        : undefined;
       const sectionStatus = sectionKey
         ? concept?.reportStatusBySection?.[sectionKey]?.status
         : undefined;
-      // Tab is loading if section is pending
       const isLoading = sectionStatus === 'pending';
 
       return {
         ...tab,
         isLoading,
-      };
+      } as ConceptTab;
     });
   }, [
     concept?.featureVersions?.assumptions,
     concept?.hasSeed,
+    concept?.isHistoricalVersion,
     concept?.reportStatusBySection,
   ]);
 
@@ -174,8 +300,6 @@ const ConceptReport: FunctionComponent = () => {
     }
   }, [concept, setActiveConcept]);
 
-  // Clear active concept UUID when leaving the concept report page
-  // This ensures workflow_completed toasts show for any concept, not just the last viewed one
   useEffect(() => {
     return () => {
       setConceptUuid(undefined);
@@ -198,19 +322,44 @@ const ConceptReport: FunctionComponent = () => {
     [conceptIdentifier, navigate],
   );
 
-  const changeConceptStatus = useCallback(
-    (value: string) => {
-      if (!conceptIdentifier) return;
-      updateConcept({
-        identifier: conceptIdentifier,
-        status: value as ConceptStatus,
-      });
-    },
-    [updateConcept, conceptIdentifier],
-  );
+  // Close versions dropdown on click outside
+  useEffect(() => {
+    if (!showVersions) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        versionsRef.current &&
+        !versionsRef.current.contains(event.target as Node)
+      ) {
+        setShowVersions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showVersions]);
+
+  // Auto-hide versions dropdown after 3s of mouse not hovering
+  const startVersionsHideTimer = useCallback(() => {
+    versionsHideTimer.current = setTimeout(() => setShowVersions(false), 2000);
+  }, []);
+
+  const clearVersionsHideTimer = useCallback(() => {
+    if (versionsHideTimer.current) {
+      clearTimeout(versionsHideTimer.current);
+      versionsHideTimer.current = null;
+    }
+  }, []);
+
+  // Start timer when dropdown opens, clean up on unmount/close
+  useEffect(() => {
+    if (showVersions) {
+      startVersionsHideTimer();
+    } else {
+      clearVersionsHideTimer();
+    }
+    return clearVersionsHideTimer;
+  }, [showVersions, startVersionsHideTimer, clearVersionsHideTimer]);
 
   // Show toast and redirect if concept not found
-  // Only redirect when query is idle (not loading/fetching) and no concept exists
   const shouldRedirect = !concept && !isConceptLoading && !isConceptFetching;
   useEffect(() => {
     if (shouldRedirect) {
@@ -225,81 +374,108 @@ const ConceptReport: FunctionComponent = () => {
   return (
     <>
       <ConceptReportSocketWrapper />
-      <div className={cn('mx-auto my-0 flex min-h-full w-full flex-col p-8')}>
-        <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
-          {/* Title and Status Section */}
-          {isConceptLoading || isConceptFetching ? (
-            <div className='aucctus-bg-secondary flex flex-row items-center justify-start gap-4 rounded-lg p-4'>
-              {/* Title Skeleton - matches text-3xl height */}
-              <SkeletonBlock className='h-9 w-80' />
-              {/* Status Dropdown Skeleton */}
-              <SkeletonBlock className='h-10 w-32 rounded' />
+      <ShareReportDialog
+        conceptIdentifier={conceptIdentifier}
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+      />
+      <div
+        className={cn('mx-auto my-0 flex min-h-full w-full flex-col p-8')}
+        style={navBrandStyles}
+      >
+        {/* Hero Section */}
+        {isConceptLoading || isConceptFetching ? (
+          <div className='mb-8 flex flex-col gap-6'>
+            <div className='aucctus-bg-secondary flex h-[280px] animate-pulse items-center justify-center rounded-xl'>
+              <SkeletonBlock className='h-40 w-80' />
             </div>
-          ) : (
-            <div className='flex flex-row items-center justify-start'>
-              <EditModeSwitcher
-                containerClassName={cn({
-                  'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
-                    concept?.isHistoricalVersion,
-                })}
-                pClassName='aucctus-text-brand-primary aucctus-header-sm-medium'
-                textFieldClassName='!text-3xl max-w-[600px]'
-                value={titleEdit.value}
-                label=''
-                name='title'
-                maxLength={titleEdit.validation.maxLength}
-                rows={1}
-                onChange={(e) => titleEdit.handleChange(e)}
-                saveOnBlur={true}
-                handleSave={() => titleEdit.handleSave()}
-                handleCancel={() => titleEdit.handleCancel()}
-              />
-              <div className='ml-4 flex'>
-                <Select.ConceptStatus
-                  disabled={concept?.isHistoricalVersion}
-                  value={status}
-                  onChange={changeConceptStatus}
-                />
-              </div>
-            </div>
-          )}
-          <div className='flex gap-4'>
-            {concept && !concept.isHistoricalVersion && isMagicShareUser && (
-              <button
-                onClick={() =>
-                  openModal(Modal.MagicShare, {
-                    conceptUuid,
-                  })
+            <SkeletonBlock className='h-12 w-full rounded-lg' />
+          </div>
+        ) : (
+          <>
+            <div className='mb-8'>
+              <ConceptHero
+                titleEdit={titleEdit}
+                description={heroDescription}
+                imageUrl={conceptImageUrl}
+                imageAlt={concept?.title || 'Concept image'}
+                creator={concept?.createdBy}
+                conceptUuid={conceptUuid}
+                isHistoricalVersion={concept?.isHistoricalVersion}
+                uploadMutation={uploadMutation}
+                isCustomActive={
+                  !!conceptOverview?.useCustomImage &&
+                  !!conceptOverview?.customImageUrl
                 }
-                className='btn btn-secondary flex items-center gap-2'
+                customImageUrl={conceptOverview?.customImageUrl}
+                onRevertToAI={handleRevertToAI}
+                isRevertingImage={updateSettings.isLoading}
+              />
+            </div>
+          </>
+        )}
+
+        {/* Glass Tab Navigation — sentinel for sticky nav detection */}
+        <div className='relative'>
+          <div
+            ref={navSentinelRef}
+            className={cn({
+              'pointer-events-none': isConceptLoading || isConceptFetching,
+            })}
+          >
+            <ConceptNavigation
+              tabs={conceptTabs}
+              activeTab={activeTab || ''}
+              onTabSelect={onTabSelect}
+            />
+          </div>
+
+          {/* Versions dropdown */}
+          <AnimatePresence>
+            {showVersions && conceptUuid && conceptIdentifier && (
+              <motion.div
+                ref={versionsRef}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className='fixed z-40 w-80'
+                style={{
+                  top: versionsDropdownPos.top,
+                  right: versionsDropdownPos.right,
+                }}
+                onMouseEnter={clearVersionsHideTimer}
+                onMouseLeave={startVersionsHideTimer}
               >
-                <Share2 size={16} />
-                Magic Share
-              </button>
-            )}
-            {concept &&
-              !concept.isHistoricalVersion &&
-              FEATURE_CONCEPT_VERSIONING && (
-                <ConceptVersionsButton
+                <ConceptVersionsDropdown
                   conceptUuid={conceptUuid}
                   conceptIdentifier={conceptIdentifier}
+                  onClose={() => setShowVersions(false)}
                 />
-              )}
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        <div className='flex h-full w-full max-w-[1200px] flex-col flex-wrap items-start gap-6 self-stretch'>
-          <Container.TabView
-            className=''
-            tabGroupClassName='rounded-lg p-1 mb-2'
-            tabContainerClassName='gap-1'
-            tabContentClassName={cn({
-              'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
+
+        {/* Sticky Nav — hidden when viewing a historical version */}
+        {!(concept?.isHistoricalVersion && FEATURE_CONCEPT_VERSIONING) && (
+          <StickyConceptNav
+            sentinelRef={navSentinelRef}
+            tabs={conceptTabs}
+            conceptImage={conceptImageUrl}
+            conceptTitle={concept?.title}
+            activeTab={activeTab || ''}
+            onTabChange={onTabSelect}
+          />
+        )}
+
+        {/* Tab Content */}
+        <div className='flex h-full w-full flex-col flex-wrap items-start gap-6 self-stretch'>
+          <div
+            className={cn('w-full', {
+              'user-select-auto webkit-user-select-auto pointer-events-none select-text select-auto':
                 concept?.isHistoricalVersion,
             })}
-            tabs={conceptTabs}
-            variant='icon-button'
-            onTabSelect={onTabSelect}
-            activeTab={activeTab || ''}
           >
             {!concept ? (
               <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
@@ -307,15 +483,24 @@ const ConceptReport: FunctionComponent = () => {
               </div>
             ) : (
               <div key={activeTab} className='animate-fade-in'>
-                <Outlet
-                  context={{
+                <ConceptReportContext.Provider
+                  value={{
                     navigateToTab: onTabSelect,
                     concept: concept,
+                    isReadOnly,
                   }}
-                />
+                >
+                  <Outlet
+                    context={{
+                      navigateToTab: onTabSelect,
+                      concept: concept,
+                      isReadOnly,
+                    }}
+                  />
+                </ConceptReportContext.Provider>
               </div>
             )}
-          </Container.TabView>
+          </div>
         </div>
         <LoadingMask
           isLoading={

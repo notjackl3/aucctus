@@ -319,11 +319,7 @@ const CustomerConversation = forwardRef<
   return (
     <div
       ref={ref}
-      className={cn(
-        'aucctus-bg-primary aucctus-border-primary w-full rounded-lg border shadow-sm',
-        'flex flex-col',
-        className,
-      )}
+      className={cn('flex h-full w-full flex-col overflow-hidden', className)}
       style={style}
     >
       <CustomerConversationSocketWrapper />

@@ -1,17 +1,16 @@
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
 import { useGenerateKeyAssumptions } from '@hooks/query/concepts.hook';
 import AssumptionsV1 from './Assumptions/AssumptionsV1';
 import AssumptionsV2 from './Assumptions/AssumptionsV2';
 import { VersionUpgradeBanner, ConceptReportSkeletons } from '@components';
-import { IConceptReportContext } from './ConceptReport/ConceptReport';
 import { toast } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { AppPath } from '@routes/routes';
+import { useConceptReportContext } from './ConceptReport/ConceptReportContext';
 
 const AssumptionsWrapper: React.FC = () => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept, isReadOnly } = useConceptReportContext();
   const { mutate: generateKeyAssumptions, isLoading } =
     useGenerateKeyAssumptions();
 
@@ -48,7 +47,7 @@ const AssumptionsWrapper: React.FC = () => {
   return (
     <>
       {/* Show upgrade banner if not v2 */}
-      {!shouldRenderV2 && (
+      {!isReadOnly && !shouldRenderV2 && (
         <VersionUpgradeBanner
           onUpgrade={handleUpgrade}
           isLoading={isLoading}
@@ -57,7 +56,7 @@ const AssumptionsWrapper: React.FC = () => {
       )}
 
       {/* Show debug mode banner if debug mode is enabled */}
-      {isDebugModeEnabled && (
+      {!isReadOnly && isDebugModeEnabled && (
         <VersionUpgradeBanner
           onUpgrade={handleDebugModeGenerate}
           isLoading={isLoading}

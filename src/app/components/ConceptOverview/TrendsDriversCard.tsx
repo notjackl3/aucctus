@@ -1,6 +1,7 @@
 import HexagonChart from '@pages/Concept/Report/MarketScan/v3/components/HexagonChart';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConceptReportContext } from '@pages/Concept/Report/ConceptReport/ConceptReportContext';
 import ProgressBar from './ProgressBar';
 import { LineChart } from 'lucide-react';
 
@@ -28,6 +29,7 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
   executiveSummary,
 }) => {
   const navigate = useNavigate();
+  const { isReadOnly, navigateToTab } = useConceptReportContext();
 
   // Use the passed-in data
   const displayMarketForces = marketForces.length > 0 ? marketForces : [];
@@ -38,9 +40,13 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      navigate(`/concept/${conceptId}/market-scan?tab=trends-drivers`);
+      if (isReadOnly) {
+        navigateToTab('trends');
+      } else {
+        navigate(`/concept/${conceptId}/trends`);
+      }
     },
-    [navigate, conceptId],
+    [navigate, conceptId, isReadOnly, navigateToTab],
   );
 
   return (

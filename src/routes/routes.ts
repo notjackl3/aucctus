@@ -2,6 +2,8 @@
 export enum ConceptPath {
   Overview = 'overview',
   MarketScan = 'market-scan',
+  Trends = 'trends',
+  Ecosystem = 'ecosystem',
   FinancialProjection = 'financial-projection',
   CustomerProfile = 'customer-profile',
   Assumptions = 'assumptions',
@@ -29,6 +31,8 @@ export enum AppPath {
   ConceptFinancialProjection = `/concept/:id/${ConceptPath.FinancialProjection}`,
   ConceptKeyAssumptions = `/concept/:id/${ConceptPath.Assumptions}`,
   ConceptMarketScan = `/concept/:id/${ConceptPath.MarketScan}`,
+  ConceptTrends = `/concept/:id/${ConceptPath.Trends}`,
+  ConceptEcosystem = `/concept/:id/${ConceptPath.Ecosystem}`,
   ConceptSettings = `/concept/:id/${ConceptPath.Settings}`,
   ConceptWorkshop = `/concept/:id/${ConceptPath.Workshop}`,
   ConceptTesting = `/concept/:id/${ConceptPath.Testing}`,
@@ -75,6 +79,9 @@ export enum AppPath {
   Testing = '/testing',
   TestingConceptOverview = '/testing/concept-overview',
 
+  /* Shared Report (Public) */
+  SharedReport = '/shared-report/:token',
+
   /* Auth */
   Login = '/login',
   SignUp = '/sign-up',
@@ -93,4 +100,5 @@ export const UNAUTH_ROUTES = [
   AppPath.ResetPassword,
   AppPath.SubmissionLinkPublicForm,
   AppPath.Discover,
+  AppPath.SharedReport,
 ];

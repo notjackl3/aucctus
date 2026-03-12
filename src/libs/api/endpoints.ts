@@ -350,6 +350,55 @@ export class Endpoints {
     return `/api/v2/concept/customer-profile/${customerProfileUuid}/journey-steps/${stepUuid}`;
   }
 
+  // Customer Social Values
+  static customerProfileSocialValues(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/social-values`;
+  }
+  static customerProfileSocialValue(
+    customerProfileUuid: string,
+    valueUuid: string,
+  ) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/social-values/${valueUuid}`;
+  }
+
+  // Customer Motivations
+  static customerProfileMotivations(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/motivations`;
+  }
+  static customerProfileMotivation(
+    customerProfileUuid: string,
+    motivationUuid: string,
+  ) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/motivations/${motivationUuid}`;
+  }
+
+  // Customer Behaviours
+  static customerProfileBehaviours(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/behaviours`;
+  }
+  static customerProfileBehaviour(
+    customerProfileUuid: string,
+    behaviourUuid: string,
+  ) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/behaviours/${behaviourUuid}`;
+  }
+
+  // Customer Key Facts
+  static customerProfileKeyFacts(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/key-facts`;
+  }
+  static customerProfileKeyFact(customerProfileUuid: string, factUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/key-facts/${factUuid}`;
+  }
+
+  // Customer Quotes
+  static customerProfileQuotes(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/quotes`;
+  }
+  static customerProfileQuote(customerProfileUuid: string, quoteUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/quotes/${quoteUuid}`;
+  }
+
   static conceptSeen(conceptUuid: string) {
     return `api/v2/concept/${conceptUuid}/seen`;
   }
@@ -1315,6 +1364,39 @@ export class Endpoints {
     if (pageSize) params.append('page_size', pageSize.toString());
     const query = params.toString();
     return `/api/v1/portfolio/insights${query ? `?${query}` : ''}`;
+  }
+
+  // ============================================
+  // Shared Report Endpoints (Public - No Auth)
+  // ============================================
+
+  static sharedReportInfo(token: string) {
+    return `/api/shared-report/${token}/info`;
+  }
+
+  static sharedReportSendCode(token: string) {
+    return `/api/shared-report/${token}/send-code`;
+  }
+
+  static sharedReportVerify(token: string) {
+    return `/api/shared-report/${token}/verify`;
+  }
+
+  static sharedReportData(token: string) {
+    return `/api/shared-report/${token}/report`;
+  }
+
+  // Authenticated share management
+  static conceptShares(identifier: string) {
+    return `/api/v1/concept/${identifier}/shares`;
+  }
+
+  static conceptShareConfig(identifier: string) {
+    return `/api/v1/concept/${identifier}/shares/config`;
+  }
+
+  static conceptShareRevoke(identifier: string, shareUuid: string) {
+    return `/api/v1/concept/${identifier}/shares/${shareUuid}`;
   }
 }
 

@@ -5,12 +5,10 @@ import React, {
   useContext,
   useEffect,
 } from 'react';
-import { useOutletContext } from 'react-router-dom';
 import RecommendedTestSection from './components/RecommendedTestSection';
 import TestHistorySection from './components/TestHistorySection';
 import { useModal } from '@context/ModalContextProvider';
 import { Modal, ConceptReportSkeletons } from '@components';
-import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { useTestDetails } from '@hooks/query/testing.hook';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { AppPath } from '@routes/routes';
@@ -23,6 +21,7 @@ import {
   Plus,
   RefreshCw,
 } from 'lucide-react';
+import { useConceptReportContext } from '../ConceptReport/ConceptReportContext';
 
 interface TestCompletionContextType {
   isCompletingTest: boolean;
@@ -38,7 +37,7 @@ export const useTestCompletion = () => useContext(TestCompletionContext);
 
 const Testing: React.FC = () => {
   const { openModal } = useModal();
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept, isReadOnly } = useConceptReportContext();
   const conceptUuid = concept?.uuid || '';
 
   // Track page time for analytics
@@ -108,6 +107,8 @@ const Testing: React.FC = () => {
           testUuid: nextTest.uuid,
           testType: nextTest.testType,
           concept,
+          ...(isReadOnly && { mode: 'view' as const }),
+          ...(isReadOnly && { initialTestDetail: nextTest }),
         },
         {
           position: 'center',
@@ -218,10 +219,12 @@ const Testing: React.FC = () => {
                   Create your first test to start gathering valuable insights
                   from your target audience.
                 </p>
-                <button className='btn btn-primary'>
-                  <Plus className='aucctus-stroke-white mr-2 h-4 w-4' />
-                  Create Your First Test
-                </button>
+                {!isReadOnly && (
+                  <button className='btn btn-primary'>
+                    <Plus className='aucctus-stroke-white mr-2 h-4 w-4' />
+                    Create Your First Test
+                  </button>
+                )}
               </div>
             </div>
 
@@ -264,6 +267,7 @@ const Testing: React.FC = () => {
                 onRunTest={handleRunTest}
                 generationState={generationState}
                 onCancelGeneration={resetGenerationState}
+                isViewMode={isReadOnly}
               />
             </div>
 

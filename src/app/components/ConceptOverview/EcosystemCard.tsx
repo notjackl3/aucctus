@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConceptReportContext } from '@pages/Concept/Report/ConceptReport/ConceptReportContext';
 import type { IEcosystemPlayer } from './config';
 import ProgressBar from './ProgressBar';
 import { useEcosystem } from '../EcosystemV2/hooks/useEcosystem';
@@ -35,6 +36,7 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
   concept,
 }) => {
   const navigate = useNavigate();
+  const { isReadOnly, navigateToTab } = useConceptReportContext();
 
   // Check if concept is using V2 ecosystem
   const isEcosystemV2 = concept?.featureVersions?.ecosystem === 'v2';
@@ -110,9 +112,13 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      navigate(`/concept/${conceptId}/market-scan?tab=ecosystem`);
+      if (isReadOnly) {
+        navigateToTab('ecosystem');
+      } else {
+        navigate(`/concept/${conceptId}/ecosystem`);
+      }
     },
-    [navigate, conceptId],
+    [navigate, conceptId, isReadOnly, navigateToTab],
   );
 
   // Memoize player cards for performance

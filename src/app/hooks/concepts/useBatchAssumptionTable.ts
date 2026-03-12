@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
 import {
   IAssumptionV2,
   AssumptionCategory,
@@ -11,10 +10,10 @@ import {
 import { useAssumptionBatchUpdate } from '@hooks/query/concepts.hook';
 import { useModal } from '@context/ModalContextProvider';
 import { useBatchAssumptionChangesStore } from '../../stores/batch-assumption-changes';
-import { IConceptReportContext } from '../../pages/Concept/Report';
 import { toast } from '@components';
 import { Modal } from '@components';
 import BatchConfirmationModal from '@components/Modal/AssumptionLifecycleModal/BatchConfirmationModal';
+import { useConceptReportContext } from '../../pages/Concept/Report/ConceptReport/ConceptReportContext';
 
 interface UseBatchAssumptionTableProps {
   assumptions: IAssumptionV2[];
@@ -29,7 +28,7 @@ export const useBatchAssumptionTable = ({
   selectedCategory: propSelectedCategory,
   onCategoryChange,
 }: UseBatchAssumptionTableProps) => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept } = useConceptReportContext();
   const { openModal, closeModal } = useModal();
   const { mutate: batchUpdateAssumptions } = useAssumptionBatchUpdate();
 

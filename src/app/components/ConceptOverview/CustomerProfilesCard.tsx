@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConceptReportContext } from '@pages/Concept/Report/ConceptReport/ConceptReportContext';
 import type { ICustomerProfile as ICustomerProfileAPI } from '@libs/api/types/concept/concepts';
 import type { ICustomerProfile } from './config';
 import ProgressBar from './ProgressBar';
@@ -29,6 +30,7 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
   executiveSummary,
 }) => {
   const navigate = useNavigate();
+  const { isReadOnly, navigateToTab } = useConceptReportContext();
 
   // State to track the selected profile
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
@@ -90,9 +92,13 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      navigate(`/concept/${conceptId}/customer-profile`);
+      if (isReadOnly) {
+        navigateToTab('customers');
+      } else {
+        navigate(`/concept/${conceptId}/customer-profile`);
+      }
     },
-    [navigate, conceptId],
+    [navigate, conceptId, isReadOnly, navigateToTab],
   );
 
   const handleProfileClick = useCallback((profileId: string) => {

@@ -122,35 +122,35 @@
   filter: blur(24px);
 }
 
-/* Top-left — Rose */
+/* Top-left — Rose (fallback) / brand secondary */
 .floating-search-orb-1 {
   top: -10%;
   left: 2%;
-  background: radial-gradient(circle, hsl(0 80% 58%) 0%, hsl(0 80% 58% / 0) 70%);
+  background: radial-gradient(circle, var(--orb-color-1, hsl(0 80% 58%)) 0%, transparent 70%);
   animation: search-orb-corner-1 16s ease-in-out infinite;
 }
 
-/* Bottom-right — Vermillion */
+/* Bottom-right — Vermillion (fallback) / brand accent1 */
 .floating-search-orb-2 {
   bottom: -10%;
   right: 2%;
-  background: radial-gradient(circle, hsl(15 90% 58%) 0%, hsl(15 90% 58% / 0) 70%);
+  background: radial-gradient(circle, var(--orb-color-2, hsl(15 90% 58%)) 0%, transparent 70%);
   animation: search-orb-corner-2 19s ease-in-out infinite;
 }
 
-/* Top-right — Pink */
+/* Top-right — Pink (fallback) / brand tertiary */
 .floating-search-orb-3 {
   top: -10%;
   right: 18%;
-  background: radial-gradient(circle, hsl(330 75% 62%) 0%, hsl(330 75% 62% / 0) 70%);
+  background: radial-gradient(circle, var(--orb-color-3, hsl(330 75% 62%)) 0%, transparent 70%);
   animation: search-orb-corner-3 21s ease-in-out infinite;
 }
 
-/* Bottom-left — Peach */
+/* Bottom-left — Peach (fallback) / brand primary */
 .floating-search-orb-4 {
   bottom: -10%;
   left: 18%;
-  background: radial-gradient(circle, hsl(25 85% 65%) 0%, hsl(25 85% 65% / 0) 70%);
+  background: radial-gradient(circle, var(--orb-color-4, hsl(25 85% 65%)) 0%, transparent 70%);
   animation: search-orb-corner-4 14s ease-in-out infinite;
 }
 

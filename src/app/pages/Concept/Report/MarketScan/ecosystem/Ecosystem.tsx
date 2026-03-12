@@ -13,14 +13,13 @@ import {
   VersionUpgradeBanner,
   ConceptReportSkeletons,
 } from '@components';
-import { useOutletContext } from 'react-router-dom';
-import { IConceptReportContext } from '../../ConceptReport/ConceptReport';
 import { useEcosystem } from '@components/EcosystemV2/hooks/useEcosystem';
+import { useConceptReportContext } from '../../ConceptReport/ConceptReportContext';
 
 const { EcosystemV2Skeleton } = ConceptReportSkeletons;
 
 const Ecosystem: React.FC = () => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept, isReadOnly } = useConceptReportContext();
   const activeConceptUuid = useStore(
     (state) => state.conceptReport.conceptUuid ?? '',
   );
@@ -76,7 +75,7 @@ const Ecosystem: React.FC = () => {
 
   return (
     <div data-section-id='ecosystem_v2' className='flex w-full flex-col gap-6'>
-      {!shouldRenderV2 && (
+      {!isReadOnly && !shouldRenderV2 && (
         <VersionUpgradeBanner
           onUpgrade={handleUpgrade}
           isLoading={isUpgrading || isAwaitingEcosystemUpgrade}

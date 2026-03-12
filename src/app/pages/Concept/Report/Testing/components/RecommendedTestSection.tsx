@@ -26,12 +26,14 @@ import {
   ArrowRight,
   Check,
   Clipboard,
+  Eye,
   Plus,
   RefreshCw,
   Sparkles,
   Telescope,
   X,
 } from 'lucide-react';
+import ProfileStaleTestBanner from './ProfileStaleTestBanner';
 
 interface RecommendedTestSectionProps {
   conceptUuid: string;
@@ -40,6 +42,7 @@ interface RecommendedTestSectionProps {
   onRunTest: () => void;
   generationState: ITestGenerationState;
   onCancelGeneration?: () => void;
+  isViewMode?: boolean;
 }
 
 const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
@@ -49,6 +52,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
   onRunTest,
   generationState,
   onCancelGeneration,
+  isViewMode,
 }) => {
   const { isCompletingTest } = useTestCompletion();
   const isDebugModeEnabled = useDebugMode();
@@ -77,8 +81,9 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
 
   // Fetch assumptions to check validation status using V2 API
   // Fetch all assumptions across all categories with a high page size
+  // Skip in view mode — no assumption management needed for read-only
   const { assumptions: conceptAssumptions, isLoading: isLoadingAssumptions } =
-    useFilteredAssumptions(conceptIdentifier, {
+    useFilteredAssumptions(isViewMode ? '' : conceptIdentifier, {
       page: 1,
       page_size: 100,
     });
@@ -151,9 +156,10 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
   }, [assumptions, pendingAdditions, pendingRemovals, conceptAssumptions]);
 
   // Fetch timing estimate for TestGenerationPipeline
+  // Skip in view mode — no generation in read-only context
   const { data: timingData, refetch: refetchAgentTiming } =
     useAgentEstimatedTime('TestGenerationPipeline', conceptUuid, {
-      enabled: !!conceptUuid,
+      enabled: !!conceptUuid && !isViewMode,
       staleTime: 1000 * 60 * 5, // 5 minutes
     });
 
@@ -346,8 +352,8 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
   }, []);
 
   if (!recommendedTest) {
-    // Show loading state while fetching assumptions
-    if (isLoadingAssumptions) {
+    // Show loading state while fetching assumptions (skip in view mode)
+    if (isLoadingAssumptions && !isViewMode) {
       return (
         <div className='aucctus-bg-primary aucctus-border-secondary relative rounded-lg border p-6 shadow-sm'>
           <div className='flex flex-col items-center justify-center py-8'>
@@ -418,6 +424,26 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
       );
     }
 
+    // In view mode with no recommended test, just show a simple message
+    if (isViewMode) {
+      return (
+        <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-6 shadow-sm'>
+          <div className='flex flex-col items-center justify-center py-8'>
+            <Telescope
+              size={48}
+              className='aucctus-stroke-brand-primary mb-4'
+            />
+            <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>
+              No active test
+            </h3>
+            <p className='aucctus-text-sm-regular aucctus-text-brand-secondary max-w-md text-center'>
+              There is no recommended test at this time.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     // No recommended test and not generating - check if all assumptions validated
     if (!allAssumptionsValidated) {
       // Some assumptions still need validation - show generate next test button
@@ -468,14 +494,16 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                 : 's'}{' '}
               validation. Generate a test to continue validating your concept.
             </p>
-            <button
-              onClick={handleGenerateNextTest}
-              disabled={generateNextTest.isLoading}
-              className='btn btn-primary flex items-center gap-2'
-            >
-              <Plus className='aucctus-stroke-white h-4 w-4' />
-              Generate Next Test
-            </button>
+            {!isViewMode && (
+              <button
+                onClick={handleGenerateNextTest}
+                disabled={generateNextTest.isLoading}
+                className='btn btn-primary flex items-center gap-2'
+              >
+                <Plus className='aucctus-stroke-white h-4 w-4' />
+                Generate Next Test
+              </button>
+            )}
           </div>
         </div>
       );
@@ -591,6 +619,20 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
           </div>
         )}
 
+        {!isViewMode && recommendedTest?.testDetails.profileBasisStale && (
+          <ProfileStaleTestBanner
+            onRegenerate={() => {
+              if (testUuid) {
+                regenerateTestDetails.mutate({
+                  conceptUuid,
+                  testUuid,
+                });
+              }
+            }}
+            isLoading={regenerateTestDetails.isLoading}
+          />
+        )}
+
         <div className='mb-4 flex items-start justify-between'>
           {/* Recommended Label */}
           <div className='aucctus-bg-brand-secondary aucctus-border-secondary aucctus-text-xs-semibold aucctus-text-brand-primary mb-1 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5'>
@@ -598,41 +640,53 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
             Recommended Next Test
           </div>
 
-          {/* Action Buttons - Run Test or Save Changes + Cancel */}
-          {hasUnsavedChanges ? (
-            <div className='flex items-center gap-2'>
-              <button
-                onClick={handleCancelAssumptionChanges}
-                className='btn btn-light'
-                disabled={regenerateTestDetails.isLoading}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveChanges}
-                className='btn btn-primary flex items-center gap-1'
-                disabled={regenerateTestDetails.isLoading}
-              >
-                <ArrowRight className='aucctus-stroke-white h-4 w-4' />
-                Save Changes
-              </button>
-            </div>
-          ) : (
+          {/* Action Buttons - Show Test (view mode) or Run Test / Save Changes */}
+          {isViewMode ? (
             <button
               onClick={onRunTest}
-              className={cn(
-                'btn btn-primary flex items-center gap-1',
-                disableInteractions && 'cursor-not-allowed opacity-50',
-              )}
-              disabled={disableInteractions}
+              className='btn btn-primary flex items-center gap-1'
             >
-              {disableInteractions ? (
-                <RefreshCw className='aucctus-stroke-white h-4 w-4 animate-spin' />
-              ) : (
-                <ArrowRight className='aucctus-stroke-white h-4 w-4' />
-              )}
-              {disableInteractions ? 'Running...' : 'Run Test'}
+              <Eye className='aucctus-stroke-white h-4 w-4' />
+              Show Test
             </button>
+          ) : (
+            <>
+              {hasUnsavedChanges ? (
+                <div className='flex items-center gap-2'>
+                  <button
+                    onClick={handleCancelAssumptionChanges}
+                    className='btn btn-light'
+                    disabled={regenerateTestDetails.isLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveChanges}
+                    className='btn btn-primary flex items-center gap-1'
+                    disabled={regenerateTestDetails.isLoading}
+                  >
+                    <ArrowRight className='aucctus-stroke-white h-4 w-4' />
+                    Save Changes
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={onRunTest}
+                  className={cn(
+                    'btn btn-primary flex items-center gap-1',
+                    disableInteractions && 'cursor-not-allowed opacity-50',
+                  )}
+                  disabled={disableInteractions}
+                >
+                  {disableInteractions ? (
+                    <RefreshCw className='aucctus-stroke-white h-4 w-4 animate-spin' />
+                  ) : (
+                    <ArrowRight className='aucctus-stroke-white h-4 w-4' />
+                  )}
+                  {disableInteractions ? 'Running...' : 'Run Test'}
+                </button>
+              )}
+            </>
           )}
         </div>
 
@@ -703,20 +757,22 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                     <div className='flex items-center gap-2'>
                       <GenericStatusBadge config={riskColors} />
                       {/* Remove button - appears on hover */}
-                      <button
-                        type='button'
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveAssumption(
-                            assumptionUuidForRemoval,
-                            isPending,
-                          );
-                        }}
-                        className='flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100'
-                        aria-label='Remove assumption'
-                      >
-                        <X className='aucctus-stroke-error-primary h-4 w-4' />
-                      </button>
+                      {!isViewMode && (
+                        <button
+                          type='button'
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveAssumption(
+                              assumptionUuidForRemoval,
+                              isPending,
+                            );
+                          }}
+                          className='flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100'
+                          aria-label='Remove assumption'
+                        >
+                          <X className='aucctus-stroke-error-primary h-4 w-4' />
+                        </button>
+                      )}
                     </div>
                   </div>
                   <p className='aucctus-text-md-medium aucctus-text-brand-primary'>
@@ -728,30 +784,33 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
           </ul>
 
           {/* Add Assumption Button - Dashed Border at Bottom */}
-          <div className='relative mt-3'>
-            <button
-              type='button'
-              onClick={handleToggleDropdown}
-              className={cn(
-                'aucctus-border-secondary aucctus-text-brand-tertiary hover:aucctus-bg-secondary-hover aucctus-text-sm-medium flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed py-3 transition-colors',
-                (!conceptUuid || !testUuid) && 'cursor-not-allowed opacity-60',
-              )}
-              disabled={!conceptUuid || !testUuid}
-            >
-              <Plus className='aucctus-stroke-primary h-4 w-4' />
-              Add assumption
-            </button>
+          {!isViewMode && (
+            <div className='relative mt-3'>
+              <button
+                type='button'
+                onClick={handleToggleDropdown}
+                className={cn(
+                  'aucctus-border-secondary aucctus-text-brand-tertiary hover:aucctus-bg-secondary-hover aucctus-text-sm-medium flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed py-3 transition-colors',
+                  (!conceptUuid || !testUuid) &&
+                    'cursor-not-allowed opacity-60',
+                )}
+                disabled={!conceptUuid || !testUuid}
+              >
+                <Plus className='aucctus-stroke-primary h-4 w-4' />
+                Add assumption
+              </button>
 
-            {/* Assumption Dropdown */}
-            <AssumptionDropdown
-              isOpen={isDropdownOpen}
-              onClose={() => setIsDropdownOpen(false)}
-              availableAssumptions={conceptAssumptions}
-              onSelectAssumption={handleSelectAssumption}
-              existingAssumptionUuids={new Set(existingAssumptionUuids)}
-              existingAssumptionStatements={existingAssumptionStatements}
-            />
-          </div>
+              {/* Assumption Dropdown */}
+              <AssumptionDropdown
+                isOpen={isDropdownOpen}
+                onClose={() => setIsDropdownOpen(false)}
+                availableAssumptions={conceptAssumptions}
+                onSelectAssumption={handleSelectAssumption}
+                existingAssumptionUuids={new Set(existingAssumptionUuids)}
+                existingAssumptionStatements={existingAssumptionStatements}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ import {
 import PriorityIndicator from './components/PriorityIndicator';
 import SectionHeader from './components/SectionHeader';
 import { Plus } from 'lucide-react';
+import { useConceptReportContext } from '../../ConceptReport/ConceptReportContext';
 
 export interface Job {
   text: string;
@@ -31,6 +32,7 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
   customerProfileUuid,
   jobs: initialJobs,
 }) => {
+  const { isReadOnly } = useConceptReportContext();
   const [isAdding, setIsAdding] = useState(false);
 
   const jobsQuery = useCustomerJobsList(customerProfileUuid || '');
@@ -104,7 +106,7 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
   const handleAddComplete = React.useCallback(() => setIsAdding(false), []);
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-lg border shadow-sm'>
+    <div className='aucctus-bg-primary aucctus-border-secondary flex h-full flex-col overflow-hidden rounded-lg border shadow-sm'>
       <SectionHeader
         icon='briefcase'
         iconClass={PRIORITY_COLOR_ICON}
@@ -112,18 +114,20 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
         title='Jobs to be Done'
         noDivider={true}
         rightAction={
-          <button
-            className='aucctus-bg-secondary-hover flex items-center justify-center rounded-full p-2 transition-colors disabled:opacity-50'
-            aria-label='Add job'
-            onClick={handleStartAdding}
-            disabled={isAdding}
-          >
-            <Plus />
-          </button>
+          !isReadOnly ? (
+            <button
+              className='aucctus-bg-secondary-hover flex items-center justify-center rounded-full p-2 transition-colors disabled:opacity-50'
+              aria-label='Add job'
+              onClick={handleStartAdding}
+              disabled={isAdding}
+            >
+              <Plus />
+            </button>
+          ) : undefined
         }
       />
 
-      <div className='px-4 py-2'>
+      <div className='min-h-0 flex-1 px-4 py-2'>
         <p className='aucctus-text-secondary aucctus-text-sm mb-6'>
           Tasks your customer needs to accomplish
         </p>
@@ -150,6 +154,7 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
               iconColorClass={PRIORITY_COLOR_ICON}
               iconBgClass={PRIORITY_COLOR_ICON_BG}
               iconSize='md'
+              isReadOnly={isReadOnly}
             />
           </div>
         </div>

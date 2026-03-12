@@ -42,6 +42,16 @@ export const OVERSEER_ROUTE_REGISTRY: Partial<
     contextLevel: 'concept',
     editingEnabled: true,
   },
+  [AppPath.ConceptTrends]: {
+    pageContext: 'trends',
+    contextLevel: 'concept',
+    editingEnabled: true,
+  },
+  [AppPath.ConceptEcosystem]: {
+    pageContext: 'ecosystem',
+    contextLevel: 'concept',
+    editingEnabled: true,
+  },
   [AppPath.ConceptFinancialProjection]: {
     pageContext: 'financial_projections',
     contextLevel: 'concept',

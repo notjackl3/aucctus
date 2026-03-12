@@ -511,6 +511,22 @@ export const useConceptWorkflowHandler = (
             });
           }
 
+          // When customer profiles section completes during upgrade, actively refetch
+          // the concept so the new version UUID propagates to the store. Needed because
+          // workflow_completed returns early for partial regeneration.
+          if (normalizedStatus?.customerProfiles?.status === 'complete') {
+            if (message.conceptRootIdentifier) {
+              queryClient.invalidateQueries({
+                queryKey: [
+                  AucctusQueryKeys.concept,
+                  message.conceptRootIdentifier,
+                ],
+                refetchActive: true,
+                refetchInactive: false,
+              });
+            }
+          }
+
           const overrideIdentifier =
             message.conceptRootIdentifier || message.conceptUuid;
           syncPendingOverridesFromServer(overrideIdentifier, normalizedStatus);

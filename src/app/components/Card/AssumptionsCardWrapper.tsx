@@ -1,12 +1,11 @@
 import React, { useMemo } from 'react';
-import { useOutletContext } from 'react-router-dom';
 import {
   useAssumptions,
   useFilteredAssumptions,
 } from '@hooks/query/assumptions.hook';
-import { IConceptReportContext } from '@pages/Concept/Report/ConceptReport/ConceptReport';
 import KeyAssumptionsCard from './KeyAssumptionsCard';
 import { Loading } from '@components';
+import { useConceptReportContext } from '@pages/Concept/Report/ConceptReport/ConceptReportContext';
 
 interface IAssumptionsCardWrapperProps {
   onViewClick: React.MouseEventHandler<HTMLButtonElement> | undefined;
@@ -15,7 +14,7 @@ interface IAssumptionsCardWrapperProps {
 const AssumptionsCardWrapper: React.FC<IAssumptionsCardWrapperProps> = ({
   onViewClick,
 }) => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept } = useConceptReportContext();
 
   // Use concept's featureVersions to determine which version to render
   const featureVersion = concept.featureVersions?.assumptions || 'v1';

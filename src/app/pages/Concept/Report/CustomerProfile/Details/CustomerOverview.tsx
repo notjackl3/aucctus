@@ -1,202 +1,206 @@
 import defaultAvatar from '@assets/img/avatar.png';
 import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
-import { forwardRef, useCallback } from 'react';
+import { CSSProperties, forwardRef, useCallback, useMemo } from 'react';
 import {
-  BookOpen,
   Briefcase,
+  ChevronDown,
+  ChevronUp,
+  MapPin,
   Calendar,
   DollarSign,
-  Globe,
   Users,
+  GraduationCap,
 } from 'lucide-react';
-
-// Icon stroke constant for consistency
-const MAIN_ICON_STROKE = 'aucctus-stroke-brand-primary';
 
 interface CustomerOverviewProps {
   profile: ICustomerProfile;
-  description: {
-    value: string;
-    handleChange: (value: string) => void;
-    handleSave: () => void;
-    handleCancel: () => void;
-  };
+  overviewExpanded: boolean;
+  setOverviewExpanded: (expanded: boolean) => void;
   className?: string;
 }
 
-// Extend ICustomerProfile for the demo to include occupation and education
+// Extend ICustomerProfile for optional fields not yet in the backend
 interface ExtendedCustomerProfile extends ICustomerProfile {
   educationLevel?: string;
   occupation?: string;
+  themeColor?: string;
 }
 
 const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
-  ({ profile, description, className }, ref) => {
-    // Cast to extended profile for the demo
+  ({ profile, overviewExpanded, setOverviewExpanded, className }, ref) => {
     const extendedProfile = profile as ExtendedCustomerProfile;
 
     const formatIncome = useCallback((income: number) => {
       if (income < 1000) {
-        // If income is a small number like 80 or 85, assume it's already in thousands
         return `$${income}K`;
-      } else {
-        // Otherwise divide by 1000
-        return `$${income / 1000}K`;
       }
+      return `$${Math.round(income / 1000)}K`;
     }, []);
 
+    const incomeDisplay =
+      profile?.incomeLower || profile?.incomeUpper
+        ? `${profile.incomeLower ? formatIncome(profile.incomeLower) : '?'}-${profile.incomeUpper ? formatIncome(profile.incomeUpper) : '?'}`
+        : null;
+
+    // Build demographic pills from available data
+    const pills: { icon: React.ReactNode; label: string }[] = [];
+    if (profile?.geoLocation) {
+      pills.push({
+        icon: <MapPin size={12} />,
+        label: profile.geoLocation,
+      });
+    }
+    if (profile?.ageRange) {
+      pills.push({
+        icon: <Calendar size={12} />,
+        label: profile.ageRange,
+      });
+    }
+    if (incomeDisplay) {
+      pills.push({
+        icon: <DollarSign size={12} />,
+        label: incomeDisplay,
+      });
+    }
+    if (profile?.familySize) {
+      pills.push({
+        icon: <Users size={12} />,
+        label: `Family of ${profile.familySize}`,
+      });
+    }
+    if (extendedProfile?.educationLevel) {
+      pills.push({
+        icon: <GraduationCap size={12} />,
+        label: extendedProfile.educationLevel,
+      });
+    }
+    if (extendedProfile?.occupation) {
+      pills.push({
+        icon: <Briefcase size={12} />,
+        label: extendedProfile.occupation,
+      });
+    }
+
+    const heroTintStyle = useMemo<CSSProperties>(() => {
+      if (extendedProfile?.themeColor) {
+        return {
+          background: `radial-gradient(circle at left center, hsl(${extendedProfile.themeColor} / 0.18) 0%, hsl(${extendedProfile.themeColor} / 0.08) 38%, transparent 72%)`,
+        };
+      }
+
+      return {
+        background:
+          'radial-gradient(circle at left center, rgba(99, 102, 241, 0.16) 0%, rgba(99, 102, 241, 0.07) 38%, transparent 72%)',
+      };
+    }, [extendedProfile?.themeColor]);
+
+    const heroImageBleedStyle = useMemo<CSSProperties | undefined>(() => {
+      if (!profile?.avatarUrl || extendedProfile?.themeColor) {
+        return undefined;
+      }
+
+      return {
+        backgroundImage: `url(${profile.avatarUrl})`,
+        backgroundPosition: 'left center',
+        backgroundSize: '145% 145%',
+        filter: 'blur(42px) saturate(135%)',
+        opacity: 0.28,
+        transform: 'scale(1.08)',
+      };
+    }, [extendedProfile?.themeColor, profile?.avatarUrl]);
+
+    // heroWashStyle replaced with Tailwind dark-mode-aware gradient below
+
     return (
-      <div
-        ref={ref}
-        className={cn(
-          'aucctus-bg-primary aucctus-border-primary h-fit w-full rounded-lg border shadow-sm',
-          className,
-        )}
-      >
-        <div className='flex flex-col px-6 pb-4 pt-4'>
-          {/* Header with avatar, segment and name */}
-          <div className='mb-6 flex items-start gap-4'>
+      <div ref={ref} className={cn('flex h-full flex-col', className)}>
+        {/* Hero section */}
+        <div className='flex h-[200px] overflow-hidden'>
+          {/* Left: Avatar */}
+          <div className='aucctus-bg-secondary aucctus-border-secondary w-60 flex-shrink-0 border-r'>
             <img
-              className='aucctus-border-primary h-16 w-16 self-center rounded-full border object-cover'
-              alt='avatar'
               src={profile?.avatarUrl || defaultAvatar}
+              alt={profile?.name || 'avatar'}
+              className='h-full w-full object-cover'
             />
-            <div className='flex flex-col'>
-              {/* Primary badge */}
+          </div>
+
+          {/* Right: Title area */}
+          <div className='relative flex flex-1 overflow-hidden px-8 py-6'>
+            <div aria-hidden className='pointer-events-none absolute inset-0'>
+              <div className='absolute inset-0' style={heroTintStyle} />
+              {heroImageBleedStyle && (
+                <div className='absolute inset-0' style={heroImageBleedStyle} />
+              )}
+              <div className='absolute inset-0 bg-gradient-to-r from-white/20 via-white/70 to-white/95 dark:from-black/20 dark:via-black/70 dark:to-black/95' />
+            </div>
+
+            <div className='relative z-10 flex flex-1 flex-col justify-center'>
               {profile?.isPrimary && (
-                <div className='mb-1 flex'>
-                  <span className='aucctus-bg-brand-secondary aucctus-text-brand-tertiary flex items-center gap-1 rounded-full px-3 py-1 text-sm'>
-                    <Briefcase size={14} className={MAIN_ICON_STROKE} />
+                <div className='mb-2 flex'>
+                  <span className='aucctus-bg-brand-secondary aucctus-text-brand-tertiary inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium'>
+                    <Briefcase size={12} />
                     Primary
                   </span>
                 </div>
               )}
-              <h2 className='aucctus-text-primary aucctus-header-xs-semibold mt-2'>
-                {profile?.segment || 'Global Students'}
+              <h2 className='aucctus-text-primary text-3xl font-semibold'>
+                {profile?.segment || 'Customer Segment'}
               </h2>
-              <div className='aucctus-text-tertiary aucctus-text-sm mt-1'>
+              <p className='aucctus-text-tertiary mt-1.5 text-lg'>
                 Represented by {profile?.name}
-              </div>
-            </div>
-          </div>
-
-          {/* Details section */}
-          <div className='mt-2'>
-            <div className='flex-1'>
-              {/* Overview section */}
-              <div className='mb-6 pb-4'>
-                <h3 className='aucctus-text-secondary aucctus-text-md-medium mb-2 uppercase tracking-wider'>
-                  OVERVIEW
-                </h3>
-                <p className='aucctus-text-secondary aucctus-text-md hyphens-auto break-words'>
-                  {description.value ||
-                    'Global Students represent a significant market opportunity with unique challenges in maintaining healthy eating habits while studying abroad. They exhibit distinct behavioral patterns including limited cooking facilities, irregular schedules, and a strong desire for wellness routines. This segment shows high nutritional awareness, growing purchasing power, and alignment with sustainability values.'}
-                </p>
-              </div>
-
-              {/* Demographics section */}
-              <div>
-                <h3 className='aucctus-text-secondary aucctus-text-md-medium mb-2 uppercase tracking-wider'>
-                  SAMPLE DEMOGRAPHICS
-                </h3>
-
-                <div className='aucctus-text-secondary space-y-3'>
-                  <div className='flex items-start gap-2'>
-                    <Globe
-                      size={16}
-                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
-                    />
-                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
-                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
-                        Geography:
-                      </span>
-                      <span className='aucctus-text-md break-words'>
-                        {profile?.geoLocation || 'Ontario, Canada'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className='flex items-start gap-2'>
-                    <Calendar
-                      size={16}
-                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
-                    />
-                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
-                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
-                        Age Range:
-                      </span>
-                      <span className='aucctus-text-md break-words'>
-                        {profile?.ageRange || '24-35'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className='flex items-start gap-2'>
-                    <Users
-                      size={16}
-                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
-                    />
-                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
-                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
-                        Family Size:
-                      </span>
-                      <span className='aucctus-text-md break-words'>
-                        {profile?.familySize || '2 (Lives with roommate)'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className='flex items-start gap-2'>
-                    <DollarSign
-                      size={16}
-                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
-                    />
-                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
-                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
-                        Income:
-                      </span>
-                      <span className='aucctus-text-md break-words'>
-                        {`${profile?.incomeLower ? formatIncome(profile.incomeLower) : '$40K'}-${profile?.incomeUpper ? formatIncome(profile.incomeUpper) : '$75K'}`}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className='flex items-start gap-2'>
-                    <BookOpen
-                      size={16}
-                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
-                    />
-                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
-                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
-                        Education:
-                      </span>
-                      <span className='aucctus-text-md break-words'>
-                        {extendedProfile?.educationLevel || 'Graduate Student'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className='flex items-start gap-2'>
-                    <Briefcase
-                      size={16}
-                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
-                    />
-                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
-                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
-                        Occupation:
-                      </span>
-                      <span className='aucctus-text-md break-words'>
-                        {extendedProfile?.occupation ||
-                          'Part-time Marketing Assistant'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              </p>
             </div>
           </div>
         </div>
+
+        {/* Demographics pills */}
+        {pills.length > 0 && (
+          <div className='flex flex-wrap gap-2 px-6 pt-5'>
+            {pills.map((pill, i) => (
+              <span
+                key={i}
+                className='aucctus-text-secondary aucctus-border-secondary bg-muted/60 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium'
+              >
+                {pill.icon}
+                {pill.label}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Overview text with "See more" toggle */}
+        {profile?.description && (
+          <div className='flex flex-1 flex-col px-6 pb-5 pt-4'>
+            <h3 className='aucctus-text-secondary aucctus-text-md-medium mb-2 uppercase tracking-wider'>
+              OVERVIEW
+            </h3>
+            <p
+              className={cn(
+                'aucctus-text-secondary aucctus-text-md hyphens-auto break-words',
+                !overviewExpanded && 'line-clamp-4',
+              )}
+            >
+              {profile.description}
+            </p>
+            {profile.description.length > 280 && (
+              <button
+                onClick={() => setOverviewExpanded(!overviewExpanded)}
+                className='aucctus-text-brand-primary mt-2 inline-flex items-center gap-1 self-start text-xs font-medium opacity-80 transition-opacity hover:opacity-100'
+              >
+                {overviewExpanded ? (
+                  <>
+                    Show less <ChevronUp size={14} />
+                  </>
+                ) : (
+                  <>
+                    See more <ChevronDown size={14} />
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     );
   },

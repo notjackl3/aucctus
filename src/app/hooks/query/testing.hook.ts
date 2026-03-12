@@ -40,10 +40,6 @@ export const useTestDetails = (conceptUuid: string) => {
     queryKey: [AucctusQueryKeys.testDetails, conceptUuid],
     queryFn: async () => await api.testing.getTestDetails(conceptUuid),
     enabled: !!conceptUuid,
-    staleTime: 1000 * 30, // 30 seconds - shorter for more frequent updates
-    cacheTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnWindowFocus: true, // Refetch when user returns to tab
-    refetchOnMount: true, // Always refetch when component mounts
   });
 
   return { ...query, testDetails: query.data?.results || [] };
@@ -70,10 +66,6 @@ export const useTestDetail = (
       options?.enabled !== undefined
         ? options.enabled
         : !!conceptUuid && !!testUuid,
-    staleTime: 1000 * 30, // 30 seconds - shorter for more frequent updates
-    cacheTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnWindowFocus: true, // Refetch when user returns to tab
-    refetchOnMount: true, // Always refetch when component mounts
   });
 
   return { ...query, testDetail: query.data };
@@ -349,8 +341,6 @@ export const useTestCollateral = (
       options?.enabled !== undefined
         ? options.enabled
         : !!conceptUuid && !!testUuid,
-    staleTime: 1000 * 60 * 2, // 2 minutes - prevent unnecessary refetches
-    cacheTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const data = query.data as ITestCollateralPageResponse | undefined;
@@ -714,8 +704,6 @@ export const useTestParticipants = (
       options?.enabled !== undefined
         ? options.enabled
         : !!conceptUuid && !!testUuid,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    cacheTime: 1000 * 60 * 2, // 2 minutes
   });
 
   return { ...query, participants: query.data?.results || [] };
@@ -1315,8 +1303,6 @@ export const useTestAssumptions = (
       options?.enabled !== undefined
         ? options.enabled
         : !!conceptUuid && !!testUuid,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    cacheTime: 1000 * 60 * 2, // 2 minutes
   });
 
   return { ...query, assumptions: query.data?.results || [] };

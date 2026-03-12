@@ -46,6 +46,10 @@ export interface EditableListProps {
    * 'lg' = h-7 w-7
    */
   iconSize?: 'sm' | 'md' | 'lg';
+  /**
+   * When true, hides edit and delete controls on list items
+   */
+  isReadOnly?: boolean;
 }
 
 /**
@@ -63,6 +67,7 @@ const EditableList: React.FC<EditableListProps> = ({
   iconBgClass = 'aucctus-bg-secondary-subtle',
   iconColorClass = '',
   iconSize = 'sm',
+  isReadOnly = false,
 }) => {
   const [newValue, setNewValue] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -205,20 +210,22 @@ const EditableList: React.FC<EditableListProps> = ({
                       {item.description}
                     </p>
                   </div>
-                  <div className='absolute right-2 top-2.5 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
-                    <span
-                      className='aucctus-bg-secondary-hover flex h-5 w-5 cursor-pointer items-center justify-center rounded-full'
-                      onClick={() => handleEditStart(index, item.description)}
-                    >
-                      <Pencil size={14} />
-                    </span>
-                    <span
-                      className='aucctus-bg-secondary-hover flex h-5 w-5 cursor-pointer items-center justify-center rounded-full text-red-500'
-                      onClick={() => handleRemove(item, index)}
-                    >
-                      <X size={12} />
-                    </span>
-                  </div>
+                  {!isReadOnly && (
+                    <div className='absolute right-2 top-2.5 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
+                      <span
+                        className='aucctus-bg-secondary-hover flex h-5 w-5 cursor-pointer items-center justify-center rounded-full'
+                        onClick={() => handleEditStart(index, item.description)}
+                      >
+                        <Pencil size={14} />
+                      </span>
+                      <span
+                        className='aucctus-bg-secondary-hover flex h-5 w-5 cursor-pointer items-center justify-center rounded-full text-red-500'
+                        onClick={() => handleRemove(item, index)}
+                      >
+                        <X size={12} />
+                      </span>
+                    </div>
+                  )}
                 </>
               )}
             </div>

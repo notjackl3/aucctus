@@ -113,7 +113,8 @@ export type FeatureName =
   | 'financialProjection'
   | 'marketScan'
   | 'conceptOverview'
-  | 'ecosystem';
+  | 'ecosystem'
+  | 'customerProfiles';
 
 export type IFeatureVersions = {
   [K in FeatureName]?: FeatureVersion;
@@ -263,6 +264,41 @@ export interface ICustomerAlternative {
   uuid?: string;
 }
 
+export interface ICustomerSocialValue {
+  uuid: string;
+  title: string;
+  description: string;
+  order: number;
+}
+
+export interface ICustomerMotivation {
+  uuid: string;
+  text: string;
+  priority: number;
+  order: number;
+}
+
+export interface ICustomerBehaviour {
+  uuid: string;
+  text: string;
+  order: number;
+}
+
+export interface ICustomerKeyFact {
+  uuid: string;
+  stat: string;
+  label: string;
+  trend?: 'up' | 'down' | 'neutral';
+  order: number;
+}
+
+export interface ICustomerQuote {
+  uuid: string;
+  text: string;
+  context?: string;
+  order: number;
+}
+
 export interface ICustomerProfileRealWorldSignalsResponse
   extends IBaseConceptEntity {
   status: 'Not Started' | 'Pending' | 'Error' | 'Complete';
@@ -317,6 +353,13 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   journeyInsight?: string;
   customerInsight?: string;
   isPrimary?: boolean;
+  socialValues?: ICustomerSocialValue[];
+  motivations?: ICustomerMotivation[];
+  behaviours?: ICustomerBehaviour[];
+  keyFacts?: ICustomerKeyFact[];
+  quotes?: ICustomerQuote[];
+  alternatives?: ICustomerAlternative[];
+  journeySteps?: IUserJourneyStep[];
 
   conversations?: ICustomerProfileConversation[]; // Returned from additional API call
 }
@@ -408,12 +451,14 @@ export interface IUserJourneyStep {
     | 'Pain'
     | 'Moment of Intervention';
   icon?: string;
+  time?: string;
 }
 
 export interface IUserJourneyStepCreate {
   title: string;
   description: string;
   order: number;
+  time?: string;
   relationType?:
     | 'job'
     | 'pain'

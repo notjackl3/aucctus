@@ -19,6 +19,7 @@ interface FloatingSearchBarProps {
   rightOffset?: number;
   conceptItems?: MentionItem[];
   personaItems?: MentionItem[];
+  brandColors?: Record<string, string>;
 }
 
 const FloatingSearchBar = ({
@@ -29,6 +30,7 @@ const FloatingSearchBar = ({
   rightOffset = 0,
   conceptItems,
   personaItems,
+  brandColors,
 }: FloatingSearchBarProps) => {
   const [query, setQuery] = useState('');
   const [localImages, setLocalImages] = useState<IOverseerPendingImage[]>([]);
@@ -236,6 +238,17 @@ const FloatingSearchBar = ({
     [addImageFile],
   );
 
+  const orbStyles = useMemo(() => {
+    if (!brandColors || Object.keys(brandColors).length === 0) return undefined;
+    const values = Object.values(brandColors);
+    return {
+      '--orb-color-1': values[1] || undefined,
+      '--orb-color-2': values[3] || undefined,
+      '--orb-color-3': values[2] || undefined,
+      '--orb-color-4': values[0] || undefined,
+    } as React.CSSProperties;
+  }, [brandColors]);
+
   const hasMentionsOrImages = mentions.length > 0 || localImages.length > 0;
   const personaCount = filteredPersonas.length;
 
@@ -337,6 +350,7 @@ const FloatingSearchBar = ({
                 className={cn('floating-search-shell', {
                   'floating-search-shell--dragover': isDragging,
                 })}
+                style={orbStyles}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}

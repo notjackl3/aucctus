@@ -64,6 +64,7 @@ interface AssumptionsTableProps {
   categoryMetrics?: Record<AssumptionCategory, CategoryMetric>;
   selectedCategory?: AssumptionCategory;
   onCategoryChange?: (category: AssumptionCategory) => void;
+  isReadOnly?: boolean;
 }
 
 const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
@@ -72,6 +73,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
   categoryMetrics,
   selectedCategory: propSelectedCategory,
   onCategoryChange,
+  isReadOnly,
 }) => {
   const {
     // State
@@ -165,7 +167,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
   return (
     <div className='aucctus-border-primary rounded-lg border shadow-sm'>
       {/* Regenerate tests banner */}
-      {hasUnsavedChanges() && (
+      {!isReadOnly && hasUnsavedChanges() && (
         <RegenerateTestsBanner
           onRegenerate={handleSaveAllChanges}
           onDismiss={handleDiscardAllChanges}
@@ -241,7 +243,10 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                         <AssumptionDetailCard
                           assumption={effectiveData}
                           showActions={
-                            !isAdding && !editingAssumptionId && !isSubmitting
+                            !isReadOnly &&
+                            !isAdding &&
+                            !editingAssumptionId &&
+                            !isSubmitting
                           }
                           onDelete={() =>
                             handleDeleteAssumption(assumption.uuid, assumption)
@@ -300,7 +305,10 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                       <AssumptionDetailCard
                         assumption={effectiveData}
                         showActions={
-                          !isAdding && !editingAssumptionId && !isSubmitting
+                          !isReadOnly &&
+                          !isAdding &&
+                          !editingAssumptionId &&
+                          !isSubmitting
                         }
                         onDelete={() => removeChange(newAssumption.id)}
                       />
@@ -310,7 +318,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
               </div>
 
               {/* Add New Assumption Button - Dashed Border at Bottom */}
-              {!isAdding && (
+              {!isReadOnly && !isAdding && (
                 <div className='mt-4'>
                   <button
                     type='button'
@@ -334,7 +342,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
               </p>
 
               {/* Add New Assumption Button - Dashed Border at Bottom (empty state) */}
-              {!isAdding && (
+              {!isReadOnly && !isAdding && (
                 <div className='mt-4'>
                   <button
                     type='button'

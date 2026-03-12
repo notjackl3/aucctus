@@ -13,6 +13,7 @@ import telemetry from '@libs/telemetry';
 import { useModal } from '@context/ModalContextProvider';
 import Modal from '@components/Modal';
 import { Plus } from 'lucide-react';
+import { useConceptReportContext } from '../../ConceptReport/ConceptReportContext';
 
 // Constants for styling
 const ICON_STROKE = 'aucctus-stroke-brand-primary';
@@ -47,6 +48,7 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
   journey: initialJourney,
   productName = 'High Fibre Portable Cheese Bites',
 }) => {
+  const { isReadOnly } = useConceptReportContext();
   const { openModal, closeModal } = useModal();
 
   const {
@@ -227,14 +229,16 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
         title='User Journey Flow'
         noDivider={true}
         rightAction={
-          <button
-            className={addButtonStyles}
-            aria-label='Add journey step'
-            onClick={handleOpenAddStepModal}
-            disabled={isLoading}
-          >
-            <Plus className='aucctus-stroke-brand-primary h-5 w-5' />
-          </button>
+          !isReadOnly ? (
+            <button
+              className={addButtonStyles}
+              aria-label='Add journey step'
+              onClick={handleOpenAddStepModal}
+              disabled={isLoading}
+            >
+              <Plus className='aucctus-stroke-brand-primary h-5 w-5' />
+            </button>
+          ) : undefined
         }
       />
 
@@ -264,7 +268,7 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
           <>
             <JourneyCarousel
               steps={steps}
-              editable={true}
+              editable={!isReadOnly}
               onEdit={handleOpenEditStepModal}
               onRemove={handleRemoveStep}
               productName={productName}

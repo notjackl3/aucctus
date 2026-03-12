@@ -19,6 +19,11 @@ const PublicValueDiscoveryPage = React.lazy(
   () => import('@pages/ValueDiscovery/PublicValueDiscoveryPage'),
 );
 
+// Lazy load the public Shared Report page (completely unauthenticated)
+const SharedReportPage = React.lazy(
+  () => import('@pages/SharedReport/SharedReportPage'),
+);
+
 function App() {
   // Initialize global debug mode listener
   useDebugModeListener();
@@ -89,6 +94,7 @@ function App() {
             path={AppPath.Discover}
             element={<PublicValueDiscoveryPage />}
           />
+          <Route path={AppPath.SharedReport} element={<SharedReportPage />} />
 
           {/* Protected Routes */}
           <Route element={<AuthGuard />}>

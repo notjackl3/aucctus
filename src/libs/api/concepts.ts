@@ -14,11 +14,16 @@ import {
   IConversationMessagePage,
   ICreateRealWorldSignal,
   ICustomerAlternative,
+  ICustomerBehaviour,
   ICustomerJob,
+  ICustomerKeyFact,
+  ICustomerMotivation,
   ICustomerPain,
   ICustomerProfile,
   ICustomerProfileConversationPage,
   ICustomerProfileCreate,
+  ICustomerQuote,
+  ICustomerSocialValue,
   IExecutiveSummaries,
   IGenerationResponse,
   ICustomerProfileRealWorldSignal,
@@ -587,6 +592,7 @@ export class ConceptApi extends ApiService {
       title: string;
       description: string;
       order?: number;
+      time?: string;
       relationType?: string;
       isProductIntervention?: boolean;
     },
@@ -611,6 +617,179 @@ export class ConceptApi extends ApiService {
   deleteCustomerJourneyStep(customerProfileUuid: string, stepUuid: string) {
     return this.delete<void>(
       endpoints.customerProfileJourneyStep(customerProfileUuid, stepUuid),
+    );
+  }
+
+  // Customer Social Values API
+  getCustomerSocialValues(customerProfileUuid: string) {
+    return this.get<ICustomerSocialValue[]>(
+      endpoints.customerProfileSocialValues(customerProfileUuid),
+    );
+  }
+
+  createCustomerSocialValue(
+    customerProfileUuid: string,
+    data: { title: string; description: string; order?: number },
+  ) {
+    return this.post<ICustomerSocialValue>(
+      endpoints.customerProfileSocialValues(customerProfileUuid),
+      data,
+    );
+  }
+
+  updateCustomerSocialValue(
+    customerProfileUuid: string,
+    valueUuid: string,
+    data: Partial<ICustomerSocialValue>,
+  ) {
+    return this.patch<ICustomerSocialValue>(
+      endpoints.customerProfileSocialValue(customerProfileUuid, valueUuid),
+      data,
+    );
+  }
+
+  deleteCustomerSocialValue(customerProfileUuid: string, valueUuid: string) {
+    return this.delete<void>(
+      endpoints.customerProfileSocialValue(customerProfileUuid, valueUuid),
+    );
+  }
+
+  // Customer Motivations API
+  getCustomerMotivations(customerProfileUuid: string) {
+    return this.get<ICustomerMotivation[]>(
+      endpoints.customerProfileMotivations(customerProfileUuid),
+    );
+  }
+
+  createCustomerMotivation(
+    customerProfileUuid: string,
+    data: { text: string; priority?: number; order?: number },
+  ) {
+    return this.post<ICustomerMotivation>(
+      endpoints.customerProfileMotivations(customerProfileUuid),
+      data,
+    );
+  }
+
+  updateCustomerMotivation(
+    customerProfileUuid: string,
+    motivationUuid: string,
+    data: Partial<ICustomerMotivation>,
+  ) {
+    return this.patch<ICustomerMotivation>(
+      endpoints.customerProfileMotivation(customerProfileUuid, motivationUuid),
+      data,
+    );
+  }
+
+  deleteCustomerMotivation(
+    customerProfileUuid: string,
+    motivationUuid: string,
+  ) {
+    return this.delete<void>(
+      endpoints.customerProfileMotivation(customerProfileUuid, motivationUuid),
+    );
+  }
+
+  // Customer Behaviours API
+  getCustomerBehaviours(customerProfileUuid: string) {
+    return this.get<ICustomerBehaviour[]>(
+      endpoints.customerProfileBehaviours(customerProfileUuid),
+    );
+  }
+
+  createCustomerBehaviour(
+    customerProfileUuid: string,
+    data: { text: string; order?: number },
+  ) {
+    return this.post<ICustomerBehaviour>(
+      endpoints.customerProfileBehaviours(customerProfileUuid),
+      data,
+    );
+  }
+
+  updateCustomerBehaviour(
+    customerProfileUuid: string,
+    behaviourUuid: string,
+    data: Partial<ICustomerBehaviour>,
+  ) {
+    return this.patch<ICustomerBehaviour>(
+      endpoints.customerProfileBehaviour(customerProfileUuid, behaviourUuid),
+      data,
+    );
+  }
+
+  deleteCustomerBehaviour(customerProfileUuid: string, behaviourUuid: string) {
+    return this.delete<void>(
+      endpoints.customerProfileBehaviour(customerProfileUuid, behaviourUuid),
+    );
+  }
+
+  // Customer Key Facts API
+  getCustomerKeyFacts(customerProfileUuid: string) {
+    return this.get<ICustomerKeyFact[]>(
+      endpoints.customerProfileKeyFacts(customerProfileUuid),
+    );
+  }
+
+  createCustomerKeyFact(
+    customerProfileUuid: string,
+    data: { stat: string; label: string; trend?: string; order?: number },
+  ) {
+    return this.post<ICustomerKeyFact>(
+      endpoints.customerProfileKeyFacts(customerProfileUuid),
+      data,
+    );
+  }
+
+  updateCustomerKeyFact(
+    customerProfileUuid: string,
+    factUuid: string,
+    data: Partial<ICustomerKeyFact>,
+  ) {
+    return this.patch<ICustomerKeyFact>(
+      endpoints.customerProfileKeyFact(customerProfileUuid, factUuid),
+      data,
+    );
+  }
+
+  deleteCustomerKeyFact(customerProfileUuid: string, factUuid: string) {
+    return this.delete<void>(
+      endpoints.customerProfileKeyFact(customerProfileUuid, factUuid),
+    );
+  }
+
+  // Customer Quotes API
+  getCustomerQuotes(customerProfileUuid: string) {
+    return this.get<ICustomerQuote[]>(
+      endpoints.customerProfileQuotes(customerProfileUuid),
+    );
+  }
+
+  createCustomerQuote(
+    customerProfileUuid: string,
+    data: { text: string; context?: string; order?: number },
+  ) {
+    return this.post<ICustomerQuote>(
+      endpoints.customerProfileQuotes(customerProfileUuid),
+      data,
+    );
+  }
+
+  updateCustomerQuote(
+    customerProfileUuid: string,
+    quoteUuid: string,
+    data: Partial<ICustomerQuote>,
+  ) {
+    return this.patch<ICustomerQuote>(
+      endpoints.customerProfileQuote(customerProfileUuid, quoteUuid),
+      data,
+    );
+  }
+
+  deleteCustomerQuote(customerProfileUuid: string, quoteUuid: string) {
+    return this.delete<void>(
+      endpoints.customerProfileQuote(customerProfileUuid, quoteUuid),
     );
   }
 

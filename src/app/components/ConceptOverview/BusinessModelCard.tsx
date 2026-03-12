@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConceptReportContext } from '@pages/Concept/Report/ConceptReport/ConceptReportContext';
 import type { IBusinessMetric, BusinessMetricType } from './config';
 import { formatCurrency } from '@pages/Concept/Report/FinancialProjections/GenerateRevenue/tabs/MarketSizing/assumptionsUtils';
 import ProgressBar from './ProgressBar';
@@ -30,13 +31,20 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
   executiveSummary,
 }) => {
   const navigate = useNavigate();
+  const { isReadOnly, navigateToTab } = useConceptReportContext();
 
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      navigate(`/concept/${conceptId}/financial-projection?tab=business-model`);
+      if (isReadOnly) {
+        navigateToTab('financial');
+      } else {
+        navigate(
+          `/concept/${conceptId}/financial-projection?tab=business-model`,
+        );
+      }
     },
-    [navigate, conceptId],
+    [navigate, conceptId, isReadOnly, navigateToTab],
   );
 
   // Create business metrics from real data or fallback to mock

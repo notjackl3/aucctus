@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConceptReportContext } from '@pages/Concept/Report/ConceptReport/ConceptReportContext';
 import type { AssumptionCategory } from '@libs/api/types/concept/assumptions';
 import type { RiskLevel } from './config';
 import ProgressBar from './ProgressBar';
@@ -53,6 +54,7 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
   executiveSummary,
 }) => {
   const navigate = useNavigate();
+  const { isReadOnly, navigateToTab } = useConceptReportContext();
 
   // Convert averageRisk (0-1) to risk level
   const getRiskLevelFromValue = useCallback(
@@ -142,9 +144,13 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      navigate(`/concept/${conceptId}/assumptions`);
+      if (isReadOnly) {
+        navigateToTab('assumptions');
+      } else {
+        navigate(`/concept/${conceptId}/assumptions`);
+      }
     },
-    [navigate, conceptId],
+    [navigate, conceptId, isReadOnly, navigateToTab],
   );
 
   // Memoize risk categories with colors

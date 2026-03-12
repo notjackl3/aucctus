@@ -1,5 +1,5 @@
 import { cn } from '@libs/utils/react';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, ReactNode } from 'react';
 import { Bell } from 'lucide-react';
 
 interface IVersionUpgradeBannerProps {
@@ -9,6 +9,8 @@ interface IVersionUpgradeBannerProps {
   buttonText?: string;
   debugMode?: boolean;
   featureName?: string;
+  title?: string;
+  description?: ReactNode;
 }
 
 const VersionUpgradeBanner: FunctionComponent<IVersionUpgradeBannerProps> = ({
@@ -17,6 +19,8 @@ const VersionUpgradeBanner: FunctionComponent<IVersionUpgradeBannerProps> = ({
   isLoading = false,
   buttonText = 'Update',
   debugMode = false,
+  title,
+  description,
 }) => {
   return (
     <div
@@ -38,24 +42,28 @@ const VersionUpgradeBanner: FunctionComponent<IVersionUpgradeBannerProps> = ({
 
           <div className='flex-1'>
             <div className='aucctus-text-primary aucctus-text-md-semibold mb-0.5'>
-              {debugMode ? 'Debug Mode Regeneration' : 'New Features Available'}
+              {title ??
+                (debugMode
+                  ? 'Debug Mode Regeneration'
+                  : 'New Features Available')}
             </div>
             <div className='aucctus-text-secondary aucctus-text-sm'>
-              {debugMode ? (
-                <>
-                  This will regenerate the current section with fresh data for
-                  testing purposes.
-                  <br />
-                  Previous content will be replaced.
-                </>
-              ) : (
-                <>
-                  This page has been upgraded and is ready to be updated with
-                  the latest features.
-                  <br />
-                  Current content will be saved to version history.
-                </>
-              )}
+              {description ??
+                (debugMode ? (
+                  <>
+                    This will regenerate the current section with fresh data for
+                    testing purposes.
+                    <br />
+                    Previous content will be replaced.
+                  </>
+                ) : (
+                  <>
+                    This page has been upgraded and is ready to be updated with
+                    the latest features.
+                    <br />
+                    Current content will be saved to version history.
+                  </>
+                ))}
             </div>
           </div>
         </div>

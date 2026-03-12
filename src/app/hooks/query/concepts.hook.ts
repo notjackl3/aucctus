@@ -18,10 +18,15 @@ import {
   IConceptSeedUpdate,
   IConversationFilterOptions,
   ICreateRealWorldSignal,
+  ICustomerBehaviour,
   ICustomerJob,
+  ICustomerKeyFact,
+  ICustomerMotivation,
   ICustomerPain,
   ICustomerProfile,
   ICustomerProfileCreate,
+  ICustomerQuote,
+  ICustomerSocialValue,
   IFinancialProjection,
   IFormError,
   IGeneratedConcept,
@@ -1063,6 +1068,7 @@ export const useConceptCustomerProfileConversationList = (
         filterOptions,
       );
     },
+    enabled: !!profileUuid,
     onError: (e: AxiosError) => {
       if (e.response?.status === 404) {
         return; // Don't show error toast for 404 responses
@@ -2035,6 +2041,7 @@ export const useCustomerJourneyStepCreate = (customerProfileUuid: string) => {
       title: string;
       description: string;
       order?: number;
+      time?: string;
       relationType?: string;
       isProductIntervention?: boolean;
     }) => {
@@ -2136,6 +2143,612 @@ export const useCustomerJourneyStepDelete = () => {
         'Journey Step Deletion Failed',
         message || 'Unable to delete journey step',
       );
+    },
+  });
+};
+
+/**
+ * Customer Social Values API hooks
+ */
+export const useCustomerSocialValuesList = (customerProfileUuid: string) => {
+  return useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerProfile,
+      customerProfileUuid,
+      'social-values',
+    ],
+    queryFn: async () => {
+      if (!customerProfileUuid) return [];
+      return await api.concept.getCustomerSocialValues(customerProfileUuid);
+    },
+    enabled: !!customerProfileUuid,
+  });
+};
+
+export const useCustomerSocialValueCreate = (customerProfileUuid: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      title: string;
+      description: string;
+      order?: number;
+    }) => {
+      return await api.concept.createCustomerSocialValue(
+        customerProfileUuid,
+        data,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          customerProfileUuid,
+          'social-values',
+        ],
+      });
+      toast.success(
+        'Social Value Created',
+        'Social value has been added successfully',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Social Value Creation Failed',
+        message || 'Unable to create social value',
+      );
+    },
+  });
+};
+
+export const useCustomerSocialValueUpdate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      valueUuid: string;
+      data: Partial<ICustomerSocialValue>;
+    }) => {
+      const { customerProfileUuid, valueUuid, data } = params;
+      return await api.concept.updateCustomerSocialValue(
+        customerProfileUuid,
+        valueUuid,
+        data,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'social-values',
+        ],
+      });
+      toast.success(
+        'Social Value Updated',
+        'Social value has been updated successfully',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Social Value Update Failed',
+        message || 'Unable to update social value',
+      );
+    },
+  });
+};
+
+export const useCustomerSocialValueDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      valueUuid: string;
+    }) => {
+      const { customerProfileUuid, valueUuid } = params;
+      return await api.concept.deleteCustomerSocialValue(
+        customerProfileUuid,
+        valueUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'social-values',
+        ],
+      });
+      toast.success(
+        'Social Value Deleted',
+        'Social value has been removed successfully',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Social Value Deletion Failed',
+        message || 'Unable to delete social value',
+      );
+    },
+  });
+};
+
+/**
+ * Customer Motivations API hooks
+ */
+export const useCustomerMotivationsList = (customerProfileUuid: string) => {
+  return useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerProfile,
+      customerProfileUuid,
+      'motivations',
+    ],
+    queryFn: async () => {
+      if (!customerProfileUuid) return [];
+      return await api.concept.getCustomerMotivations(customerProfileUuid);
+    },
+    enabled: !!customerProfileUuid,
+  });
+};
+
+export const useCustomerMotivationCreate = (customerProfileUuid: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      text: string;
+      priority?: number;
+      order?: number;
+    }) => {
+      return await api.concept.createCustomerMotivation(
+        customerProfileUuid,
+        data,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          customerProfileUuid,
+          'motivations',
+        ],
+      });
+      toast.success(
+        'Motivation Created',
+        'Motivation has been added successfully',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Motivation Creation Failed',
+        message || 'Unable to create motivation',
+      );
+    },
+  });
+};
+
+export const useCustomerMotivationUpdate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      motivationUuid: string;
+      data: Partial<ICustomerMotivation>;
+    }) => {
+      const { customerProfileUuid, motivationUuid, data } = params;
+      return await api.concept.updateCustomerMotivation(
+        customerProfileUuid,
+        motivationUuid,
+        data,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'motivations',
+        ],
+      });
+      toast.success(
+        'Motivation Updated',
+        'Motivation has been updated successfully',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Motivation Update Failed',
+        message || 'Unable to update motivation',
+      );
+    },
+  });
+};
+
+export const useCustomerMotivationDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      motivationUuid: string;
+    }) => {
+      const { customerProfileUuid, motivationUuid } = params;
+      return await api.concept.deleteCustomerMotivation(
+        customerProfileUuid,
+        motivationUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'motivations',
+        ],
+      });
+      toast.success(
+        'Motivation Deleted',
+        'Motivation has been removed successfully',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Motivation Deletion Failed',
+        message || 'Unable to delete motivation',
+      );
+    },
+  });
+};
+
+/**
+ * Customer Behaviours API hooks
+ */
+export const useCustomerBehavioursList = (customerProfileUuid: string) => {
+  return useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerProfile,
+      customerProfileUuid,
+      'behaviours',
+    ],
+    queryFn: async () => {
+      if (!customerProfileUuid) return [];
+      return await api.concept.getCustomerBehaviours(customerProfileUuid);
+    },
+    enabled: !!customerProfileUuid,
+  });
+};
+
+export const useCustomerBehaviourCreate = (customerProfileUuid: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { text: string; order?: number }) => {
+      return await api.concept.createCustomerBehaviour(
+        customerProfileUuid,
+        data,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          customerProfileUuid,
+          'behaviours',
+        ],
+      });
+      toast.success(
+        'Behaviour Created',
+        'Behaviour has been added successfully',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Behaviour Creation Failed',
+        message || 'Unable to create behaviour',
+      );
+    },
+  });
+};
+
+export const useCustomerBehaviourUpdate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      behaviourUuid: string;
+      data: Partial<ICustomerBehaviour>;
+    }) => {
+      const { customerProfileUuid, behaviourUuid, data } = params;
+      return await api.concept.updateCustomerBehaviour(
+        customerProfileUuid,
+        behaviourUuid,
+        data,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'behaviours',
+        ],
+      });
+      toast.success(
+        'Behaviour Updated',
+        'Behaviour has been updated successfully',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Behaviour Update Failed',
+        message || 'Unable to update behaviour',
+      );
+    },
+  });
+};
+
+export const useCustomerBehaviourDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      behaviourUuid: string;
+    }) => {
+      const { customerProfileUuid, behaviourUuid } = params;
+      return await api.concept.deleteCustomerBehaviour(
+        customerProfileUuid,
+        behaviourUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'behaviours',
+        ],
+      });
+      toast.success(
+        'Behaviour Deleted',
+        'Behaviour has been removed successfully',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Behaviour Deletion Failed',
+        message || 'Unable to delete behaviour',
+      );
+    },
+  });
+};
+
+/**
+ * Customer Key Facts API hooks
+ */
+export const useCustomerKeyFactsList = (customerProfileUuid: string) => {
+  return useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerProfile,
+      customerProfileUuid,
+      'key-facts',
+    ],
+    queryFn: async () => {
+      if (!customerProfileUuid) return [];
+      return await api.concept.getCustomerKeyFacts(customerProfileUuid);
+    },
+    enabled: !!customerProfileUuid,
+  });
+};
+
+export const useCustomerKeyFactCreate = (customerProfileUuid: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      stat: string;
+      label: string;
+      trend?: string;
+      order?: number;
+    }) => {
+      return await api.concept.createCustomerKeyFact(customerProfileUuid, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          customerProfileUuid,
+          'key-facts',
+        ],
+      });
+      toast.success('Key Fact Created', 'Key fact has been added successfully');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Key Fact Creation Failed',
+        message || 'Unable to create key fact',
+      );
+    },
+  });
+};
+
+export const useCustomerKeyFactUpdate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      factUuid: string;
+      data: Partial<ICustomerKeyFact>;
+    }) => {
+      const { customerProfileUuid, factUuid, data } = params;
+      return await api.concept.updateCustomerKeyFact(
+        customerProfileUuid,
+        factUuid,
+        data,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'key-facts',
+        ],
+      });
+      toast.success(
+        'Key Fact Updated',
+        'Key fact has been updated successfully',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Key Fact Update Failed',
+        message || 'Unable to update key fact',
+      );
+    },
+  });
+};
+
+export const useCustomerKeyFactDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      factUuid: string;
+    }) => {
+      const { customerProfileUuid, factUuid } = params;
+      return await api.concept.deleteCustomerKeyFact(
+        customerProfileUuid,
+        factUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'key-facts',
+        ],
+      });
+      toast.success(
+        'Key Fact Deleted',
+        'Key fact has been removed successfully',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Key Fact Deletion Failed',
+        message || 'Unable to delete key fact',
+      );
+    },
+  });
+};
+
+/**
+ * Customer Quotes API hooks
+ */
+export const useCustomerQuotesList = (customerProfileUuid: string) => {
+  return useQuery({
+    queryKey: [AucctusQueryKeys.customerProfile, customerProfileUuid, 'quotes'],
+    queryFn: async () => {
+      if (!customerProfileUuid) return [];
+      return await api.concept.getCustomerQuotes(customerProfileUuid);
+    },
+    enabled: !!customerProfileUuid,
+  });
+};
+
+export const useCustomerQuoteCreate = (customerProfileUuid: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      text: string;
+      context?: string;
+      order?: number;
+    }) => {
+      return await api.concept.createCustomerQuote(customerProfileUuid, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          customerProfileUuid,
+          'quotes',
+        ],
+      });
+      toast.success('Quote Created', 'Quote has been added successfully');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error('Quote Creation Failed', message || 'Unable to create quote');
+    },
+  });
+};
+
+export const useCustomerQuoteUpdate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      quoteUuid: string;
+      data: Partial<ICustomerQuote>;
+    }) => {
+      const { customerProfileUuid, quoteUuid, data } = params;
+      return await api.concept.updateCustomerQuote(
+        customerProfileUuid,
+        quoteUuid,
+        data,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'quotes',
+        ],
+      });
+      toast.success('Quote Updated', 'Quote has been updated successfully');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error('Quote Update Failed', message || 'Unable to update quote');
+    },
+  });
+};
+
+export const useCustomerQuoteDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      quoteUuid: string;
+    }) => {
+      const { customerProfileUuid, quoteUuid } = params;
+      return await api.concept.deleteCustomerQuote(
+        customerProfileUuid,
+        quoteUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'quotes',
+        ],
+      });
+      toast.success('Quote Deleted', 'Quote has been removed successfully');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error('Quote Deletion Failed', message || 'Unable to delete quote');
     },
   });
 };

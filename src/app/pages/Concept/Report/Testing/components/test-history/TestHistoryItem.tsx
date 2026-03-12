@@ -57,6 +57,7 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({ test, concept }) => {
         testType: test.testType,
         concept,
         mode: 'view' as const,
+        initialTestDetail: test,
       },
       {
         position: 'center',

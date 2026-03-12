@@ -11,11 +11,10 @@ import { AppPath } from '@routes/routes';
 import { ISource } from '@libs/api/types';
 import utils from '@libs/utils';
 import React, { FunctionComponent, useMemo } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { IConceptReportContext } from './ConceptReport/ConceptReport';
+import { useConceptReportContext } from './ConceptReport/ConceptReportContext';
 
 const FinancialProjectionsV1: FunctionComponent = () => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept } = useConceptReportContext();
   const { financialProjection, isLoading: isFinancialProjectionLoading } =
     useFinancialProjection(concept.uuid);
 

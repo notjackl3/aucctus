@@ -1,5 +1,4 @@
 import { ConceptReportSkeletons } from '@components';
-import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
 import { useConceptCustomerProfileConversationList } from '@hooks/query/concepts.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import { CustomerProfileConversationEvent } from '@libs/events/CustomerProfileConversationEvent';
@@ -17,9 +16,14 @@ import CustomerConversation from './CustomerConversation';
 import CustomerJobs from './CustomerJobs';
 import CustomerOverview from './CustomerOverview';
 import CustomerPains from './CustomerPains';
-import RealWorldSignalList from './signals/RealWorldSignalList';
 import CustomerAlternatives from './CustomerAlternatives';
+import CustomerSocialValues from './CustomerSocialValues';
+import CustomerMotivationsAndBehaviours from './CustomerMotivationsAndBehaviours';
+import CustomerKeyFacts from './CustomerKeyFacts';
+import PersonaQuotesCarousel from './PersonaQuotesCarousel';
+import WorkdayJourney from './WorkdayJourney';
 import UserJourneyFlow from './UserJourneyFlow';
+import RealWorldSignalList from './signals/RealWorldSignalList';
 
 const {
   ProfileOverviewSkeleton,
@@ -32,27 +36,34 @@ export interface ICustomerDetailsProps {
   profile: ICustomerProfile;
   className?: string;
   showSkeletons?: boolean;
+  featureVersion?: string;
+  isReadOnly?: boolean;
 }
 
 const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
   profile,
   className = '',
   showSkeletons = false,
+  featureVersion = 'v2',
+  isReadOnly = false,
 }) => {
-  const { description, isLoading } = useEditCustomerProfile(profile.uuid);
+  const isV1 = featureVersion === 'v1';
   const overviewRef = useRef<HTMLDivElement>(null);
   const conversationRef = useRef<HTMLDivElement>(null);
-  const jobsRef = useRef<HTMLDivElement>(null);
-  const painsRef = useRef<HTMLDivElement>(null);
-  const alternativesRef = useRef<HTMLDivElement>(null);
   const [conversations, setConversations] = useState<
     ICustomerProfileConversation[]
   >([]);
+  const [overviewExpanded, setOverviewExpanded] = useState(false);
   const { setCustomerProfileUuid } = useStore(
     (state) => state.customerProfileConversations,
   );
   const { data: conversationResults, refetch } =
-    useConceptCustomerProfileConversationList(profile.uuid);
+    useConceptCustomerProfileConversationList(isReadOnly ? '' : profile.uuid);
+
+  // Reset overview expanded state on profile change
+  useEffect(() => {
+    setOverviewExpanded(false);
+  }, [profile.uuid]);
 
   useEffect(() => {
     if (conversationResults) {
@@ -67,11 +78,13 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
 
   // Refetch conversation list when profile.uuid changes
   useEffect(() => {
+    if (isReadOnly) return;
     refetch();
-  }, [profile.uuid, refetch]);
+  }, [profile.uuid, refetch, isReadOnly]);
 
   // Set customer profile UUID and handle new conversations
   useEffect(() => {
+    if (isReadOnly) return;
     setCustomerProfileUuid(profile.uuid);
 
     // Add event listener for the customer-profile-new-conversation event
@@ -100,132 +113,36 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         handleHandshake,
       );
     };
-  }, [profile, profile.uuid, setCustomerProfileUuid, conversations]);
+  }, [
+    profile,
+    profile.uuid,
+    setCustomerProfileUuid,
+    conversations,
+    isReadOnly,
+  ]);
 
-  // Synchronize conversation height with overview height
-  useEffect(() => {
-    const overviewElement = overviewRef.current;
-    const conversationElement = conversationRef.current;
-
-    if (overviewElement && conversationElement && !isLoading) {
-      const updateHeight = () => {
-        if (overviewElement) {
-          conversationElement.style.maxHeight = `${overviewElement.offsetHeight}px`;
-        }
-      };
-
-      // Create a ResizeObserver to detect changes in the overview component
-      const resizeObserver = new ResizeObserver(updateHeight);
-      resizeObserver.observe(overviewElement);
-
-      // Also keep the window resize listener for other layout changes
-      window.addEventListener('resize', updateHeight);
-
-      return () => {
-        if (overviewElement) {
-          resizeObserver.unobserve(overviewElement);
-        }
-        resizeObserver.disconnect();
-        window.removeEventListener('resize', updateHeight);
-      };
-    }
-  }, [isLoading]);
-
-  // Synchronize the heights of Jobs, Pains, and Alternatives cards
-  // Uses a flag to prevent infinite resize loops
-  const syncCardsHeight = useCallback(() => {
-    const jobsElement = jobsRef.current;
-    const painsElement = painsRef.current;
-    const alternativesElement = alternativesRef.current;
-
-    if (!jobsElement || !painsElement || !alternativesElement) return;
-
-    // First, reset all heights to auto to get natural heights
-    jobsElement.style.minHeight = 'auto';
-    painsElement.style.minHeight = 'auto';
-    alternativesElement.style.minHeight = 'auto';
-
-    // Force a reflow to get accurate measurements
-    void jobsElement.offsetHeight;
-
-    // Get the natural heights of all three cards
-    const jobsHeight = jobsElement.offsetHeight;
-    const painsHeight = painsElement.offsetHeight;
-    const alternativesHeight = alternativesElement.offsetHeight;
-
-    // Find the maximum height
-    const maxHeight = Math.max(jobsHeight, painsHeight, alternativesHeight);
-
-    // Apply the max height to all cards
-    jobsElement.style.minHeight = `${maxHeight}px`;
-    painsElement.style.minHeight = `${maxHeight}px`;
-    alternativesElement.style.minHeight = `${maxHeight}px`;
-  }, []);
-
-  useEffect(() => {
-    const jobsElement = jobsRef.current;
-    const painsElement = painsRef.current;
-    const alternativesElement = alternativesRef.current;
-
-    if (!jobsElement || !painsElement || !alternativesElement || isLoading) {
-      return;
-    }
-
-    // Initial sync
-    // Use setTimeout to let the content render first
-    const timeoutId = setTimeout(syncCardsHeight, 100);
-
-    // Create a single ResizeObserver for all three cards
-    let isUpdating = false;
-    const resizeObserver = new ResizeObserver(() => {
-      // Prevent recursive updates
-      if (isUpdating) return;
-      isUpdating = true;
-
-      // Use requestAnimationFrame to batch updates
-      requestAnimationFrame(() => {
-        syncCardsHeight();
-        // Reset the flag after a short delay to allow for settling
-        setTimeout(() => {
-          isUpdating = false;
-        }, 50);
-      });
-    });
-
-    resizeObserver.observe(jobsElement);
-    resizeObserver.observe(painsElement);
-    resizeObserver.observe(alternativesElement);
-
-    // Also listen for window resize
-    window.addEventListener('resize', syncCardsHeight);
-
-    return () => {
-      clearTimeout(timeoutId);
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', syncCardsHeight);
-    };
-  }, [isLoading, syncCardsHeight]);
-
-  const shouldShowSkeleton = showSkeletons || isLoading;
-
-  const renderSupportSkeletonCard = () => (
-    <div className='aucctus-bg-primary aucctus-border-secondary flex flex-1 flex-col gap-3 rounded-lg border p-4 shadow-sm'>
-      <SkeletonBlock className='h-5 w-40' />
-      <SkeletonBlock className='h-3 w-28' />
-      <SkeletonBlock className='h-4 w-full' />
-      <SkeletonBlock className='h-4 w-3/4' />
-      <SkeletonBlock className='h-4 w-2/3' />
-    </div>
+  const renderSupportSkeletonCard = useCallback(
+    () => (
+      <div className='aucctus-bg-primary aucctus-border-secondary flex flex-1 flex-col gap-3 rounded-lg border p-4 shadow-sm'>
+        <SkeletonBlock className='h-5 w-40' />
+        <SkeletonBlock className='h-3 w-28' />
+        <SkeletonBlock className='h-4 w-full' />
+        <SkeletonBlock className='h-4 w-3/4' />
+        <SkeletonBlock className='h-4 w-2/3' />
+      </div>
+    ),
+    [],
   );
 
   return (
     <div
       className={cn(
-        'flex h-full w-full flex-col items-start gap-6 self-stretch',
+        'flex h-full w-full flex-col items-start gap-6 self-stretch pb-32',
         className,
       )}
     >
-      {shouldShowSkeleton ? (
+      {/* Unified card: Overview + Conversation */}
+      {showSkeletons ? (
         <div className='flex w-full flex-row gap-4'>
           <ProfileOverviewSkeleton />
           <ProfileConversationSkeleton />
@@ -233,89 +150,133 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
       ) : (
         <div
           data-section-id='customer_profiles'
-          className='flex w-full flex-row gap-4'
+          className='aucctus-border-primary aucctus-bg-primary w-full overflow-hidden rounded-xl border shadow-sm'
         >
-          <CustomerOverview
-            ref={overviewRef}
-            profile={profile}
-            description={description}
-          />
-          <CustomerConversation
-            ref={conversationRef}
-            profile={profile}
-            conversations={conversations}
-          />
+          <div
+            className={cn('grid grid-cols-1', !isReadOnly && 'xl:grid-cols-2')}
+          >
+            {/* Left - persona overview */}
+            <div
+              className={cn(
+                'aucctus-border-secondary',
+                !isReadOnly && 'xl:border-r',
+              )}
+            >
+              <CustomerOverview
+                ref={overviewRef}
+                profile={profile}
+                overviewExpanded={overviewExpanded}
+                setOverviewExpanded={setOverviewExpanded}
+              />
+            </div>
+            {/* Right - chat (hidden in read-only mode) */}
+            {!isReadOnly && (
+              <div className='aucctus-border-secondary h-[480px] border-t xl:border-t-0'>
+                <CustomerConversation
+                  ref={conversationRef}
+                  profile={profile}
+                  conversations={conversations}
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      <div className='flex w-full flex-row gap-4'>
-        {shouldShowSkeleton ? (
+      {/* Quotes Carousel - full width, conditional */}
+      {!showSkeletons && profile.quotes && profile.quotes.length > 0 && (
+        <PersonaQuotesCarousel
+          quotes={profile.quotes}
+          profileId={profile.uuid}
+        />
+      )}
+
+      {/* Widget section - responsive grid */}
+      <div className='grid w-full grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3'>
+        {showSkeletons ? (
           <JobsToBeDoneSkeleton />
         ) : (
-          <div
-            ref={jobsRef}
-            data-section-id='customer_jobs'
-            className='flex min-w-0 flex-1 [&>*]:h-full [&>*]:w-full'
-          >
+          <div data-section-id='customer_jobs' className='h-full'>
             <CustomerJobs
               customerProfileUuid={profile.uuid}
               jobs={profile.jobs}
             />
           </div>
         )}
-        {shouldShowSkeleton ? (
+        {showSkeletons ? (
           renderSupportSkeletonCard()
         ) : (
-          <div
-            ref={painsRef}
-            data-section-id='customer_pains'
-            className='flex min-w-0 flex-1 [&>*]:h-full [&>*]:w-full'
-          >
+          <div data-section-id='customer_pains' className='h-full'>
             <CustomerPains
               customerProfileUuid={profile.uuid}
               pains={profile.pains}
             />
           </div>
         )}
-        {shouldShowSkeleton ? (
+        {!showSkeletons &&
+          profile.socialValues &&
+          profile.socialValues.length > 0 && (
+            <CustomerSocialValues
+              customerProfileUuid={profile.uuid}
+              socialValues={profile.socialValues}
+            />
+          )}
+        {!showSkeletons &&
+          ((profile.motivations && profile.motivations.length > 0) ||
+            (profile.behaviours && profile.behaviours.length > 0)) && (
+            <CustomerMotivationsAndBehaviours
+              customerProfileUuid={profile.uuid}
+              motivations={profile.motivations}
+              behaviours={profile.behaviours}
+            />
+          )}
+        {!showSkeletons && profile.keyFacts && profile.keyFacts.length > 0 && (
+          <CustomerKeyFacts
+            customerProfileUuid={profile.uuid}
+            keyFacts={profile.keyFacts}
+          />
+        )}
+        {showSkeletons ? (
           renderSupportSkeletonCard()
         ) : (
-          <div
-            ref={alternativesRef}
-            data-section-id='customer_alternatives'
-            className='flex min-w-0 flex-1 [&>*]:h-full [&>*]:w-full'
-          >
+          <div data-section-id='customer_alternatives' className='h-full'>
             <CustomerAlternatives customerProfileUuid={profile.uuid} />
           </div>
         )}
       </div>
 
+      {/* Journey */}
       <div
         data-section-id='customer_journey_steps'
         className='flex w-full flex-row gap-4'
       >
-        {shouldShowSkeleton ? (
+        {showSkeletons ? (
           renderSupportSkeletonCard()
-        ) : (
+        ) : isV1 ? (
           <UserJourneyFlow
             customerProfileUuid={profile.uuid}
             journey={profile.journey}
-            productName='High Fibre Cheese Bites'
+          />
+        ) : (
+          <WorkdayJourney
+            customerProfileUuid={profile.uuid}
+            journey={profile.journey}
           />
         )}
       </div>
-      {FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS && (
-        <div
-          data-section-id='customer_real_world_signals'
-          className='flex w-full flex-row gap-4'
-        >
-          {shouldShowSkeleton ? (
-            renderSupportSkeletonCard()
-          ) : (
+
+      {/* Real World Signals - v1 only, hidden in read-only (shared) reports */}
+      {isV1 &&
+        !showSkeletons &&
+        !isReadOnly &&
+        FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS && (
+          <div
+            data-section-id='customer_real_world_signals'
+            className='flex w-full flex-row gap-4'
+          >
             <RealWorldSignalList profileUuid={profile.uuid} />
-          )}
-        </div>
-      )}
+          </div>
+        )}
     </div>
   );
 };

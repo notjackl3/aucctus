@@ -25,6 +25,7 @@ import { PortfolioApi } from './portfolio';
 import { PortfolioInsightsApi } from './portfolioInsights';
 import { PropertyApi } from './properties';
 import { SeedApi } from './seed';
+import { SharedReportApi } from './sharedReport';
 import { TestingApi } from './testing';
 import { TrendsAndDriversV3Api } from './trendsAndDrivers';
 import { ValueDiscoveryApi } from './valueDiscovery';
@@ -71,6 +72,7 @@ export class Api {
   portfolio!: PortfolioApi;
   portfolioInsights!: PortfolioInsightsApi;
   accountBranding!: AccountBrandingApi;
+  sharedReport!: SharedReportApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -110,6 +112,7 @@ export class Api {
       { key: 'portfolio', class: PortfolioApi },
       { key: 'portfolioInsights', class: PortfolioInsightsApi },
       { key: 'accountBranding', class: AccountBrandingApi },
+      { key: 'sharedReport', class: SharedReportApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {

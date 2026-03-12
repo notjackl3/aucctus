@@ -37,6 +37,7 @@ interface TestExecutionModalProps {
   testUuid?: string;
   concept: any;
   mode?: 'edit' | 'view'; // Add mode prop to control edit/view behavior
+  initialTestDetail?: any; // Pre-loaded test detail (skips API fetch, used by shared report)
 }
 
 const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
@@ -45,6 +46,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   testUuid,
   concept,
   mode = 'edit', // Default to edit mode for backward compatibility
+  initialTestDetail,
 }) => {
   const { closeModal } = useModal();
   const queryClient = useQueryClient();
@@ -89,12 +91,64 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
     );
   }, [executionState?.status]);
 
-  // Only fetch test detail initially (needed for all tabs)
+  // When initialTestDetail is provided (shared report / view mode), seed the app-level
+  // QueryClient with sub-entity data so tab component hooks get cache hits.
+  // The modal renders via portal outside SharedReportProvider's QueryClientProvider,
+  // so the shared report's seeded cache is not accessible here.
+  useEffect(() => {
+    if (initialTestDetail && conceptUuid && testUuid) {
+      const noRefetch = {
+        staleTime: Infinity,
+        cacheTime: Infinity,
+        refetchOnMount: false as const,
+        refetchOnWindowFocus: false as const,
+      };
+      const keys = [
+        [AucctusQueryKeys.testDetail, conceptUuid, testUuid],
+        [AucctusQueryKeys.testParticipants, conceptUuid, testUuid],
+        [AucctusQueryKeys.testCollateral, conceptUuid, testUuid],
+        [AucctusQueryKeys.testResults, conceptUuid, testUuid],
+        [AucctusQueryKeys.testAssumptions, conceptUuid, testUuid],
+      ];
+      for (const key of keys) {
+        queryClient.setQueryDefaults(key, noRefetch);
+      }
+      queryClient.setQueryData(
+        [AucctusQueryKeys.testDetail, conceptUuid, testUuid],
+        initialTestDetail,
+      );
+      queryClient.setQueryData(
+        [AucctusQueryKeys.testParticipants, conceptUuid, testUuid],
+        { results: initialTestDetail.participants ?? [] },
+      );
+      queryClient.setQueryData(
+        [AucctusQueryKeys.testCollateral, conceptUuid, testUuid],
+        { results: initialTestDetail.collaterals ?? [] },
+      );
+      queryClient.setQueryData(
+        [AucctusQueryKeys.testResults, conceptUuid, testUuid],
+        { results: initialTestDetail.results ?? [] },
+      );
+      queryClient.setQueryData(
+        [AucctusQueryKeys.testAssumptions, conceptUuid, testUuid],
+        { results: initialTestDetail.assumptions ?? [] },
+      );
+    }
+  }, [initialTestDetail, conceptUuid, testUuid, queryClient]);
+
+  // Only fetch test detail initially (needed for all tabs).
+  // When initialTestDetail is provided (shared report), skip the API fetch entirely.
   const {
-    testDetail,
-    isLoading: isTestDetailLoading,
-    error: testDetailError,
-  } = useTestDetail(conceptUuid, testUuid || '');
+    testDetail: fetchedTestDetail,
+    isLoading: isFetchLoading,
+    error: fetchError,
+  } = useTestDetail(conceptUuid, testUuid || '', {
+    enabled: !initialTestDetail,
+  });
+
+  const testDetail = initialTestDetail ?? fetchedTestDetail;
+  const isTestDetailLoading = initialTestDetail ? false : isFetchLoading;
+  const testDetailError = initialTestDetail ? null : fetchError;
 
   const collateralRegenerationStatus = testDetail?.collateralRegenerationStatus;
   const isCollateralRegeneratingFromServer =
@@ -117,20 +171,27 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
       setSelectedCollateralUuid(undefined);
     }
 
-    // Invalidate collateral query when switching to collateral tab
-    if (activeTab === 'collateral' && conceptUuid && testUuid) {
+    // Invalidate collateral query when switching to collateral tab (skip in view mode to avoid re-fetches)
+    if (activeTab === 'collateral' && conceptUuid && testUuid && !isViewMode) {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.testCollateral, conceptUuid, testUuid],
       });
     }
 
     // Invalidate synthetic execution status query when switching to execute tab
-    if (activeTab === 'execute' && conceptUuid && testUuid) {
+    if (activeTab === 'execute' && conceptUuid && testUuid && !isViewMode) {
       queryClient.invalidateQueries({
         queryKey: ['syntheticExecutionStatus', conceptUuid, testUuid],
       });
     }
-  }, [activeTab, conceptUuid, testUuid, queryClient, selectedCollateralUuid]);
+  }, [
+    activeTab,
+    conceptUuid,
+    testUuid,
+    queryClient,
+    selectedCollateralUuid,
+    isViewMode,
+  ]);
 
   // Check if test can be completed (will be determined by Results tab)
   const [canCompleteTest, setCanCompleteTest] = useState(false);
@@ -191,15 +252,17 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
 
   // Enhanced close modal function
   const handleCloseModal = () => {
-    // Invalidate queries to ensure parent component gets fresh data
-    queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.testDetails, conceptUuid],
-    });
-
-    if (testUuid) {
+    // Invalidate queries to ensure parent component gets fresh data (skip in view mode)
+    if (!isViewMode) {
       queryClient.invalidateQueries({
-        queryKey: [AucctusQueryKeys.testDetail, conceptUuid, testUuid],
+        queryKey: [AucctusQueryKeys.testDetails, conceptUuid],
       });
+
+      if (testUuid) {
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.testDetail, conceptUuid, testUuid],
+        });
+      }
     }
 
     closeModal();
@@ -267,8 +330,8 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
     [disabledTabs, isSyntheticExecutionRunning],
   );
 
-  const tabs: TabElement[] = React.useMemo(
-    () => [
+  const tabs: TabElement[] = React.useMemo(() => {
+    const allTabs: TabElement[] = [
       {
         value: 'overview',
         label: createTabLabel('file-text', 'Overview', 'overview'),
@@ -293,9 +356,15 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
         value: 'impact',
         label: createTabLabel('lightbulb', 'Impact', 'impact'),
       },
-    ],
-    [createTabLabel],
-  );
+    ];
+    // Hide execute and impact tabs in view mode (read-only / shared report)
+    if (isViewMode) {
+      return allTabs.filter(
+        (tab) => tab.value !== 'execute' && tab.value !== 'impact',
+      );
+    }
+    return allTabs;
+  }, [createTabLabel, isViewMode]);
 
   const getTabIndex = (tabId: string) => {
     return tabs.findIndex((tab) => tab.value === tabId);
@@ -462,7 +531,10 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
         <TabView
           tabs={tabs}
           tabGroupClassName='aucctus-border-secondary w-full border-b px-6 py-0 flex-shrink-0'
-          tabContainerClassName='grid w-full grid-cols-6'
+          tabContainerClassName={cn(
+            'grid w-full',
+            isViewMode ? 'grid-cols-4' : 'grid-cols-6',
+          )}
           tabClassName='flex flex-1 items-center justify-center py-3 mt-4'
           className='flex min-h-0 w-full flex-1 flex-col'
           variant='default'

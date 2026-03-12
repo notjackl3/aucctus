@@ -15,12 +15,11 @@ import {
   getAssumptionHexColor,
 } from '@libs/utils/concepts';
 import React from 'react';
-import { useOutletContext } from 'react-router-dom';
-import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { List, ListFilter } from 'lucide-react';
+import { useConceptReportContext } from '../ConceptReport/ConceptReportContext';
 
 const AssumptionsV1: React.FC = () => {
-  const { concept } = useOutletContext<IConceptReportContext>();
+  const { concept } = useConceptReportContext();
   const { openModal } = useModal();
 
   const {
