@@ -44,6 +44,8 @@ jobs:
         run: npm install --include=dev
       - name: Build
         run: npm run build
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
       # upload all static assets w/ cache control (dist/** is an artifact from the previous step)
       - name: Deploy assets to S3
         run: aws s3 sync ./build/ s3://aucctus-staging-bucket --cache-control 'public,max-age=31536000,immutable'
