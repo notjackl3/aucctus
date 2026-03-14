@@ -41,6 +41,7 @@ import PersonaOverviewSection from './PersonaOverviewSection';
 import PersonaLiveChat from './PersonaLiveChat';
 import TrainingDocumentsPanel from './TrainingDocumentsPanel';
 import LayoutEditSaveBanner from './LayoutEditSaveBanner';
+import TaggedConceptsSection from './TaggedConceptsSection';
 import { DeletePersonaModal, AddWidgetModal } from './modals';
 import { PersonaWidgetGrid, QuotesCarouselWidget } from './widgets';
 import type {
@@ -609,7 +610,10 @@ const PersonaDetailView: React.FC<PersonaDetailViewProps> = ({ listItem }) => {
         </div>
       </div>
 
-      {/* 3.5. Quotes Carousel - full width below overview + chat */}
+      {/* 4.5. Tagged Concepts */}
+      <TaggedConceptsSection personaUuid={listItem.uuid} />
+
+      {/* 5. Quotes Carousel - full width below overview + chat */}
       {widgetData?.quotes && widgetData.quotes.length > 0 && (
         <QuotesCarouselWidget quotes={widgetData.quotes as PersonaQuote[]} />
       )}

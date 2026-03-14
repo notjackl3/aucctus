@@ -47,6 +47,7 @@ export const useAnchorThoughts = () => {
 interface ICreateSeedInput {
   thoughtText: string;
   file?: File;
+  livingPersonaUuids?: string[];
 }
 
 /**
@@ -62,11 +63,17 @@ export const useCreateSeed = () => {
       // Support both string (legacy) and object (with file) inputs
       const thoughtText = typeof input === 'string' ? input : input.thoughtText;
       const file = typeof input === 'string' ? undefined : input.file;
+      const livingPersonaUuids =
+        typeof input === 'string' ? undefined : input.livingPersonaUuids;
 
       if (!thoughtText?.trim()) {
         throw new Error('Thought text is required');
       }
-      return await api.ideaPlayground.createSeedWithThought(thoughtText, file);
+      return await api.ideaPlayground.createSeedWithThought(
+        thoughtText,
+        file,
+        livingPersonaUuids,
+      );
     },
     onSuccess: (data, input) => {
       const hasFile = typeof input !== 'string' && !!input.file;

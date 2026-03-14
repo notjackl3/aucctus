@@ -56,12 +56,18 @@ export class IdeaPlaygroundApi extends ApiService {
   createSeedWithThought(
     thoughtText: string,
     file?: File,
+    livingPersonaUuids?: string[],
   ): Promise<ICreateSeedResponse> {
     if (file) {
       // Use multipart/form-data for file upload
       const formData = new FormData();
       formData.append('thought_text', thoughtText);
       formData.append('file', file);
+      if (livingPersonaUuids?.length) {
+        for (const uuid of livingPersonaUuids) {
+          formData.append('living_persona_uuids', uuid);
+        }
+      }
 
       return this.postFormData<ICreateSeedResponse>(
         endpoints.ideaPlaygroundSeedWithFile,
@@ -70,7 +76,12 @@ export class IdeaPlaygroundApi extends ApiService {
     }
 
     // No file - use JSON body
-    const payload: ICreateSeedRequest = { thought_text: thoughtText };
+    const payload: ICreateSeedRequest = {
+      thought_text: thoughtText,
+      ...(livingPersonaUuids?.length && {
+        living_persona_uuids: livingPersonaUuids,
+      }),
+    };
     return this.post<ICreateSeedResponse, ICreateSeedRequest>(
       endpoints.ideaPlaygroundSeed,
       payload,
@@ -294,8 +305,15 @@ export class IdeaPlaygroundApi extends ApiService {
   /**
    * Save selected concepts to database
    */
-  saveConcepts(seedUuid: string, conceptUuids: string[]): Promise<void> {
-    const payload: ISaveConceptsRequest = { conceptUuids };
+  saveConcepts(
+    seedUuid: string,
+    conceptUuids: string[],
+    livingPersonaUuids?: string[],
+  ): Promise<void> {
+    const payload: ISaveConceptsRequest = {
+      conceptUuids,
+      ...(livingPersonaUuids?.length && { livingPersonaUuids }),
+    };
     return this.post<void, ISaveConceptsRequest>(
       endpoints.ideaPlaygroundSaveConcepts(seedUuid),
       payload,

@@ -1,9 +1,14 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from '@components';
 import { cn } from '@libs/utils/react';
 import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
-import { File, FileUp, Send, X } from 'lucide-react';
+import { File, Send, Upload, Users, X } from 'lucide-react';
+import {
+  MentionMenu,
+  buildMentionSections,
+} from '@components/shared/MentionMenu';
+import type { MentionItem } from '@stores/overseer/types';
 
 /** Maximum file size: 10MB */
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -36,6 +41,10 @@ interface LandingViewProps {
   onFileChange?: (file: File | null) => void;
   selectedFile?: File | null;
   style?: any;
+  personaItems?: MentionItem[];
+  selectedPersonas?: MentionItem[];
+  onPersonaSelect?: (item: MentionItem) => void;
+  onPersonaRemove?: (id: string) => void;
 }
 
 const LandingView: React.FC<LandingViewProps> = ({
@@ -46,10 +55,51 @@ const LandingView: React.FC<LandingViewProps> = ({
   onFileChange,
   selectedFile,
   style,
+  personaItems = [],
+  selectedPersonas = [],
+  onPersonaSelect,
+  onPersonaRemove,
 }) => {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [showPersonaMenu, setShowPersonaMenu] = useState(false);
+  const [personaQuery, setPersonaQuery] = useState('');
+
+  // Build persona-only sections for the menu (filter out already-selected)
+  const selectedIds = React.useMemo(
+    () => new Set(selectedPersonas.map((p) => p.id)),
+    [selectedPersonas],
+  );
+  const sections = React.useMemo(
+    () =>
+      buildMentionSections(
+        personaItems.filter((p) => !selectedIds.has(p.id)),
+        [],
+      ),
+    [personaItems, selectedIds],
+  );
+
+  const handlePersonaSelect = useCallback(
+    (item: MentionItem) => {
+      setShowPersonaMenu(false);
+      setPersonaQuery('');
+      onPersonaSelect?.(item);
+      setTimeout(() => textareaRef.current?.focus(), 0);
+    },
+    [onPersonaSelect],
+  );
+
+  const handlePersonaMenuClose = useCallback(() => {
+    setShowPersonaMenu(false);
+    setPersonaQuery('');
+  }, []);
+
+  const togglePersonaMenu = useCallback(() => {
+    if (selectedPersonas.length >= 4) return;
+    setShowPersonaMenu((prev) => !prev);
+    setPersonaQuery('');
+  }, [selectedPersonas.length]);
 
   const validateFile = (file: File): boolean => {
     // Check file size
@@ -115,10 +165,25 @@ const LandingView: React.FC<LandingViewProps> = ({
     fileInputRef.current?.click();
   };
 
-  const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Let persona menu handle navigation keys when open
+    if (showPersonaMenu) {
+      if (
+        e.key === 'Enter' ||
+        e.key === 'Escape' ||
+        e.key === 'ArrowUp' ||
+        e.key === 'ArrowDown'
+      ) {
+        return;
+      }
+    }
+
+    // Enter submits (without shift), Shift+Enter creates newline
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      onSubmit?.();
+    }
+    onKeyDown?.(e);
   };
 
   return (
@@ -141,79 +206,158 @@ const LandingView: React.FC<LandingViewProps> = ({
           </div>
 
           <div
-            className='pointer-events-auto mx-auto w-full max-w-xl'
+            className='pointer-events-auto mx-auto w-full max-w-lg'
             style={getAnimationStyle('fadeIn', 800, 600)}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <div
-              className={cn('relative', {
-                'rounded-3xl ring-2 ring-white/40': isDragging,
-              })}
-            >
-              <textarea
-                ref={textareaRef}
-                value={inputValue}
-                onChange={onInputChange}
-                onKeyDown={(e) => {
-                  // Enter submits (without shift), Shift+Enter creates newline
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    onSubmit?.();
-                  }
-                  onKeyDown?.(e);
-                }}
-                placeholder='Describe a problem, idea or focus area on your mind'
-                rows={1}
-                className='aucctus-text-md shadow-glass aucctus-text-white w-full resize-none overflow-y-auto rounded-3xl border border-white/20 bg-white/10 py-6 pl-8 pr-24 backdrop-blur-md transition-all duration-300 [-ms-overflow-style:none] [scrollbar-width:none] placeholder:text-white/60 focus:border-white/40 focus:bg-white/20 [&::-webkit-scrollbar]:hidden'
-                style={{ maxHeight: '7.5rem' }} // ~3 lines
-                onInput={(e) => {
-                  const target = e.target as HTMLTextAreaElement;
-                  target.style.height = 'auto';
-                  target.style.height =
-                    Math.min(target.scrollHeight, 120) + 'px';
-                }}
+            <div className='relative'>
+              {/* Persona menu (positioned above the card) */}
+              <MentionMenu
+                query={personaQuery}
+                onSelect={handlePersonaSelect}
+                onClose={handlePersonaMenuClose}
+                visible={showPersonaMenu}
+                sections={sections}
+                className='absolute bottom-full left-0 right-0 z-50 mb-1 max-h-[160px] overflow-y-auto rounded-xl border border-white/15 bg-black/90 shadow-2xl backdrop-blur-xl'
               />
 
-              {/* File upload button */}
-              <button
-                type='button'
-                onClick={handleUploadClick}
+              {/* Card container */}
+              <div
                 className={cn(
-                  'absolute right-14 top-6 rounded-lg p-1.5 transition-all duration-200',
-                  {
-                    'opacity-60 hover:bg-white/10 hover:opacity-100':
-                      !selectedFile,
-                    'bg-white/20 opacity-100': selectedFile,
-                  },
+                  'shadow-glass rounded-xl border border-white/20 bg-white/10 backdrop-blur-md transition-all duration-300 focus-within:border-white/30',
+                  { 'ring-2 ring-white/40': isDragging },
                 )}
-                title={
-                  selectedFile
-                    ? `${selectedFile.name} (${formatFileSize(selectedFile.size)})`
-                    : 'Attach a file (optional)'
-                }
               >
-                <FileUp className='aucctus-stroke-white h-5 w-5' />
-              </button>
+                {/* Input area */}
+                <div className='relative'>
+                  <textarea
+                    ref={textareaRef}
+                    value={inputValue}
+                    onChange={onInputChange}
+                    onKeyDown={handleKeyDown}
+                    placeholder='Describe a problem, idea or focus area on your mind'
+                    rows={1}
+                    className='no-focus-ring w-full resize-none overflow-y-auto border-0 bg-transparent px-5 py-6 text-base text-white shadow-none [-ms-overflow-style:none] [scrollbar-width:none] placeholder:text-white/60 focus:border-0 focus:outline-none focus:ring-0 [&::-webkit-scrollbar]:hidden'
+                    style={{ maxHeight: '7.5rem' }}
+                    onInput={(e) => {
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = 'auto';
+                      target.style.height =
+                        Math.min(target.scrollHeight, 120) + 'px';
+                    }}
+                  />
+                </div>
 
-              {/* Send button */}
-              <button
-                type='button'
-                onClick={onSubmit}
-                disabled={!inputValue.trim()}
-                className={cn(
-                  'absolute right-6 top-6 rounded-lg p-1.5 transition-all duration-200',
-                  {
-                    'cursor-not-allowed opacity-30': !inputValue.trim(),
-                    'opacity-60 hover:bg-white/10 hover:opacity-100':
-                      inputValue.trim(),
-                  },
-                )}
-                title='Submit'
-              >
-                <Send className='aucctus-stroke-white h-5 w-5' />
-              </button>
+                {/* Bottom action bar */}
+                <div className='-mt-1 flex items-center gap-1.5 px-5 pb-3'>
+                  {/* Add Personas button */}
+                  {personaItems.length > 0 && (
+                    <button
+                      type='button'
+                      onClick={togglePersonaMenu}
+                      className={cn(
+                        'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors',
+                        selectedPersonas.length >= 4
+                          ? 'cursor-not-allowed border-white/10 text-white/20'
+                          : showPersonaMenu
+                            ? 'border-white/30 bg-white/10 text-white/70'
+                            : 'border-white/15 text-white/40 hover:bg-white/[0.08] hover:text-white/70',
+                      )}
+                    >
+                      <Users className='h-3 w-3' />
+                      <span>
+                        {selectedPersonas.length > 0
+                          ? `Personas (${selectedPersonas.length}/4)`
+                          : 'Add Personas'}
+                      </span>
+                    </button>
+                  )}
+
+                  {/* Selected persona badges */}
+                  {selectedPersonas.map((persona) => (
+                    <motion.span
+                      key={persona.id}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className='inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-500/20 px-2 py-0.5 text-[10px] font-medium text-purple-200'
+                    >
+                      {persona.avatar ? (
+                        <img
+                          src={persona.avatar}
+                          alt={persona.name}
+                          className='h-3.5 w-3.5 rounded-full object-cover'
+                        />
+                      ) : (
+                        <span className='flex h-3.5 w-3.5 items-center justify-center rounded-full bg-purple-500/30 text-[7px] font-bold text-purple-200'>
+                          {persona.name.charAt(0)}
+                        </span>
+                      )}
+                      {persona.name}
+                      <button
+                        type='button'
+                        onClick={() => onPersonaRemove?.(persona.id)}
+                        className='ml-0.5 transition-colors hover:text-white'
+                      >
+                        <X size={10} className='stroke-current' />
+                      </button>
+                    </motion.span>
+                  ))}
+
+                  {/* Spacer */}
+                  <div className='flex-1' />
+
+                  {/* Selected file indicator (inline) */}
+                  {selectedFile && (
+                    <div className='flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[10px] text-white/60'>
+                      <File className='h-3 w-3 stroke-current' />
+                      <span className='max-w-20 truncate'>
+                        {selectedFile.name}
+                      </span>
+                      <button
+                        type='button'
+                        onClick={handleRemoveFile}
+                        className='transition-colors hover:text-white'
+                      >
+                        <X size={10} className='stroke-current' />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Upload button */}
+                  <button
+                    type='button'
+                    onClick={handleUploadClick}
+                    className={cn(
+                      'rounded-lg p-2 transition-all',
+                      selectedFile
+                        ? 'bg-white/10 text-white/50'
+                        : 'text-white/20 hover:bg-white/[0.08] hover:text-white/50',
+                    )}
+                    aria-label='Upload file'
+                  >
+                    <Upload className='h-4 w-4' />
+                  </button>
+
+                  {/* Send button */}
+                  <button
+                    type='button'
+                    onClick={onSubmit}
+                    disabled={!inputValue.trim()}
+                    className={cn(
+                      'rounded-lg p-2 transition-all',
+                      inputValue.trim()
+                        ? 'text-white/50 hover:bg-white/[0.08] hover:text-white/80'
+                        : 'text-white/20',
+                    )}
+                    aria-label='Submit'
+                  >
+                    <Send className='h-4 w-4' />
+                  </button>
+                </div>
+              </div>
 
               {/* Hidden file input */}
               <input
@@ -224,32 +368,6 @@ const LandingView: React.FC<LandingViewProps> = ({
                 className='hidden'
               />
             </div>
-
-            {/* Selected file indicator */}
-            {selectedFile && (
-              <div
-                className='mt-3 flex items-center justify-center gap-2'
-                style={getAnimationStyle('fadeIn', 300, 0)}
-              >
-                <div className='flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 backdrop-blur-md'>
-                  <File className='aucctus-stroke-white h-4 w-4 opacity-80' />
-                  <span className='aucctus-text-sm aucctus-text-white max-w-48 truncate opacity-80'>
-                    {selectedFile.name}
-                  </span>
-                  <span className='aucctus-text-xs aucctus-text-white opacity-60'>
-                    ({formatFileSize(selectedFile.size)})
-                  </span>
-                  <button
-                    type='button'
-                    onClick={handleRemoveFile}
-                    className='ml-1 rounded-full p-0.5 transition-colors hover:bg-white/20'
-                    title='Remove file'
-                  >
-                    <X className='aucctus-stroke-white h-3.5 w-3.5 opacity-80' />
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
 
           <div style={getAnimationStyle('fadeIn', 800, 1500)}>

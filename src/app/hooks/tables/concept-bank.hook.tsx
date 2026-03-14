@@ -1147,6 +1147,76 @@ export const useConceptBank = (
         ),
         enableColumnFilter: false,
       }),
+      // Living Persona column
+      columnHelper.accessor((row) => row.livingPersonas, {
+        id: 'livingPersona',
+        enableColumnFilter: false,
+        enableSorting: false,
+        size: 160,
+        minSize: 130,
+        maxSize: 250,
+        enableResizing: true,
+        header: () => (
+          <Table.ConceptBank.StaticColumnMenu
+            columnName='Persona'
+            columnId='livingPersona'
+            leadingIcon='user'
+            onSort={undefined}
+            onReorder={handleColumnReorder}
+          />
+        ),
+        cell: (info) => {
+          const personas = info.row.original.livingPersonas;
+          if (!personas || personas.length === 0) return null;
+
+          const tooltipText = personas
+            .map((p) => `${p.name} (${p.segment})`)
+            .join(', ');
+
+          return (
+            <span
+              className='flex w-full flex-row items-center justify-start gap-2'
+              title={tooltipText}
+            >
+              <div className='flex -space-x-2'>
+                {personas.map((persona) => {
+                  const initials = persona.segment
+                    .split(' ')
+                    .map((w: string) => w[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2);
+                  return persona.avatarUrl ? (
+                    <img
+                      key={persona.uuid}
+                      src={persona.avatarUrl}
+                      alt={persona.name}
+                      className='h-7 w-7 shrink-0 rounded-full border-2 border-white object-cover dark:border-gray-800'
+                    />
+                  ) : (
+                    <div
+                      key={persona.uuid}
+                      className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-white text-[10px] font-bold text-white dark:border-gray-800'
+                      style={{
+                        backgroundColor: persona.themeColor
+                          ? `hsl(${persona.themeColor})`
+                          : '#6366F1',
+                      }}
+                    >
+                      {initials}
+                    </div>
+                  );
+                })}
+              </div>
+              <span className='aucctus-text-primary aucctus-text-sm max-w-[120px] truncate'>
+                {personas.length === 1
+                  ? personas[0].name
+                  : `${personas.length} personas`}
+              </span>
+            </span>
+          );
+        },
+      }),
       columnHelper.accessor('uuid', {
         id: 'priority',
         enableSorting: true,
@@ -1344,6 +1414,7 @@ export const useConceptBank = (
       'lastModifiedBy',
       'updatedAt',
       'status',
+      'livingPersona',
       'actions',
       'settings',
     ]);
@@ -1363,6 +1434,7 @@ export const useConceptBank = (
         'lastModifiedBy',
         'updatedAt',
         'status',
+        'livingPersona',
         ...propertyIds,
         'actions',
         'settings',
@@ -1412,6 +1484,7 @@ export const useConceptBank = (
         'lastModifiedBy',
         'lastModifiedDate',
         'status',
+        'livingPersona',
         'actions',
         'settings',
       ]);

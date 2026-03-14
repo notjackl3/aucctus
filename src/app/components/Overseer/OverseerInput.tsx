@@ -1,12 +1,7 @@
 import { cn } from '@libs/utils/react';
 import { IOverseerPendingImage, MentionItem } from '@stores/overseer/types';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useMentionDetection } from '@components/shared/MentionMenu';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import OverseerMentionMenu from './OverseerMentionMenu';
 import { Paperclip, Send, Square, X } from 'lucide-react';
 
@@ -59,24 +54,7 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
   const [mentionQuery, setMentionQuery] = useState('');
 
   // Detect @mention trigger
-  const mentionState = useMemo(() => {
-    const lastAtIndex = value.lastIndexOf('@');
-    if (lastAtIndex === -1) return { active: false, query: '', index: -1 };
-
-    // @ must be at start or preceded by a space
-    if (lastAtIndex > 0 && value[lastAtIndex - 1] !== ' ') {
-      return { active: false, query: '', index: -1 };
-    }
-
-    const textAfterAt = value.slice(lastAtIndex + 1);
-
-    // If there's a space, mention input is done
-    if (textAfterAt.includes(' ')) {
-      return { active: false, query: '', index: -1 };
-    }
-
-    return { active: true, query: textAfterAt, index: lastAtIndex };
-  }, [value]);
+  const mentionState = useMentionDetection(value);
 
   useEffect(() => {
     setShowMentionMenu(mentionState.active);

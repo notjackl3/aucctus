@@ -92,6 +92,7 @@ export interface IAnchorThoughtsResponse {
  */
 export interface ICreateSeedRequest {
   thought_text: string;
+  living_persona_uuids?: string[];
 }
 
 /**
@@ -114,6 +115,7 @@ export interface ICreateSeedResponse {
   anchorThought: IAnchorThought;
   title?: string;
   file?: ISeedFile | null;
+  livingPersonaUuids?: string[];
 }
 
 /**
@@ -289,6 +291,7 @@ export interface IIdeaPlaygroundGenerateIdeasResponse {
  */
 export interface ISaveConceptsRequest {
   conceptUuids: string[];
+  livingPersonaUuids?: string[];
 }
 
 /**

@@ -1,7 +1,12 @@
 import { cn } from '@libs/utils/react';
 import { IOverseerPendingImage, MentionItem } from '@stores/overseer/types';
+import {
+  MentionMenu,
+  buildMentionSections,
+  useMentionDetection,
+} from '@components/shared/MentionMenu';
 import { AnimatePresence, motion } from 'framer-motion';
-import { History, Lightbulb, Search, Users, X } from 'lucide-react';
+import { History, Search, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './floating-search-bar.scss';
 
@@ -36,8 +41,6 @@ const FloatingSearchBar = ({
   const [localImages, setLocalImages] = useState<IOverseerPendingImage[]>([]);
   const [mentions, setMentions] = useState<MentionItem[]>([]);
   const [showMentionMenu, setShowMentionMenu] = useState(false);
-  const [mentionQuery, setMentionQuery] = useState('');
-  const [activeMenuIndex, setActiveMenuIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -54,73 +57,16 @@ const FloatingSearchBar = ({
   }, []);
 
   // Detect @mention trigger
-  const mentionState = useMemo(() => {
-    const lastAtIndex = query.lastIndexOf('@');
-    if (lastAtIndex === -1) return { active: false, query: '', index: -1 };
-
-    if (lastAtIndex > 0 && query[lastAtIndex - 1] !== ' ') {
-      return { active: false, query: '', index: -1 };
-    }
-
-    const textAfterAt = query.slice(lastAtIndex + 1);
-    if (textAfterAt.includes(' ')) {
-      return { active: false, query: '', index: -1 };
-    }
-
-    return { active: true, query: textAfterAt, index: lastAtIndex };
-  }, [query]);
+  const mentionState = useMentionDetection(query);
 
   useEffect(() => {
     setShowMentionMenu(mentionState.active);
-    setMentionQuery(mentionState.query);
-  }, [mentionState.active, mentionState.query]);
+  }, [mentionState.active]);
 
-  const filteredPersonas = useMemo(() => {
-    if (!personaItems) return [];
-    const q = mentionQuery.toLowerCase();
-    return personaItems.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.segment?.toLowerCase().includes(q),
-    );
-  }, [mentionQuery, personaItems]);
-
-  const filteredConcepts = useMemo(() => {
-    if (!conceptItems) return [];
-    const q = mentionQuery.toLowerCase();
-    return conceptItems.filter((c) => c.name.toLowerCase().includes(q));
-  }, [mentionQuery, conceptItems]);
-
-  const allItems = useMemo(
-    () => [...filteredPersonas, ...filteredConcepts],
-    [filteredPersonas, filteredConcepts],
+  const mentionSections = useMemo(
+    () => buildMentionSections(personaItems, conceptItems),
+    [personaItems, conceptItems],
   );
-
-  // Reset active index when query changes
-  useEffect(() => {
-    setActiveMenuIndex(0);
-  }, [mentionQuery]);
-
-  // Keyboard navigation for mention menu
-  useEffect(() => {
-    if (!showMentionMenu) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setActiveMenuIndex((i) => Math.min(i + 1, allItems.length - 1));
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setActiveMenuIndex((i) => Math.max(i - 1, 0));
-      } else if (e.key === 'Enter' && allItems.length > 0) {
-        e.preventDefault();
-        handleMentionSelect(allItems[activeMenuIndex]);
-      } else if (e.key === 'Escape') {
-        setShowMentionMenu(false);
-      }
-    };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [showMentionMenu, activeMenuIndex, allItems]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addImageFile = useCallback(
     (file: File) => {
@@ -238,6 +184,10 @@ const FloatingSearchBar = ({
     [addImageFile],
   );
 
+  const handleMentionMenuClose = useCallback(() => {
+    setShowMentionMenu(false);
+  }, []);
+
   const orbStyles = useMemo(() => {
     if (!brandColors || Object.keys(brandColors).length === 0) return undefined;
     const values = Object.values(brandColors);
@@ -250,7 +200,6 @@ const FloatingSearchBar = ({
   }, [brandColors]);
 
   const hasMentionsOrImages = mentions.length > 0 || localImages.length > 0;
-  const personaCount = filteredPersonas.length;
 
   return (
     <AnimatePresence>
@@ -269,82 +218,20 @@ const FloatingSearchBar = ({
           <div className='flex justify-center px-4'>
             <div className='pointer-events-auto relative w-[480px] max-w-full'>
               {/* Mention menu — rendered OUTSIDE the shell to avoid overflow:hidden clipping */}
-              {showMentionMenu && allItems.length > 0 && (
-                <div className='no-scrollbar absolute bottom-full left-0 right-0 z-50 mb-1 max-h-[160px] overflow-y-auto rounded-2xl border border-gray-200/60 bg-white/80 shadow-lg backdrop-blur-xl'>
-                  {/* Living Personas section */}
-                  {filteredPersonas.length > 0 && (
-                    <>
-                      <div className='flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-wider text-gray-400'>
-                        <Users className='h-3 w-3' />
-                        Living Personas
-                      </div>
-                      {filteredPersonas.map((item, i) => (
-                        <button
-                          key={item.id}
-                          onClick={() => handleMentionSelect(item)}
-                          className={cn(
-                            'flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors',
-                            i === activeMenuIndex
-                              ? 'text-gray-900'
-                              : 'text-gray-500 hover:text-gray-700',
-                          )}
-                        >
-                          {item.avatar ? (
-                            <img
-                              src={item.avatar}
-                              alt={item.name}
-                              className='h-5 w-5 shrink-0 rounded-full object-cover'
-                            />
-                          ) : (
-                            <span className='flex h-5 w-5 items-center justify-center rounded-full bg-purple-500/15 text-[9px] font-bold text-purple-600'>
-                              {item.name.charAt(0)}
-                            </span>
-                          )}
-                          <span className='flex-1 truncate'>{item.name}</span>
-                          {item.segment && (
-                            <span className='max-w-[100px] shrink-0 truncate text-[9px] text-gray-400'>
-                              {item.segment}
-                            </span>
-                          )}
-                        </button>
-                      ))}
-                    </>
-                  )}
-
-                  {/* Concept Bank section */}
-                  {filteredConcepts.length > 0 && (
-                    <>
-                      <div
-                        className={cn(
-                          'flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-wider text-gray-400',
-                          filteredPersonas.length > 0 &&
-                            'border-t border-gray-200/60',
-                        )}
-                      >
-                        <Lightbulb className='h-3 w-3' />
-                        Concept Bank
-                      </div>
-                      {filteredConcepts.map((item, i) => (
-                        <button
-                          key={item.id}
-                          onClick={() => handleMentionSelect(item)}
-                          className={cn(
-                            'flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors',
-                            i + personaCount === activeMenuIndex
-                              ? 'text-gray-900'
-                              : 'text-gray-500 hover:text-gray-700',
-                          )}
-                        >
-                          <span className='flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/15'>
-                            <Lightbulb className='h-3 w-3 stroke-amber-600' />
-                          </span>
-                          <span className='flex-1 truncate'>{item.name}</span>
-                        </button>
-                      ))}
-                    </>
-                  )}
-                </div>
-              )}
+              <MentionMenu
+                query={mentionState.query}
+                onSelect={handleMentionSelect}
+                onClose={handleMentionMenuClose}
+                visible={showMentionMenu}
+                sections={mentionSections}
+                className='no-scrollbar absolute bottom-full left-0 right-0 z-50 mb-1 max-h-[160px] overflow-y-auto rounded-2xl border border-gray-200/60 bg-white/80 shadow-lg backdrop-blur-xl'
+                activeItemClassName='text-gray-900'
+                inactiveItemClassName='text-gray-500 hover:text-gray-700'
+                sectionLabelClassName='flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-wider text-gray-400'
+                sectionDividerClassName='border-t border-gray-200/60'
+                avatarFallbackClassName='flex h-5 w-5 items-center justify-center rounded-full bg-purple-500/15 text-[9px] font-bold text-purple-600'
+                segmentClassName='max-w-[100px] shrink-0 truncate text-[9px] text-gray-400'
+              />
 
               <div
                 className={cn('floating-search-shell', {

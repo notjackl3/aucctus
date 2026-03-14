@@ -24,14 +24,27 @@ import { AppPath } from '@routes/routes';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import { ArrowLeft } from 'lucide-react';
 
+/** Persona display info for rendering badges on concept cards */
+export interface PersonaDisplayInfo {
+  uuid: string;
+  name: string;
+  segment: string;
+  themeColor?: string;
+  avatar?: string;
+}
+
 interface OpportunityMapProps {
   seedUuid: string | null;
   onClose: () => void;
+  livingPersonaUuids?: string[];
+  personaInfos?: PersonaDisplayInfo[];
 }
 
 const OpportunityMap: React.FC<OpportunityMapProps> = ({
   seedUuid,
   onClose,
+  livingPersonaUuids,
+  personaInfos,
 }) => {
   // Only use store for temporary UI state (concept selection)
   const selectedConceptUuids = useStore(
@@ -488,7 +501,11 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
 
     setIsSaving(true);
     try {
-      await api.ideaPlayground.saveConcepts(seedUuid, selectedConceptUuids);
+      await api.ideaPlayground.saveConcepts(
+        seedUuid,
+        selectedConceptUuids,
+        livingPersonaUuids,
+      );
       toast.success(
         `Saved ${selectedConceptUuids.length} concept${selectedConceptUuids.length > 1 ? 's' : ''}`,
       );
@@ -524,7 +541,11 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     setIsSaving(true);
     try {
       // First save the concepts
-      await api.ideaPlayground.saveConcepts(seedUuid, selectedConceptUuids);
+      await api.ideaPlayground.saveConcepts(
+        seedUuid,
+        selectedConceptUuids,
+        livingPersonaUuids,
+      );
 
       telemetry.log('ideaPlayground.concepts.saved', {
         count: selectedConceptUuids.length,
@@ -680,6 +701,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
                       handleDeleteConcept(concept.uuid, concept.title, e)
                     }
                     animationDelay={index * 0.1}
+                    personaInfos={personaInfos}
                   />
                 ))}
               </div>

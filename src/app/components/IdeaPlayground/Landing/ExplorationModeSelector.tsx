@@ -2,6 +2,11 @@ import React from 'react';
 import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
 import { Lightbulb, RefreshCw, X } from 'lucide-react';
 
+interface PersonaBadgeInfo {
+  name: string;
+  avatar?: string;
+}
+
 interface ExplorationModeSelectorProps {
   currentTopic: string;
   /** Restart the playground from the beginning */
@@ -10,6 +15,8 @@ interface ExplorationModeSelectorProps {
   onClose: () => void;
   /** Whether to show the title bubble (hidden until LogoAnimation completes) */
   showTitle?: boolean;
+  /** Tagged living personas to display alongside the topic */
+  personas?: PersonaBadgeInfo[];
 }
 
 const ExplorationModeSelector: React.FC<ExplorationModeSelectorProps> = ({
@@ -17,6 +24,7 @@ const ExplorationModeSelector: React.FC<ExplorationModeSelectorProps> = ({
   onRestart,
   onClose,
   showTitle = true,
+  personas = [],
 }) => {
   return (
     <div
@@ -32,20 +40,43 @@ const ExplorationModeSelector: React.FC<ExplorationModeSelectorProps> = ({
           {showTitle && (
             <div className='relative flex justify-center'>
               <div
-                className='group cursor-pointer'
+                className='flex items-center gap-2'
                 style={getAnimationStyle('scaleIn', 400, 100)}
               >
-                <div className='flex h-12 items-center rounded-full border border-white/30 bg-white/15 px-4 py-3 shadow-xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/40 hover:bg-white/20'>
-                  <div className='flex items-center gap-3'>
-                    <Lightbulb
-                      size={16}
-                      className='aucctus-stroke-warning-tertiary'
-                    />
-                    <span className='aucctus-text-sm-medium aucctus-text-white'>
-                      {currentTopic}
-                    </span>
+                <div className='group cursor-pointer'>
+                  <div className='flex h-12 items-center rounded-full border border-white/30 bg-white/15 px-4 py-3 shadow-xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/40 hover:bg-white/20'>
+                    <div className='flex items-center gap-3'>
+                      <Lightbulb
+                        size={16}
+                        className='aucctus-stroke-warning-tertiary'
+                      />
+                      <span className='aucctus-text-sm-medium aucctus-text-white'>
+                        {currentTopic}
+                      </span>
+                    </div>
                   </div>
                 </div>
+                {personas.map((p) => (
+                  <div
+                    key={p.name}
+                    className='flex h-12 items-center rounded-full border border-purple-400/30 bg-purple-500/20 px-3 shadow-xl backdrop-blur-md'
+                  >
+                    <span className='inline-flex items-center gap-1.5 text-xs font-medium text-purple-200'>
+                      {p.avatar ? (
+                        <img
+                          src={p.avatar}
+                          alt={p.name}
+                          className='h-4 w-4 rounded-full object-cover'
+                        />
+                      ) : (
+                        <span className='flex h-4 w-4 items-center justify-center rounded-full bg-purple-500/30 text-[8px] font-bold text-purple-200'>
+                          {p.name.charAt(0)}
+                        </span>
+                      )}
+                      @{p.name}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           )}

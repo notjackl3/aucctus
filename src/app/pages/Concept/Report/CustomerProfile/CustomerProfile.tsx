@@ -18,6 +18,7 @@ import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
 import {
   FunctionComponent,
   useCallback,
@@ -30,6 +31,12 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useConceptReportContext } from '../ConceptReport/ConceptReportContext';
 import CustomerDetails from './Details/CustomerDetails';
+import LivingPersonaProfile from './LivingPersonaProfile';
+
+/** Prefix for living persona tabs in URL params (format: __living_persona__:<uuid>) */
+const LIVING_PERSONA_PREFIX = '__living_persona__';
+/** Legacy sentinel value — maps to the first tagged persona for backward compat */
+const LIVING_PERSONA_TAB = '__living_persona__';
 
 const {
   ExecutiveSummarySkeleton,
@@ -84,6 +91,25 @@ const CustomerProfile: FunctionComponent = () => {
     [profiles, selectedProfileName],
   );
 
+  const livingPersonas = concept?.livingPersonas || [];
+  const livingPersonaUuids = useMemo(
+    () => concept?.livingPersonaUuids || [],
+    [concept?.livingPersonaUuids],
+  );
+  const hasLivingPersonas = livingPersonaUuids.length > 0;
+
+  /** Check if the selected tab is any living persona */
+  const isLivingPersonaSelected =
+    selectedProfileName === LIVING_PERSONA_TAB ||
+    (selectedProfileName?.startsWith(LIVING_PERSONA_PREFIX + ':') ?? false);
+
+  /** Extract the selected living persona UUID from the tab key */
+  const selectedLivingPersonaUuid = isLivingPersonaSelected
+    ? selectedProfileName === LIVING_PERSONA_TAB
+      ? livingPersonaUuids[0] // Legacy format — use first persona
+      : selectedProfileName?.split(':')[1]
+    : undefined;
+
   const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
     currentRoute: AppPath.ConceptCustomerProfile,
     concept,
@@ -94,10 +120,12 @@ const CustomerProfile: FunctionComponent = () => {
   });
 
   const hasProfiles = profiles.length > 0;
+  const hasContent = hasProfiles || hasLivingPersonas;
   const shouldShowSkeletons =
-    isSectionPending || hasBlockingLoad || (isLoading && !hasProfiles);
-  const hasSelectedProfile = Boolean(selectedProfile);
-  const canRenderDetails = hasProfiles && hasSelectedProfile;
+    isSectionPending || hasBlockingLoad || (isLoading && !hasContent);
+  const hasSelectedProfile =
+    Boolean(selectedProfile) || isLivingPersonaSelected;
+  const canRenderDetails = hasContent && hasSelectedProfile;
   const shouldRenderSkeletonWithoutData =
     shouldShowSkeletons && !canRenderDetails;
   const shouldRenderSkeletonWithData = shouldShowSkeletons && canRenderDetails;
@@ -115,9 +143,12 @@ const CustomerProfile: FunctionComponent = () => {
 
   // Sliding indicator calculation - matching Living Personas pattern
   const recalcIndicator = useCallback(() => {
-    if (!selectedProfile?.uuid) return;
+    const activeKey = isLivingPersonaSelected
+      ? selectedProfileName || LIVING_PERSONA_TAB
+      : selectedProfile?.uuid;
+    if (!activeKey) return;
 
-    const activeEl = profileItemRefs.current.get(selectedProfile.uuid);
+    const activeEl = profileItemRefs.current.get(activeKey);
     const containerEl = sidebarContainerRef.current;
 
     if (!activeEl || !containerEl) return;
@@ -143,7 +174,7 @@ const CustomerProfile: FunctionComponent = () => {
       }
       return next;
     });
-  }, [selectedProfile?.uuid]);
+  }, [isLivingPersonaSelected, selectedProfile?.uuid, selectedProfileName]);
 
   useLayoutEffect(() => {
     recalcIndicator();
@@ -198,10 +229,20 @@ const CustomerProfile: FunctionComponent = () => {
   useEffect(() => {
     if (isReadOnly) return;
     const firstPersona = profiles.length > 0 ? profiles[0] : undefined;
+    // Determine the default tab: first living persona if tagged, otherwise first profile
+    const defaultTab =
+      livingPersonaUuids.length > 0
+        ? `${LIVING_PERSONA_PREFIX}:${livingPersonaUuids[0]}`
+        : firstPersona?.segment;
+
+    const isValidSelection = isLivingPersonaSelected
+      ? hasLivingPersonas
+      : !!selectedProfile;
+
     if (
-      (!selectedProfileName || !selectedProfile) &&
+      (!selectedProfileName || !isValidSelection) &&
       activeConceptIdentifier &&
-      firstPersona
+      defaultTab
     ) {
       navigate(
         {
@@ -209,7 +250,7 @@ const CustomerProfile: FunctionComponent = () => {
             ':id',
             activeConceptIdentifier,
           ),
-          search: `?persona=${firstPersona.segment}`,
+          search: `?persona=${defaultTab}`,
         },
         {
           replace: true,
@@ -223,6 +264,9 @@ const CustomerProfile: FunctionComponent = () => {
     profiles,
     selectedProfile,
     activeConceptIdentifier,
+    livingPersonaUuids,
+    hasLivingPersonas,
+    isLivingPersonaSelected,
     isReadOnly,
   ]);
 
@@ -238,8 +282,13 @@ const CustomerProfile: FunctionComponent = () => {
     !hasBlockingLoad &&
     !isGenerating;
 
-  // No profiles found
-  if (!shouldShowSkeletons && !isLoading && profiles.length === 0) {
+  // Handle case where loading is finished but no profiles and no living persona exist
+  if (
+    !shouldShowSkeletons &&
+    !isLoading &&
+    profiles.length === 0 &&
+    !hasLivingPersonas
+  ) {
     return (
       <>
         {!isReadOnly && isDebugModeEnabled && (
@@ -438,7 +487,7 @@ const CustomerProfile: FunctionComponent = () => {
 
                     {/* Profile list with sliding indicator */}
                     <div ref={sidebarContainerRef} className='relative'>
-                      {selectedProfile && (
+                      {(selectedProfile || isLivingPersonaSelected) && (
                         <motion.div
                           className='aucctus-border-primary aucctus-bg-secondary pointer-events-none absolute z-0 rounded-lg border'
                           initial={false}
@@ -457,6 +506,87 @@ const CustomerProfile: FunctionComponent = () => {
                       )}
 
                       <div className='relative z-10 flex flex-col gap-1'>
+                        {/* Living Persona sidebar items */}
+                        {livingPersonas.map((lp, lpIndex) => {
+                          const tabKey = `${LIVING_PERSONA_PREFIX}:${livingPersonaUuids[lpIndex]}`;
+                          const isActive =
+                            selectedProfileName === tabKey ||
+                            (selectedProfileName === LIVING_PERSONA_TAB &&
+                              lpIndex === 0);
+                          const avatarElement = lp.avatarUrl ? (
+                            <div className='h-11 w-11 shrink-0 overflow-hidden rounded-lg border border-purple-400/30'>
+                              <img
+                                src={lp.avatarUrl}
+                                alt={lp.name}
+                                className='h-full w-full rounded-lg object-cover'
+                              />
+                            </div>
+                          ) : (
+                            <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-purple-500 text-xs font-bold text-white'>
+                              <Sparkles size={16} />
+                            </div>
+                          );
+
+                          const button = (
+                            <div
+                              ref={(el) => {
+                                if (el) {
+                                  profileItemRefs.current.set(tabKey, el);
+                                } else {
+                                  profileItemRefs.current.delete(tabKey);
+                                }
+                              }}
+                              onClick={() => onProfileSelect(tabKey)}
+                              className={cn(
+                                'flex cursor-pointer items-center rounded-lg transition-colors',
+                                isActive
+                                  ? 'aucctus-text-brand-primary'
+                                  : 'aucctus-text-tertiary aucctus-bg-secondary-hover hover:aucctus-text-secondary',
+                              )}
+                              style={{
+                                padding: sidebarExpanded ? '6px 8px' : '6px',
+                                justifyContent: sidebarExpanded
+                                  ? 'flex-start'
+                                  : 'center',
+                                gap: sidebarExpanded ? '10px' : '0',
+                              }}
+                            >
+                              {avatarElement}
+                              <div
+                                className='flex min-w-0 flex-1 flex-col'
+                                style={{
+                                  opacity: sidebarExpanded ? 1 : 0,
+                                  width: sidebarExpanded ? 'auto' : 0,
+                                  overflow: 'hidden',
+                                  transition: 'opacity 150ms ease-out',
+                                }}
+                              >
+                                <div className='flex items-center gap-1.5'>
+                                  <span className='aucctus-text-sm-bold aucctus-text-primary truncate whitespace-nowrap'>
+                                    {lp.name || 'Living Persona'}
+                                  </span>
+                                </div>
+                                <span className='truncate whitespace-nowrap text-[10px] font-medium text-purple-600 dark:text-purple-400'>
+                                  Living Persona
+                                </span>
+                              </div>
+                            </div>
+                          );
+
+                          if (!sidebarExpanded) {
+                            return (
+                              <ComponentTooltip
+                                key={tabKey}
+                                tip={lp.name || 'Living Persona'}
+                              >
+                                {button}
+                              </ComponentTooltip>
+                            );
+                          }
+
+                          return <div key={tabKey}>{button}</div>;
+                        })}
+
                         {profiles.map((profile: ICustomerProfile) => {
                           const isActive =
                             profile.segment === selectedProfileName;
@@ -554,7 +684,19 @@ const CustomerProfile: FunctionComponent = () => {
             {/* Main Content Area */}
             <div className='min-w-0 flex-1'>
               <AnimatePresence mode='wait'>
-                {selectedProfile ? (
+                {isLivingPersonaSelected && selectedLivingPersonaUuid ? (
+                  <motion.div
+                    key={`living-persona-${selectedLivingPersonaUuid}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <LivingPersonaProfile
+                      personaUuid={selectedLivingPersonaUuid}
+                    />
+                  </motion.div>
+                ) : selectedProfile ? (
                   <motion.div
                     key={selectedProfile.uuid}
                     initial={{ opacity: 0, y: 20 }}

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { IGeneratedIdeaPlaygroundConcept } from '../types';
+import type { PersonaDisplayInfo } from './OpportunityMap';
 import { Check, Loader2, X } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
 
@@ -13,6 +14,8 @@ interface ConceptCardProps {
   onCardSelect: (e: React.MouseEvent) => void;
   onDelete: (e: React.MouseEvent) => void;
   animationDelay?: number;
+  personaInfo?: PersonaDisplayInfo;
+  personaInfos?: PersonaDisplayInfo[];
 }
 
 /**
@@ -33,7 +36,15 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
   onCardSelect,
   onDelete,
   animationDelay = 0,
+  personaInfo,
+  personaInfos,
 }) => {
+  // Use personaInfos array if provided, otherwise fall back to single personaInfo
+  const personas = useMemo(() => {
+    if (personaInfos && personaInfos.length > 0) return personaInfos;
+    if (personaInfo) return [personaInfo];
+    return [];
+  }, [personaInfos, personaInfo]);
   // Determine category badge styling
   const getBadgeStyle = () => {
     switch (concept.conceptType) {
@@ -130,7 +141,7 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
           {concept.description}
         </p>
 
-        {/* Idea Score */}
+        {/* Idea Score + Persona Badge */}
         <div className='flex-start flex items-center gap-2 border-t border-white/20 pt-3'>
           <div className='flex items-center gap-2'>
             <span className='aucctus-text-xs aucctus-text-white opacity-70'>
@@ -176,6 +187,50 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
                   ? 'Emerging Momentum'
                   : 'Early Momentum'}
             </span>
+          )}
+
+          {/* Persona Avatar Stack */}
+          {personas.length > 0 && (
+            <div
+              className='ml-auto flex items-center gap-1.5'
+              title={personas.map((p) => p.name).join(', ')}
+            >
+              <div className='flex -space-x-1.5'>
+                {personas.map((p, i) => {
+                  const initials = p.segment
+                    .split(' ')
+                    .map((w) => w[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2);
+                  return p.avatar ? (
+                    <img
+                      key={p.uuid || i}
+                      src={p.avatar}
+                      alt={p.name}
+                      className='h-5 w-5 rounded-full border border-black/30 object-cover'
+                    />
+                  ) : (
+                    <div
+                      key={p.uuid || i}
+                      className='flex h-5 w-5 items-center justify-center rounded-full border border-black/30 text-[8px] font-bold text-white'
+                      style={{
+                        backgroundColor: p.themeColor
+                          ? `hsl(${p.themeColor})`
+                          : '#6366F1',
+                      }}
+                    >
+                      {initials}
+                    </div>
+                  );
+                })}
+              </div>
+              {personas.length === 1 && (
+                <span className='max-w-[80px] truncate text-[10px] text-white/70'>
+                  {personas[0].name}
+                </span>
+              )}
+            </div>
           )}
         </div>
       </div>

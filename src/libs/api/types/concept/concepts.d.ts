@@ -195,6 +195,22 @@ export interface IConcept extends IBaseConceptEntity {
 
   // Custom properties from dynamic property definitions
   customProperties?: Record<string, any>;
+
+  // Living persona references (multi-persona support)
+  livingPersonaUuids?: string[];
+  livingPersonas?: ILivingPersonaSummary[];
+}
+
+/**
+ * Lightweight living persona summary embedded in concept responses.
+ * Matches backend LivingPersonaSummarySchema.
+ */
+export interface ILivingPersonaSummary {
+  uuid: string;
+  name: string;
+  segment: string;
+  avatarUrl?: string;
+  themeColor?: string;
 }
 
 export interface IConceptMagicShareLatest {

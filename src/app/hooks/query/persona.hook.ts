@@ -34,6 +34,7 @@ import type {
   IPersonaConversationSearchResponse,
   ICreateCustomWidgetPayload,
   IUpdateCustomWidgetPayload,
+  ITaggedConcept,
 } from '@libs/api/types/persona';
 
 // ============================================
@@ -74,6 +75,8 @@ export const personaKeys = {
     [...personaKeys.all, 'starterPrompts', uuid] as const,
   conversationSearch: (uuid: string, message?: string, page?: number) =>
     [...personaKeys.all, 'conversationSearch', uuid, message, page] as const,
+  taggedConcepts: (uuid: string) =>
+    [...personaKeys.all, 'taggedConcepts', uuid] as const,
   mentionSearch: (query: string, type?: string, excludePersona?: string) =>
     ['mentionSearch', query, type, excludePersona] as const,
 };
@@ -140,6 +143,27 @@ export const usePersona = (personaUuid: string) => {
     isError: query.isError,
     error: query.error,
     refetch: query.refetch,
+  };
+};
+
+// ============================================
+// Tagged Concepts Query
+// ============================================
+
+export const useTaggedConcepts = (personaUuid: string) => {
+  const query = useQuery({
+    queryKey: personaKeys.taggedConcepts(personaUuid),
+    queryFn: async (): Promise<ITaggedConcept[]> => {
+      return await api.persona.getTaggedConcepts(personaUuid);
+    },
+    enabled: !!personaUuid,
+    staleTime: STALE_TIMES.standard,
+    cacheTime: 1000 * 60 * 5,
+  });
+
+  return {
+    concepts: query.data ?? [],
+    isLoading: query.isLoading,
   };
 };
 

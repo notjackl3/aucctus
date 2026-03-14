@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AppPath } from '@routes/routes';
@@ -26,6 +26,8 @@ import {
   useGetGeneratedIdeas,
   useGenerateConcepts,
 } from '@hooks/query/ideaPlayground.hook';
+import { usePersonas } from '@hooks/query/persona.hook';
+import type { MentionItem } from '@stores/overseer/types';
 
 const IdeaPlaygroundQBased: React.FC = () => {
   // Track page time for analytics
@@ -40,6 +42,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   // Track if logo animation intro has completed (for showing title)
   const [showLogoTitle, setShowLogoTitle] = useState(false);
+  // Track selected living personas for tagging (max 4)
+  const [selectedPersonas, setSelectedPersonas] = useState<MentionItem[]>([]);
 
   // URL parameter handling
   const [searchParams, setSearchParams] = useSearchParams();
@@ -62,6 +66,32 @@ const IdeaPlaygroundQBased: React.FC = () => {
 
   // Create seed mutation
   const { createSeedAsync } = useCreateSeed();
+
+  // Fetch living personas for @mention menu
+  const { personas: personaList } = usePersonas();
+  const personaItems: MentionItem[] = useMemo(() => {
+    if (!personaList) return [];
+    return personaList.map((p) => ({
+      id: p.uuid,
+      name: p.name,
+      type: 'persona' as const,
+      segment: p.segment,
+      themeColor: p.themeColor,
+      avatar: p.avatar,
+    }));
+  }, [personaList]);
+
+  const handlePersonaSelect = useCallback((item: MentionItem) => {
+    setSelectedPersonas((prev) => {
+      if (prev.length >= 4) return prev;
+      if (prev.some((p) => p.id === item.id)) return prev;
+      return [...prev, item];
+    });
+  }, []);
+
+  const handlePersonaRemove = useCallback((id: string) => {
+    setSelectedPersonas((prev) => prev.filter((p) => p.id !== id));
+  }, []);
 
   // Fetch anchor thought for seed restoration (only when seedUuidFromUrl exists)
   const {
@@ -220,10 +250,14 @@ const IdeaPlaygroundQBased: React.FC = () => {
     setHasStartedTyping(true);
 
     try {
-      // Create seed with the selected anchor thought using hook (with optional file)
+      // Create seed with the selected anchor thought using hook (with optional file and personas)
       const { seedUuid } = await createSeedAsync({
         thoughtText: thought.thought,
         file: selectedFile || undefined,
+        livingPersonaUuids:
+          selectedPersonas.length > 0
+            ? selectedPersonas.map((p) => p.id)
+            : undefined,
       });
 
       // Set seed UUID in local state (synchronized with URL)
@@ -261,10 +295,14 @@ const IdeaPlaygroundQBased: React.FC = () => {
     setHasStartedTyping(true);
 
     try {
-      // Create seed with custom input using hook (with optional file)
+      // Create seed with custom input using hook (with optional file and personas)
       const { seedUuid } = await createSeedAsync({
         thoughtText,
         file: selectedFile || undefined,
+        livingPersonaUuids:
+          selectedPersonas.length > 0
+            ? selectedPersonas.map((p) => p.id)
+            : undefined,
       });
 
       // Set seed UUID in local state (synchronized with URL)
@@ -284,6 +322,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
         seedUuid,
         thoughtLength: thoughtText.length,
         hasFile: !!selectedFile,
+        personaCount: selectedPersonas.length,
       });
     } catch (error) {
       // On error, return to main screen with toast
@@ -308,6 +347,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
     setIsDataReady(false);
     setSelectedFile(null);
     setShowLogoTitle(false);
+    setSelectedPersonas([]);
     // Clear URL parameter and reset UI state
     setSearchParams({});
     ideaPlaygroundStore.reset();
@@ -426,6 +466,10 @@ const IdeaPlaygroundQBased: React.FC = () => {
               onFileChange={setSelectedFile}
               selectedFile={selectedFile}
               style={{ opacity: 1 }}
+              personaItems={personaItems}
+              selectedPersonas={selectedPersonas}
+              onPersonaSelect={handlePersonaSelect}
+              onPersonaRemove={handlePersonaRemove}
             />
           )}
         </AnimatePresence>
@@ -451,6 +495,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
                       onRestart={handleRestart}
                       onClose={handleClose}
                       showTitle={showLogoTitle}
+                      personas={selectedPersonas}
                     />
                   </div>
                   <div className='relative flex-1 pt-24'>
@@ -471,6 +516,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
                       onRestart={handleRestart}
                       onClose={handleClose}
                       showTitle={true}
+                      personas={selectedPersonas}
                     />
                   </div>
 
@@ -496,6 +542,18 @@ const IdeaPlaygroundQBased: React.FC = () => {
         <OpportunityMap
           seedUuid={currentSeedUuid}
           onClose={handleCloseOpportunityMap}
+          livingPersonaUuids={
+            selectedPersonas.length > 0
+              ? selectedPersonas.map((p) => p.id)
+              : undefined
+          }
+          personaInfos={selectedPersonas.map((p) => ({
+            uuid: p.id,
+            name: p.name,
+            segment: p.segment || '',
+            themeColor: p.themeColor,
+            avatar: p.avatar,
+          }))}
         />
       )}
 

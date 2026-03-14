@@ -55,6 +55,9 @@ export interface IConceptSeed {
    * For other seed types, this returns the basic anchor thought or undefined.
    */
   anchorThought?: IAnchorThought | IAnchorThoughtWithQuestions;
+
+  /** UUIDs of tagged living personas (max 4) */
+  livingPersonaUuids?: string[];
 }
 
 export interface IConceptSeedUpdate {

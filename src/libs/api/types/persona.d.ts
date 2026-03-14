@@ -154,6 +154,18 @@ export interface IPersona {
 }
 
 // ============================================
+// Tagged Concepts
+// ============================================
+
+export interface ITaggedConcept {
+  uuid: string;
+  identifier: string;
+  name: string;
+  status: string;
+  createdAt: string;
+}
+
+// ============================================
 // Create and Update Payloads
 // ============================================
 

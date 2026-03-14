@@ -98,6 +98,7 @@ export const useColumnVisibilityStore = create<IColumnVisibilityStore>()(
         'lastModifiedBy',
         'updatedAt',
         'status',
+        'livingPersona',
         'priority',
       ]),
 
@@ -173,6 +174,7 @@ export const useColumnVisibilityStore = create<IColumnVisibilityStore>()(
             'lastModifiedBy',
             'updatedAt',
             'status',
+            'livingPersona',
             'priority',
           ]),
         });
@@ -199,6 +201,7 @@ export const useColumnVisibilityStore = create<IColumnVisibilityStore>()(
           'lastModifiedBy',
           'updatedAt',
           'status',
+          'livingPersona',
           'priority',
         ];
 
@@ -209,10 +212,13 @@ export const useColumnVisibilityStore = create<IColumnVisibilityStore>()(
         // Create a Set from persisted columns
         const staticColumnsSet = new Set<string>(persistedStaticColumns);
 
-        // Auto-add 'priority' for existing users who don't have it yet
+        // Auto-add columns for existing users who don't have them yet
         // This is a one-time migration for users with old localStorage data
         if (!staticColumnsSet.has('priority')) {
           staticColumnsSet.add('priority');
+        }
+        if (!staticColumnsSet.has('livingPersona')) {
+          staticColumnsSet.add('livingPersona');
         }
 
         return {

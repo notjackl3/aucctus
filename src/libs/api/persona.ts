@@ -54,6 +54,7 @@ import type {
   ICustomWidget,
   ICreateCustomWidgetPayload,
   IUpdateCustomWidgetPayload,
+  ITaggedConcept,
 } from './types/persona';
 
 /**
@@ -115,6 +116,15 @@ export class PersonaApi extends ApiService {
    */
   getPersona(personaUuid: string) {
     return this.get<IPersona>(endpoints.persona(personaUuid));
+  }
+
+  /**
+   * Get concepts tagged with a specific persona.
+   */
+  getTaggedConcepts(personaUuid: string) {
+    return this.get<ITaggedConcept[]>(
+      endpoints.personaTaggedConcepts(personaUuid),
+    );
   }
 
   /**

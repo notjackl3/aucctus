@@ -1155,6 +1155,10 @@ export class Endpoints {
     return `/api/v1/personas/${personaUuid}`;
   }
 
+  static personaTaggedConcepts(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/concepts`;
+  }
+
   static personaTags(personaUuid: string) {
     return `/api/v1/personas/${personaUuid}/tags`;
   }
