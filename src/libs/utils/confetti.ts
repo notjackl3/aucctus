@@ -5,17 +5,17 @@ import confetti from 'canvas-confetti';
  * then run a continuous shower for ~3 seconds.
  */
 export function fireConfetti(): void {
-  const duration = 3000;
+  const duration = 1000;
   const end = Date.now() + duration;
 
   // Initial bursts from left and right
   confetti({
-    particleCount: 80,
+    particleCount: 40,
     spread: 70,
     origin: { x: 0.1, y: 0.6 },
   });
   confetti({
-    particleCount: 80,
+    particleCount: 40,
     spread: 70,
     origin: { x: 0.9, y: 0.6 },
   });

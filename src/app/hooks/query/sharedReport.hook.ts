@@ -63,7 +63,11 @@ export function useVerifyCode(token: string) {
 /**
  * Fetches the full read-only report data. Only enabled after verification.
  */
-export function useSharedReport(token: string, enabled: boolean) {
+export function useSharedReport(
+  token: string,
+  enabled: boolean,
+  onSuccess?: () => void,
+) {
   return useQuery(
     sharedReportKeys.report(token),
     () => api.sharedReport.getReport(token),
@@ -71,6 +75,7 @@ export function useSharedReport(token: string, enabled: boolean) {
       enabled: enabled && !!token,
       retry: false,
       staleTime: 5 * 60 * 1000,
+      onSuccess,
     },
   );
 }

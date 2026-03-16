@@ -35,13 +35,7 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import SharedReportProvider from './SharedReportProvider';
 
@@ -69,13 +63,8 @@ export default function SharedReportPage() {
   const { data: report, isLoading: reportLoading } = useSharedReport(
     token ?? '',
     isVerified,
+    fireConfetti,
   );
-
-  useEffect(() => {
-    if (report) {
-      fireConfetti();
-    }
-  }, [report]);
 
   const handleSendCode = useCallback(
     (e: React.FormEvent) => {

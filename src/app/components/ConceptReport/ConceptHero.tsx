@@ -1,17 +1,17 @@
-import React from 'react';
-import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
-import ImageUploadButton from '@components/ConceptOverview/ImageUploadButton';
-import ImageToggleControls from '@components/ConceptOverview/ImageToggleControls';
 import images from '@assets/img';
+import ImageToggleControls from '@components/ConceptOverview/ImageToggleControls';
+import ImageUploadButton from '@components/ConceptOverview/ImageUploadButton';
+import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { cn } from '@libs/utils/react';
-import { motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@radix-ui/react-tooltip';
+import { motion } from 'framer-motion';
+import { ArrowDown } from 'lucide-react';
+import React from 'react';
 
 interface ConceptCreator {
   firstName: string;
@@ -122,7 +122,7 @@ const ConceptHero: React.FC<ConceptHeroProps> = ({
   }, [checkIfTruncated]);
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-primary relative flex max-h-[420px] overflow-hidden rounded-xl border shadow-sm'>
+    <div className='aucctus-bg-primary aucctus-border-primary relative flex max-h-[1000px] overflow-hidden rounded-xl border shadow-sm'>
       {/* Info side */}
       <div className='relative flex flex-1 flex-col justify-center gap-4 px-8 py-6'>
         {/* Creator avatar */}

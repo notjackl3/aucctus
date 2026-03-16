@@ -452,7 +452,7 @@ const CustomerProfile: FunctionComponent = () => {
                 style={{ width: SIDEBAR_COLLAPSED }}
               >
                 <GlassSurface
-                  className='sticky top-6 w-full overflow-hidden'
+                  className='sticky top-0 w-full overflow-hidden'
                   variant='default'
                 >
                   <div className='p-[6px]'>
@@ -483,7 +483,7 @@ const CustomerProfile: FunctionComponent = () => {
               >
                 <GlassSurface
                   as='nav'
-                  className='sticky top-6 w-full overflow-hidden'
+                  className='sticky top-0 w-full overflow-hidden'
                   variant='default'
                 >
                   <div
@@ -610,7 +610,7 @@ const CustomerProfile: FunctionComponent = () => {
                                     {lp.name || 'Living Persona'}
                                   </span>
                                 </div>
-                                <span className='truncate whitespace-nowrap text-[10px] font-medium text-purple-600 dark:text-purple-400'>
+                                <span className='aucctus-text-tertiary truncate whitespace-nowrap text-[10px] font-medium'>
                                   Living Persona
                                 </span>
                               </div>
@@ -747,14 +747,14 @@ const CustomerProfile: FunctionComponent = () => {
                                   type='button'
                                   className='aucctus-text-tertiary aucctus-bg-secondary-hover flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 text-xs transition-colors'
                                 >
-                                  <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-dashed border-purple-400/40'>
+                                  <div className='aucctus-border-secondary flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-dashed'>
                                     <Plus
                                       size={16}
-                                      className='text-purple-500'
+                                      className='aucctus-text-tertiary'
                                     />
                                   </div>
                                   <span
-                                    className='whitespace-nowrap text-xs font-medium text-purple-600 dark:text-purple-400'
+                                    className='aucctus-text-secondary whitespace-nowrap text-xs font-medium'
                                     style={{
                                       opacity: sidebarExpanded ? 1 : 0,
                                       transition: 'opacity 150ms ease-out',
@@ -769,10 +769,10 @@ const CustomerProfile: FunctionComponent = () => {
                                     type='button'
                                     className='aucctus-text-tertiary aucctus-bg-secondary-hover flex w-full cursor-pointer justify-center rounded-lg p-[6px] transition-colors'
                                   >
-                                    <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-dashed border-purple-400/40'>
+                                    <div className='aucctus-border-secondary flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-dashed'>
                                       <Plus
                                         size={16}
-                                        className='text-purple-500'
+                                        className='aucctus-text-tertiary'
                                       />
                                     </div>
                                   </button>

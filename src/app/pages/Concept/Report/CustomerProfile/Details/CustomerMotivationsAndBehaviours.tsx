@@ -259,32 +259,6 @@ const CustomerMotivationsAndBehaviours: React.FC<
                       <p className='aucctus-text-sm flex-1 pr-14'>
                         {item.text}
                       </p>
-                      <div className='absolute right-3 top-3 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
-                        <button
-                          className='aucctus-bg-secondary-hover flex h-7 w-7 items-center justify-center rounded-full'
-                          onClick={() => {
-                            setEditingUuid(item.uuid);
-                            setEditingValue(item.text);
-                          }}
-                        >
-                          <PenLine className='h-3.5 w-3.5' />
-                        </button>
-                        <button
-                          className='aucctus-bg-secondary-hover flex h-7 w-7 items-center justify-center rounded-full text-red-500'
-                          onClick={async () => {
-                            try {
-                              await deleteMotivationMutation.mutateAsync({
-                                customerProfileUuid,
-                                motivationUuid: item.uuid,
-                              });
-                            } catch {
-                              // handled by mutation onError
-                            }
-                          }}
-                        >
-                          <X className='h-3.5 w-3.5' />
-                        </button>
-                      </div>
                       {!isReadOnly && (
                         <div className='absolute right-3 top-3 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
                           <button
@@ -384,32 +358,6 @@ const CustomerMotivationsAndBehaviours: React.FC<
                       <p className='aucctus-text-sm flex-1 pr-14'>
                         {item.text}
                       </p>
-                      <div className='absolute right-3 top-3 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
-                        <button
-                          className='aucctus-bg-secondary-hover flex h-7 w-7 items-center justify-center rounded-full'
-                          onClick={() => {
-                            setEditingUuid(item.uuid);
-                            setEditingValue(item.text);
-                          }}
-                        >
-                          <PenLine className='h-3.5 w-3.5' />
-                        </button>
-                        <button
-                          className='aucctus-bg-secondary-hover flex h-7 w-7 items-center justify-center rounded-full text-red-500'
-                          onClick={async () => {
-                            try {
-                              await deleteBehaviourMutation.mutateAsync({
-                                customerProfileUuid,
-                                behaviourUuid: item.uuid,
-                              });
-                            } catch {
-                              // handled by mutation onError
-                            }
-                          }}
-                        >
-                          <X className='h-3.5 w-3.5' />
-                        </button>
-                      </div>
                       {!isReadOnly && (
                         <div className='absolute right-3 top-3 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
                           <button

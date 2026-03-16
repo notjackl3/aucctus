@@ -199,27 +199,22 @@ const LivingPersonaProfile: React.FC<LivingPersonaProfileProps> = ({
       transition={{ duration: 0.3 }}
       className={cn('flex w-full flex-col gap-6', className)}
     >
-      {/* Living Persona badge + link to Nucleus */}
-      <div className='flex items-center justify-between'>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.2 }}
-          className='flex items-center gap-2'
-        >
-          <span className='inline-flex items-center gap-1.5 rounded-full border border-purple-200 bg-purple-100 px-3 py-1.5 text-sm font-medium text-purple-700 dark:border-purple-800 dark:bg-purple-900/30 dark:text-purple-300'>
-            <Sparkles className='h-3.5 w-3.5' />
-            Living Persona
-          </span>
-        </motion.div>
+      {/* Living Persona badge — click to view in Nucleus */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.2 }}
+        className='flex items-center gap-2'
+      >
         <Link
           to={`${AppPath.Nucleus}?tab=living-personas&persona=${personaUuid}`}
-          className='aucctus-text-tertiary hover:aucctus-text-secondary inline-flex items-center gap-1.5 text-sm transition-colors'
+          className='inline-flex items-center gap-1.5 rounded-full border border-purple-200 bg-purple-100 px-3 py-1.5 text-sm font-medium text-purple-700 transition-colors hover:bg-purple-200 dark:border-purple-800 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-900/50'
         >
-          View in Nucleus
-          <ExternalLink className='h-3.5 w-3.5' />
+          <Sparkles className='h-3.5 w-3.5' />
+          Living Persona
+          <ExternalLink className='h-3 w-3' />
         </Link>
-      </div>
+      </motion.div>
 
       {/* Unified card: Overview + Chat */}
       <div className='aucctus-border-primary aucctus-bg-primary w-full overflow-hidden rounded-xl border shadow-sm'>

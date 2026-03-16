@@ -10,15 +10,15 @@ import { cn } from '@libs/utils/react';
 import { Building2, Link2, Share2, Trash2 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
-function formatRelativeDate(dateStr: string): string {
+function formatRelativeDateMessage(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = date.getTime() - now.getTime();
   const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays < 0) return `${Math.abs(diffDays)} days ago`;
-  if (diffDays === 0) return 'today';
-  if (diffDays === 1) return 'in 1 day';
-  return `in ${diffDays} days`;
+  if (diffDays < 0) return `expired ${Math.abs(diffDays)} days ago`;
+  if (diffDays === 0) return 'expires today';
+  if (diffDays === 1) return 'expires in 1 day';
+  return `expires in ${diffDays} days`;
 }
 
 function extractEmailDomain(email: string): string {
@@ -205,7 +205,7 @@ export default function ShareReportDialog({
                       <div className='aucctus-text-secondary truncate text-xs'>
                         {share.recipientEmail}
                         {' · '}
-                        {formatRelativeDate(share.expiresAt)}
+                        {formatRelativeDateMessage(share.expiresAt)}
                       </div>
                     </div>
                     <div className='flex flex-shrink-0 items-center gap-0.5'>
