@@ -23,15 +23,18 @@ import type { PersonaQuote } from '@components/Nucleus/LivingPersonasTab/widgets
 import type { CardListItem } from '@components/Nucleus/LivingPersonasTab/widgets/CardListWidget';
 import type { GainItem } from '@components/Nucleus/LivingPersonasTab/widgets/GainsWidget';
 import type { SocialValueItem } from '@components/Nucleus/LivingPersonasTab/widgets/SocialValuesWidget';
+import type { IPersona } from '@libs/api/types/persona';
 import { ConceptReportSkeletons } from '@components';
+import PersonaLiveChat from '@components/Nucleus/LivingPersonasTab/PersonaLiveChat';
 import { ExternalLink, Sparkles } from 'lucide-react';
 import { AppPath } from '@routes/routes';
 import { cn } from '@libs/utils/react';
+import { useConceptReportContext } from '@pages/Concept/Report/ConceptReport/ConceptReportContext';
 
 const { ProfileOverviewSkeleton, SkeletonBlock } = ConceptReportSkeletons;
 
-/** Default read-only widget config (no editing, no layout mode) */
-const READ_ONLY_WIDGET_CONFIG: WidgetConfig[] = [
+/** Base read-only widget config (no editing, no layout mode) */
+const BASE_WIDGET_CONFIG: WidgetConfig[] = [
   { id: 'jobs', label: 'Jobs to be Done', visible: true, size: 'small' },
   { id: 'pains', label: 'Pain Points', visible: true, size: 'small' },
   { id: 'gains', label: 'Gains', visible: true, size: 'small' },
@@ -50,6 +53,18 @@ const READ_ONLY_WIDGET_CONFIG: WidgetConfig[] = [
     size: 'full',
   },
 ];
+
+/** Build widget config including any custom widgets from the persona */
+const buildWidgetConfig = (persona: IPersona | undefined): WidgetConfig[] => {
+  if (!persona?.customWidgets?.length) return BASE_WIDGET_CONFIG;
+  const customConfigs: WidgetConfig[] = persona.customWidgets.map((w) => ({
+    id: `custom-${w.uuid}`,
+    label: w.title,
+    visible: true,
+    size: 'small',
+  }));
+  return [...BASE_WIDGET_CONFIG, ...customConfigs];
+};
 
 /** Maps IPersona data to PersonaWidgetData for the read-only grid */
 const mapToWidgetData = (persona: {
@@ -73,6 +88,7 @@ const mapToWidgetData = (persona: {
     description?: string;
     isProductIntervention: boolean;
   }>;
+  customWidgets?: IPersona['customWidgets'];
 }): PersonaWidgetData => ({
   jobsToBeDone: persona.jobsToBeDone.map(
     (j): CardListItem => ({
@@ -131,23 +147,29 @@ const mapToWidgetData = (persona: {
     description: ws.description ?? '',
     isProductIntervention: ws.isProductIntervention,
   })),
+  customWidgets: persona.customWidgets ?? [],
 });
 
 export interface LivingPersonaProfileProps {
   personaUuid: string;
   className?: string;
+  isReadOnly?: boolean;
 }
 
 const LivingPersonaProfile: React.FC<LivingPersonaProfileProps> = ({
   personaUuid,
   className,
+  isReadOnly = false,
 }) => {
   const { persona, isLoading } = usePersona(personaUuid);
+  const { concept } = useConceptReportContext();
 
   const widgetData = useMemo(() => {
     if (!persona) return undefined;
     return mapToWidgetData(persona);
   }, [persona]);
+
+  const widgetConfig = useMemo(() => buildWidgetConfig(persona), [persona]);
 
   if (isLoading || !persona) {
     return (
@@ -199,17 +221,45 @@ const LivingPersonaProfile: React.FC<LivingPersonaProfileProps> = ({
         </Link>
       </div>
 
-      {/* Persona Overview (read-only) */}
-      <PersonaOverviewSection
-        name={persona.segment}
-        representativeName={persona.name}
-        avatar={persona.avatar}
-        themeColor={persona.themeColor}
-        tags={persona.tags}
-        demographics={persona.demographics}
-        overview={persona.overview}
-        isEditable={false}
-      />
+      {/* Unified card: Overview + Chat */}
+      <div className='aucctus-border-primary aucctus-bg-primary w-full overflow-hidden rounded-xl border shadow-sm'>
+        <div
+          className={cn('grid grid-cols-1', !isReadOnly && 'xl:grid-cols-2')}
+        >
+          {/* Left - persona overview */}
+          <div
+            className={cn(
+              'aucctus-border-secondary',
+              !isReadOnly && 'xl:border-r',
+            )}
+          >
+            <PersonaOverviewSection
+              name={persona.segment}
+              representativeName={persona.name}
+              avatar={persona.avatar}
+              themeColor={persona.themeColor}
+              tags={persona.tags}
+              demographics={persona.demographics}
+              overview={persona.overview}
+              isEditable={false}
+            />
+          </div>
+          {/* Right - chat (hidden in read-only mode) */}
+          {!isReadOnly && (
+            <div className='aucctus-border-secondary h-[480px] border-t xl:border-t-0'>
+              <PersonaLiveChat
+                personaUuid={personaUuid}
+                personaName={persona.name}
+                personaAvatarUrl={persona.avatar}
+                representativeName={persona.segment}
+                disableMentions
+                conceptUuid={concept?.uuid}
+                className='h-full rounded-none border-0 shadow-none'
+              />
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Quotes Carousel */}
       {widgetData?.quotes && widgetData.quotes.length > 0 && (
@@ -221,7 +271,7 @@ const LivingPersonaProfile: React.FC<LivingPersonaProfileProps> = ({
         <PersonaWidgetGrid
           data={widgetData}
           isLayoutMode={false}
-          widgetConfig={READ_ONLY_WIDGET_CONFIG}
+          widgetConfig={widgetConfig}
         />
       )}
     </motion.div>

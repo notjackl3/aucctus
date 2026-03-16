@@ -10,7 +10,7 @@
 
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X as XIcon, Zap } from 'lucide-react';
+import { Plus, X as XIcon, Zap } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import GlassWidget, { WidgetSize } from './GlassWidget';
 
@@ -135,6 +135,24 @@ const BehavioursWidget: React.FC<BehavioursWidgetProps> = ({
       </AnimatePresence>
 
       <div className='relative min-h-0 flex-1'>
+        {/* Empty state */}
+        {sortedItems.length === 0 && !isAdding && onAdd && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className='flex h-full items-center justify-center'
+          >
+            <button
+              type='button'
+              onClick={() => setIsAdding(true)}
+              className='aucctus-text-secondary hover:aucctus-text-primary aucctus-border-secondary hover:aucctus-border-primary flex items-center gap-2 rounded-lg border border-dashed px-4 py-2 transition-colors'
+            >
+              <Plus className='h-4 w-4' />
+              <span className='aucctus-text-sm'>Add a behaviour</span>
+            </button>
+          </motion.div>
+        )}
+
         <div className='absolute inset-0 overflow-y-auto pb-4 pr-1'>
           <div className='space-y-3'>
             <AnimatePresence>

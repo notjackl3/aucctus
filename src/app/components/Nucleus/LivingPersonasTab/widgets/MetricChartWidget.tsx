@@ -506,45 +506,43 @@ const MetricChartWidget: React.FC<MetricChartWidgetProps> = ({
             </ResponsiveContainer>
           </div>
 
-          {/* Edit/delete controls below chart */}
-          {isEditable && (onUpdate || onDelete) && (
-            <div className='mt-2 space-y-1'>
-              {items.map((item, index) => (
-                <div
-                  key={item.uuid}
-                  className='group flex items-center gap-2 rounded px-1 py-0.5 hover:bg-white/5'
-                >
-                  <span
-                    className='h-2.5 w-2.5 shrink-0 rounded-sm'
-                    style={{
-                      backgroundColor: BAR_COLORS[index % BAR_COLORS.length],
-                    }}
-                  />
-                  <span className='aucctus-text-xs aucctus-text-secondary flex-1 truncate'>
-                    {item.label}
-                  </span>
-                  {onUpdate && (
-                    <button
-                      type='button'
-                      onClick={() => startEditing(item)}
-                      className='flex h-5 w-5 items-center justify-center rounded opacity-0 transition-opacity hover:bg-blue-100 group-hover:opacity-100 dark:hover:bg-blue-900/30'
-                    >
-                      <Pencil size={10} className='aucctus-text-secondary' />
-                    </button>
-                  )}
-                  {onDelete && (
-                    <button
-                      type='button'
-                      onClick={() => onDelete(item.uuid)}
-                      className='flex h-5 w-5 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
-                    >
-                      <X size={12} className='text-red-500' />
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+          {/* Legend + edit/delete controls below chart */}
+          <div className='mt-2 space-y-1'>
+            {items.map((item, index) => (
+              <div
+                key={item.uuid}
+                className='group flex items-center gap-2 rounded px-1 py-0.5 hover:bg-white/5'
+              >
+                <span
+                  className='h-2.5 w-2.5 shrink-0 rounded-sm'
+                  style={{
+                    backgroundColor: BAR_COLORS[index % BAR_COLORS.length],
+                  }}
+                />
+                <span className='aucctus-text-xs aucctus-text-secondary flex-1 truncate'>
+                  {item.label}
+                </span>
+                {isEditable && onUpdate && (
+                  <button
+                    type='button'
+                    onClick={() => startEditing(item)}
+                    className='flex h-5 w-5 items-center justify-center rounded opacity-0 transition-opacity hover:bg-blue-100 group-hover:opacity-100 dark:hover:bg-blue-900/30'
+                  >
+                    <Pencil size={10} className='aucctus-text-secondary' />
+                  </button>
+                )}
+                {isEditable && onDelete && (
+                  <button
+                    type='button'
+                    onClick={() => onDelete(item.uuid)}
+                    className='flex h-5 w-5 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
+                  >
+                    <X size={12} className='text-red-500' />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         </motion.div>
       )}
 

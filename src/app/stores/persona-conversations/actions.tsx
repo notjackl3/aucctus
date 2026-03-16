@@ -34,6 +34,7 @@ const getMessageSummary = (
 export interface IPersonaConversationActions {
   setCurrentMessage: (message: string) => void;
   setPersonaUuid: (personaUuid: string) => void;
+  setConceptUuid: (conceptUuid: string | undefined) => void;
   sendMessage: (mentions?: IOutboundMention[]) => Promise<void>;
   handleHandshake: (handshake: IPersonaChatHandshakeMessage) => boolean;
   handleStream: (event: IPersonaChatStreamEvent) => void;
@@ -107,8 +108,14 @@ export async function sendMessage(
   mentions?: IOutboundMention[],
 ) {
   const { get, set } = this;
-  const { sessionId, currentMessage, personaUuid, messages, selectedMentions } =
-    get();
+  const {
+    sessionId,
+    currentMessage,
+    personaUuid,
+    conceptUuid,
+    messages,
+    selectedMentions,
+  } = get();
   const mentionsToSend =
     mentions ?? (selectedMentions.length > 0 ? selectedMentions : undefined);
 
@@ -183,6 +190,7 @@ export async function sendMessage(
       personaUuid: personaUuid,
       content: message.content,
       ...(mentionsToSend && { mentions: mentionsToSend }),
+      ...(conceptUuid && { conceptUuid }),
     });
     return;
   }
@@ -201,6 +209,7 @@ export async function sendMessage(
     content: message.content,
     uuid: message.uuid,
     ...(mentionsToSend && { mentions: mentionsToSend }),
+    ...(conceptUuid && { conceptUuid }),
   });
 }
 
@@ -213,6 +222,19 @@ export function setPersonaUuid(
   set(
     produce((state: IPersonaConversationState) => {
       state.personaUuid = personaUuid;
+    }),
+  );
+}
+
+export function setConceptUuid(
+  this: IStoreApi<IPersonaConversationState>,
+  conceptUuid: string | undefined,
+) {
+  const { set } = this;
+
+  set(
+    produce((state: IPersonaConversationState) => {
+      state.conceptUuid = conceptUuid;
     }),
   );
 }

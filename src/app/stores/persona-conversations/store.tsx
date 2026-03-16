@@ -17,6 +17,7 @@ import {
   setCurrentMessage,
   setConversation,
   setPersonaUuid,
+  setConceptUuid,
   addMention,
   clearMentions,
 } from './actions';
@@ -52,6 +53,7 @@ export interface IPersonaConversation {
 export interface IPersonaConversationState extends IPersonaConversationActions {
   sessionId?: string;
   personaUuid?: string;
+  conceptUuid?: string;
   messages: PersonaConversationMessage[];
   currentMessage?: string;
   currentStreamingContent?: string;
@@ -65,6 +67,7 @@ export interface IPersonaConversationState extends IPersonaConversationActions {
 export const initialPersonaConversationState = {
   sessionId: undefined as string | undefined,
   personaUuid: undefined as string | undefined,
+  conceptUuid: undefined as string | undefined,
   messages: [] as PersonaConversationMessage[],
   currentMessage: undefined as string | undefined,
   currentStreamingContent: undefined as string | undefined,
@@ -87,6 +90,7 @@ const personaConversationSlice: Lens<IPersonaConversationState, IAppStore> = (
     sendMessage: sendMessage.bind(actionContext),
     setCurrentMessage: setCurrentMessage.bind(actionContext),
     setPersonaUuid: setPersonaUuid.bind(actionContext),
+    setConceptUuid: setConceptUuid.bind(actionContext),
     handleHandshake: handleHandshake.bind(actionContext),
     handleStream: handleStream.bind(actionContext),
     setConversation: setConversation.bind(actionContext),

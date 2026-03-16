@@ -238,6 +238,88 @@ const InlineEditableText: React.FC<{
   );
 };
 
+/**
+ * InlineEditablePill - Click-to-edit demographic pill for empty fields
+ */
+const InlineEditablePill: React.FC<{
+  emoji: string;
+  label: string;
+  onSave: (value: string) => void;
+  index: number;
+}> = ({ emoji, label, onSave, index }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditing]);
+
+  const handleSave = useCallback(() => {
+    const trimmed = editValue.trim();
+    if (trimmed) {
+      onSave(trimmed);
+    }
+    setEditValue('');
+    setIsEditing(false);
+  }, [editValue, onSave]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSave();
+      }
+      if (e.key === 'Escape') {
+        setEditValue('');
+        setIsEditing(false);
+      }
+    },
+    [handleSave],
+  );
+
+  if (isEditing) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        className='inline-flex items-center gap-1.5 rounded-full border border-indigo-400/40 px-3 py-1'
+      >
+        <span className='text-base'>{emoji}</span>
+        <input
+          ref={inputRef}
+          type='text'
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onBlur={handleSave}
+          onKeyDown={handleKeyDown}
+          placeholder={label}
+          className='aucctus-text-sm aucctus-text-primary w-24 bg-transparent outline-none'
+        />
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.button
+      type='button'
+      onClick={() => setIsEditing(true)}
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, delay: 0.2 + index * 0.05 }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className='inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-dashed border-[#F79009]/30 px-3 py-1.5 transition-colors hover:border-indigo-400/40 hover:bg-indigo-500/5'
+      title={`Click to add ${label.toLowerCase()}`}
+    >
+      <span className='text-base opacity-50'>{emoji}</span>
+      <span className='aucctus-text-sm italic text-[#F79009]/60'>{label}</span>
+    </motion.button>
+  );
+};
+
 /** Valid tag colors in rotation order */
 const TAG_COLORS_ROTATION: TagColor[] = ['blue', 'purple', 'green', 'orange'];
 
@@ -351,6 +433,7 @@ const PersonaOverviewSection = forwardRef<
       onNameChange,
       onAddTag,
       onRemoveTag,
+      onDemographicsChange,
       onOverviewChange,
       className,
     },
@@ -552,6 +635,17 @@ const PersonaOverviewSection = forwardRef<
               {demographicsFields.map((field, index) => {
                 const value = demographics[field.key];
                 if (value) return null;
+                if (isEditable && onDemographicsChange) {
+                  return (
+                    <InlineEditablePill
+                      key={field.key}
+                      emoji={field.emoji}
+                      label={field.label}
+                      onSave={(v) => onDemographicsChange(field.key, v)}
+                      index={index}
+                    />
+                  );
+                }
                 return (
                   <motion.span
                     key={field.key}
@@ -624,6 +718,14 @@ const PersonaOverviewSection = forwardRef<
                     </button>
                   )}
                 </div>
+              ) : isEditable && onOverviewChange ? (
+                <InlineEditableText
+                  value=''
+                  onSave={onOverviewChange}
+                  className='aucctus-text-sm aucctus-text-secondary leading-relaxed'
+                  multiline
+                  placeholder='Click to add an overview...'
+                />
               ) : (
                 <div className='rounded-lg border border-dashed border-[#F79009]/40 bg-[#F79009]/5 p-4 text-center'>
                   <p className='aucctus-text-sm italic text-[#F79009]/60'>

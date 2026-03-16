@@ -13,7 +13,7 @@
 import { cn } from '@libs/utils/react';
 import PriorityIndicator from '@pages/Concept/Report/CustomerProfile/Details/components/PriorityIndicator';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircle, X as XIcon } from 'lucide-react';
+import { AlertCircle, Pencil, Plus, X as XIcon } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import GlassWidget, { WidgetSize } from './GlassWidget';
 
@@ -38,6 +38,8 @@ export interface PainsWidgetProps {
   isEditable?: boolean;
   /** Callback to add new item */
   onAdd?: (data: { text: string; severity?: number }) => void;
+  /** Callback to update item */
+  onUpdate?: (uuid: string, data: { text: string }) => void;
   /** Callback to delete item */
   onDelete?: (uuid: string) => void;
   /** Additional CSS classes */
@@ -58,6 +60,7 @@ const PainsWidget: React.FC<PainsWidgetProps> = ({
   items,
   size = 'small',
   onAdd,
+  onUpdate,
   onDelete,
   className,
 }) => {
@@ -66,6 +69,8 @@ const PainsWidget: React.FC<PainsWidgetProps> = ({
   );
   const [isAdding, setIsAdding] = useState(false);
   const [newText, setNewText] = useState('');
+  const [editingUuid, setEditingUuid] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
 
   const handleAdd = useCallback(() => {
     if (!newText.trim() || !onAdd) return;
@@ -85,6 +90,33 @@ const PainsWidget: React.FC<PainsWidgetProps> = ({
     [handleAdd],
   );
 
+  const handleStartEdit = useCallback(
+    (item: { uuid: string; text: string }) => {
+      setEditingUuid(item.uuid);
+      setEditText(item.text);
+      setIsAdding(false);
+    },
+    [],
+  );
+
+  const handleSaveEdit = useCallback(() => {
+    if (!editingUuid || !editText.trim() || !onUpdate) return;
+    onUpdate(editingUuid, { text: editText.trim() });
+    setEditingUuid(null);
+    setEditText('');
+  }, [editingUuid, editText, onUpdate]);
+
+  const handleEditKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') handleSaveEdit();
+      if (e.key === 'Escape') {
+        setEditingUuid(null);
+        setEditText('');
+      }
+    },
+    [handleSaveEdit],
+  );
+
   return (
     <GlassWidget
       title={title}
@@ -102,97 +134,163 @@ const PainsWidget: React.FC<PainsWidgetProps> = ({
       </p>
 
       <div className='flex min-h-0 flex-1'>
+        {/* Empty state */}
+        {sortedItems.length === 0 && !isAdding && onAdd && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className='flex flex-1 items-center justify-center'
+          >
+            <button
+              type='button'
+              onClick={() => setIsAdding(true)}
+              className='aucctus-text-secondary hover:aucctus-text-primary aucctus-border-secondary hover:aucctus-border-primary flex items-center gap-2 rounded-lg border border-dashed px-4 py-2 transition-colors'
+            >
+              <Plus className='h-4 w-4' />
+              <span className='aucctus-text-sm'>Add a pain point</span>
+            </button>
+          </motion.div>
+        )}
+
         {/* Priority Scale */}
-        <PriorityIndicator
-          textColorClass={PRIORITY_COLOR_TEXT}
-          lineColorClass={PRIORITY_COLOR_LINE}
-        />
+        {(sortedItems.length > 0 || isAdding) && (
+          <PriorityIndicator
+            textColorClass={PRIORITY_COLOR_TEXT}
+            lineColorClass={PRIORITY_COLOR_LINE}
+          />
+        )}
 
         {/* Items List - Scrollable */}
-        <div className='relative min-h-0 flex-1'>
-          <div className='absolute inset-0 overflow-y-auto pb-4 pr-1'>
-            <div className='space-y-3'>
-              {/* Inline add form - inside scrollable area so priority line is unaffected */}
-              <AnimatePresence>
-                {isAdding && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                  >
-                    <div className='aucctus-border-brand flex items-center gap-2 rounded-lg border p-2'>
-                      <input
-                        type='text'
-                        value={newText}
-                        onChange={(e) => setNewText(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder='Enter a pain point...'
-                        className='aucctus-bg-primary aucctus-text-primary aucctus-text-sm flex-1 border-none outline-none'
-                        autoFocus
-                      />
-                      <button
-                        type='button'
-                        onClick={handleAdd}
-                        disabled={!newText.trim()}
-                        className='btn btn-primary btn-xs'
-                      >
-                        Add
-                      </button>
-                      <button
-                        type='button'
-                        onClick={() => {
-                          setIsAdding(false);
-                          setNewText('');
-                        }}
-                        className='btn btn-ghost btn-xs'
-                      >
-                        <XIcon className='h-3 w-3' />
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <AnimatePresence>
-                {sortedItems.map((item, index) => (
-                  <motion.div
-                    key={item.uuid}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{
-                      duration: 0.2,
-                      delay: Math.min(index * 0.03, 0.3),
-                    }}
-                    className='aucctus-border-secondary hover:aucctus-bg-secondary-hover group flex items-start gap-3 rounded-md border p-3 transition-colors'
-                  >
-                    <div
-                      className={cn(
-                        'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full',
-                        ICON_BG,
-                      )}
+        {(sortedItems.length > 0 || isAdding) && (
+          <div className='relative min-h-0 flex-1'>
+            <div className='absolute inset-0 overflow-y-auto pb-4 pr-1'>
+              <div className='space-y-3'>
+                {/* Inline add form - inside scrollable area so priority line is unaffected */}
+                <AnimatePresence>
+                  {isAdding && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
                     >
-                      <AlertCircle className={cn('h-3 w-3', ICON_COLOR)} />
-                    </div>
-                    <p className='aucctus-text-sm aucctus-text-primary flex-1'>
-                      {item.text}
-                    </p>
-                    {onDelete && (
-                      <button
-                        type='button'
-                        onClick={() => onDelete(item.uuid)}
-                        className='flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
+                      <div className='aucctus-border-brand flex items-center gap-2 rounded-lg border p-2'>
+                        <input
+                          type='text'
+                          value={newText}
+                          onChange={(e) => setNewText(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          placeholder='Enter a pain point...'
+                          className='aucctus-bg-primary aucctus-text-primary aucctus-text-sm flex-1 border-none outline-none'
+                          autoFocus
+                        />
+                        <button
+                          type='button'
+                          onClick={handleAdd}
+                          disabled={!newText.trim()}
+                          className='btn btn-primary btn-xs'
+                        >
+                          Add
+                        </button>
+                        <button
+                          type='button'
+                          onClick={() => {
+                            setIsAdding(false);
+                            setNewText('');
+                          }}
+                          className='btn btn-ghost btn-xs'
+                        >
+                          <XIcon className='h-3 w-3' />
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <AnimatePresence>
+                  {sortedItems.map((item, index) => (
+                    <motion.div
+                      key={item.uuid}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{
+                        duration: 0.2,
+                        delay: Math.min(index * 0.03, 0.3),
+                      }}
+                      className='aucctus-border-secondary hover:aucctus-bg-secondary-hover group flex items-start gap-3 rounded-md border p-3 transition-colors'
+                    >
+                      <div
+                        className={cn(
+                          'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full',
+                          ICON_BG,
+                        )}
                       >
-                        <XIcon className='h-3 w-3 text-red-500' />
-                      </button>
-                    )}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+                        <AlertCircle className={cn('h-3 w-3', ICON_COLOR)} />
+                      </div>
+                      {editingUuid === item.uuid ? (
+                        <div className='flex flex-1 items-center gap-2'>
+                          <input
+                            type='text'
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            onKeyDown={handleEditKeyDown}
+                            className='aucctus-bg-primary aucctus-text-primary aucctus-text-sm flex-1 border-none outline-none'
+                            autoFocus
+                          />
+                          <button
+                            type='button'
+                            onClick={handleSaveEdit}
+                            disabled={!editText.trim()}
+                            className='btn btn-primary btn-xs'
+                          >
+                            Save
+                          </button>
+                          <button
+                            type='button'
+                            onClick={() => {
+                              setEditingUuid(null);
+                              setEditText('');
+                            }}
+                            className='btn btn-ghost btn-xs'
+                          >
+                            <XIcon className='h-3 w-3' />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <p className='aucctus-text-sm aucctus-text-primary flex-1'>
+                            {item.text}
+                          </p>
+                          <div className='flex shrink-0 items-center gap-1'>
+                            {onUpdate && (
+                              <button
+                                type='button'
+                                onClick={() => handleStartEdit(item)}
+                                className='flex h-5 w-5 items-center justify-center rounded opacity-0 transition-opacity hover:bg-blue-100 group-hover:opacity-100 dark:hover:bg-blue-900/30'
+                              >
+                                <Pencil className='aucctus-text-secondary h-3 w-3' />
+                              </button>
+                            )}
+                            {onDelete && (
+                              <button
+                                type='button'
+                                onClick={() => onDelete(item.uuid)}
+                                className='flex h-5 w-5 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
+                              >
+                                <XIcon className='h-3 w-3 text-red-500' />
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
             </div>
+            {/* Bottom fade gradient */}
+            <div className='pointer-events-none absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/80 to-transparent dark:from-gray-900/80' />
           </div>
-          {/* Bottom fade gradient */}
-          <div className='pointer-events-none absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white/80 to-transparent dark:from-gray-900/80' />
-        </div>
+        )}
       </div>
     </GlassWidget>
   );

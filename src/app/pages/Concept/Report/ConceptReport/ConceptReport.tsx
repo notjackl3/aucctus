@@ -213,10 +213,7 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
   }, [conceptImageUrl]);
 
   // Hero description
-  const heroDescription = useMemo(
-    () => conceptOverview?.whatIsThis || concept?.summary || '',
-    [conceptOverview, concept],
-  );
+  const heroDescription = useMemo(() => concept?.summary || '', [concept]);
 
   // Build tabs dynamically
   const conceptTabs = useMemo(() => {
@@ -410,7 +407,9 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
                 customImageUrl={conceptOverview?.customImageUrl}
                 onRevertToAI={handleRevertToAI}
                 isRevertingImage={updateSettings.isLoading}
-              />
+              >
+                {null}
+              </ConceptHero>
             </div>
           </>
         )}

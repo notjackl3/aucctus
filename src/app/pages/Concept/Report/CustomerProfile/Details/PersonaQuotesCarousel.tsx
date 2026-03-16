@@ -81,7 +81,7 @@ const PersonaQuotesCarousel: React.FC<PersonaQuotesCarouselProps> = ({
 
         {/* Navigation */}
         {quotes.length > 1 && (
-          <div className='aucctus-border-secondary/20 flex items-center justify-between border-t pt-3'>
+          <div className='flex items-center justify-between pt-3'>
             <div className='flex items-center gap-1.5'>
               {quotes.map((_, idx) => (
                 <button

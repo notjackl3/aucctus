@@ -11,14 +11,17 @@ import { useDebugMode } from '@hooks/debug-mode.hook';
 import {
   useConceptCustomerProfiles,
   useConceptExecutiveSummaries,
+  useConceptUpdate,
   useGenerateCustomerProfile,
 } from '@hooks/query/concepts.hook';
+import { usePersonas } from '@hooks/query/persona.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
+import * as Popover from '@radix-ui/react-popover';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { Plus, Sparkles, Trash2 } from 'lucide-react';
 import {
   FunctionComponent,
   useCallback,
@@ -97,6 +100,47 @@ const CustomerProfile: FunctionComponent = () => {
     [concept?.livingPersonaUuids],
   );
   const hasLivingPersonas = livingPersonaUuids.length > 0;
+
+  // --- Living persona add/remove management ---
+  const MAX_PERSONAS = 4;
+  const { personas: allPersonas, isLoading: personasLoading } = usePersonas();
+  const updateMutation = useConceptUpdate();
+  const [addPopoverOpen, setAddPopoverOpen] = useState(false);
+
+  const taggedUuids = useMemo(
+    () => new Set(livingPersonaUuids),
+    [livingPersonaUuids],
+  );
+
+  const availablePersonas = useMemo(() => {
+    if (!allPersonas) return [];
+    return allPersonas.filter((p) => !taggedUuids.has(p.uuid));
+  }, [allPersonas, taggedUuids]);
+
+  const atPersonaLimit = livingPersonaUuids.length >= MAX_PERSONAS;
+
+  const handleAddPersona = useCallback(
+    (personaUuid: string) => {
+      if (atPersonaLimit) return;
+      const newUuids = [...livingPersonaUuids, personaUuid];
+      updateMutation.mutate({
+        identifier: concept.identifier,
+        livingPersonaUuids: newUuids,
+      });
+    },
+    [atPersonaLimit, concept.identifier, livingPersonaUuids, updateMutation],
+  );
+
+  const handleRemovePersona = useCallback(
+    (personaUuid: string) => {
+      const newUuids = livingPersonaUuids.filter((u) => u !== personaUuid);
+      updateMutation.mutate({
+        identifier: concept.identifier,
+        livingPersonaUuids: newUuids,
+      });
+    },
+    [concept.identifier, livingPersonaUuids, updateMutation],
+  );
 
   /** Check if the selected tab is any living persona */
   const isLivingPersonaSelected =
@@ -465,7 +509,7 @@ const CustomerProfile: FunctionComponent = () => {
                         Segments
                       </span>
                       <span className='aucctus-text-xs aucctus-text-tertiary aucctus-border-secondary rounded-full border px-1.5 py-0.5 text-[10px]'>
-                        {profiles.length}
+                        {livingPersonas.length + profiles.length}
                       </span>
                     </div>
 
@@ -481,7 +525,7 @@ const CustomerProfile: FunctionComponent = () => {
                       }}
                     >
                       <span className='aucctus-text-xs aucctus-text-tertiary aucctus-border-secondary rounded-full border px-1.5 py-0.5 text-[10px]'>
-                        {profiles.length}
+                        {livingPersonas.length + profiles.length}
                       </span>
                     </div>
 
@@ -538,7 +582,7 @@ const CustomerProfile: FunctionComponent = () => {
                               }}
                               onClick={() => onProfileSelect(tabKey)}
                               className={cn(
-                                'flex cursor-pointer items-center rounded-lg transition-colors',
+                                'group/lp flex cursor-pointer items-center rounded-lg transition-colors',
                                 isActive
                                   ? 'aucctus-text-brand-primary'
                                   : 'aucctus-text-tertiary aucctus-bg-secondary-hover hover:aucctus-text-secondary',
@@ -570,6 +614,22 @@ const CustomerProfile: FunctionComponent = () => {
                                   Living Persona
                                 </span>
                               </div>
+                              {/* Remove button - only when expanded and not read-only */}
+                              {sidebarExpanded && !isReadOnly && (
+                                <button
+                                  type='button'
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRemovePersona(
+                                      livingPersonaUuids[lpIndex],
+                                    );
+                                  }}
+                                  className='aucctus-text-tertiary flex-shrink-0 rounded p-1 opacity-0 transition-all hover:text-red-500 group-hover/lp:opacity-100'
+                                  aria-label={`Remove ${lp.name}`}
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              )}
                             </div>
                           );
 
@@ -674,6 +734,118 @@ const CustomerProfile: FunctionComponent = () => {
 
                           return <div key={profile.uuid}>{button}</div>;
                         })}
+
+                        {/* Add living persona button */}
+                        {!isReadOnly && !atPersonaLimit && (
+                          <Popover.Root
+                            open={addPopoverOpen}
+                            onOpenChange={setAddPopoverOpen}
+                          >
+                            <Popover.Trigger asChild>
+                              {sidebarExpanded ? (
+                                <button
+                                  type='button'
+                                  className='aucctus-text-tertiary aucctus-bg-secondary-hover flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 text-xs transition-colors'
+                                >
+                                  <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-dashed border-purple-400/40'>
+                                    <Plus
+                                      size={16}
+                                      className='text-purple-500'
+                                    />
+                                  </div>
+                                  <span
+                                    className='whitespace-nowrap text-xs font-medium text-purple-600 dark:text-purple-400'
+                                    style={{
+                                      opacity: sidebarExpanded ? 1 : 0,
+                                      transition: 'opacity 150ms ease-out',
+                                    }}
+                                  >
+                                    Add Persona
+                                  </span>
+                                </button>
+                              ) : (
+                                <ComponentTooltip tip='Add Living Persona'>
+                                  <button
+                                    type='button'
+                                    className='aucctus-text-tertiary aucctus-bg-secondary-hover flex w-full cursor-pointer justify-center rounded-lg p-[6px] transition-colors'
+                                  >
+                                    <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-dashed border-purple-400/40'>
+                                      <Plus
+                                        size={16}
+                                        className='text-purple-500'
+                                      />
+                                    </div>
+                                  </button>
+                                </ComponentTooltip>
+                              )}
+                            </Popover.Trigger>
+                            <Popover.Portal>
+                              <Popover.Content
+                                side='right'
+                                align='start'
+                                sideOffset={8}
+                                className='aucctus-bg-primary aucctus-border-secondary z-50 w-64 rounded-lg border shadow-lg'
+                              >
+                                <div className='aucctus-border-secondary border-b px-3 py-2'>
+                                  <p className='aucctus-text-xs-medium aucctus-text-secondary'>
+                                    Add Living Persona ({livingPersonas.length}/
+                                    {MAX_PERSONAS})
+                                  </p>
+                                </div>
+                                <div className='max-h-48 overflow-y-auto p-1'>
+                                  {personasLoading ? (
+                                    <p className='aucctus-text-tertiary px-3 py-2 text-xs'>
+                                      Loading...
+                                    </p>
+                                  ) : availablePersonas.length === 0 ? (
+                                    <p className='aucctus-text-tertiary px-3 py-2 text-xs'>
+                                      No more personas available
+                                    </p>
+                                  ) : (
+                                    availablePersonas.map((persona) => (
+                                      <button
+                                        key={persona.uuid}
+                                        type='button'
+                                        onClick={() => {
+                                          handleAddPersona(persona.uuid);
+                                          setAddPopoverOpen(false);
+                                        }}
+                                        className='aucctus-bg-secondary-hover flex w-full items-center gap-2 rounded-md px-3 py-2 text-left transition-colors'
+                                      >
+                                        {persona.avatar ? (
+                                          <img
+                                            src={persona.avatar}
+                                            alt={persona.name}
+                                            className='h-6 w-6 flex-shrink-0 rounded-full object-cover'
+                                          />
+                                        ) : (
+                                          <span
+                                            className='flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white'
+                                            style={{
+                                              backgroundColor:
+                                                persona.themeColor ??
+                                                'hsl(270, 50%, 50%)',
+                                            }}
+                                          >
+                                            {persona.name.charAt(0)}
+                                          </span>
+                                        )}
+                                        <div className='min-w-0 flex-1'>
+                                          <p className='aucctus-text-primary truncate text-xs font-medium'>
+                                            {persona.name}
+                                          </p>
+                                          <p className='aucctus-text-tertiary truncate text-[10px]'>
+                                            {persona.segment}
+                                          </p>
+                                        </div>
+                                      </button>
+                                    ))
+                                  )}
+                                </div>
+                              </Popover.Content>
+                            </Popover.Portal>
+                          </Popover.Root>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -694,6 +866,7 @@ const CustomerProfile: FunctionComponent = () => {
                   >
                     <LivingPersonaProfile
                       personaUuid={selectedLivingPersonaUuid}
+                      isReadOnly={isReadOnly}
                     />
                   </motion.div>
                 ) : selectedProfile ? (

@@ -260,6 +260,7 @@ export interface IOutboundMention {
 interface BasePersonaChatMessage extends ITextMessage, BaseSocketEvent {
   personaUuid: string;
   mentions?: IOutboundMention[];
+  conceptUuid?: string;
 }
 
 /**

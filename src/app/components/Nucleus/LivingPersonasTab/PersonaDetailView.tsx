@@ -26,6 +26,7 @@ import {
   useIgnoreEvidence,
   useRemoveTag,
   useUpdatePersona,
+  useUpdateDemographics,
   useAddTag,
   useDeletePersona,
   usePersonaSocketEvents,
@@ -238,6 +239,7 @@ const PersonaDetailView: React.FC<PersonaDetailViewProps> = ({ listItem }) => {
   const { ignoreEvidence } = useIgnoreEvidence();
   const { removeTag } = useRemoveTag();
   const { updatePersona } = useUpdatePersona();
+  const { updateDemographics } = useUpdateDemographics();
   const { addTag } = useAddTag();
   const { deletePersona } = useDeletePersona();
 
@@ -285,18 +287,32 @@ const PersonaDetailView: React.FC<PersonaDetailViewProps> = ({ listItem }) => {
   const contentCallbacks = useMemo(
     (): ContentMutationCallbacks => ({
       onAddJob: (data) => jobMutations.add(data),
+      onUpdateJob: (uuid, data) =>
+        jobMutations.update({ itemUuid: uuid, data }),
       onDeleteJob: (uuid) => jobMutations.delete(uuid),
       onAddPain: (data) => painMutations.add(data),
+      onUpdatePain: (uuid, data) =>
+        painMutations.update({ itemUuid: uuid, data }),
       onDeletePain: (uuid) => painMutations.delete(uuid),
       onAddGain: (data) => gainMutations.add(data),
+      onUpdateGain: (uuid, data) =>
+        gainMutations.update({ itemUuid: uuid, data }),
       onDeleteGain: (uuid) => gainMutations.delete(uuid),
       onAddSocialValue: (data) => socialValueMutations.add(data),
+      onUpdateSocialValue: (uuid, data) =>
+        socialValueMutations.update({ itemUuid: uuid, data }),
       onDeleteSocialValue: (uuid) => socialValueMutations.delete(uuid),
       onAddMotivation: (data) => motivationMutations.add(data),
+      onUpdateMotivation: (uuid, data) =>
+        motivationMutations.update({ itemUuid: uuid, data }),
       onDeleteMotivation: (uuid) => motivationMutations.delete(uuid),
       onAddBehaviour: (data) => behaviourMutations.add(data),
+      onUpdateBehaviour: (uuid, data) =>
+        behaviourMutations.update({ itemUuid: uuid, data }),
       onDeleteBehaviour: (uuid) => behaviourMutations.delete(uuid),
       onAddKeyFact: (data) => keyFactMutations.add(data),
+      onUpdateKeyFact: (uuid, data) =>
+        keyFactMutations.update({ itemUuid: uuid, data }),
       onDeleteKeyFact: (uuid) => keyFactMutations.delete(uuid),
       onAddWorkdayStep: (data) => workdayStepMutations.add(data),
       onUpdateWorkdayStep: (uuid, data) =>
@@ -466,6 +482,16 @@ const PersonaDetailView: React.FC<PersonaDetailViewProps> = ({ listItem }) => {
     [updatePersona, listItem.uuid],
   );
 
+  const handleDemographicsChange = useCallback(
+    (field: string, value: string) => {
+      updateDemographics({
+        personaUuid: listItem.uuid,
+        data: { [field]: value },
+      });
+    },
+    [updateDemographics, listItem.uuid],
+  );
+
   const handleAddTag = useCallback(
     (label: string, color: TagColor) => {
       addTag({
@@ -596,6 +622,7 @@ const PersonaDetailView: React.FC<PersonaDetailViewProps> = ({ listItem }) => {
           isEditable
           onNameChange={handleNameChange}
           onOverviewChange={handleOverviewChange}
+          onDemographicsChange={handleDemographicsChange}
           onAddTag={handleAddTag}
           onRemoveTag={handleRemoveTag}
           className='min-w-0 flex-1'

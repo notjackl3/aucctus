@@ -1,11 +1,24 @@
 import { Loading } from '@components';
+import type { ConceptTab } from '@components/ConceptReport/ConceptNavigation';
+import ConceptNavigation from '@components/ConceptReport/ConceptNavigation';
 import {
   useSendVerificationCode,
   useShareInfo,
   useSharedReport,
   useVerifyCode,
 } from '@hooks/query/sharedReport.hook';
+import images from '@assets/img';
+import type { ISharedReport } from '@libs/api/types/sharedReport';
+import { fireConfetti } from '@libs/utils/confetti';
 import { cn } from '@libs/utils/react';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
+import AssumptionsWrapper from '@pages/Concept/Report/AssumptionsWrapper';
+import CustomerProfile from '@pages/Concept/Report/CustomerProfile/CustomerProfile';
+import EcosystemWrapper from '@pages/Concept/Report/EcosystemWrapper';
+import FinancialProjectionsWrapper from '@pages/Concept/Report/FinancialProjectionsWrapper';
+import OverviewWrapper from '@pages/Concept/Report/OverviewWrapper';
+import Testing from '@pages/Concept/Report/Testing/Testing';
+import TrendsWrapper from '@pages/Concept/Report/TrendsWrapper';
 import { motion } from 'framer-motion';
 import {
   AlertCircle,
@@ -13,6 +26,7 @@ import {
   BookOpen,
   CheckCircle,
   DollarSign,
+  Eye,
   FlaskConical,
   Globe,
   Lock,
@@ -21,20 +35,15 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react';
-import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useParams } from 'react-router-dom';
-import type { ISharedReport } from '@libs/api/types/sharedReport';
-import ConceptNavigation from '@components/ConceptReport/ConceptNavigation';
-import type { ConceptTab } from '@components/ConceptReport/ConceptNavigation';
 import SharedReportProvider from './SharedReportProvider';
-import OverviewWrapper from '@pages/Concept/Report/OverviewWrapper';
-import TrendsWrapper from '@pages/Concept/Report/TrendsWrapper';
-import EcosystemWrapper from '@pages/Concept/Report/EcosystemWrapper';
-import FinancialProjectionsWrapper from '@pages/Concept/Report/FinancialProjectionsWrapper';
-import CustomerProfile from '@pages/Concept/Report/CustomerProfile/CustomerProfile';
-import AssumptionsWrapper from '@pages/Concept/Report/AssumptionsWrapper';
-import Testing from '@pages/Concept/Report/Testing/Testing';
 
 type Phase = 'info' | 'verification' | 'report';
 
@@ -61,6 +70,12 @@ export default function SharedReportPage() {
     token ?? '',
     isVerified,
   );
+
+  useEffect(() => {
+    if (report) {
+      fireConfetti();
+    }
+  }, [report]);
 
   const handleSendCode = useCallback(
     (e: React.FormEvent) => {
@@ -150,84 +165,88 @@ export default function SharedReportPage() {
   // Info phase - enter email
   if (phase === 'info') {
     return (
-      <div className='flex min-h-screen items-center justify-center bg-gray-50 p-4'>
+      <div className='aucctus-bg-primary flex min-h-screen items-center justify-center p-4'>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className='w-full max-w-md rounded-xl bg-white p-8 shadow-lg'
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          className='w-full max-w-[500px]'
         >
-          <div className='mb-6 text-center'>
-            <Shield className='mx-auto mb-3 h-10 w-10 text-red-600' />
-            <h1 className='mb-1 text-xl font-bold text-gray-900'>
-              {shareInfo.conceptTitle}
-            </h1>
-            <p className='text-sm text-gray-500'>
-              Shared by {shareInfo.accountName}
-            </p>
-          </div>
-
-          <div className='mb-6 rounded-lg bg-gray-50 p-4'>
-            <div className='flex items-start gap-3'>
-              <Lock className='mt-0.5 h-4 w-4 flex-shrink-0 text-gray-400' />
-              <p className='text-sm text-gray-600'>
-                This report is restricted to{' '}
-                <strong>@{shareInfo.requiredEmailDomain}</strong> email
-                addresses. Enter your email to receive a verification code.
-              </p>
-            </div>
-          </div>
-
-          <form onSubmit={handleSendCode}>
-            <div className='mb-4'>
-              <label
-                htmlFor='email'
-                className='mb-1.5 block text-sm font-medium text-gray-700'
-              >
-                Email address
-              </label>
-              <div className='relative'>
-                <Mail className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400' />
-                <input
-                  id='email'
-                  type='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={`you@${shareInfo.requiredEmailDomain}`}
-                  className='w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-4 text-sm focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500'
-                  required
-                />
-              </div>
-            </div>
-
-            {TURNSTILE_SITE_KEY && (
-              <div className='mb-4 flex justify-center'>
-                <Turnstile
-                  ref={turnstileRef}
-                  siteKey={TURNSTILE_SITE_KEY}
-                  onSuccess={(token: string) => setCaptchaToken(token)}
-                  onExpire={() => setCaptchaToken('')}
-                />
-              </div>
-            )}
-
-            {error && (
-              <div className='mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600'>
-                {error}
-              </div>
-            )}
-
-            <button
-              type='submit'
-              disabled={sendCode.isLoading || !email.trim()}
-              className={cn(
-                'w-full rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700',
-                (sendCode.isLoading || !email.trim()) &&
-                  'cursor-not-allowed opacity-50',
-              )}
+          <div className='liquid-glass-modal-shell'>
+            <div
+              className='liquid-glass-modal-rim liquid-glass-modal-rim-animated'
+              aria-hidden='true'
             >
-              {sendCode.isLoading ? 'Sending...' : 'Send Verification Code'}
-            </button>
-          </form>
+              <div className='rim-orb rim-orb-1' />
+              <div className='rim-orb rim-orb-2' />
+            </div>
+            <div className='liquid-glass-modal-surface'>
+              <div className='relative z-10 p-8 text-center'>
+                {/* Icon with lock badge */}
+                <div className='relative mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-600/10'>
+                  <Mail className='h-7 w-7 text-gray-600' />
+                  <div className='aucctus-bg-secondary absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white'>
+                    <Lock className='aucctus-stroke-secondary h-2.5 w-2.5' />
+                  </div>
+                </div>
+
+                <h2 className='aucctus-text-primary mb-2 text-xl font-semibold'>
+                  Enter Your Email To Confirm Access
+                </h2>
+                <p className='aucctus-text-secondary mb-6 text-sm'>
+                  Enter your email address to verify your access to this shared
+                  concept report.
+                </p>
+
+                <form onSubmit={handleSendCode} className='space-y-3'>
+                  <input
+                    id='email'
+                    type='email'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={`you@${shareInfo.requiredEmailDomain}`}
+                    className='aucctus-bg-primary aucctus-text-primary aucctus-border-primary h-11 w-full rounded-md border px-3 py-2 text-center text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                    required
+                  />
+
+                  {TURNSTILE_SITE_KEY && (
+                    <div className='flex justify-center'>
+                      <Turnstile
+                        ref={turnstileRef}
+                        siteKey={TURNSTILE_SITE_KEY}
+                        onSuccess={(token: string) => setCaptchaToken(token)}
+                        onExpire={() => setCaptchaToken('')}
+                      />
+                    </div>
+                  )}
+
+                  {error && (
+                    <div className='rounded-lg bg-red-50 p-3 text-sm text-red-600'>
+                      {error}
+                    </div>
+                  )}
+
+                  <motion.button
+                    type='submit'
+                    disabled={sendCode.isLoading || !email.trim()}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={cn(
+                      'btn btn-primary btn-md h-11 w-full',
+                      (sendCode.isLoading || !email.trim()) &&
+                        'cursor-not-allowed opacity-50',
+                    )}
+                  >
+                    {sendCode.isLoading ? 'Sending...' : 'Continue'}
+                  </motion.button>
+                </form>
+
+                <p className='aucctus-text-secondary mt-4 text-[11px]'>
+                  Only authorized team members can view this concept
+                </p>
+              </div>
+            </div>
+          </div>
         </motion.div>
       </div>
     );
@@ -236,74 +255,93 @@ export default function SharedReportPage() {
   // Verification phase - enter code
   if (phase === 'verification') {
     return (
-      <div className='flex min-h-screen items-center justify-center bg-gray-50 p-4'>
+      <div className='aucctus-bg-primary flex min-h-screen items-center justify-center p-4'>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className='w-full max-w-md rounded-xl bg-white p-8 shadow-lg'
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          className='w-full max-w-[400px]'
         >
-          <div className='mb-6 text-center'>
-            <Mail className='mx-auto mb-3 h-10 w-10 text-red-600' />
-            <h1 className='mb-1 text-xl font-bold text-gray-900'>
-              Check your email
-            </h1>
-            <p className='text-sm text-gray-500'>
-              We sent a 6-digit code to <strong>{email}</strong>
-            </p>
-          </div>
-
-          <form onSubmit={handleVerifyCode}>
-            <div className='mb-4'>
-              <label
-                htmlFor='code'
-                className='mb-1.5 block text-sm font-medium text-gray-700'
-              >
-                Verification code
-              </label>
-              <input
-                id='code'
-                type='text'
-                value={code}
-                onChange={(e) =>
-                  setCode(e.target.value.replace(/\D/g, '').slice(0, 6))
-                }
-                placeholder='000000'
-                className='w-full rounded-lg border border-gray-300 px-4 py-2.5 text-center font-mono text-2xl tracking-[0.5em] focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500'
-                maxLength={6}
-                required
-              />
+          <div className='liquid-glass-modal-shell'>
+            <div
+              className='liquid-glass-modal-rim liquid-glass-modal-rim-animated'
+              aria-hidden='true'
+            >
+              <div className='rim-orb rim-orb-1' />
+              <div className='rim-orb rim-orb-2' />
             </div>
+            <div className='liquid-glass-modal-surface'>
+              <div className='relative z-10 p-8 text-center'>
+                {/* Icon with check badge */}
+                <div className='relative mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-600/10'>
+                  <Shield className='h-7 w-7 text-gray-600' />
+                  <div className='aucctus-bg-secondary absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white'>
+                    <CheckCircle className='h-2.5 w-2.5 text-green-600' />
+                  </div>
+                </div>
 
-            {error && (
-              <div className='mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600'>
-                {error}
+                <h2 className='aucctus-text-primary mb-2 text-xl font-semibold'>
+                  Check Your Email
+                </h2>
+                <p className='aucctus-text-secondary mb-6 text-sm'>
+                  We sent a 6-digit code to <strong>{email}</strong>
+                </p>
+
+                <form onSubmit={handleVerifyCode} className='space-y-3'>
+                  <input
+                    id='code'
+                    type='text'
+                    value={code}
+                    onChange={(e) =>
+                      setCode(e.target.value.replace(/\D/g, '').slice(0, 6))
+                    }
+                    placeholder='000000'
+                    className='aucctus-bg-primary aucctus-text-primary aucctus-border-primary h-11 w-full rounded-md border px-4 py-2.5 text-center font-mono text-2xl tracking-[0.5em] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                    maxLength={6}
+                    required
+                  />
+
+                  {error && (
+                    <div className='rounded-lg bg-red-50 p-3 text-sm text-red-600'>
+                      {error}
+                    </div>
+                  )}
+
+                  <motion.button
+                    type='submit'
+                    disabled={verifyCode.isLoading || code.length !== 6}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={cn(
+                      'btn btn-primary btn-md h-11 w-full',
+                      (verifyCode.isLoading || code.length !== 6) &&
+                        'cursor-not-allowed opacity-50',
+                    )}
+                  >
+                    {verifyCode.isLoading ? 'Verifying...' : 'Verify Code'}
+                  </motion.button>
+
+                  <motion.button
+                    type='button'
+                    onClick={() => {
+                      setPhase('info');
+                      setCode('');
+                      setError('');
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className='aucctus-text-secondary mt-1 w-full text-center text-sm transition-colors hover:text-gray-700'
+                  >
+                    Use a different email
+                  </motion.button>
+                </form>
+
+                <p className='aucctus-text-secondary mt-4 text-[11px]'>
+                  Only authorized team members can view this concept
+                </p>
               </div>
-            )}
-
-            <button
-              type='submit'
-              disabled={verifyCode.isLoading || code.length !== 6}
-              className={cn(
-                'w-full rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700',
-                (verifyCode.isLoading || code.length !== 6) &&
-                  'cursor-not-allowed opacity-50',
-              )}
-            >
-              {verifyCode.isLoading ? 'Verifying...' : 'Verify Code'}
-            </button>
-
-            <button
-              type='button'
-              onClick={() => {
-                setPhase('info');
-                setCode('');
-                setError('');
-              }}
-              className='mt-3 w-full text-center text-sm text-gray-500 hover:text-gray-700'
-            >
-              Use a different email
-            </button>
-          </form>
+            </div>
+          </div>
         </motion.div>
       </div>
     );
@@ -334,7 +372,7 @@ export default function SharedReportPage() {
     );
   }
 
-  return <SharedReportView report={report} />;
+  return <SharedReportView report={report} email={email} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -352,8 +390,13 @@ type SharedTab =
   | 'assumptions'
   | 'testing';
 
-const SharedReportView: React.FC<{ report: ISharedReport }> = ({ report }) => {
+const SharedReportView: React.FC<{ report: ISharedReport; email: string }> = ({
+  report,
+  email,
+}) => {
   const [activeTab, setActiveTab] = useState<SharedTab>('overview');
+  const resolvedImage =
+    report.concept.conceptImageUrl || images.aiExplorationsBackground;
 
   const showTestingTab =
     report.featureVersions?.assumptions === 'v2' &&
@@ -403,25 +446,55 @@ const SharedReportView: React.FC<{ report: ISharedReport }> = ({ report }) => {
   return (
     <SharedReportProvider report={report} onTabChange={onTabSelect}>
       <div className='min-h-screen'>
-        {/* Header */}
-        <div className='aucctus-border-secondary border-b'>
-          <div className='mx-auto flex max-w-[1200px] items-center justify-between px-8 py-4'>
-            <div>
-              <div className='flex items-center gap-2'>
-                <CheckCircle className='h-5 w-5 text-green-500' />
-                <span className='text-xs font-medium text-green-600'>
-                  Verified Access
-                </span>
-              </div>
-              <h1 className='aucctus-text-brand-primary mt-1 text-xl font-bold'>
-                {report.concept.title}
-              </h1>
+        {/* Sticky Read-Only Banner */}
+        <div
+          className='sticky top-0 z-50 px-4 py-1.5'
+          style={{
+            background: 'rgb(209, 224, 255)',
+            color: 'rgb(41, 123, 255)',
+          }}
+        >
+          <div className='mx-auto flex max-w-7xl items-center justify-center gap-3 text-xs'>
+            <div className='flex items-center gap-1.5'>
+              <Mail className='h-3 w-3' />
+              <span className='font-medium'>{email}</span>
+            </div>
+            <span style={{ opacity: 0.5 }}>&bull;</span>
+            <div className='flex items-center gap-1.5'>
+              <Eye className='h-3 w-3' />
+              <span>View Only</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Hero Banner — matches ConceptHero layout */}
+        <div className='mx-auto max-w-[1200px] px-8 pt-6'>
+          <div className='aucctus-bg-primary aucctus-border-primary relative flex max-h-[420px] overflow-hidden rounded-xl border shadow-sm'>
+            {/* Info side */}
+            <div className='relative flex flex-1 flex-col justify-center gap-4 px-8 py-6'>
               <p className='aucctus-text-secondary text-sm'>
                 Shared by {report.sharedByName} from {report.accountName}
               </p>
+              <h1 className='aucctus-text-brand-primary text-5xl font-extrabold leading-[1.1] tracking-tight'>
+                {report.concept.title}
+              </h1>
+              {report.concept.summary && (
+                <p className='aucctus-text-secondary line-clamp-5 leading-relaxed'>
+                  {report.concept.summary}
+                </p>
+              )}
             </div>
-            <div className='aucctus-bg-secondary rounded-lg px-3 py-1.5 text-xs font-medium'>
-              Read Only
+
+            {/* Concept image */}
+            <div className='relative w-1/2 flex-shrink-0 p-3 pl-0'>
+              <div className='aucctus-bg-secondary h-full w-full overflow-hidden rounded-lg'>
+                <img
+                  src={resolvedImage}
+                  alt={report.concept.title}
+                  className='h-full w-full object-cover'
+                  loading='eager'
+                />
+              </div>
             </div>
           </div>
         </div>

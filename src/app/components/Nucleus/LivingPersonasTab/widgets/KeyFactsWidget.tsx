@@ -10,10 +10,9 @@
 
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { TrendingDown, TrendingUp } from 'lucide-react';
+import { Pencil, Plus, TrendingDown, TrendingUp, X } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import GlassWidget, { WidgetSize } from './GlassWidget';
-import { X } from 'lucide-react';
 
 /** Trend direction */
 export type TrendDirection = 'up' | 'down' | 'neutral';
@@ -40,6 +39,11 @@ export interface KeyFactsWidgetProps {
   isEditable?: boolean;
   /** Callback to add new fact */
   onAdd?: (data: { stat: string; label: string; trend?: string }) => void;
+  /** Callback to update fact */
+  onUpdate?: (
+    uuid: string,
+    data: { stat: string; label: string; trend?: string },
+  ) => void;
   /** Callback to delete fact */
   onDelete?: (uuid: string) => void;
   /** Additional CSS classes */
@@ -100,20 +104,35 @@ const KeyFactsWidget: React.FC<KeyFactsWidgetProps> = ({
   size = 'small',
   isEditable = false,
   onAdd,
+  onUpdate,
   onDelete,
   className,
 }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [newStat, setNewStat] = useState('');
   const [newLabel, setNewLabel] = useState('');
+  const [newTrend, setNewTrend] = useState<TrendDirection | undefined>(
+    undefined,
+  );
+  const [editingUuid, setEditingUuid] = useState<string | null>(null);
+  const [editStat, setEditStat] = useState('');
+  const [editLabel, setEditLabel] = useState('');
+  const [editTrend, setEditTrend] = useState<TrendDirection | undefined>(
+    undefined,
+  );
 
   const handleAdd = useCallback(() => {
     if (!newStat.trim() || !newLabel.trim() || !onAdd) return;
-    onAdd({ stat: newStat.trim(), label: newLabel.trim() });
+    onAdd({
+      stat: newStat.trim(),
+      label: newLabel.trim(),
+      trend: newTrend,
+    });
     setNewStat('');
     setNewLabel('');
+    setNewTrend(undefined);
     setIsAdding(false);
-  }, [newStat, newLabel, onAdd]);
+  }, [newStat, newLabel, newTrend, onAdd]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -122,9 +141,45 @@ const KeyFactsWidget: React.FC<KeyFactsWidgetProps> = ({
         setIsAdding(false);
         setNewStat('');
         setNewLabel('');
+        setNewTrend(undefined);
       }
     },
     [handleAdd],
+  );
+
+  const handleStartEdit = useCallback((fact: KeyFact) => {
+    setEditingUuid(fact.uuid);
+    setEditStat(fact.stat);
+    setEditLabel(fact.label);
+    setEditTrend(fact.trend);
+    setIsAdding(false);
+  }, []);
+
+  const handleSaveEdit = useCallback(() => {
+    if (!editingUuid || !editStat.trim() || !editLabel.trim() || !onUpdate)
+      return;
+    onUpdate(editingUuid, {
+      stat: editStat.trim(),
+      label: editLabel.trim(),
+      trend: editTrend,
+    });
+    setEditingUuid(null);
+    setEditStat('');
+    setEditLabel('');
+    setEditTrend(undefined);
+  }, [editingUuid, editStat, editLabel, editTrend, onUpdate]);
+
+  const handleEditKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') handleSaveEdit();
+      if (e.key === 'Escape') {
+        setEditingUuid(null);
+        setEditStat('');
+        setEditLabel('');
+        setEditTrend(undefined);
+      }
+    },
+    [handleSaveEdit],
   );
 
   return (
@@ -166,6 +221,40 @@ const KeyFactsWidget: React.FC<KeyFactsWidgetProps> = ({
                 placeholder='Label (e.g., Renters)'
                 className='aucctus-bg-primary aucctus-text-primary aucctus-text-sm w-full border-none outline-none'
               />
+              <div className='flex flex-wrap items-center gap-1'>
+                <span className='aucctus-text-xs aucctus-text-tertiary mr-1'>
+                  Trend:
+                </span>
+                {(['up', 'down', 'neutral'] as TrendDirection[]).map(
+                  (direction) => (
+                    <button
+                      key={direction}
+                      type='button'
+                      onClick={() =>
+                        setNewTrend(
+                          newTrend === direction ? undefined : direction,
+                        )
+                      }
+                      className={cn(
+                        'flex h-7 items-center gap-1 rounded-md px-2 text-xs font-medium transition-colors',
+                        newTrend === direction
+                          ? direction === 'up'
+                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                            : direction === 'down'
+                              ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                              : 'aucctus-bg-secondary aucctus-text-primary'
+                          : 'aucctus-text-tertiary hover:aucctus-bg-secondary',
+                      )}
+                    >
+                      {direction === 'up' && <TrendingUp className='h-3 w-3' />}
+                      {direction === 'down' && (
+                        <TrendingDown className='h-3 w-3' />
+                      )}
+                      {direction.charAt(0).toUpperCase() + direction.slice(1)}
+                    </button>
+                  ),
+                )}
+              </div>
               <div className='flex gap-2'>
                 <button
                   type='button'
@@ -181,6 +270,7 @@ const KeyFactsWidget: React.FC<KeyFactsWidgetProps> = ({
                     setIsAdding(false);
                     setNewStat('');
                     setNewLabel('');
+                    setNewTrend(undefined);
                   }}
                   className='btn btn-ghost btn-xs'
                 >
@@ -192,9 +282,28 @@ const KeyFactsWidget: React.FC<KeyFactsWidgetProps> = ({
         )}
       </AnimatePresence>
 
+      {/* Empty state */}
+      {facts.length === 0 && !isAdding && onAdd && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className='flex flex-1 items-center justify-center'
+        >
+          <button
+            type='button'
+            onClick={() => setIsAdding(true)}
+            className='aucctus-text-secondary hover:aucctus-text-primary aucctus-border-secondary hover:aucctus-border-primary flex items-center gap-2 rounded-lg border border-dashed px-4 py-2 transition-colors'
+          >
+            <Plus className='h-4 w-4' />
+            <span className='aucctus-text-sm'>Add a key fact</span>
+          </button>
+        </motion.div>
+      )}
+
       <div className='flex flex-wrap gap-3'>
         {facts.map((fact, index) => {
           const TrendIcon = getTrendIcon(fact.trend);
+          const isEditingThis = editingUuid === fact.uuid;
           return (
             <motion.div
               key={fact.uuid}
@@ -206,35 +315,126 @@ const KeyFactsWidget: React.FC<KeyFactsWidgetProps> = ({
               }}
               className={cn(
                 'group relative min-w-[calc(50%-0.375rem)] flex-1 rounded-lg p-4',
-                getTrendCardStyle(fact.trend),
+                isEditingThis
+                  ? 'aucctus-border-brand border'
+                  : getTrendCardStyle(fact.trend),
               )}
             >
-              <div className='flex items-start justify-between'>
-                <div>
-                  <p className='aucctus-text-lg-bold aucctus-text-primary'>
-                    {fact.stat}
-                  </p>
-                  <p className='aucctus-text-sm aucctus-text-secondary mt-1'>
-                    {fact.label}
-                  </p>
-                </div>
-                <div className='flex items-center gap-1'>
-                  {TrendIcon && (
-                    <TrendIcon
-                      className={cn('h-4 w-4', getTrendIconColor(fact.trend))}
-                    />
-                  )}
-                  {onDelete && (
+              {isEditingThis ? (
+                <div className='space-y-2'>
+                  <input
+                    type='text'
+                    value={editStat}
+                    onChange={(e) => setEditStat(e.target.value)}
+                    placeholder='Stat (e.g., 59%)'
+                    className='aucctus-bg-primary aucctus-text-primary aucctus-text-sm w-full border-none outline-none'
+                    autoFocus
+                  />
+                  <input
+                    type='text'
+                    value={editLabel}
+                    onChange={(e) => setEditLabel(e.target.value)}
+                    onKeyDown={handleEditKeyDown}
+                    placeholder='Label (e.g., Renters)'
+                    className='aucctus-bg-primary aucctus-text-primary aucctus-text-sm w-full border-none outline-none'
+                  />
+                  <div className='flex flex-wrap items-center gap-1'>
+                    <span className='aucctus-text-xs aucctus-text-tertiary mr-1'>
+                      Trend:
+                    </span>
+                    {(['up', 'down', 'neutral'] as TrendDirection[]).map(
+                      (direction) => (
+                        <button
+                          key={direction}
+                          type='button'
+                          onClick={() =>
+                            setEditTrend(
+                              editTrend === direction ? undefined : direction,
+                            )
+                          }
+                          className={cn(
+                            'flex h-7 items-center gap-1 rounded-md px-2 text-xs font-medium transition-colors',
+                            editTrend === direction
+                              ? direction === 'up'
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                                : direction === 'down'
+                                  ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                  : 'aucctus-bg-secondary aucctus-text-primary'
+                              : 'aucctus-text-tertiary hover:aucctus-bg-secondary',
+                          )}
+                        >
+                          {direction === 'up' && (
+                            <TrendingUp className='h-3 w-3' />
+                          )}
+                          {direction === 'down' && (
+                            <TrendingDown className='h-3 w-3' />
+                          )}
+                          {direction.charAt(0).toUpperCase() +
+                            direction.slice(1)}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                  <div className='flex gap-2'>
                     <button
                       type='button'
-                      onClick={() => onDelete(fact.uuid)}
-                      className='flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
+                      onClick={handleSaveEdit}
+                      disabled={!editStat.trim() || !editLabel.trim()}
+                      className='btn btn-primary btn-xs'
                     >
-                      <X className='h-3 w-3 text-red-500' />
+                      Save
                     </button>
-                  )}
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setEditingUuid(null);
+                        setEditStat('');
+                        setEditLabel('');
+                        setEditTrend(undefined);
+                      }}
+                      className='btn btn-ghost btn-xs'
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className='flex items-start justify-between'>
+                  <div>
+                    <p className='aucctus-text-lg-bold aucctus-text-primary'>
+                      {fact.stat}
+                    </p>
+                    <p className='aucctus-text-sm aucctus-text-secondary mt-1'>
+                      {fact.label}
+                    </p>
+                  </div>
+                  <div className='flex items-center gap-1'>
+                    {TrendIcon && (
+                      <TrendIcon
+                        className={cn('h-4 w-4', getTrendIconColor(fact.trend))}
+                      />
+                    )}
+                    {onUpdate && (
+                      <button
+                        type='button'
+                        onClick={() => handleStartEdit(fact)}
+                        className='flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity hover:bg-blue-100 group-hover:opacity-100 dark:hover:bg-blue-900/30'
+                      >
+                        <Pencil className='aucctus-text-secondary h-3 w-3' />
+                      </button>
+                    )}
+                    {onDelete && (
+                      <button
+                        type='button'
+                        onClick={() => onDelete(fact.uuid)}
+                        className='flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
+                      >
+                        <X className='h-3 w-3 text-red-500' />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
             </motion.div>
           );
         })}

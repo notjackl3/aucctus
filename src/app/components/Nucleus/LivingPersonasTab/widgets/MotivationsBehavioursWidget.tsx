@@ -11,7 +11,7 @@
 
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Target, X as XIcon, Zap } from 'lucide-react';
+import { Pencil, Plus, Target, X as XIcon, Zap } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import GlassWidget, { WidgetSize } from './GlassWidget';
 
@@ -41,10 +41,14 @@ export interface MotivationsBehavioursWidgetProps {
   isEditable?: boolean;
   /** Callback to add new motivation */
   onAddMotivation?: (data: { text: string; priority?: number }) => void;
+  /** Callback to update motivation */
+  onUpdateMotivation?: (uuid: string, data: { text: string }) => void;
   /** Callback to delete motivation */
   onDeleteMotivation?: (uuid: string) => void;
   /** Callback to add new behaviour */
   onAddBehaviour?: (data: { text: string }) => void;
+  /** Callback to update behaviour */
+  onUpdateBehaviour?: (uuid: string, data: { text: string }) => void;
   /** Callback to delete behaviour */
   onDeleteBehaviour?: (uuid: string) => void;
   /** Additional CSS classes */
@@ -63,14 +67,18 @@ const MotivationsBehavioursWidget: React.FC<
   behaviours,
   size = 'small',
   onAddMotivation,
+  onUpdateMotivation,
   onDeleteMotivation,
   onAddBehaviour,
+  onUpdateBehaviour,
   onDeleteBehaviour,
   className,
 }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('motivations');
   const [isAdding, setIsAdding] = useState(false);
   const [newText, setNewText] = useState('');
+  const [editingUuid, setEditingUuid] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
 
   const sortedMotivations = [...motivations].sort(
     (a, b) => (b.priority || 0) - (a.priority || 0),
@@ -108,11 +116,44 @@ const MotivationsBehavioursWidget: React.FC<
     setActiveTab(tab);
     setIsAdding(false);
     setNewText('');
+    setEditingUuid(null);
+    setEditText('');
   }, []);
 
   const handleStartAdding = useCallback(() => {
     setIsAdding(true);
+    setEditingUuid(null);
   }, []);
+
+  const handleStartEdit = useCallback(
+    (item: { uuid: string; text: string }) => {
+      setEditingUuid(item.uuid);
+      setEditText(item.text);
+      setIsAdding(false);
+    },
+    [],
+  );
+
+  const onUpdate =
+    activeTab === 'motivations' ? onUpdateMotivation : onUpdateBehaviour;
+
+  const handleSaveEdit = useCallback(() => {
+    if (!editingUuid || !editText.trim() || !onUpdate) return;
+    onUpdate(editingUuid, { text: editText.trim() });
+    setEditingUuid(null);
+    setEditText('');
+  }, [editingUuid, editText, onUpdate]);
+
+  const handleEditKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') handleSaveEdit();
+      if (e.key === 'Escape') {
+        setEditingUuid(null);
+        setEditText('');
+      }
+    },
+    [handleSaveEdit],
+  );
 
   const activeItems =
     activeTab === 'motivations' ? sortedMotivations : sortedBehaviours;
@@ -222,6 +263,29 @@ const MotivationsBehavioursWidget: React.FC<
                   )}
                 </AnimatePresence>
 
+                {/* Empty state for active tab */}
+                {activeItems.length === 0 && !isAdding && canAdd && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className='flex h-32 items-center justify-center'
+                  >
+                    <button
+                      type='button'
+                      onClick={handleStartAdding}
+                      className='aucctus-text-secondary hover:aucctus-text-primary aucctus-border-secondary hover:aucctus-border-primary flex items-center gap-2 rounded-lg border border-dashed px-4 py-2 transition-colors'
+                    >
+                      <Plus className='h-4 w-4' />
+                      <span className='aucctus-text-sm'>
+                        Add a{' '}
+                        {activeTab === 'motivations'
+                          ? 'motivation'
+                          : 'behaviour'}
+                      </span>
+                    </button>
+                  </motion.div>
+                )}
+
                 {activeItems.map((item, index) => (
                   <motion.div
                     key={item.uuid}
@@ -247,17 +311,61 @@ const MotivationsBehavioursWidget: React.FC<
                         <Zap className='h-3 w-3 text-blue-600' />
                       )}
                     </div>
-                    <p className='aucctus-text-sm aucctus-text-primary flex-1'>
-                      {item.text}
-                    </p>
-                    {onDelete && (
-                      <button
-                        type='button'
-                        onClick={() => onDelete(item.uuid)}
-                        className='flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
-                      >
-                        <XIcon className='h-3 w-3 text-red-500' />
-                      </button>
+                    {editingUuid === item.uuid ? (
+                      <div className='flex flex-1 items-center gap-2'>
+                        <input
+                          type='text'
+                          value={editText}
+                          onChange={(e) => setEditText(e.target.value)}
+                          onKeyDown={handleEditKeyDown}
+                          className='aucctus-bg-primary aucctus-text-primary aucctus-text-sm flex-1 border-none outline-none'
+                          autoFocus
+                        />
+                        <button
+                          type='button'
+                          onClick={handleSaveEdit}
+                          disabled={!editText.trim()}
+                          className='btn btn-primary btn-xs'
+                        >
+                          Save
+                        </button>
+                        <button
+                          type='button'
+                          onClick={() => {
+                            setEditingUuid(null);
+                            setEditText('');
+                          }}
+                          className='btn btn-ghost btn-xs'
+                        >
+                          <XIcon className='h-3 w-3' />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <p className='aucctus-text-sm aucctus-text-primary flex-1'>
+                          {item.text}
+                        </p>
+                        <div className='flex shrink-0 items-center gap-1'>
+                          {onUpdate && (
+                            <button
+                              type='button'
+                              onClick={() => handleStartEdit(item)}
+                              className='flex h-5 w-5 items-center justify-center rounded opacity-0 transition-opacity hover:bg-blue-100 group-hover:opacity-100 dark:hover:bg-blue-900/30'
+                            >
+                              <Pencil className='aucctus-text-secondary h-3 w-3' />
+                            </button>
+                          )}
+                          {onDelete && (
+                            <button
+                              type='button'
+                              onClick={() => onDelete(item.uuid)}
+                              className='flex h-5 w-5 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
+                            >
+                              <XIcon className='h-3 w-3 text-red-500' />
+                            </button>
+                          )}
+                        </div>
+                      </>
                     )}
                   </motion.div>
                 ))}

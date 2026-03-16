@@ -53,22 +53,35 @@ export interface PersonaWidgetData {
 /** Content mutation callbacks for widgets */
 export interface ContentMutationCallbacks {
   onAddJob?: (data: { text: string; priority?: number }) => void;
+  onUpdateJob?: (uuid: string, data: { text: string }) => void;
   onDeleteJob?: (uuid: string) => void;
   onAddPain?: (data: { text: string; severity?: number }) => void;
+  onUpdatePain?: (uuid: string, data: { text: string }) => void;
   onDeletePain?: (uuid: string) => void;
   onAddGain?: (data: { text: string; impact?: number }) => void;
+  onUpdateGain?: (uuid: string, data: { text: string }) => void;
   onDeleteGain?: (uuid: string) => void;
   onAddSocialValue?: (data: { title: string; description?: string }) => void;
+  onUpdateSocialValue?: (
+    uuid: string,
+    data: { title: string; description?: string },
+  ) => void;
   onDeleteSocialValue?: (uuid: string) => void;
   onAddMotivation?: (data: { text: string; priority?: number }) => void;
+  onUpdateMotivation?: (uuid: string, data: { text: string }) => void;
   onDeleteMotivation?: (uuid: string) => void;
   onAddBehaviour?: (data: { text: string }) => void;
+  onUpdateBehaviour?: (uuid: string, data: { text: string }) => void;
   onDeleteBehaviour?: (uuid: string) => void;
   onAddKeyFact?: (data: {
     stat: string;
     label: string;
     trend?: string;
   }) => void;
+  onUpdateKeyFact?: (
+    uuid: string,
+    data: { stat: string; label: string; trend?: string },
+  ) => void;
   onDeleteKeyFact?: (uuid: string) => void;
   onAddWorkdayStep?: (data: {
     time: string;
@@ -186,6 +199,7 @@ const renderWidget = (
           size={size as any}
           isEditable={isEditable}
           onAdd={callbacks?.onAddJob}
+          onUpdate={callbacks?.onUpdateJob}
           onDelete={callbacks?.onDeleteJob}
         />
       );
@@ -196,6 +210,7 @@ const renderWidget = (
           size={size as any}
           isEditable={isEditable}
           onAdd={callbacks?.onAddPain}
+          onUpdate={callbacks?.onUpdatePain}
           onDelete={callbacks?.onDeletePain}
         />
       );
@@ -206,6 +221,7 @@ const renderWidget = (
           size={size as any}
           isEditable={isEditable}
           onAdd={callbacks?.onAddGain}
+          onUpdate={callbacks?.onUpdateGain}
           onDelete={callbacks?.onDeleteGain}
         />
       );
@@ -216,6 +232,7 @@ const renderWidget = (
           size={size as any}
           isEditable={isEditable}
           onAdd={callbacks?.onAddSocialValue}
+          onUpdate={callbacks?.onUpdateSocialValue}
           onDelete={callbacks?.onDeleteSocialValue}
         />
       );
@@ -227,8 +244,10 @@ const renderWidget = (
           size={size as any}
           isEditable={isEditable}
           onAddMotivation={callbacks?.onAddMotivation}
+          onUpdateMotivation={callbacks?.onUpdateMotivation}
           onDeleteMotivation={callbacks?.onDeleteMotivation}
           onAddBehaviour={callbacks?.onAddBehaviour}
+          onUpdateBehaviour={callbacks?.onUpdateBehaviour}
           onDeleteBehaviour={callbacks?.onDeleteBehaviour}
         />
       );
@@ -239,6 +258,7 @@ const renderWidget = (
           size={size as any}
           isEditable={isEditable}
           onAdd={callbacks?.onAddKeyFact}
+          onUpdate={callbacks?.onUpdateKeyFact}
           onDelete={callbacks?.onDeleteKeyFact}
         />
       );

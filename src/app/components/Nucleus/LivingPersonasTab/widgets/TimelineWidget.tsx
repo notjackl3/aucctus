@@ -201,7 +201,6 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({
   icon = 'clock',
   steps,
   size = 'full',
-  isEditable = false,
   onAdd,
   onUpdate,
   onDelete,
@@ -279,7 +278,7 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({
     setAddForm(EMPTY_FORM);
   }, []);
 
-  const showAddButton = isEditable && onAdd;
+  const showAddButton = !!onAdd;
 
   return (
     <GlassWidget
@@ -444,7 +443,7 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({
                           </p>
 
                           {/* Hover action buttons */}
-                          {isEditable && (onDelete || onUpdate) && (
+                          {(onDelete || onUpdate) && (
                             <div className='absolute bottom-2 right-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
                               {onUpdate && (
                                 <button

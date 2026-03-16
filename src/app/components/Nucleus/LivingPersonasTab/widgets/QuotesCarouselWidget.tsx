@@ -114,7 +114,7 @@ const QuotesCarouselWidget: React.FC<QuotesCarouselWidgetProps> = ({
 
         {/* Navigation */}
         {quotes.length > 1 && (
-          <div className='aucctus-border-primary mt-4 flex items-center justify-between border-t pt-3'>
+          <div className='mt-4 flex items-center justify-between pt-3'>
             {/* Dot indicators */}
             <div className='flex items-center gap-2'>
               {quotes.map((_, idx) => (

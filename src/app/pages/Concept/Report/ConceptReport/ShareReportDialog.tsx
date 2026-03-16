@@ -127,7 +127,7 @@ export default function ShareReportDialog({
       <LiquidGlassModal
         open={open}
         onOpenChange={setOpen}
-        size='sm'
+        size='md'
         title='Share This Concept'
         headerClassName='p-5 pb-3'
       >

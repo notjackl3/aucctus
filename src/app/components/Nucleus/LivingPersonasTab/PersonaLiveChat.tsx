@@ -18,6 +18,7 @@ import { Loading, Modal, toast } from '@components';
 import Avatar from '@components/Avatar';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import Tooltip from '@components/ToolTip/Tooltip';
+import AucctusMessageInput from '@components/Input/AucctusMessageInput';
 import PersonaChatInput, {
   type PersonaChatInputHandle,
 } from './PersonaChatInput';
@@ -80,6 +81,10 @@ export interface PersonaLiveChatProps {
   className?: string;
   /** Additional inline styles */
   style?: React.CSSProperties;
+  /** Hide @mention UI and use simple input instead */
+  disableMentions?: boolean;
+  /** Concept UUID to contextualize the chat to a specific concept */
+  conceptUuid?: string;
 }
 
 /**
@@ -125,12 +130,14 @@ interface ChatBubbleProps {
   message: ChatMessage;
   personaName: string;
   personaAvatarUrl?: string;
+  hideMentions?: boolean;
 }
 
 const ChatBubble: React.FC<ChatBubbleProps> = React.memo(function ChatBubble({
   message,
   personaName,
   personaAvatarUrl,
+  hideMentions = false,
 }: ChatBubbleProps) {
   const { user } = useStore((state) => state.auth);
   const isUser = message.role === 'user';
@@ -140,7 +147,9 @@ const ChatBubble: React.FC<ChatBubbleProps> = React.memo(function ChatBubble({
       <div className='mb-2 flex flex-1 animate-expand flex-row'>
         <div className='flex flex-1' />
         <div className='aucctus-text-primary aucctus-bg-quaternary mr-4 h-fit max-w-[70%] rounded-lg p-4'>
-          {renderContentWithMentions(message.content)}
+          {hideMentions
+            ? message.content
+            : renderContentWithMentions(message.content)}
         </div>
         <Avatar
           firstName={user?.firstName || ''}
@@ -162,7 +171,9 @@ const ChatBubble: React.FC<ChatBubbleProps> = React.memo(function ChatBubble({
       />
       <div className='aucctus-text-primary aucctus-bg-secondary ml-4 h-fit max-w-[70%] space-y-2 rounded-lg p-4'>
         <p className='whitespace-pre-wrap'>
-          {renderContentWithMentions(message.content)}
+          {hideMentions
+            ? message.content
+            : renderContentWithMentions(message.content)}
         </p>
         {/* Streaming indicator */}
         {message.isStreaming && (
@@ -189,7 +200,15 @@ const mapToDisplayMessage = (msg: PersonaConversationMessage): ChatMessage => ({
  */
 const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
   (
-    { personaUuid, personaName, personaAvatarUrl, className, style = {} },
+    {
+      personaUuid,
+      personaName,
+      personaAvatarUrl,
+      className,
+      style = {},
+      disableMentions = false,
+      conceptUuid,
+    },
     ref,
   ) => {
     // Refs
@@ -208,9 +227,12 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
       PersonaConversationMessage[]
     >([]);
 
-    // @mention state - now driven by PersonaChatInput
+    // @mention state - now driven by PersonaChatInput (skipped when disableMentions)
     const [mentionQuery, setMentionQuery] = useState<string | null>(null);
-    const showMentionDropdown = mentionQuery !== null;
+    const showMentionDropdown = !disableMentions && mentionQuery !== null;
+
+    // Simple input state for disableMentions mode
+    const [simpleInputValue, setSimpleInputValue] = useState('');
 
     // Modal
     const { openModal, closeModal } = useModal();
@@ -241,6 +263,9 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
     const setPersonaUuid = useStore(
       (state) => state.personaConversations.setPersonaUuid,
     );
+    const setConceptUuid = useStore(
+      (state) => state.personaConversations.setConceptUuid,
+    );
     const setConversation = useStore(
       (state) => state.personaConversations.setConversation,
     );
@@ -252,7 +277,11 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
     const { sessions, isLoading: isLoadingConversations } =
       useChatSessions(personaUuid);
     const { results: mentionResults, isSearching: isMentionSearching } =
-      useMentionSearch(mentionQuery, undefined, personaUuid);
+      useMentionSearch(
+        disableMentions ? null : mentionQuery,
+        undefined,
+        personaUuid,
+      );
 
     // Loading messages for first interaction
     const loadingMessages = useMemo(() => {
@@ -335,13 +364,21 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
       }, delay);
     }, []);
 
-    // Set personaUuid in store on mount
+    // Set personaUuid and conceptUuid in store on mount
     useEffect(() => {
       setPersonaUuid(personaUuid);
+      setConceptUuid(conceptUuid);
       return () => {
         clearConversation(true);
+        setConceptUuid(undefined);
       };
-    }, [personaUuid, setPersonaUuid, clearConversation]);
+    }, [
+      personaUuid,
+      conceptUuid,
+      setPersonaUuid,
+      setConceptUuid,
+      clearConversation,
+    ]);
 
     // Resume most recent session on mount (load history)
     useEffect(() => {
@@ -419,6 +456,13 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
       },
       [isThinking, setCurrentMessage, storeSendMessage],
     );
+
+    // Handle sending from simple input (disableMentions mode)
+    const handleSimpleSend = useCallback(() => {
+      if (!simpleInputValue.trim() || isThinking) return;
+      handleSend(simpleInputValue, []);
+      setSimpleInputValue('');
+    }, [simpleInputValue, isThinking, handleSend]);
 
     // Handle selecting a session from sidebar
     const handleSelectSession = useCallback(
@@ -625,6 +669,7 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
                   message={introMessage}
                   personaName={personaName}
                   personaAvatarUrl={personaAvatarUrl}
+                  hideMentions={disableMentions}
                 />
               </div>
             )}
@@ -636,6 +681,7 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
                   message={message}
                   personaName={personaName}
                   personaAvatarUrl={personaAvatarUrl}
+                  hideMentions={disableMentions}
                 />
               </div>
             ))}
@@ -685,16 +731,28 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
 
         {/* Message input */}
         <div className='relative m-4 mt-auto w-auto'>
-          <PersonaChatInput
-            ref={inputRef}
-            onSubmit={handleSend}
-            disabled={isThinking}
-            placeholder={`Ask ${personaName} a question...`}
-            showMentionDropdown={showMentionDropdown}
-            onMentionQueryChange={setMentionQuery}
-            mentionResults={mentionResults}
-            isMentionSearching={isMentionSearching}
-          />
+          {disableMentions ? (
+            <AucctusMessageInput
+              value={simpleInputValue}
+              onChange={(e) => setSimpleInputValue(e.target.value)}
+              onSubmitMessage={handleSimpleSend}
+              allowSubmitMessage={!isThinking}
+              disabled={isThinking}
+              placeholder={`Ask ${personaName} a question...`}
+              className='!max-h-[100px]'
+            />
+          ) : (
+            <PersonaChatInput
+              ref={inputRef}
+              onSubmit={handleSend}
+              disabled={isThinking}
+              placeholder={`Ask ${personaName} a question...`}
+              showMentionDropdown={showMentionDropdown}
+              onMentionQueryChange={setMentionQuery}
+              mentionResults={mentionResults}
+              isMentionSearching={isMentionSearching}
+            />
+          )}
           <div className='aucctus-text-tertiary aucctus-text-sm mt-2 flex flex-row items-center justify-center gap-2'>
             <span className='flex items-center justify-center'>
               <AlertCircle size={16} className='aucctus-stroke-quaternary' />
