@@ -90,6 +90,10 @@ export default defineConfig(async (config: ViteUserConfig) => {
         env.FEATURE_WATCHTOWER !== undefined
           ? env.FEATURE_WATCHTOWER === 'true'
           : (env.ENVIRONMENT ?? 'production') !== 'production',
+      FEATURE_VALUE_DISCOVERY:
+        env.FEATURE_VALUE_DISCOVERY !== undefined
+          ? env.FEATURE_VALUE_DISCOVERY === 'true'
+          : (env.ENVIRONMENT ?? 'production') !== 'production',
     },
     css: {
       preprocessorOptions: {

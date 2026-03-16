@@ -90,10 +90,12 @@ function App() {
             path={AppPath.SubmissionLinkPublicForm}
             element={<SubmissionLinkPublicForm />}
           />
-          <Route
-            path={AppPath.Discover}
-            element={<PublicValueDiscoveryPage />}
-          />
+          {FEATURE_VALUE_DISCOVERY && (
+            <Route
+              path={AppPath.Discover}
+              element={<PublicValueDiscoveryPage />}
+            />
+          )}
           <Route path={AppPath.SharedReport} element={<SharedReportPage />} />
 
           {/* Protected Routes */}

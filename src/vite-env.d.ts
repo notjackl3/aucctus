@@ -43,6 +43,7 @@ declare const FEATURE_CUSTOMER_PROFILE_CHAT: boolean;
 declare const FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS: boolean;
 declare const FEATURE_CONCEPT_VERSIONING: boolean;
 declare const FEATURE_WATCHTOWER: boolean;
+declare const FEATURE_VALUE_DISCOVERY: boolean;
 
 // Hotjar User Identification
 interface HotjarUserAttributes {
