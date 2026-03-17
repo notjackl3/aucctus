@@ -35,6 +35,7 @@ import {
   Share2,
   TrendingUp,
   Users,
+  Wand2,
 } from 'lucide-react';
 import {
   FunctionComponent,
@@ -166,6 +167,15 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
   const conceptUuid = useMemo(() => concept?.uuid || '', [concept]);
   const { openModal, closeModal } = useModal();
 
+  const userEmail = useStore((state) => state.auth.user?.email);
+  const isMagicShareUser = useMemo(() => {
+    if (!userEmail) return false;
+    return (
+      userEmail.endsWith('@aucctus.com') ||
+      userEmail.endsWith('@disruptiveedge.com')
+    );
+  }, [userEmail]);
+
   // Fetch concept overview for the hero image and description
   const { conceptOverview } = useConceptOverview(conceptUuid || undefined);
 
@@ -252,6 +262,19 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
       });
     }
 
+    // Add Magic Share tab (icon only) for aucctus/disruptiveedge users
+    if (isMagicShareUser && !concept?.isHistoricalVersion) {
+      tabs.push({
+        label: 'Magic Share',
+        value: 'magic-share',
+        icon: Wand2,
+        onAction: () =>
+          openModal(Modal.MagicShare, {
+            conceptUuid,
+          }),
+      });
+    }
+
     // Add Share tab (icon only)
     tabs.push({
       label: '',
@@ -289,6 +312,9 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
     concept?.hasSeed,
     concept?.isHistoricalVersion,
     concept?.reportStatusBySection,
+    isMagicShareUser,
+    openModal,
+    conceptUuid,
   ]);
 
   useEffect(() => {
