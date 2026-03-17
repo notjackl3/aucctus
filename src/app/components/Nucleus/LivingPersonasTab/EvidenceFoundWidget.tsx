@@ -21,6 +21,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import { cn } from '@libs/utils/react';
+import { getBaseUrl } from '@libs/utils/source';
 
 /** Evidence type for display */
 export type EvidenceType = 'document' | 'survey' | 'analytics' | 'interview';
@@ -127,9 +128,22 @@ const EvidenceCard: React.FC<EvidenceCardProps> = React.memo(
             {typeConfig.label}
           </span>
           {evidence.source && (
-            <span className='aucctus-bg-secondary aucctus-border-secondary inline-flex h-5 items-center rounded border px-1.5 py-0 text-[10px]'>
-              {evidence.source}
-            </span>
+            <a
+              href={evidence.source}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-tertiary inline-flex h-5 max-w-[160px] items-center gap-1 truncate rounded border px-1.5 py-0 text-[10px] no-underline transition-colors hover:bg-black/[0.06] dark:hover:bg-white/[0.06]'
+            >
+              <img
+                src={`https://www.google.com/s2/favicons?domain=${getBaseUrl(evidence.source)}&sz=32`}
+                alt=''
+                className='h-3 w-3 rounded-full'
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+              {getBaseUrl(evidence.source)}
+            </a>
           )}
           {evidence.sourceTag && (
             <span className='aucctus-bg-secondary aucctus-border-secondary inline-flex h-5 items-center rounded border px-1.5 py-0 text-[10px] font-medium'>

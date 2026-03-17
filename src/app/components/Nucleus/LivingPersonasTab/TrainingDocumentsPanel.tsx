@@ -5,22 +5,22 @@
  * - Colored file type badge (PDF=red, CSV=green, DOCX=blue, XLSX=purple)
  * - Document name, source label, and upload date
  * - Hover-reveal delete button
- * - Add Document button with file picker
+ * - Add Document button opens DocumentUploadModal (3-step flow)
  * - Upload/processing progress indicator
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { FileText, Upload, Calendar, Trash2 } from 'lucide-react';
 import { GlassSurface } from '@components';
 import { cn } from '@libs/utils/react';
 import {
   useTrainingDocuments,
-  useUploadTrainingDocument,
   useDeleteTrainingDocument,
 } from '@hooks/query/persona.hook';
 import type { PersonaDocumentProcessingProgress } from '@hooks/query/persona.hook';
 import type { ITrainingDocument } from '@libs/api/types/persona';
+import DocumentUploadModal from './modals/DocumentUploadModal';
 
 /** Props for the TrainingDocumentsPanel component */
 export interface TrainingDocumentsPanelProps {
@@ -148,22 +148,8 @@ const TrainingDocumentsPanel: React.FC<TrainingDocumentsPanelProps> = ({
   processingProgress,
 }) => {
   const { documents, isLoading } = useTrainingDocuments(personaUuid);
-  const { uploadDocumentAsync, isUploading } = useUploadTrainingDocument();
   const { deleteDocument } = useDeleteTrainingDocument();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = Array.from(e.target.files || []);
-      for (const file of files) {
-        await uploadDocumentAsync({ personaUuid, file });
-      }
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    },
-    [personaUuid, uploadDocumentAsync],
-  );
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   const handleDelete = useCallback(
     (documentUuid: string) => {
@@ -175,60 +161,46 @@ const TrainingDocumentsPanel: React.FC<TrainingDocumentsPanelProps> = ({
   const documentCount = useMemo(() => documents.length, [documents]);
 
   return (
-    <GlassSurface className='p-4'>
-      {/* Header */}
-      <div className='mb-4 flex items-center justify-between'>
-        <div className='flex items-center gap-2'>
-          <FileText className='text-muted-foreground h-4 w-4' />
-          <h3 className='text-foreground text-sm font-medium'>
-            Training Documents
-          </h3>
-          {documentCount > 0 && (
-            <span className='text-muted-foreground text-xs'>
-              ({documentCount})
-            </span>
-          )}
-        </div>
-        <button
-          type='button'
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
-          className={cn(
-            'btn btn-light btn-sm h-7 gap-1.5 text-xs',
-            isUploading && 'cursor-not-allowed opacity-50',
-          )}
-        >
-          <Upload className='h-3 w-3' />
-          Add Document
-        </button>
-        <input
-          ref={fileInputRef}
-          type='file'
-          accept='.pdf,.docx,.csv,.xlsx'
-          multiple
-          onChange={handleFileChange}
-          className='hidden'
-        />
-      </div>
-
-      {/* Upload progress */}
-      {(isUploading || processingProgress.isProcessing) && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          className='aucctus-bg-brand-secondary mb-3 rounded-lg p-3'
-        >
-          <div className='mb-2 flex items-center gap-2'>
-            <div className='aucctus-border-brand h-4 w-4 animate-spin rounded-full border-2 border-t-transparent' />
-            <span className='aucctus-text-sm-medium aucctus-text-brand-primary'>
-              {isUploading
-                ? 'Uploading...'
-                : processingProgress.message || 'Processing...'}
-            </span>
+    <>
+      <GlassSurface className='p-4'>
+        {/* Header */}
+        <div className='mb-4 flex items-center justify-between'>
+          <div className='flex items-center gap-2'>
+            <FileText className='text-muted-foreground h-4 w-4' />
+            <h3 className='text-foreground text-sm font-medium'>
+              Training Documents
+            </h3>
+            {documentCount > 0 && (
+              <span className='text-muted-foreground text-xs'>
+                ({documentCount})
+              </span>
+            )}
           </div>
-          {processingProgress.isProcessing &&
-            processingProgress.progress > 0 && (
+          <button
+            type='button'
+            onClick={() => setIsUploadModalOpen(true)}
+            className='btn btn-light btn-sm h-7 gap-1.5 text-xs'
+          >
+            <Upload className='h-3 w-3' />
+            Add Document
+          </button>
+        </div>
+
+        {/* Background processing progress (when modal is closed) */}
+        {processingProgress.isProcessing && !isUploadModalOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className='aucctus-bg-brand-secondary mb-3 rounded-lg p-3'
+          >
+            <div className='mb-2 flex items-center gap-2'>
+              <div className='aucctus-border-brand h-4 w-4 animate-spin rounded-full border-2 border-t-transparent' />
+              <span className='aucctus-text-sm-medium aucctus-text-brand-primary'>
+                {processingProgress.message || 'Processing...'}
+              </span>
+            </div>
+            {processingProgress.progress > 0 && (
               <div className='aucctus-bg-tertiary h-1.5 overflow-hidden rounded-full'>
                 <motion.div
                   className='aucctus-bg-brand-solid h-full rounded-full'
@@ -238,53 +210,63 @@ const TrainingDocumentsPanel: React.FC<TrainingDocumentsPanelProps> = ({
                 />
               </div>
             )}
-        </motion.div>
-      )}
+          </motion.div>
+        )}
 
-      {/* Loading skeleton */}
-      {isLoading && (
-        <div className='animate-pulse space-y-2'>
-          {Array.from({ length: 2 }).map((_, i) => (
-            <div
-              key={i}
-              className='border-border/40 bg-background/60 flex items-center gap-3 rounded-lg border p-3'
-            >
-              <div className='bg-muted h-8 w-8 rounded-lg' />
-              <div className='flex-1 space-y-1.5'>
-                <div className='bg-muted h-3.5 w-3/4 rounded' />
-                <div className='bg-muted h-3 w-1/3 rounded' />
+        {/* Loading skeleton */}
+        {isLoading && (
+          <div className='animate-pulse space-y-2'>
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div
+                key={i}
+                className='border-border/40 bg-background/60 flex items-center gap-3 rounded-lg border p-3'
+              >
+                <div className='bg-muted h-8 w-8 rounded-lg' />
+                <div className='flex-1 space-y-1.5'>
+                  <div className='bg-muted h-3.5 w-3/4 rounded' />
+                  <div className='bg-muted h-3 w-1/3 rounded' />
+                </div>
+                <div className='bg-muted h-3 w-20 rounded' />
               </div>
-              <div className='bg-muted h-3 w-20 rounded' />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Empty state */}
-      {!isLoading && documents.length === 0 && !isUploading && (
-        <p className='text-muted-foreground py-4 text-center text-sm'>
-          No training documents uploaded yet.
-        </p>
-      )}
-
-      {/* Document list */}
-      {!isLoading && documents.length > 0 && (
-        <div className='space-y-2'>
-          <AnimatePresence mode='popLayout'>
-            {documents.map((doc) => (
-              <DocumentRow key={doc.uuid} doc={doc} onDelete={handleDelete} />
             ))}
-          </AnimatePresence>
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* Footer description */}
-      <p className='text-muted-foreground/70 mt-3 text-xs leading-relaxed'>
-        These documents are used by AI agents to understand and represent{' '}
-        {personaName}. Add research reports, surveys, or analytics data to
-        improve persona accuracy.
-      </p>
-    </GlassSurface>
+        {/* Empty state */}
+        {!isLoading && documents.length === 0 && (
+          <p className='text-muted-foreground py-4 text-center text-sm'>
+            No training documents uploaded yet.
+          </p>
+        )}
+
+        {/* Document list */}
+        {!isLoading && documents.length > 0 && (
+          <div className='space-y-2'>
+            <AnimatePresence mode='popLayout'>
+              {documents.map((doc) => (
+                <DocumentRow key={doc.uuid} doc={doc} onDelete={handleDelete} />
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
+
+        {/* Footer description */}
+        <p className='text-muted-foreground/70 mt-3 text-xs leading-relaxed'>
+          These documents are used by AI agents to understand and represent{' '}
+          {personaName}. Add research reports, surveys, or analytics data to
+          improve persona accuracy.
+        </p>
+      </GlassSurface>
+
+      {/* Document Upload Modal */}
+      <DocumentUploadModal
+        open={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        personaUuid={personaUuid}
+        personaName={personaName}
+        processingProgress={processingProgress}
+      />
+    </>
   );
 };
 

@@ -5,7 +5,7 @@ import React from 'react';
 import { cn } from '@libs/utils/react';
 import { X } from 'lucide-react';
 
-type ModalSize = 'sm' | 'md' | 'lg';
+type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
 type ModalVariant = 'default' | 'danger';
 
 interface LiquidGlassModalProps {
@@ -22,6 +22,7 @@ interface LiquidGlassModalProps {
    * - sm: 400px max-width (compact dialogs, confirmations)
    * - md: 560px max-width (forms, detail views)
    * - lg: 720px max-width (complex content, wizards)
+   * - xl: 900px max-width (wide review layouts, multi-column content)
    */
   size?: ModalSize;
   /**
@@ -72,6 +73,7 @@ const sizeClasses: Record<ModalSize, string> = {
   sm: 'max-w-[400px]',
   md: 'max-w-[560px]',
   lg: 'max-w-[720px]',
+  xl: 'max-w-[900px]',
 };
 
 /**

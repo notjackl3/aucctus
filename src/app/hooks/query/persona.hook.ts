@@ -683,6 +683,9 @@ export const useDeleteTrainingDocument = () => {
       queryClient.invalidateQueries({
         queryKey: personaKeys.trainingDocuments(personaUuid),
       });
+      queryClient.invalidateQueries({
+        queryKey: personaKeys.evidence(personaUuid),
+      });
       toast.success('Document Deleted', 'The document has been removed.');
     },
     onError: (e: AxiosError) => {

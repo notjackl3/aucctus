@@ -15,3 +15,6 @@ export type { AddWidgetModalProps, WidgetType } from './AddWidgetModal';
 
 export { default as LivingPersonasInitModal } from './LivingPersonasInitModal';
 export type { LivingPersonasInitModalProps } from './LivingPersonasInitModal';
+
+export { default as DocumentUploadModal } from './DocumentUploadModal';
+export type { DocumentUploadModalProps } from './DocumentUploadModal';

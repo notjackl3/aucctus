@@ -345,6 +345,8 @@ export interface IEvidence {
   relevance: EvidenceRelevance;
   suggestedUpdate?: string;
   targetField?: string;
+  action?: 'add' | 'change' | 'inform';
+  confidence?: number;
   status: EvidenceStatus;
   discoveredAt: string;
 }
