@@ -42,7 +42,7 @@ const ExecutiveSummaryBanner: React.FC<ExecutiveSummaryBannerProps> = ({
           className='absolute -left-6 -top-6 h-20 w-20 animate-pulse rounded-full'
           style={{
             background:
-              'radial-gradient(circle, var(--nav-brand-1, hsla(152, 100%, 33%, 0.45)) 0%, transparent 50%, transparent 70%)',
+              'radial-gradient(circle, hsl(var(--nav-brand-hsl-1, 152 100% 33%) / 0.45) 0%, transparent 50%, transparent 70%)',
             filter: 'blur(10px)',
             animationDuration: '4s',
           }}
@@ -52,7 +52,7 @@ const ExecutiveSummaryBanner: React.FC<ExecutiveSummaryBannerProps> = ({
           className='absolute -bottom-6 -left-6 h-20 w-20 animate-pulse rounded-full'
           style={{
             background:
-              'radial-gradient(circle, var(--nav-brand-2, hsla(75, 75%, 43%, 0.40)) 0%, transparent 50%, transparent 70%)',
+              'radial-gradient(circle, hsl(var(--nav-brand-hsl-2, 75 75% 43%) / 0.40) 0%, transparent 50%, transparent 70%)',
             filter: 'blur(10px)',
             animationDuration: '5s',
             animationDelay: '1.5s',
@@ -63,7 +63,7 @@ const ExecutiveSummaryBanner: React.FC<ExecutiveSummaryBannerProps> = ({
           className='absolute left-0 top-1/2 h-20 w-14 -translate-y-1/2 rounded-full'
           style={{
             background:
-              'radial-gradient(ellipse, var(--nav-brand-3, hsla(27, 94%, 55%, 0.30)) 0%, transparent 70%)',
+              'radial-gradient(ellipse, hsl(var(--nav-brand-hsl-3, 27 94% 55%) / 0.30) 0%, transparent 70%)',
             filter: 'blur(12px)',
           }}
         />

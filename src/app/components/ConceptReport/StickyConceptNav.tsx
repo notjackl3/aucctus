@@ -26,6 +26,11 @@ const StickyConceptNav: React.FC<StickyConceptNavProps> = ({
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<Element | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  useEffect(() => {
+    setImageLoaded(false);
+  }, [conceptImage]);
 
   // Filter tabs before effects so they can reference the filtered list
   const mainTabs = useMemo(() => tabs.filter((t) => t.label), [tabs]);
@@ -99,11 +104,19 @@ const StickyConceptNav: React.FC<StickyConceptNavProps> = ({
           <div className='sticky-concept-nav flex max-w-7xl items-center gap-0 rounded-xl'>
             {/* Concept image flush left */}
             {conceptImage && (
-              <div className='w-16 flex-shrink-0 self-stretch overflow-hidden rounded-l-xl'>
+              <div className='aucctus-bg-secondary h-12 w-16 flex-shrink-0 overflow-hidden rounded-l-xl'>
                 <img
                   src={conceptImage}
                   alt={conceptTitle}
-                  className='h-full w-full object-cover'
+                  className={cn(
+                    'h-full w-full object-cover transition-opacity duration-300',
+                    {
+                      'opacity-0': !imageLoaded,
+                      'opacity-100': imageLoaded,
+                    },
+                  )}
+                  loading='eager'
+                  onLoad={() => setImageLoaded(true)}
                 />
               </div>
             )}

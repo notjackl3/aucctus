@@ -9,6 +9,7 @@ import {
   useConceptAiEditing,
   useConcepts,
 } from '@hooks/query/concepts.hook';
+import { useRimOrbStyles } from '@hooks/useRimOrbStyles';
 import { usePersonas } from '@hooks/query/persona.hook';
 import { useOverseerConversationsInfinite } from '@hooks/query/overseerHistory.hook';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -97,6 +98,7 @@ const OverseerPopup: React.FC = () => {
   const editSuggestions = useStore((state) => state.overseer.editSuggestions);
   const user = useStore((state) => state.auth.user);
   const isAdmin = useMemo(() => isAucctusAdmin(user), [user]);
+  const orbStyles = useRimOrbStyles();
   const navigateSuggestion = useStore(
     (state) => state.overseer.navigateSuggestion,
   );
@@ -694,9 +696,10 @@ const OverseerPopup: React.FC = () => {
                 isDocked && 'rounded-none',
               )}
               aria-hidden='true'
+              style={orbStyles}
             >
-              <div className='overseer-rim-orb overseer-rim-orb-1' />
-              <div className='overseer-rim-orb overseer-rim-orb-2' />
+              <div className='rim-orb rim-orb-1' />
+              <div className='rim-orb rim-orb-2' />
             </div>
 
             {/* Dark gradient surface — stop propagation so clicks inside don't trigger shell drag */}

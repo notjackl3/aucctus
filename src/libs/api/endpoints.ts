@@ -1155,8 +1155,14 @@ export class Endpoints {
     return `/api/v1/personas/${personaUuid}`;
   }
 
-  static personaTaggedConcepts(personaUuid: string) {
-    return `/api/v1/personas/${personaUuid}/concepts`;
+  static personaTaggedConcepts(
+    personaUuid: string,
+    page: number = 1,
+    pageSize?: number,
+  ) {
+    const params = new URLSearchParams({ page: String(page) });
+    if (pageSize) params.set('page_size', String(pageSize));
+    return `/api/v1/personas/${personaUuid}/concepts?${params.toString()}`;
   }
 
   static personaTags(personaUuid: string) {

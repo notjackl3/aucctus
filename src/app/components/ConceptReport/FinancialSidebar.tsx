@@ -1,13 +1,13 @@
-import React, {
-  useRef,
-  useCallback,
-  useLayoutEffect,
-  useEffect,
-  useState,
-} from 'react';
+import { ComponentTooltip, GlassSurface } from '@components';
 import { motion } from 'framer-motion';
 import { Building, CircleDollarSign, TrendingUp } from 'lucide-react';
-import { ComponentTooltip, GlassSurface } from '@components';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 interface FinancialSection {
   id: string;
@@ -94,7 +94,7 @@ const FinancialSidebar: React.FC<FinancialSidebarProps> = ({
         if (e.propertyName === 'width') recalcIndicator();
       }}
     >
-      <GlassSurface className='sticky top-6 w-full overflow-hidden'>
+      <GlassSurface className='sticky top-4 w-full overflow-hidden'>
         <div className='p-2'>
           {/* Header - Expanded only */}
           <div

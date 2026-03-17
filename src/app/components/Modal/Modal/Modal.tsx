@@ -1,3 +1,4 @@
+import { useRimOrbStyles } from '@hooks/useRimOrbStyles';
 import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
 import React, { FunctionComponent, useEffect, useRef } from 'react';
@@ -26,6 +27,7 @@ const Modal: FunctionComponent<IModalProps> = ({
   const { closeModal, shouldCloseOnOverlayClick, shouldCloseOnEscape } =
     useModal();
   const contentRef = useRef<HTMLDivElement>(null);
+  const orbStyles = useRimOrbStyles();
 
   const isCenter = position === 'center';
 
@@ -120,6 +122,7 @@ const Modal: FunctionComponent<IModalProps> = ({
                   variant === 'danger' && 'liquid-glass-modal-rim-danger',
                   variant !== 'danger' && 'liquid-glass-modal-rim-animated',
                 )}
+                style={variant !== 'danger' ? orbStyles : undefined}
               >
                 {variant !== 'danger' && (
                   <>

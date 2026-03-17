@@ -17,9 +17,9 @@ import {
 import { usePersonas } from '@hooks/query/persona.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import * as Popover from '@radix-ui/react-popover';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
-import * as Popover from '@radix-ui/react-popover';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Sparkles, Trash2 } from 'lucide-react';
 import {
@@ -413,7 +413,7 @@ const CustomerProfile: FunctionComponent = () => {
             {/* Sidebar skeleton */}
             <div className='flex-shrink-0' style={{ width: SIDEBAR_COLLAPSED }}>
               <GlassSurface
-                className='sticky top-6 w-full overflow-hidden'
+                className='sticky w-full overflow-hidden'
                 variant='default'
               >
                 <div className='p-[6px]'>

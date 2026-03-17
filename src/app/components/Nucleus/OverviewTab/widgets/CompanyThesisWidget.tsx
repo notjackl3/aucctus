@@ -16,7 +16,7 @@ import React, { useCallback, useState } from 'react';
 
 interface CompanyThesisWidgetProps {
   widget: INucleusOverviewWidget;
-  brandColors: Record<string, string>;
+  brandColors: string[];
   isEditable?: boolean;
   onUpdateWidget?: (widgetUuid: string, data: Record<string, unknown>) => void;
 }
@@ -104,10 +104,9 @@ const CompanyThesisWidget: React.FC<CompanyThesisWidgetProps> = ({
   isEditable = false,
   onUpdateWidget,
 }) => {
-  const colorValues = Object.values(brandColors);
-  const c1 = colorValues[0] || DEFAULT_COLORS.teal;
-  const c2 = colorValues[1] || DEFAULT_COLORS.purple;
-  const c3 = colorValues[2] || DEFAULT_COLORS.dark;
+  const c1 = brandColors[0] || DEFAULT_COLORS.teal;
+  const c2 = brandColors[1] || DEFAULT_COLORS.purple;
+  const c3 = brandColors[2] || DEFAULT_COLORS.dark;
 
   return (
     <div className='relative col-span-full min-h-[160px] overflow-hidden rounded-xl'>

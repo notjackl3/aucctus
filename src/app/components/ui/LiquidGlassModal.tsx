@@ -2,6 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import React from 'react';
 
+import { useRimOrbStyles } from '@hooks/useRimOrbStyles';
 import { cn } from '@libs/utils/react';
 import { X } from 'lucide-react';
 
@@ -157,6 +158,7 @@ const LiquidGlassModal: React.FC<LiquidGlassModalProps> = ({
 }) => {
   const styles = variantStyles[variant];
   const distortionId = React.useId().replace(/:/g, '');
+  const orbStyles = useRimOrbStyles();
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -223,7 +225,7 @@ const LiquidGlassModal: React.FC<LiquidGlassModalProps> = ({
                       style={
                         !animatedRim
                           ? { filter: `url(#distort-${distortionId})` }
-                          : undefined
+                          : orbStyles
                       }
                     >
                       {animatedRim && (

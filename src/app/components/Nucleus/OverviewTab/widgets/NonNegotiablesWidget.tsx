@@ -22,7 +22,7 @@ const DEFAULT_ACCENT_RGB = '251, 113, 133'; // rose-400
 
 interface NonNegotiablesWidgetProps {
   widget: INucleusOverviewWidget;
-  brandColors?: Record<string, string>;
+  brandColors?: string[];
   isEditable?: boolean;
   onAddItem?: (widgetUuid: string, data: Record<string, unknown>) => void;
   onUpdateItem?: (
@@ -88,7 +88,7 @@ const EditableText: React.FC<{
 
 const NonNegotiablesWidget: React.FC<NonNegotiablesWidgetProps> = ({
   widget,
-  brandColors = {},
+  brandColors = [],
   isEditable = false,
   onAddItem,
   onUpdateItem,
@@ -105,7 +105,7 @@ const NonNegotiablesWidget: React.FC<NonNegotiablesWidgetProps> = ({
   const subtleGlowId = `guardrailSubtleGlow-${svgId}`;
 
   const accentRgb = useMemo(() => {
-    const primaryHex = Object.values(brandColors)[0];
+    const primaryHex = brandColors?.[0];
     if (!primaryHex) return DEFAULT_ACCENT_RGB;
     const rgb = hexToRgb(primaryHex);
     return rgb ? `${rgb.r}, ${rgb.g}, ${rgb.b}` : DEFAULT_ACCENT_RGB;

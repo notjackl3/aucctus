@@ -18,7 +18,7 @@ import {
   useUploadConceptCustomImage,
 } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
-import { hexToHsla } from '@libs/utils/color';
+import { hexToHslValues } from '@libs/utils/color';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
@@ -149,13 +149,12 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
 
   const navBrandStyles = useMemo(() => {
     const colors = branding?.colors;
-    if (!colors || Object.keys(colors).length === 0) return undefined;
-    const values = Object.values(colors);
+    if (!colors || colors.length === 0) return undefined;
     return {
-      '--nav-brand-1': values[0] ? hexToHsla(values[0], 0.35) : undefined,
-      '--nav-brand-2': values[1] ? hexToHsla(values[1], 0.3) : undefined,
-      '--nav-brand-3': values[2] ? hexToHsla(values[2], 0.3) : undefined,
-      '--nav-brand-4': values[3] ? hexToHsla(values[3], 0.25) : undefined,
+      '--nav-brand-hsl-1': hexToHslValues(colors[0 % colors.length]),
+      '--nav-brand-hsl-2': hexToHslValues(colors[1 % colors.length]),
+      '--nav-brand-hsl-3': hexToHslValues(colors[2 % colors.length]),
+      '--nav-brand-hsl-4': hexToHslValues(colors[3 % colors.length]),
     } as React.CSSProperties;
   }, [branding?.colors]);
 
@@ -269,9 +268,11 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
         value: 'magic-share',
         icon: Wand2,
         onAction: () =>
-          openModal(Modal.MagicShare, {
-            conceptUuid,
-          }),
+          openModal(
+            Modal.MagicShare,
+            { conceptUuid },
+            { hideBodyScroll: true },
+          ),
       });
     }
 

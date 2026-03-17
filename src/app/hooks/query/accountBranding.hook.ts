@@ -74,11 +74,29 @@ export const useUpdateBranding = () => {
     mutationFn: async (data: IUpdateAccountBrandingPayload) => {
       return await api.accountBranding.updateBranding(data);
     },
+    onMutate: async (data: IUpdateAccountBrandingPayload) => {
+      await queryClient.cancelQueries(accountBrandingKeys.detail());
+      const previous = queryClient.getQueryData<IAccountBranding>(
+        accountBrandingKeys.detail(),
+      );
+      if (previous) {
+        queryClient.setQueryData<IAccountBranding>(
+          accountBrandingKeys.detail(),
+          { ...previous, ...data },
+        );
+      }
+      return { previous };
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(accountBrandingKeys.all);
-      toast.success('Branding Updated', 'Your branding has been saved.');
     },
-    onError: (e: AxiosError) => {
+    onError: (e: AxiosError, _variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(
+          accountBrandingKeys.detail(),
+          context.previous,
+        );
+      }
       const message = utils.osiris.parseFormError(e);
       toast.error(
         'Update Failed',

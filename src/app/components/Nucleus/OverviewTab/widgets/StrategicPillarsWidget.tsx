@@ -18,7 +18,7 @@ import React, { useCallback, useState } from 'react';
 
 interface StrategicPillarsWidgetProps {
   widget: INucleusOverviewWidget;
-  brandColors?: Record<string, string>;
+  brandColors?: string[];
   isEditable?: boolean;
   onAddItem?: (widgetUuid: string, data: Record<string, unknown>) => void;
   onUpdateItem?: (
@@ -109,7 +109,7 @@ const EditableText: React.FC<{
 
 const StrategicPillarsWidget: React.FC<StrategicPillarsWidgetProps> = ({
   widget,
-  brandColors = {},
+  brandColors = [],
   isEditable = false,
   onAddItem,
   onUpdateItem,
@@ -121,7 +121,7 @@ const StrategicPillarsWidget: React.FC<StrategicPillarsWidgetProps> = ({
   const [newName, setNewName] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const pillars = widget.accordionItems;
-  const brandColorValues = Object.values(brandColors);
+  const brandColorValues = brandColors;
 
   const handleAdd = useCallback(() => {
     if (!newName.trim()) return;

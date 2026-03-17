@@ -60,6 +60,7 @@ import {
   clearWidgetPreferences,
 } from '@libs/utils/persona-widget-preferences';
 import useStore from '@stores/store';
+import { useLayoutEditStore } from '@stores/layout-edit.store';
 
 /** Props for the PersonaDetailView component */
 export interface PersonaDetailViewProps {
@@ -342,6 +343,13 @@ const PersonaDetailView: React.FC<PersonaDetailViewProps> = ({ listItem }) => {
   const [isEvidenceVisible, setIsEvidenceVisible] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAddWidgetModalOpen, setIsAddWidgetModalOpen] = useState(false);
+
+  // Broadcast edit mode to app shell (hides floating search bar during layout editing)
+  const setEditingLayout = useLayoutEditStore((s) => s.setEditingLayout);
+  useEffect(() => {
+    setEditingLayout(isEditMode);
+    return () => setEditingLayout(false);
+  }, [isEditMode, setEditingLayout]);
 
   // Widget configuration state — initialized from localStorage if available
   // Widget configuration state — initialized from localStorage if available

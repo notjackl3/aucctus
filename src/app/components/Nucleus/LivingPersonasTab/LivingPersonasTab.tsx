@@ -14,7 +14,7 @@ import { ComponentTooltip, GlassSurface } from '@components';
 import { usePersonas } from '@hooks/query/persona.hook';
 import type { IPersonaListItem } from '@libs/api/types/persona';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { AlertCircle, Plus, RefreshCw, Users } from 'lucide-react';
 import React, {
   useCallback,
   useEffect,
@@ -27,7 +27,6 @@ import { useSearchParams } from 'react-router-dom';
 import PersonaDetailView from './PersonaDetailView';
 import PersonaSidebarItem from './PersonaSidebarItem';
 import { CreatePersonaModal, LivingPersonasInitModal } from './modals';
-import { AlertCircle, RefreshCw, Users } from 'lucide-react';
 
 /** Props for the LivingPersonasTab component */
 export interface LivingPersonasTabProps {
@@ -233,9 +232,9 @@ const LivingPersonasTab: React.FC<LivingPersonasTabProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className='mx-auto px-4 py-6 sm:px-6 lg:px-8'
+        className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'
       >
-        <div className='flex gap-4'>
+        <div className='flex items-start gap-4'>
           <GlassSurface
             as='aside'
             className='w-[68px] shrink-0 p-2 py-4'
@@ -350,10 +349,10 @@ const LivingPersonasTab: React.FC<LivingPersonasTabProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className='mx-auto px-4 py-6 sm:px-6 lg:px-8'
+        className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'
         style={personaColorStyle}
       >
-        <div className='flex gap-4'>
+        <div className='flex items-start gap-4'>
           {/* Left Sidebar - Expandable on hover */}
           <div
             className='flex-shrink-0 transition-all duration-200 ease-in-out'
@@ -368,7 +367,7 @@ const LivingPersonasTab: React.FC<LivingPersonasTabProps> = ({
           >
             <GlassSurface
               as='nav'
-              className='sticky top-6 w-full overflow-hidden'
+              className='sticky w-full overflow-hidden'
               variant='default'
             >
               <div

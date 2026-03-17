@@ -1,6 +1,7 @@
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
+import type { IPageResponse } from './types/osiris';
 import type {
   IPersona,
   IPersonaListItem,
@@ -119,11 +120,11 @@ export class PersonaApi extends ApiService {
   }
 
   /**
-   * Get concepts tagged with a specific persona.
+   * Get concepts tagged with a specific persona (paginated).
    */
-  getTaggedConcepts(personaUuid: string) {
-    return this.get<ITaggedConcept[]>(
-      endpoints.personaTaggedConcepts(personaUuid),
+  getTaggedConcepts(personaUuid: string, page: number = 1, pageSize?: number) {
+    return this.get<IPageResponse<ITaggedConcept>>(
+      endpoints.personaTaggedConcepts(personaUuid, page, pageSize),
     );
   }
 

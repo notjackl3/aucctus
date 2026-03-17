@@ -39,6 +39,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useStore from '@stores/store';
+import { useLayoutEditStore } from '@stores/layout-edit.store';
 
 import LayoutEditSaveBanner from '../LivingPersonasTab/LayoutEditSaveBanner';
 import AddOverviewWidgetModal from './AddOverviewWidgetModal';
@@ -146,11 +147,18 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
   const account = useStore((state) => state.auth.account);
   const accountUuid = account?.uuid;
 
-  const brandColors = branding?.colors ?? {};
+  const brandColors = branding?.colors ?? [];
 
   // Edit mode state
   const [isEditMode, setIsEditMode] = useState(false);
   const [isAddWidgetModalOpen, setIsAddWidgetModalOpen] = useState(false);
+
+  // Broadcast edit mode to app shell (hides floating search bar during layout editing)
+  const setEditingLayout = useLayoutEditStore((s) => s.setEditingLayout);
+  useEffect(() => {
+    setEditingLayout(isEditMode);
+    return () => setEditingLayout(false);
+  }, [isEditMode, setEditingLayout]);
 
   // Widget config state — lazy initializer reads localStorage once on mount
   const [widgetConfig, setWidgetConfig] = useState<OverviewWidgetConfig[]>(

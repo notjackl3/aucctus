@@ -234,8 +234,8 @@ const CompanyContextTab: React.FC<CompanyContextTabProps> = ({
   );
 
   return (
-    <div className='mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8'>
-      <div className='flex gap-4'>
+    <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+      <div className='flex items-start gap-4'>
         {/* Left Sidebar - Expandable on hover */}
         <div
           className='flex-shrink-0 transition-all duration-200 ease-in-out'

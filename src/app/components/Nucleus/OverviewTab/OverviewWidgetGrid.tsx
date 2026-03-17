@@ -56,7 +56,7 @@ export interface OverviewWidgetGridProps extends OverviewWidgetItemCallbacks {
   /** Overview widgets from the API */
   widgets: INucleusOverviewWidget[];
   /** Brand colors for themed widgets */
-  brandColors: Record<string, string>;
+  brandColors: string[];
   /** Whether layout mode is active (drag, hide, resize widgets) */
   isLayoutMode?: boolean;
   /** Widget configuration */
@@ -117,7 +117,7 @@ export const buildDefaultOverviewConfig = (
 /** Render a widget based on its type */
 const renderOverviewWidget = (
   widget: INucleusOverviewWidget,
-  brandColors: Record<string, string>,
+  brandColors: string[],
   itemCallbacks?: OverviewWidgetItemCallbacks,
 ): React.ReactNode => {
   const { isEditable, onAddItem, onUpdateItem, onDeleteItem, onUpdateWidget } =
@@ -201,7 +201,7 @@ const renderOverviewWidget = (
 /** Fallback static layout (matches original OverviewTab hardcoded grid) */
 const StaticOverviewGrid: React.FC<{
   widgets: INucleusOverviewWidget[];
-  brandColors: Record<string, string>;
+  brandColors: string[];
   className?: string;
 }> = ({ widgets, brandColors, className }) => {
   const thesis = widgets.find((w) => w.widgetType === 'thesis');

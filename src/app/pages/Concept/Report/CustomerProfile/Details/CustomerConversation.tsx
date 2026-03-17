@@ -26,7 +26,7 @@ import defaultAvatar from '@assets/img/avatar.png';
 import Avatar from '@components/Avatar';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import AucctusMessageInput from '@components/Input/AucctusMessageInput';
-import Tooltip from '@components/ToolTip/Tooltip';
+import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 import CustomerConversationSocketWrapper from '../CustomerConversationSocketWrapper';
 import CustomerChatMessage from './CustomerChatMessage';
 import SelectableCustomerConversationList from './SelectableCustomerConversationList';
@@ -337,7 +337,13 @@ const CustomerConversation = forwardRef<
         </span>
         <span className='flex-1' />
         <span className='mr-2 flex flex-row gap-2'>
-          <Tooltip tip='Search for a conversation'>
+          <ComponentTooltip
+            tip={
+              <div className='aucctus-text-primary aucctus-text-sm aucctus-bg-primary rounded-lg px-3 py-1.5 shadow-md'>
+                Search for a conversation
+              </div>
+            }
+          >
             <button
               onClick={handleSearchConversation}
               className={cn(
@@ -351,8 +357,14 @@ const CustomerConversation = forwardRef<
                 <Search size={20} className='aucctus-stroke-secondary' />
               </span>
             </button>
-          </Tooltip>
-          <Tooltip tip='Export chat as PDF'>
+          </ComponentTooltip>
+          <ComponentTooltip
+            tip={
+              <div className='aucctus-text-primary aucctus-text-sm aucctus-bg-primary rounded-lg px-3 py-1.5 shadow-md'>
+                Export chat as PDF
+              </div>
+            }
+          >
             <button
               onClick={handleExportConversation}
               disabled={!canExport || isExporting}
@@ -372,8 +384,14 @@ const CustomerConversation = forwardRef<
                 )}
               </span>
             </button>
-          </Tooltip>
-          <Tooltip tip='Start a new conversation'>
+          </ComponentTooltip>
+          <ComponentTooltip
+            tip={
+              <div className='aucctus-text-primary aucctus-text-sm aucctus-bg-primary rounded-lg px-3 py-1.5 shadow-md'>
+                Start a new conversation
+              </div>
+            }
+          >
             <button
               onClick={doConversationClear}
               className={cn(
@@ -387,7 +405,7 @@ const CustomerConversation = forwardRef<
                 <Pencil size={20} className='aucctus-stroke-secondary' />
               </span>
             </button>
-          </Tooltip>
+          </ComponentTooltip>
         </span>
       </div>
 

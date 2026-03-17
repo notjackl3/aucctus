@@ -25,7 +25,7 @@ import React, { useCallback, useId, useState } from 'react';
 
 interface ChecklistWidgetProps {
   widget: INucleusOverviewWidget;
-  brandColors?: Record<string, string>;
+  brandColors?: string[];
   isEditable?: boolean;
   onAddItem?: (widgetUuid: string, data: Record<string, unknown>) => void;
   onUpdateItem?: (
@@ -249,7 +249,7 @@ const ItemDeleteButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
 
 const ChecklistWidget: React.FC<ChecklistWidgetProps> = ({
   widget,
-  brandColors = {},
+  brandColors = [],
   isEditable = false,
   onAddItem,
   onUpdateItem,
@@ -262,7 +262,7 @@ const ChecklistWidget: React.FC<ChecklistWidgetProps> = ({
   const variant = getVariant(widget.title);
   const config = variantConfig[variant];
   const HeaderIcon = widget.icon ? resolveIcon(widget.icon) : config.Icon;
-  const brandColorValues = Object.values(brandColors);
+  const brandColorValues = brandColors;
   const primaryBrandColor = brandColorValues[0] || null;
   const secondaryBrandColor = brandColorValues[1] || primaryBrandColor;
 

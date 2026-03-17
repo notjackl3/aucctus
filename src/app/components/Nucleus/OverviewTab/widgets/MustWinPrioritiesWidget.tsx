@@ -18,7 +18,7 @@ import React, { useCallback, useState } from 'react';
 
 interface MustWinPrioritiesWidgetProps {
   widget: INucleusOverviewWidget;
-  brandColors?: Record<string, string>;
+  brandColors?: string[];
   isEditable?: boolean;
   onAddItem?: (widgetUuid: string, data: Record<string, unknown>) => void;
   onUpdateItem?: (
@@ -32,7 +32,7 @@ interface MustWinPrioritiesWidgetProps {
 
 const MustWinPrioritiesWidget: React.FC<MustWinPrioritiesWidgetProps> = ({
   widget,
-  brandColors = {},
+  brandColors = [],
   isEditable = false,
   onAddItem,
   onUpdateItem,
@@ -43,7 +43,7 @@ const MustWinPrioritiesWidget: React.FC<MustWinPrioritiesWidgetProps> = ({
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const priorities = widget.cardListItems;
-  const brandColorValues = Object.values(brandColors);
+  const brandColorValues = brandColors;
 
   const handleAdd = useCallback(() => {
     if (!newTitle.trim()) return;

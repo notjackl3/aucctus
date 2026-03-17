@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from '@components';
 import { cn } from '@libs/utils/react';
@@ -62,9 +62,28 @@ const LandingView: React.FC<LandingViewProps> = ({
 }) => {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const personaMenuRef = useRef<HTMLDivElement>(null);
+  const personaButtonRef = useRef<HTMLButtonElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [showPersonaMenu, setShowPersonaMenu] = useState(false);
   const [personaQuery, setPersonaQuery] = useState('');
+
+  // Close persona menu on click outside
+  useEffect(() => {
+    if (!showPersonaMenu) return;
+    const handler = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        personaMenuRef.current?.contains(target) ||
+        personaButtonRef.current?.contains(target)
+      )
+        return;
+      setShowPersonaMenu(false);
+      setPersonaQuery('');
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showPersonaMenu]);
 
   // Build persona-only sections for the menu (filter out already-selected)
   const selectedIds = React.useMemo(
@@ -214,14 +233,16 @@ const LandingView: React.FC<LandingViewProps> = ({
           >
             <div className='relative'>
               {/* Persona menu (positioned above the card) */}
-              <MentionMenu
-                query={personaQuery}
-                onSelect={handlePersonaSelect}
-                onClose={handlePersonaMenuClose}
-                visible={showPersonaMenu}
-                sections={sections}
-                className='absolute bottom-full left-0 right-0 z-50 mb-1 max-h-[160px] overflow-y-auto rounded-xl border border-white/15 bg-black/90 shadow-2xl backdrop-blur-xl'
-              />
+              <div ref={personaMenuRef}>
+                <MentionMenu
+                  query={personaQuery}
+                  onSelect={handlePersonaSelect}
+                  onClose={handlePersonaMenuClose}
+                  visible={showPersonaMenu}
+                  sections={sections}
+                  className='absolute bottom-full left-0 right-0 z-50 mb-1 max-h-[160px] overflow-y-auto rounded-xl border border-white/15 bg-black/90 shadow-2xl backdrop-blur-xl'
+                />
+              </div>
 
               {/* Card container */}
               <div
@@ -255,6 +276,7 @@ const LandingView: React.FC<LandingViewProps> = ({
                   {/* Add Personas button */}
                   {personaItems.length > 0 && (
                     <button
+                      ref={personaButtonRef}
                       type='button'
                       onClick={togglePersonaMenu}
                       className={cn(

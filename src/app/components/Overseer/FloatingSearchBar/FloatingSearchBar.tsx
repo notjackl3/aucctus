@@ -1,3 +1,4 @@
+import { hexToHslValues } from '@libs/utils/color';
 import { cn } from '@libs/utils/react';
 import { IOverseerPendingImage, MentionItem } from '@stores/overseer/types';
 import {
@@ -24,7 +25,7 @@ interface FloatingSearchBarProps {
   rightOffset?: number;
   conceptItems?: MentionItem[];
   personaItems?: MentionItem[];
-  brandColors?: Record<string, string>;
+  brandColors?: string[];
 }
 
 const FloatingSearchBar = ({
@@ -189,13 +190,12 @@ const FloatingSearchBar = ({
   }, []);
 
   const orbStyles = useMemo(() => {
-    if (!brandColors || Object.keys(brandColors).length === 0) return undefined;
-    const values = Object.values(brandColors);
+    if (!brandColors || brandColors.length === 0) return undefined;
     return {
-      '--orb-color-1': values[1] || undefined,
-      '--orb-color-2': values[3] || undefined,
-      '--orb-color-3': values[2] || undefined,
-      '--orb-color-4': values[0] || undefined,
+      '--orb-hsl-1': hexToHslValues(brandColors[0 % brandColors.length]),
+      '--orb-hsl-2': hexToHslValues(brandColors[1 % brandColors.length]),
+      '--orb-hsl-3': hexToHslValues(brandColors[2 % brandColors.length]),
+      '--orb-hsl-4': hexToHslValues(brandColors[3 % brandColors.length]),
     } as React.CSSProperties;
   }, [brandColors]);
 

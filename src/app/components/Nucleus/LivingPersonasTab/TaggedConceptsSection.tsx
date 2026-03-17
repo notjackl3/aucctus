@@ -1,24 +1,24 @@
 /**
  * TaggedConceptsSection - Displays concepts tagged with a living persona.
  *
- * Shows a list of concepts linked to the persona via the living_personas M2M,
+ * Shows a paginated list of concepts linked to the persona via the living_personas M2M,
  * with clickable rows that navigate to the concept report.
  */
 
-import { motion } from 'framer-motion';
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { GlassSurface } from '@components';
 import { useTaggedConcepts } from '@hooks/query/persona.hook';
-import { AppPath } from '@routes/routes';
-import { Lightbulb, ChevronRight } from 'lucide-react';
-import { cn } from '@libs/utils/react';
+import type { ConceptStatus } from '@libs/api/types/concept/concepts';
 import {
+  CONCEPT_STATUS_STYLE_MAP,
   getConceptStatusColor,
   getConceptStatusDisplayName,
-  CONCEPT_STATUS_STYLE_MAP,
 } from '@libs/utils/concepts';
-import type { ConceptStatus } from '@libs/api/types/concept/concepts';
+import { cn } from '@libs/utils/react';
+import { AppPath } from '@routes/routes';
+import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Lightbulb } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export interface TaggedConceptsSectionProps {
   personaUuid: string;
@@ -29,7 +29,9 @@ const TaggedConceptsSection: React.FC<TaggedConceptsSectionProps> = ({
   personaUuid,
   className,
 }) => {
-  const { concepts, isLoading } = useTaggedConcepts(personaUuid);
+  const [page, setPage] = useState(1);
+  const { concepts, count, numberOfPages, isLoading, isFetching } =
+    useTaggedConcepts(personaUuid, page, 5);
   const navigate = useNavigate();
 
   const handleConceptClick = (concept: {
@@ -47,11 +49,18 @@ const TaggedConceptsSection: React.FC<TaggedConceptsSectionProps> = ({
     <div className={className}>
       <GlassSurface className='overflow-hidden'>
         <div className='p-6'>
-          <h3 className='aucctus-text-xs-bold aucctus-text-tertiary mb-4 uppercase tracking-wider'>
-            Tagged Concepts
-          </h3>
+          <div className='mb-4 flex items-center justify-between'>
+            <h3 className='aucctus-text-xs-bold aucctus-text-tertiary uppercase tracking-wider'>
+              Tagged Concepts
+              {count > 0 && (
+                <span className='aucctus-text-tertiary ml-1.5 text-[10px] font-normal normal-case'>
+                  ({count})
+                </span>
+              )}
+            </h3>
+          </div>
 
-          {isLoading ? (
+          {isLoading && page === 1 ? (
             <div className='animate-pulse space-y-3'>
               {Array.from({ length: 2 }).map((_, i) => (
                 <div key={i} className='aucctus-bg-secondary h-16 rounded-xl' />
@@ -74,7 +83,12 @@ const TaggedConceptsSection: React.FC<TaggedConceptsSectionProps> = ({
               </p>
             </motion.div>
           ) : (
-            <div className='space-y-2'>
+            <div
+              className={cn(
+                'space-y-2 transition-opacity duration-200',
+                isFetching && !isLoading && 'pointer-events-none opacity-50',
+              )}
+            >
               {concepts.map((concept, index) => {
                 const statusColor = getConceptStatusColor(
                   concept.status as ConceptStatus,
@@ -83,6 +97,7 @@ const TaggedConceptsSection: React.FC<TaggedConceptsSectionProps> = ({
                 const statusLabel = getConceptStatusDisplayName(
                   concept.status as ConceptStatus,
                 );
+                const isNew = concept.status === 'new';
 
                 return (
                   <motion.button
@@ -128,12 +143,58 @@ const TaggedConceptsSection: React.FC<TaggedConceptsSectionProps> = ({
                             },
                           )}
                         </span>
+                        {isNew && (
+                          <span className='aucctus-text-tertiary text-[10px] italic opacity-60'>
+                            Generate Concept to View
+                          </span>
+                        )}
                       </div>
                     </div>
                     <ChevronRight className='aucctus-text-tertiary h-4 w-4 flex-shrink-0 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:opacity-100' />
                   </motion.button>
                 );
               })}
+
+              {/* Pagination controls */}
+              {numberOfPages > 1 && (
+                <div className='flex items-center justify-between pt-3'>
+                  <span className='aucctus-text-tertiary text-xs'>
+                    Page {page} of {numberOfPages}
+                  </span>
+                  <div className='flex items-center gap-1'>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page <= 1}
+                      className={cn(
+                        'rounded-lg p-1.5 transition-colors',
+                        page <= 1
+                          ? 'cursor-not-allowed opacity-30'
+                          : 'aucctus-text-secondary hover:aucctus-bg-secondary',
+                      )}
+                    >
+                      <ChevronLeft className='h-4 w-4' />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() =>
+                        setPage((p) => Math.min(numberOfPages, p + 1))
+                      }
+                      disabled={page >= numberOfPages}
+                      className={cn(
+                        'rounded-lg p-1.5 transition-colors',
+                        page >= numberOfPages
+                          ? 'cursor-not-allowed opacity-30'
+                          : 'aucctus-text-secondary hover:aucctus-bg-secondary',
+                      )}
+                    >
+                      <ChevronRight className='h-4 w-4' />
+                    </motion.button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

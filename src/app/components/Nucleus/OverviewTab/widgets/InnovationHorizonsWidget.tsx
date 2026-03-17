@@ -19,7 +19,7 @@ import React, { useCallback, useId, useState } from 'react';
 
 interface InnovationHorizonsWidgetProps {
   widget: INucleusOverviewWidget;
-  brandColors?: Record<string, string>;
+  brandColors?: string[];
   isEditable?: boolean;
   onAddItem?: (widgetUuid: string, data: Record<string, unknown>) => void;
   onUpdateItem?: (
@@ -137,7 +137,7 @@ const EditableText: React.FC<{
 
 const InnovationHorizonsWidget: React.FC<InnovationHorizonsWidgetProps> = ({
   widget,
-  brandColors = {},
+  brandColors = [],
   isEditable = false,
   onAddItem,
   onUpdateItem,
@@ -145,7 +145,7 @@ const InnovationHorizonsWidget: React.FC<InnovationHorizonsWidgetProps> = ({
   onUpdateWidget,
 }) => {
   const horizons = widget.visualizationItems;
-  const brandColorValues = Object.values(brandColors);
+  const brandColorValues = brandColors;
   const [selectedIndex, setSelectedIndex] = useState(
     Math.min(horizons.length - 1, 2),
   );

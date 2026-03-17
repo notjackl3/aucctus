@@ -17,7 +17,7 @@
 import { Loading, Modal, toast } from '@components';
 import Avatar from '@components/Avatar';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
-import Tooltip from '@components/ToolTip/Tooltip';
+import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 import AucctusMessageInput from '@components/Input/AucctusMessageInput';
 import PersonaChatInput, {
   type PersonaChatInputHandle,
@@ -581,7 +581,13 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
           </span>
           <span className='flex-1' />
           <span className='mr-2 flex flex-row gap-2'>
-            <Tooltip tip='Search for a conversation'>
+            <ComponentTooltip
+              tip={
+                <div className='aucctus-text-primary aucctus-text-sm aucctus-bg-primary rounded-lg px-3 py-1.5 shadow-md'>
+                  Search for a conversation
+                </div>
+              }
+            >
               <button
                 onClick={handleSearchConversation}
                 className={cn(
@@ -595,8 +601,14 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
                   <Search size={20} className='aucctus-stroke-secondary' />
                 </span>
               </button>
-            </Tooltip>
-            <Tooltip tip='Export chat as PDF'>
+            </ComponentTooltip>
+            <ComponentTooltip
+              tip={
+                <div className='aucctus-text-primary aucctus-text-sm aucctus-bg-primary rounded-lg px-3 py-1.5 shadow-md'>
+                  Export chat as PDF
+                </div>
+              }
+            >
               <button
                 onClick={handleExportConversation}
                 disabled={!canExport || isExporting}
@@ -617,8 +629,14 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
                   )}
                 </span>
               </button>
-            </Tooltip>
-            <Tooltip tip='Start a new conversation'>
+            </ComponentTooltip>
+            <ComponentTooltip
+              tip={
+                <div className='aucctus-text-primary aucctus-text-sm aucctus-bg-primary rounded-lg px-3 py-1.5 shadow-md'>
+                  Start a new conversation
+                </div>
+              }
+            >
               <button
                 onClick={doConversationClear}
                 className={cn(
@@ -632,7 +650,7 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
                   <Pencil size={20} className='aucctus-stroke-secondary' />
                 </span>
               </button>
-            </Tooltip>
+            </ComponentTooltip>
           </span>
         </div>
 

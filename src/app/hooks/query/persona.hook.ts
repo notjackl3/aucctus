@@ -36,6 +36,7 @@ import type {
   IUpdateCustomWidgetPayload,
   ITaggedConcept,
 } from '@libs/api/types/persona';
+import type { IPageResponse } from '@libs/api/types/osiris';
 
 // ============================================
 // Query Stale Times (ms)
@@ -75,8 +76,8 @@ export const personaKeys = {
     [...personaKeys.all, 'starterPrompts', uuid] as const,
   conversationSearch: (uuid: string, message?: string, page?: number) =>
     [...personaKeys.all, 'conversationSearch', uuid, message, page] as const,
-  taggedConcepts: (uuid: string) =>
-    [...personaKeys.all, 'taggedConcepts', uuid] as const,
+  taggedConcepts: (uuid: string, page?: number) =>
+    [...personaKeys.all, 'taggedConcepts', uuid, page] as const,
   mentionSearch: (query: string, type?: string, excludePersona?: string) =>
     ['mentionSearch', query, type, excludePersona] as const,
 };
@@ -150,20 +151,28 @@ export const usePersona = (personaUuid: string) => {
 // Tagged Concepts Query
 // ============================================
 
-export const useTaggedConcepts = (personaUuid: string) => {
+export const useTaggedConcepts = (
+  personaUuid: string,
+  page: number = 1,
+  pageSize?: number,
+) => {
   const query = useQuery({
-    queryKey: personaKeys.taggedConcepts(personaUuid),
-    queryFn: async (): Promise<ITaggedConcept[]> => {
-      return await api.persona.getTaggedConcepts(personaUuid);
+    queryKey: personaKeys.taggedConcepts(personaUuid, page),
+    queryFn: async (): Promise<IPageResponse<ITaggedConcept>> => {
+      return await api.persona.getTaggedConcepts(personaUuid, page, pageSize);
     },
     enabled: !!personaUuid,
     staleTime: STALE_TIMES.standard,
     cacheTime: 1000 * 60 * 5,
+    keepPreviousData: true,
   });
 
   return {
-    concepts: query.data ?? [],
+    concepts: query.data?.results ?? [],
+    count: query.data?.count ?? 0,
+    numberOfPages: query.data?.numberOfPages ?? 1,
     isLoading: query.isLoading,
+    isFetching: query.isFetching,
   };
 };
 

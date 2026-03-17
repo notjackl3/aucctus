@@ -11,7 +11,7 @@ export interface IAccountBranding {
   tagline: string;
   logoUrl: string;
   hqImageUrl: string;
-  colors: Record<string, string>;
+  colors: string[];
   typography: Record<string, string>;
   toneOfVoice: string;
   source: string;
@@ -25,7 +25,7 @@ export interface IAccountBranding {
 export interface IUpdateAccountBrandingPayload {
   brandName?: string;
   tagline?: string;
-  colors?: Record<string, string>;
+  colors?: string[];
   typography?: Record<string, string>;
   toneOfVoice?: string;
 }

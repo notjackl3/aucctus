@@ -2,7 +2,7 @@
  * PersonalizationTab - Brand customization for the Nucleus company profile.
  *
  * Two-column layout:
- * - Left: Company name (readonly), website domain (readonly), brand colors (editable)
+ * - Left: Company name (editable), website domain (editable), brand colors (editable, drag-to-reorder)
  * - Right: Logo upload (drag-drop), HQ image upload (drag-drop)
  *
  * Connected to useAccountBranding hooks for persistence.
@@ -18,24 +18,99 @@ import { useUpdateAccount } from '@hooks/query/account.hook';
 import { useAccountLogo } from '@hooks/query/admin.hook';
 import useStore from '@stores/store';
 import { cn } from '@libs/utils/react';
+import {
+  closestCenter,
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Building2,
   Check,
   Globe,
+  GripVertical,
   Palette,
   Pencil,
   Plus,
   Upload,
   X,
 } from 'lucide-react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
-interface BrandColor {
+/* ------------------------------------------------------------------ */
+/* Sortable color swatch                                               */
+/* ------------------------------------------------------------------ */
+
+const SortableColorSwatch: React.FC<{
   id: string;
   hex: string;
-  name: string;
-}
+  onRemove: () => void;
+}> = ({ id, hex, onRemove }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className='group relative'>
+      <div
+        className={cn(
+          'border-border/40 flex h-14 w-14 items-center justify-center rounded-lg border shadow-sm transition-transform',
+          isDragging ? 'scale-110 shadow-lg' : 'hover:scale-105',
+        )}
+        style={{ backgroundColor: hex }}
+      >
+        <button
+          {...attributes}
+          {...listeners}
+          className='absolute inset-0 flex cursor-grab items-center justify-center rounded-lg opacity-0 transition-opacity active:cursor-grabbing group-hover:opacity-100'
+          style={{ background: 'rgba(0,0,0,0.25)' }}
+        >
+          <GripVertical className='h-4 w-4 text-white drop-shadow' />
+        </button>
+        <button
+          onClick={onRemove}
+          className='border-border bg-background hover:border-destructive hover:bg-destructive hover:text-destructive-foreground absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border opacity-0 shadow-md transition-opacity group-hover:opacity-100'
+        >
+          <X className='h-2.5 w-2.5' />
+        </button>
+      </div>
+      <p className='aucctus-text-tertiary mt-1 text-center text-[9px] uppercase'>
+        {hex}
+      </p>
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* Main component                                                      */
+/* ------------------------------------------------------------------ */
 
 const PersonalizationTab: React.FC = () => {
   const account = useStore((state) => state.auth.account);
@@ -50,7 +125,6 @@ const PersonalizationTab: React.FC = () => {
   const [isDraggingHQ, setIsDraggingHQ] = useState(false);
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [newColor, setNewColor] = useState('#6366F1');
-  const [newColorName, setNewColorName] = useState('');
 
   // Editable company name
   const [isEditingName, setIsEditingName] = useState(false);
@@ -80,6 +154,13 @@ const PersonalizationTab: React.FC = () => {
     if (isEditingDomain) domainInputRef.current?.focus();
   }, [isEditingDomain]);
 
+  // Auto-open native color picker when panel opens
+  useEffect(() => {
+    if (colorPickerOpen) {
+      requestAnimationFrame(() => colorInputRef.current?.click());
+    }
+  }, [colorPickerOpen]);
+
   const saveName = useCallback(() => {
     const trimmed = editName.trim();
     if (trimmed && trimmed !== account?.name) {
@@ -96,16 +177,30 @@ const PersonalizationTab: React.FC = () => {
     setIsEditingDomain(false);
   }, [editDomain, account?.domain, updateAccountMutation]);
 
+  const colorInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const hqInputRef = useRef<HTMLInputElement>(null);
 
-  // Derive brand colors from branding data
-  const brandColors: BrandColor[] = Object.entries(branding?.colors ?? {}).map(
-    ([name, hex], i) => ({
-      id: String(i),
-      hex,
-      name,
-    }),
+  // Brand colors as ordered list
+  const brandColors = useMemo(() => branding?.colors ?? [], [branding?.colors]);
+
+  // Sortable IDs (dnd-kit needs string ids)
+  const colorIds = brandColors.map((_hex: string, i: number) => `color-${i}`);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+      const oldIndex = colorIds.indexOf(String(active.id));
+      const newIndex = colorIds.indexOf(String(over.id));
+      const reordered = arrayMove(brandColors, oldIndex, newIndex);
+      updateMutation.mutate({ colors: reordered });
+    },
+    [brandColors, colorIds, updateMutation],
   );
 
   const handleDragOver = useCallback(
@@ -166,32 +261,17 @@ const PersonalizationTab: React.FC = () => {
 
   const addColor = useCallback(() => {
     if (brandColors.length >= 5) return;
-    const updatedColors: Record<string, string> = {
-      ...(branding?.colors ?? {}),
-    };
-    const name = newColorName || `Color ${brandColors.length + 1}`;
-    updatedColors[name] = newColor;
-    updateMutation.mutate({ colors: updatedColors });
+    updateMutation.mutate({ colors: [...brandColors, newColor] });
     setColorPickerOpen(false);
     setNewColor('#6366F1');
-    setNewColorName('');
-  }, [
-    brandColors.length,
-    branding?.colors,
-    newColor,
-    newColorName,
-    updateMutation,
-  ]);
+  }, [brandColors, newColor, updateMutation]);
 
   const removeColor = useCallback(
-    (colorName: string) => {
-      const updatedColors: Record<string, string> = {
-        ...(branding?.colors ?? {}),
-      };
-      delete updatedColors[colorName];
-      updateMutation.mutate({ colors: updatedColors });
+    (index: number) => {
+      const updated = brandColors.filter((_: string, i: number) => i !== index);
+      updateMutation.mutate({ colors: updated });
     },
-    [branding?.colors, updateMutation],
+    [brandColors, updateMutation],
   );
 
   return (
@@ -264,7 +344,7 @@ const PersonalizationTab: React.FC = () => {
               </div>
             ) : (
               <p className='aucctus-text-primary text-xl font-bold'>
-                {account?.name || branding?.brandName || '—'}
+                {account?.name || branding?.brandName || '\u2014'}
               </p>
             )}
           </motion.div>
@@ -324,7 +404,7 @@ const PersonalizationTab: React.FC = () => {
               </div>
             ) : (
               <p className='aucctus-text-primary text-lg font-medium'>
-                {account?.domain || '—'}
+                {account?.domain || '\u2014'}
               </p>
             )}
           </motion.div>
@@ -346,33 +426,34 @@ const PersonalizationTab: React.FC = () => {
             </div>
 
             <div className='flex flex-wrap gap-2'>
-              <AnimatePresence mode='popLayout'>
-                {brandColors.map((color) => (
-                  <motion.div
-                    key={color.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className='group relative'
-                  >
-                    <div
-                      className='border-border/40 flex h-14 w-14 items-center justify-center rounded-lg border shadow-sm transition-transform hover:scale-105'
-                      style={{ backgroundColor: color.hex }}
-                    >
-                      <button
-                        onClick={() => removeColor(color.name)}
-                        className='border-border bg-background hover:border-destructive hover:bg-destructive hover:text-destructive-foreground absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border opacity-0 shadow-md transition-opacity group-hover:opacity-100'
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={colorIds}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  <AnimatePresence mode='popLayout'>
+                    {brandColors.map((hex: string, index: number) => (
+                      <motion.div
+                        key={`${hex}-${index}`}
+                        layout
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
                       >
-                        <X className='h-2.5 w-2.5' />
-                      </button>
-                    </div>
-                    <p className='aucctus-text-tertiary mt-1 text-center text-[9px] uppercase'>
-                      {color.hex}
-                    </p>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+                        <SortableColorSwatch
+                          id={colorIds[index]}
+                          hex={hex}
+                          onRemove={() => removeColor(index)}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </SortableContext>
+              </DndContext>
 
               {brandColors.length < 5 && !colorPickerOpen && (
                 <motion.button
@@ -389,36 +470,30 @@ const PersonalizationTab: React.FC = () => {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className='flex items-center gap-2'
+                  className='group relative'
                 >
                   <input
+                    ref={colorInputRef}
                     type='color'
                     value={newColor}
                     onChange={(e) => setNewColor(e.target.value)}
                     className='border-border/40 h-14 w-14 cursor-pointer rounded-lg border'
                   />
-                  <div className='flex flex-col gap-1'>
-                    <input
-                      type='text'
-                      placeholder='Name'
-                      value={newColorName}
-                      onChange={(e) => setNewColorName(e.target.value)}
-                      className='border-border/60 bg-muted/50 w-20 rounded border px-2 py-1 text-xs outline-none'
-                    />
-                    <div className='flex gap-1'>
-                      <button
-                        onClick={() => setColorPickerOpen(false)}
-                        className='hover:bg-muted rounded px-2 py-1 text-xs transition-colors'
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={addColor}
-                        className='aucctus-bg-brand-primary rounded px-2 py-1 text-xs text-white'
-                      >
-                        Add
-                      </button>
-                    </div>
+                  <div className='mt-1 flex items-center justify-center gap-1'>
+                    <button
+                      onClick={() => setColorPickerOpen(false)}
+                      className='aucctus-text-tertiary hover:aucctus-text-primary hover:bg-muted flex h-5 w-5 items-center justify-center rounded transition-colors'
+                      title='Cancel'
+                    >
+                      <X className='h-3 w-3' />
+                    </button>
+                    <button
+                      onClick={addColor}
+                      className='flex h-5 w-5 items-center justify-center rounded text-emerald-400 transition-colors hover:bg-emerald-500/20 hover:text-emerald-300'
+                      title='Save color'
+                    >
+                      <Check className='h-3 w-3' />
+                    </button>
                   </div>
                 </motion.div>
               )}

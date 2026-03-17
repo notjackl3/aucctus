@@ -768,7 +768,7 @@ select:focus {
   height: 140px;
   top: 0;
   left: 0;
-  background: radial-gradient(circle, rgba(151, 45, 85, 0.55) 0%, transparent 70%);
+  background: radial-gradient(circle, hsl(var(--rim-orb-hsl-1, 337 54% 38%) / 0.55) 0%, transparent 70%);
   animation: rim-orb-loop 20s linear infinite;
 }
 
@@ -777,7 +777,7 @@ select:focus {
   height: 140px;
   top: 0;
   left: 0;
-  background: radial-gradient(circle, rgba(163, 13, 19, 0.50) 0%, transparent 70%);
+  background: radial-gradient(circle, hsl(var(--rim-orb-hsl-2, 358 85% 35%) / 0.50) 0%, transparent 70%);
   animation: rim-orb-loop 20s linear infinite;
   animation-delay: -10s;
 }
@@ -872,7 +872,7 @@ select:focus {
       hsl(283 86% 60% / 0.04),
       hsl(0 12% 29% / 0.06));
   opacity: 0.15;
-  animation: overseer-rim-rotate 8s linear infinite;
+  animation: animated-rim-rotate 8s linear infinite;
   pointer-events: none;
 }
 
@@ -888,64 +888,6 @@ select:focus {
   pointer-events: none;
 }
 
-/* Floating gradient orbs in the Overseer rim */
-.overseer-rim-orb {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  filter: blur(14px);
-}
-
-.overseer-rim-orb-1 {
-  width: 140px;
-  height: 140px;
-  top: 0;
-  left: 0;
-  background: radial-gradient(circle, rgba(151, 45, 85, 0.55) 0%, transparent 70%);
-  animation: overseer-orb-loop 20s linear infinite;
-}
-
-.overseer-rim-orb-2 {
-  width: 140px;
-  height: 140px;
-  top: 0;
-  left: 0;
-  background: radial-gradient(circle, rgba(163, 13, 19, 0.50) 0%, transparent 70%);
-  animation: overseer-orb-loop 20s linear infinite;
-  animation-delay: -10s;
-}
-
-@keyframes overseer-rim-rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes overseer-orb-loop {
-  0% {
-    transform: translate(-70px, -70px);
-  }
-
-  25% {
-    transform: translate(calc(100% - 70px), -70px);
-  }
-
-  50% {
-    transform: translate(calc(100% - 70px), calc(100% - 70px));
-  }
-
-  75% {
-    transform: translate(-70px, calc(100% - 70px));
-  }
-
-  100% {
-    transform: translate(-70px, -70px);
-  }
-}
 
 /* Dark gradient surface for Overseer floating panel */
 .overseer-panel-surface {
@@ -1201,10 +1143,10 @@ select:focus {
   border-radius: inherit;
   background: linear-gradient(
     135deg,
-    var(--nav-brand-1, hsla(152, 100%, 33%, 0.35)) 0%,
-    var(--nav-brand-2, hsla(75, 75%, 43%, 0.3)) 35%,
-    var(--nav-brand-3, hsla(27, 94%, 55%, 0.3)) 70%,
-    var(--nav-brand-4, hsla(152, 80%, 40%, 0.25)) 100%
+    hsl(var(--nav-brand-hsl-1, 152 100% 33%) / 0.35) 0%,
+    hsl(var(--nav-brand-hsl-2, 75 75% 43%) / 0.3) 35%,
+    hsl(var(--nav-brand-hsl-3, 27 94% 55%) / 0.3) 70%,
+    hsl(var(--nav-brand-hsl-4, 152 80% 40%) / 0.25) 100%
   );
   filter: blur(1.5px);
   z-index: 0;
@@ -1220,10 +1162,10 @@ select:focus {
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
   box-shadow:
-    inset 0 2px 6px var(--nav-brand-4, hsla(152, 80%, 40%, 0.08)),
-    inset 0 -2px 6px var(--nav-brand-3, hsla(27, 94%, 55%, 0.06)),
-    inset 3px 0 8px var(--nav-brand-2, hsla(75, 75%, 43%, 0.05)),
-    inset -3px 0 8px var(--nav-brand-1, hsla(152, 100%, 33%, 0.05));
+    inset 0 2px 6px hsl(var(--nav-brand-hsl-4, 152 80% 40%) / 0.08),
+    inset 0 -2px 6px hsl(var(--nav-brand-hsl-3, 27 94% 55%) / 0.06),
+    inset 3px 0 8px hsl(var(--nav-brand-hsl-2, 75 75% 43%) / 0.05),
+    inset -3px 0 8px hsl(var(--nav-brand-hsl-1, 152 100% 33%) / 0.05);
   z-index: 0;
 }
 
@@ -1234,20 +1176,20 @@ select:focus {
 .dark .concept-nav-indicator::before {
   background: linear-gradient(
     135deg,
-    var(--nav-brand-1, hsla(152, 100%, 33%, 0.25)) 0%,
-    var(--nav-brand-2, hsla(75, 75%, 43%, 0.2)) 35%,
-    var(--nav-brand-3, hsla(27, 94%, 55%, 0.2)) 70%,
-    var(--nav-brand-4, hsla(152, 80%, 40%, 0.15)) 100%
+    hsl(var(--nav-brand-hsl-1, 152 100% 33%) / 0.25) 0%,
+    hsl(var(--nav-brand-hsl-2, 75 75% 43%) / 0.2) 35%,
+    hsl(var(--nav-brand-hsl-3, 27 94% 55%) / 0.2) 70%,
+    hsl(var(--nav-brand-hsl-4, 152 80% 40%) / 0.15) 100%
   );
 }
 
 .dark .concept-nav-indicator::after {
   background: rgba(20, 20, 25, 0.9);
   box-shadow:
-    inset 0 2px 6px var(--nav-brand-4, hsla(152, 80%, 40%, 0.06)),
-    inset 0 -2px 6px var(--nav-brand-3, hsla(27, 94%, 55%, 0.04)),
-    inset 3px 0 8px var(--nav-brand-2, hsla(75, 75%, 43%, 0.04)),
-    inset -3px 0 8px var(--nav-brand-1, hsla(152, 100%, 33%, 0.04));
+    inset 0 2px 6px hsl(var(--nav-brand-hsl-4, 152 80% 40%) / 0.06),
+    inset 0 -2px 6px hsl(var(--nav-brand-hsl-3, 27 94% 55%) / 0.04),
+    inset 3px 0 8px hsl(var(--nav-brand-hsl-2, 75 75% 43%) / 0.04),
+    inset -3px 0 8px hsl(var(--nav-brand-hsl-1, 152 100% 33%) / 0.04);
 }
 
 /* Hide orbs — no longer used */
