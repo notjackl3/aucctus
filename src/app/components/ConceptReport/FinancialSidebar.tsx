@@ -9,26 +9,34 @@ import React, {
   useState,
 } from 'react';
 
-interface FinancialSection {
+export interface FinancialSection {
   id: string;
   label: string;
   icon: React.ElementType;
 }
 
-const SECTIONS: FinancialSection[] = [
+export const REVENUE_SECTIONS: FinancialSection[] = [
   { id: 'business-model', label: 'Business Model', icon: Building },
   { id: 'market-sizing', label: 'Market Sizing', icon: CircleDollarSign },
+  { id: 'projections', label: 'Projections', icon: TrendingUp },
+];
+
+export const COST_SAVINGS_SECTIONS: FinancialSection[] = [
+  { id: 'savings-method', label: 'Savings Model', icon: Building },
+  { id: 'impact-sizing', label: 'Impact Sizing', icon: CircleDollarSign },
   { id: 'projections', label: 'Projections', icon: TrendingUp },
 ];
 
 interface FinancialSidebarProps {
   activeSection: string;
   onSectionChange: (section: string) => void;
+  sections?: FinancialSection[];
 }
 
 const FinancialSidebar: React.FC<FinancialSidebarProps> = ({
   activeSection,
   onSectionChange,
+  sections = REVENUE_SECTIONS,
 }) => {
   const [expanded, setExpanded] = useState(false);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -41,7 +49,7 @@ const FinancialSidebar: React.FC<FinancialSidebarProps> = ({
   });
 
   const recalcIndicator = useCallback(() => {
-    const activeIndex = SECTIONS.findIndex((s) => s.id === activeSection);
+    const activeIndex = sections.findIndex((s) => s.id === activeSection);
     const activeEl = sectionRefs.current[activeIndex];
     const containerEl = listRef.current;
 
@@ -67,7 +75,7 @@ const FinancialSidebar: React.FC<FinancialSidebarProps> = ({
         return prev;
       return next;
     });
-  }, [activeSection]);
+  }, [activeSection, sections]);
 
   useLayoutEffect(() => {
     recalcIndicator();
@@ -127,7 +135,7 @@ const FinancialSidebar: React.FC<FinancialSidebarProps> = ({
             />
 
             <div className='relative z-10 flex flex-col gap-1'>
-              {SECTIONS.map((section, index) => {
+              {sections.map((section, index) => {
                 const Icon = section.icon;
                 const isActive = section.id === activeSection;
 
