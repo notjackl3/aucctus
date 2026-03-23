@@ -1,12 +1,17 @@
 import React from 'react';
 import { useWatchtowerDomains } from '@hooks/query/watchtower.hook';
+import { useWatchtowerView } from '../WatchtowerViewContext';
 import { Compass, Sparkles } from 'lucide-react';
 
 /**
  * FutureDomainsWidget - AI-suggested strategic domains
  */
 const FutureDomainsWidget: React.FC = () => {
-  const { domains, isLoading } = useWatchtowerDomains();
+  const { activeWatchtowerConfigUuid, selectedScanUuid } = useWatchtowerView();
+  const { domains, isLoading } = useWatchtowerDomains(
+    selectedScanUuid,
+    activeWatchtowerConfigUuid,
+  );
 
   if (isLoading || domains.length === 0) {
     return (

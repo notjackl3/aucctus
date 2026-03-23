@@ -1,5 +1,6 @@
 import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Clock, RefreshCw, X } from 'lucide-react';
 import React, { useState } from 'react';
@@ -14,8 +15,9 @@ interface SignalHistoryPopoverProps {
   isScanningActive: boolean;
   scanProgress: WatchtowerScanProgress;
   onRefresh: () => void;
-  selectedScanUuid: string | null;
-  onSelectScan: (scanUuid: string | null) => void;
+  selectedScanUuid: string | undefined;
+  onSelectScan: (scanUuid: string | undefined) => void;
+  watchtowerConfigUuid?: string;
 }
 
 const formatScanDate = (isoDate: string): string => {
@@ -42,21 +44,24 @@ const SignalHistoryPopover: React.FC<SignalHistoryPopoverProps> = ({
   onRefresh,
   selectedScanUuid,
   onSelectScan,
+  watchtowerConfigUuid,
 }) => {
   const [open, setOpen] = useState(false);
-  const { scans } = useWatchtowerScanHistory();
+  const { scans } = useWatchtowerScanHistory(watchtowerConfigUuid);
 
-  const isViewingHistorical = selectedScanUuid !== null;
+  const isViewingHistorical = selectedScanUuid !== undefined;
+  const isAllTowersView = watchtowerConfigUuid === undefined;
+  const isRefreshDisabled = isScanningActive || isAllTowersView;
 
   // Find the selected scan to show its date
   const selectedScan = isViewingHistorical
     ? scans.find((s) => s.uuid === selectedScanUuid)
-    : null;
+    : undefined;
 
   const handleSelectScan = (scanUuid: string) => {
     // If selecting the most recent scan (first in list), go back to "current" view
     if (scans.length > 0 && scans[0].uuid === scanUuid) {
-      onSelectScan(null);
+      onSelectScan(undefined);
     } else {
       onSelectScan(scanUuid);
     }
@@ -65,7 +70,7 @@ const SignalHistoryPopover: React.FC<SignalHistoryPopoverProps> = ({
 
   const handleReturnToCurrent = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onSelectScan(null);
+    onSelectScan(undefined);
   };
 
   return (
@@ -110,28 +115,50 @@ const SignalHistoryPopover: React.FC<SignalHistoryPopoverProps> = ({
               <X size={12} className='stroke-current' />
             </button>
           ) : (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onRefresh();
-              }}
-              disabled={isScanningActive}
-              className={cn(
-                '-mr-1 rounded-full p-0.5 transition-colors',
-                isScanningActive
-                  ? 'cursor-not-allowed text-white/40'
-                  : 'text-white/60 hover:bg-white/15 hover:text-white',
-              )}
-              title='Refresh signals'
-            >
-              <RefreshCw
-                size={12}
-                className={cn(
-                  'stroke-current',
-                  isScanningActive && 'animate-spin',
+            <Tooltip.Provider delayDuration={300}>
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isRefreshDisabled) onRefresh();
+                    }}
+                    disabled={isRefreshDisabled}
+                    className={cn(
+                      '-mr-1 rounded-full p-0.5 transition-colors',
+                      isRefreshDisabled
+                        ? 'cursor-not-allowed text-white/40'
+                        : 'text-white/60 hover:bg-white/15 hover:text-white',
+                    )}
+                    title={
+                      isAllTowersView
+                        ? 'Select a specific tower to refresh'
+                        : 'Refresh signals'
+                    }
+                  >
+                    <RefreshCw
+                      size={12}
+                      className={cn(
+                        'stroke-current',
+                        isScanningActive && 'animate-spin',
+                      )}
+                    />
+                  </button>
+                </Tooltip.Trigger>
+                {isAllTowersView && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content
+                      side='top'
+                      sideOffset={6}
+                      className='z-[100] rounded-md border border-white/15 bg-black/95 px-2.5 py-1.5 text-xs text-white/80 shadow-lg backdrop-blur-md'
+                    >
+                      Select a specific tower to refresh
+                      <Tooltip.Arrow className='fill-black/95' />
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
                 )}
-              />
-            </button>
+              </Tooltip.Root>
+            </Tooltip.Provider>
           )}
         </motion.div>
       </Popover.Trigger>

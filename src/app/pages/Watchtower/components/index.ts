@@ -10,3 +10,7 @@ export type {
   WatchtowerFeatureHighlight,
   WatchtowerInitiationBadge,
 } from './WatchtowerInitiation';
+export { default as WatchtowerViewDropdown } from './WatchtowerViewDropdown';
+export { default as CreateWatchtowerModal } from './CreateWatchtowerModal';
+export { default as DescribeStep } from './DescribeStep';
+export { default as ReviewStep } from './ReviewStep';

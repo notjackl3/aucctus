@@ -960,6 +960,27 @@ export class Endpoints {
     return `/api/v1/watchtower/signals/${signalUuid}/tracking`;
   }
 
+  // Watchtower Config Endpoints
+  static watchtowerConfigs = '/api/v1/watchtower/custom-watchtowers/';
+  static watchtowerConfigGenerateRules =
+    '/api/v1/watchtower/custom-watchtowers/generate-rules/';
+
+  static watchtowerConfig(uuid: string) {
+    return `/api/v1/watchtower/custom-watchtowers/${uuid}/`;
+  }
+
+  static watchtowerConfigScan(uuid: string) {
+    return `/api/v1/watchtower/custom-watchtowers/${uuid}/scan/`;
+  }
+
+  static watchtowerConfigRules(configUuid: string) {
+    return `/api/v1/watchtower/custom-watchtowers/${configUuid}/rules/`;
+  }
+
+  static watchtowerConfigRule(configUuid: string, ruleUuid: string) {
+    return `/api/v1/watchtower/custom-watchtowers/${configUuid}/rules/${ruleUuid}/`;
+  }
+
   // Value Discovery Public Endpoints (no auth required)
   static valueDiscoveryPublicStart = '/api/value-discovery/public/start';
 

@@ -833,6 +833,14 @@ select:focus {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
+/* Dark surface variant — forces dark background regardless of theme.
+   Used for modals with dark-themed content (white text on dark bg). */
+.liquid-glass-modal-surface.liquid-glass-dark-surface {
+  background: rgba(13, 13, 15, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
 /* Glass rim subtle rotation animation */
 @keyframes glass-rim-rotate {
   0% {

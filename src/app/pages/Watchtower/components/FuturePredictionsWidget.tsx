@@ -3,6 +3,7 @@ import { ComponentCarousel, Badge } from '@components';
 import { useWatchtowerPredictions } from '@hooks/query/watchtower.hook';
 import type { ISource } from '@libs/api/types';
 import type { PredictionSource } from '../types';
+import { useWatchtowerView } from '../WatchtowerViewContext';
 import { ChevronLeft, ChevronRight, Sparkles, Telescope } from 'lucide-react';
 
 /**
@@ -85,7 +86,11 @@ const FuturePredictionsWidget: React.FC = () => {
     scrollNext: () => void;
   }>(null);
 
-  const { predictions, isLoading } = useWatchtowerPredictions();
+  const { activeWatchtowerConfigUuid, selectedScanUuid } = useWatchtowerView();
+  const { predictions, isLoading } = useWatchtowerPredictions(
+    selectedScanUuid,
+    activeWatchtowerConfigUuid,
+  );
 
   if (isLoading || predictions.length === 0) {
     return (

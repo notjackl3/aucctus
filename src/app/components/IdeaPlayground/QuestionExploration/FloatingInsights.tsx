@@ -28,6 +28,7 @@ interface FloatingInsightsProps {
   ) => void;
   onInsightDoubleClick: (insight: InsightCardType) => void;
   onUserAnswerDelete: (questionId: string, card: any) => Promise<void>;
+  onUserAnswerSubmit: (questionId: string, answer: string) => Promise<void>;
 }
 
 /**
@@ -43,6 +44,7 @@ const FloatingInsights: React.FC<FloatingInsightsProps> = ({
   onSelectionChange,
   onInsightDoubleClick,
   onUserAnswerDelete,
+  onUserAnswerSubmit,
 }) => {
   // Track previous card IDs for smooth animations
   const prevCardIdsRef = useRef<Set<string>>(new Set());
@@ -160,6 +162,9 @@ const FloatingInsights: React.FC<FloatingInsightsProps> = ({
                 }
                 onDoubleClick={() => onInsightDoubleClick(card)}
                 onDelete={() => onUserAnswerDelete(currentQuestion.id, card)}
+                onSubmit={(answer) =>
+                  onUserAnswerSubmit(currentQuestion.id, answer)
+                }
               />
             </div>
           </div>

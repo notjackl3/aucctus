@@ -6,9 +6,14 @@ import type {
   IWatchtowerDashboard,
   IWatchtowerMonitoringRule,
   IWatchtowerRefreshResponse,
+  IWatchtowerRuleGenerationResponse,
   IWatchtowerScanListItem,
   ICreateMonitoringRulePayload,
   IUpdateMonitoringRulePayload,
+  IWatchtowerConfigDetail,
+  IWatchtowerConfigListItem,
+  IWatchtowerConfigRule,
+  ICreateWatchtowerConfigPayload,
 } from './types/watchtower';
 
 /**
@@ -34,6 +39,7 @@ export class WatchtowerApi extends ApiService {
   getWatchtowerDashboard(
     includeConceptImpacts: boolean = false,
     scanUuid?: string,
+    watchtowerConfigUuid?: string,
   ) {
     const params: Record<string, unknown> = {};
     if (includeConceptImpacts) {
@@ -41,6 +47,9 @@ export class WatchtowerApi extends ApiService {
     }
     if (scanUuid) {
       params.scan_uuid = scanUuid;
+    }
+    if (watchtowerConfigUuid) {
+      params.watchtower_config_uuid = watchtowerConfigUuid;
     }
     return this.get<IWatchtowerDashboard>(endpoints.watchtowerDashboard, {
       params,
@@ -50,8 +59,14 @@ export class WatchtowerApi extends ApiService {
   /**
    * Get scan history (completed scans) for the account.
    */
-  getScanHistory() {
-    return this.get<IWatchtowerScanListItem[]>(endpoints.watchtowerScans);
+  getScanHistory(watchtowerConfigUuid?: string) {
+    const params: Record<string, unknown> = {};
+    if (watchtowerConfigUuid) {
+      params.watchtower_config_uuid = watchtowerConfigUuid;
+    }
+    return this.get<IWatchtowerScanListItem[]>(endpoints.watchtowerScans, {
+      params,
+    });
   }
 
   /**
@@ -59,8 +74,16 @@ export class WatchtowerApi extends ApiService {
    * Uses Gemini with Google Search for signal discovery.
    * Returns immediately with a task ID for tracking.
    */
-  refreshWatchtower() {
-    return this.post<IWatchtowerRefreshResponse>(endpoints.watchtowerRefresh);
+  refreshWatchtower(watchtowerConfigUuid?: string) {
+    const params: Record<string, unknown> = {};
+    if (watchtowerConfigUuid) {
+      params.watchtower_config_uuid = watchtowerConfigUuid;
+    }
+    return this.post<IWatchtowerRefreshResponse>(
+      endpoints.watchtowerRefresh,
+      undefined,
+      { params },
+    );
   }
 
   /**
@@ -117,5 +140,58 @@ export class WatchtowerApi extends ApiService {
       endpoints.watchtowerSignalTracking(signalId),
       { isTracked },
     );
+  }
+
+  // ============================================
+  // Watchtower Configs
+  // ============================================
+
+  generateWatchtowerRules(description: string, files?: File[]) {
+    const formData = new FormData();
+    formData.append('description', description);
+    if (files) {
+      files.forEach((file) => formData.append('files', file));
+    }
+    return this.post<IWatchtowerRuleGenerationResponse>(
+      endpoints.watchtowerConfigGenerateRules,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    );
+  }
+
+  createWatchtowerConfig(data: ICreateWatchtowerConfigPayload) {
+    return this.post<IWatchtowerConfigDetail>(
+      endpoints.watchtowerConfigs,
+      data,
+    );
+  }
+
+  getWatchtowerConfigs() {
+    return this.get<IWatchtowerConfigListItem[]>(endpoints.watchtowerConfigs);
+  }
+
+  getWatchtowerConfig(uuid: string) {
+    return this.get<IWatchtowerConfigDetail>(endpoints.watchtowerConfig(uuid));
+  }
+
+  deleteWatchtowerConfig(uuid: string) {
+    return this.delete(endpoints.watchtowerConfig(uuid));
+  }
+
+  scanWatchtowerConfig(uuid: string) {
+    return this.post<IWatchtowerRefreshResponse>(
+      endpoints.watchtowerConfigScan(uuid),
+    );
+  }
+
+  addWatchtowerConfigRule(configUuid: string, ruleText: string) {
+    return this.post<IWatchtowerConfigRule>(
+      endpoints.watchtowerConfigRules(configUuid),
+      { rule_text: ruleText },
+    );
+  }
+
+  deleteWatchtowerConfigRule(configUuid: string, ruleUuid: string) {
+    return this.delete(endpoints.watchtowerConfigRule(configUuid, ruleUuid));
   }
 }

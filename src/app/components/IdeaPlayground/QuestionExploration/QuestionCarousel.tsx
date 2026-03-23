@@ -482,6 +482,17 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     }
   };
 
+  const handleUserAnswerEdit = async (questionId: string, answer: string) => {
+    if (!seedUuid) return;
+
+    await api.ideaPlayground.addUserAnswer(seedUuid, questionId, answer.trim());
+    debouncedInvalidate([AucctusQueryKeys.ideaPlaygroundQuestions, seedUuid]);
+    telemetry.log('ideaPlayground.userAnswer.edited', {
+      questionUuid: questionId,
+      answerLength: answer.trim().length,
+    });
+  };
+
   const handleSelectionChange = (
     questionId: string,
     cardId: string,
@@ -835,6 +846,7 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
                     onSelectionChange={handleSelectionChange}
                     onInsightDoubleClick={handleInsightDoubleClick}
                     onUserAnswerDelete={handleUserAnswerDelete}
+                    onUserAnswerSubmit={handleUserAnswerEdit}
                   />
                 </div>
               </div>

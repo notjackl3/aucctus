@@ -3,6 +3,7 @@ import {
   useAddOpportunityToConceptBank,
   useWatchtowerOpportunities,
 } from '@hooks/query/watchtower.hook';
+import { useWatchtowerView } from '../WatchtowerViewContext';
 import { DynamicIcon } from '@libs/utils/iconMap';
 import { cn } from '@libs/utils/react';
 import {
@@ -36,7 +37,11 @@ const urgencyConfig = {
  * ConceptOpportunitiesWidget - Signal-driven concept suggestions
  */
 const ConceptOpportunitiesWidget: React.FC = () => {
-  const { opportunities, isLoading } = useWatchtowerOpportunities();
+  const { activeWatchtowerConfigUuid, selectedScanUuid } = useWatchtowerView();
+  const { opportunities, isLoading } = useWatchtowerOpportunities(
+    selectedScanUuid,
+    activeWatchtowerConfigUuid,
+  );
   const { addToBank, addingOpportunityId } = useAddOpportunityToConceptBank();
 
   // Track opportunities added during this session for optimistic UI updates

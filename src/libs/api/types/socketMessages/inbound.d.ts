@@ -1077,6 +1077,7 @@ export interface IWatchtowerScanProgressMessage extends BaseSocketEvent {
   stage: string;
   progress: number;
   message: string;
+  watchtowerConfigUuid?: string | null;
 }
 
 export interface IWatchtowerScanCompletedMessage extends BaseSocketEvent {
@@ -1089,6 +1090,7 @@ export interface IWatchtowerScanCompletedMessage extends BaseSocketEvent {
   domainsCreated: number;
   opportunitiesCreated: number;
   message: string;
+  watchtowerConfigUuid?: string | null;
 }
 
 export interface IWatchtowerScanErrorMessage extends BaseSocketEvent {
@@ -1097,6 +1099,7 @@ export interface IWatchtowerScanErrorMessage extends BaseSocketEvent {
   error: string;
   message: string;
   details?: string;
+  watchtowerConfigUuid?: string | null;
 }
 
 // ==========================================
@@ -1126,6 +1129,29 @@ export interface IWatchtowerConceptImpactCompletedMessage
 export interface IWatchtowerConceptImpactErrorMessage extends BaseSocketEvent {
   type: 'watchtower.concept_impact.error.account';
   accountUuid: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
+// ==========================================
+// Watchtower Rule Generation Messages
+// ==========================================
+
+export interface IWatchtowerRuleGenerationCompletedMessage
+  extends BaseSocketEvent {
+  type: 'watchtower.rule_generation.completed.account';
+  accountUuid: string;
+  taskId: string;
+  name: string;
+  rules: string[];
+  message: string;
+}
+
+export interface IWatchtowerRuleGenerationErrorMessage extends BaseSocketEvent {
+  type: 'watchtower.rule_generation.error.account';
+  accountUuid: string;
+  taskId: string;
   error: string;
   message: string;
   details?: string;
@@ -1371,6 +1397,8 @@ export type InboundSocketEvent<C = {}> =
   | IWatchtowerConceptImpactProgressMessage
   | IWatchtowerConceptImpactCompletedMessage
   | IWatchtowerConceptImpactErrorMessage
+  | IWatchtowerRuleGenerationCompletedMessage
+  | IWatchtowerRuleGenerationErrorMessage
   | ICompetitorAssessmentScanProgressMessage
   | ICompetitorAssessmentScanCompletedMessage
   | ICompetitorAssessmentScanErrorMessage

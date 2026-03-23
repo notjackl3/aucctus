@@ -3,12 +3,7 @@ import ImageToggleControls from '@components/ConceptOverview/ImageToggleControls
 import ImageUploadButton from '@components/ConceptOverview/ImageUploadButton';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { cn } from '@libs/utils/react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@radix-ui/react-tooltip';
+import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import React from 'react';
@@ -127,36 +122,33 @@ const ConceptHero: React.FC<ConceptHeroProps> = ({
       <div className='relative flex flex-1 flex-col justify-center gap-4 px-8 py-6'>
         {/* Creator avatar */}
         {creator && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className='absolute right-4 top-4'>
-                  <div className='aucctus-bg-secondary aucctus-border-secondary flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full border'>
-                    {creator.profileImage ? (
-                      <img
-                        src={creator.profileImage}
-                        alt={`${creator.firstName} ${creator.lastName}`}
-                        className='h-full w-full object-cover'
-                      />
-                    ) : (
-                      <span className='aucctus-text-xs-medium aucctus-text-tertiary'>
-                        {creator.firstName?.charAt(0)}
-                        {creator.lastName?.charAt(0)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent
-                side='bottom'
-                className='aucctus-bg-primary aucctus-border-secondary rounded-md border px-3 py-1.5 text-sm shadow-md'
-              >
+          <ComponentTooltip
+            tip={
+              <div className='aucctus-bg-primary aucctus-border-secondary rounded-md border px-3 py-1.5 text-sm shadow-md'>
                 <p>
                   Created by {creator.firstName} {creator.lastName}
                 </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+              </div>
+            }
+            preferredPosition='below'
+          >
+            <div className='absolute right-4 top-4'>
+              <div className='aucctus-bg-secondary aucctus-border-secondary flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border'>
+                {creator.profileImage ? (
+                  <img
+                    src={creator.profileImage}
+                    alt={`${creator.firstName} ${creator.lastName}`}
+                    className='h-full w-full object-cover'
+                  />
+                ) : (
+                  <span className='aucctus-text-xs-medium aucctus-text-tertiary'>
+                    {creator.firstName?.charAt(0)}
+                    {creator.lastName?.charAt(0)}
+                  </span>
+                )}
+              </div>
+            </div>
+          </ComponentTooltip>
         )}
 
         <EditModeSwitcher

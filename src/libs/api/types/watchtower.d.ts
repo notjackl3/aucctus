@@ -267,3 +267,43 @@ export interface IWatchtowerRefreshStatus {
   domainsCreated?: number;
   opportunitiesCreated?: number;
 }
+
+// ============================================
+// Watchtower Config Types
+// ============================================
+
+export interface IWatchtowerConfigRule {
+  uuid: string;
+  ruleText: string;
+  isActive: boolean;
+}
+
+export interface IWatchtowerConfigDetail {
+  uuid: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+  rules: IWatchtowerConfigRule[];
+  createdAt: string;
+  lastScanAt?: string | null;
+  isScanning: boolean;
+}
+
+export interface IWatchtowerConfigListItem {
+  uuid: string;
+  name: string;
+  rulesCount: number;
+  lastScanAt?: string | null;
+  isScanning: boolean;
+}
+
+export interface ICreateWatchtowerConfigPayload {
+  name: string;
+  description: string;
+  rules: string[];
+}
+
+export interface IWatchtowerRuleGenerationResponse {
+  taskId: string;
+  message: string;
+}

@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { memo } from 'react';
-import { Pencil, Target } from 'lucide-react';
+import { Pencil, SendHorizontal, Target } from 'lucide-react';
 interface ManualAnswerEditProps {
   answer: string;
   originalAnswer?: string; // Track original answer to detect changes
@@ -20,6 +20,7 @@ const ManualAnswerEdit: React.FC<ManualAnswerEditProps> = memo(
     onCancel,
   }) => {
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+    const isSubmittingRef = React.useRef(false);
     const [showError, setShowError] = React.useState(false);
 
     // Position cursor at end when component mounts
@@ -55,10 +56,16 @@ const ManualAnswerEdit: React.FC<ManualAnswerEditProps> = memo(
         onCancel?.();
         return;
       }
+      isSubmittingRef.current = true;
       onSubmit(answer);
     };
 
     const handleBlur = () => {
+      // Skip blur if we just submitted via Enter/button click
+      if (isSubmittingRef.current) {
+        return;
+      }
+
       // Don't save empty strings on blur
       if (!answer.trim()) {
         return;
@@ -131,13 +138,25 @@ const ManualAnswerEdit: React.FC<ManualAnswerEditProps> = memo(
           )}
         </div>
 
-        <div className='mt-2 flex justify-end'>
-          <div className='inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-2 py-1 transition-colors hover:bg-white/15'>
+        <div className='mt-2 flex items-center justify-between'>
+          <div className='inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-2 py-1'>
             <Pencil size={12} className='aucctus-stroke-white' />
             <span className='aucctus-text-xs-medium max-w-[80px] truncate'>
               User Input
             </span>
           </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSubmit();
+            }}
+            disabled={isSubmitting || !answer.trim()}
+            className='inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-2.5 py-1 transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40'
+            title='Submit answer'
+          >
+            <SendHorizontal size={12} className='aucctus-stroke-white' />
+            <span className='aucctus-text-xs-medium'>Submit</span>
+          </button>
         </div>
       </>
     );
