@@ -149,20 +149,14 @@ const CompanyContextTab: React.FC<CompanyContextTabProps> = ({
     left: 0,
   });
 
-  const defaultSection: ContextSection = isAucctusAdminProp
-    ? 'overview'
-    : 'intelligence';
+  const defaultSection: ContextSection = 'intelligence';
   const activeSection: ContextSection =
     (searchParams.get('section') as ContextSection) || defaultSection;
 
   const setActiveSection = useCallback(
     (section: ContextSection) => {
       const newParams = new URLSearchParams(searchParams);
-      if (section === 'overview') {
-        newParams.delete('section');
-      } else {
-        newParams.set('section', section);
-      }
+      newParams.set('section', section);
       setSearchParams(newParams, { replace: true });
     },
     [searchParams, setSearchParams],

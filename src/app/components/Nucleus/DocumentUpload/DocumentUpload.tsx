@@ -46,8 +46,8 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ reportUuid }) => {
 
     const input = document.createElement('input');
     input.type = 'file';
-    input.multiple = false;
-    input.accept = '.pdf,.txt';
+    input.multiple = true;
+    input.accept = '.pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx';
     input.onchange = (e) => {
       const files = (e.target as HTMLInputElement).files;
       handleFileUpload(files);
@@ -107,7 +107,7 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ reportUuid }) => {
                     : 'Drop file here or click to browse'}
                 </p>
                 <p className='aucctus-text-xs aucctus-text-secondary'>
-                  PDF, TXT (max 10MB)
+                  PDF, TXT, DOC, DOCX, XLS, XLSX, PPT, PPTX (max 100MB)
                 </p>
               </>
             )}

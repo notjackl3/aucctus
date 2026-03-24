@@ -1,32 +1,32 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  FileText,
-  Upload,
-  Lock,
-  ChevronRight,
-  Trash2,
-  FileSpreadsheet,
-  FileType,
-  Presentation,
-  File,
-  Loader2,
-  AlertCircle,
-} from 'lucide-react';
-import {
-  useNucleusDocuments,
-  useNucleusReportLatest,
-  useNucleusDocumentUpload,
-  useDeleteNucleusDocument,
-} from '@hooks/query/nucleus.hook';
-import { useQueryClient } from 'react-query';
-import { AucctusQueryKeys } from '@hooks/query/query-keys';
-import Tooltip from '@components/ToolTip/Tooltip';
 import { toast } from '@components';
+import Tooltip from '@components/ToolTip/Tooltip';
 import { useModal } from '@context/ModalContextProvider';
+import {
+  useDeleteNucleusDocument,
+  useNucleusDocuments,
+  useNucleusDocumentUpload,
+  useNucleusReportLatest,
+} from '@hooks/query/nucleus.hook';
+import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import type { DocumentWithUsage } from '@libs/api/types/nucleus';
-import { X } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  AlertCircle,
+  ChevronRight,
+  File,
+  FileSpreadsheet,
+  FileText,
+  FileType,
+  Loader2,
+  Lock,
+  Presentation,
+  Trash2,
+  Upload,
+  X,
+} from 'lucide-react';
+import React, { useCallback, useRef, useState } from 'react';
+import { useQueryClient } from 'react-query';
 
 // Accepted file types for Nucleus documents
 const ACCEPTED_FILE_EXTENSIONS = [
@@ -35,7 +35,6 @@ const ACCEPTED_FILE_EXTENSIONS = [
   '.docx',
   '.xls',
   '.xlsx',
-  '.csv',
   '.ppt',
   '.pptx',
   '.txt',
@@ -46,7 +45,6 @@ const ACCEPTED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'application/vnd.ms-excel',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'text/csv',
   'application/vnd.ms-powerpoint',
   'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   'text/plain',
@@ -708,7 +706,7 @@ const UploadsTab: React.FC<UploadsTabProps> = ({ onNavigateToCategory }) => {
                   : 'Drop files or click to upload'}
             </p>
             <p className='aucctus-text-xs aucctus-text-quaternary'>
-              PDF, DOC, XLS, CSV, PPT
+              PDF, TXT, DOC, DOCX, XLS, XLSX, PPT, PPTX
             </p>
           </div>
           <div
@@ -793,11 +791,16 @@ const UploadsTab: React.FC<UploadsTabProps> = ({ onNavigateToCategory }) => {
                         <span>
                           {new Date(doc.createdAt).toLocaleDateString()}
                         </span>
-                        <span>&middot;</span>
-                        <span className='aucctus-text-brand-primary'>
-                          Used in {doc.categories.length} categor
-                          {doc.categories.length !== 1 ? 'ies' : 'y'}
-                        </span>
+                        {(!doc.processingStatus ||
+                          doc.processingStatus === 'completed') && (
+                          <>
+                            <span>&middot;</span>
+                            <span className='aucctus-text-brand-primary'>
+                              Used in {doc.categories.length} categor
+                              {doc.categories.length !== 1 ? 'ies' : 'y'}
+                            </span>
+                          </>
+                        )}
                         {doc.processingStatus &&
                           doc.processingStatus !== 'completed' && (
                             <>

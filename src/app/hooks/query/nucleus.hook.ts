@@ -109,6 +109,8 @@ export const useNucleusReport = (reportUuid?: string) => {
  * Returns a mutation function for uploading files with progress and error handling.
  */
 export const useNucleusDocumentUpload = () => {
+  const queryClient = useQueryClient();
+
   const { mutate, isLoading, error, isSuccess, reset } = useMutation({
     mutationFn: async ({
       reportUuid,
@@ -124,34 +126,57 @@ export const useNucleusDocumentUpload = () => {
         throw new Error('At least one file is required');
       }
 
-      // Validate file types (PDF, TXT)
-      const allowedTypes = ['application/pdf', 'text/plain'];
+      // Validate file types
+      const allowedTypes = [
+        'application/pdf',
+        'text/plain',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      ];
 
       const invalidFiles = files.filter(
         (file) => !allowedTypes.includes(file.type),
       );
       if (invalidFiles.length > 0) {
         throw new Error(
-          `Invalid file types: ${invalidFiles.map((f) => f.name).join(', ')}. Only PDF and TXT files are allowed.`,
+          `Invalid file types: ${invalidFiles.map((f) => f.name).join(', ')}. Supported types: PDF, TXT, DOC, DOCX, XLS, XLSX, PPT, PPTX.`,
         );
       }
 
-      // Validate file sizes (max 10MB per file)
-      const maxSize = 10 * 1024 * 1024; // 10MB
+      // Validate file sizes (max 100MB per file)
+      const maxSize = 100 * 1024 * 1024; // 100MB
       const oversizedFiles = files.filter((file) => file.size > maxSize);
       if (oversizedFiles.length > 0) {
         throw new Error(
-          `Files too large: ${oversizedFiles.map((f) => f.name).join(', ')}. Maximum size is 10MB per file.`,
+          `Files too large: ${oversizedFiles.map((f) => f.name).join(', ')}. Maximum size is 100MB per file.`,
         );
       }
 
       return await api.nucleus.uploadDocuments(reportUuid, files);
     },
-    onSuccess: (data, variables) => {
-      toast.success(
-        'Documents Uploaded',
-        `Successfully uploaded ${variables.files.length} document${variables.files.length > 1 ? 's' : ''} for processing`,
-      );
+    onSuccess: (data) => {
+      const uploadedCount = data.sources.length;
+      const errorCount = data.errors.length;
+
+      if (errorCount > 0 && uploadedCount > 0) {
+        toast.success(
+          'Partial Upload',
+          `Uploaded ${uploadedCount} file${uploadedCount > 1 ? 's' : ''}, but ${errorCount} failed validation.`,
+        );
+      } else {
+        toast.success(
+          'Documents Uploaded',
+          `Successfully uploaded ${uploadedCount} document${uploadedCount > 1 ? 's' : ''} for processing`,
+        );
+      }
+      // Invalidate documents list to show newly uploaded files
+      queryClient.invalidateQueries([AucctusQueryKeys.nucleusDocuments]);
+      // Invalidate nucleus report to refresh answers/sources
+      queryClient.invalidateQueries([AucctusQueryKeys.nucleusReportLatest]);
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);

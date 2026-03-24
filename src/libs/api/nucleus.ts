@@ -22,6 +22,7 @@ import {
   DocumentUsage,
   CompanyLookupRequest,
   CompanyLookupResponse,
+  BatchUploadResponse,
 } from './types/nucleus';
 import type {
   INucleusOverviewWidget,
@@ -286,11 +287,15 @@ export class NucleusApi extends ApiService {
       formData.append('files', file);
     });
 
-    return this.post(endpoints.nucleusDocuments(reportUuid), formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
+    return this.post<BatchUploadResponse>(
+      endpoints.nucleusDocuments(reportUuid),
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       },
-    });
+    );
   }
 
   emailWhenReady(reportUuid: string) {

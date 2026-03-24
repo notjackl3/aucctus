@@ -658,7 +658,7 @@ const NucleusPage: React.FC = () => {
                 onNavigateToCategory={(categoryId) => {
                   // Switch to intelligence section and expand the category
                   const newParams = new URLSearchParams(searchParams);
-                  newParams.delete('section'); // intelligence is the default
+                  newParams.set('section', 'intelligence');
                   setSearchParams(newParams, { replace: true });
                   setExpandedCategory(categoryId);
                   requestAnimationFrame(() => {

@@ -8,7 +8,7 @@ export type ProcessingStatus =
   | 'failed';
 export type Priority = 'P1' | 'P2' | 'P3';
 export type Answerability = 'public' | 'internal' | 'mixed';
-export type ConfidenceLevel = 'high' | 'medium' | 'low';
+export type ConfidenceLevel = 'high' | 'medium' | 'low' | 'none';
 export type AssessmentStatus =
   | 'validated'
   | 'new_details'
@@ -387,4 +387,37 @@ export interface CompanyLookupResponse {
   headquarters: string | null;
   websiteDomain: string | null;
   confidence: number;
+}
+
+// ============================================
+// Batch Upload Response Types
+// ============================================
+
+/**
+ * Error detail for a single file that failed validation during batch upload
+ */
+export interface UploadError {
+  filename: string;
+  error: string;
+}
+
+/**
+ * Response for a single successfully uploaded file
+ */
+export interface UploadedSource {
+  uuid: string;
+  title: string;
+  originalFilename: string;
+  fileSize: number;
+  contentType: string;
+}
+
+/**
+ * Response from batch file upload with partial success support
+ * Returned by POST /api/v1/nucleus-reports/{uuid}/documents
+ */
+export interface BatchUploadResponse {
+  nucleusReportUuid: string;
+  sources: UploadedSource[];
+  errors: UploadError[];
 }

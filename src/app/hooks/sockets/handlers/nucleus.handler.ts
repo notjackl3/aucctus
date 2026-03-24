@@ -12,7 +12,6 @@ import type {
   INucleusOverviewErrorMessage,
   INucleusOverviewProgressMessage,
 } from '@libs/api/types';
-import type { DocumentWithUsage } from '@libs/api/types/nucleus';
 
 export const useNucleusHandler = (
   preventDuplicate: (key: string) => boolean,
@@ -24,23 +23,11 @@ export const useNucleusHandler = (
     'nucleus_upload.progress.account',
     INucleusUploadProgressMessage
   >('nucleus_upload.progress.account', (message) => {
-    // Per-document status update: optimistically update React Query cache
+    // Per-document status update: invalidate documents query to refetch from server
     if (message.sourceUuid && message.processingStatus) {
-      queryClient.setQueryData<DocumentWithUsage[] | undefined>(
-        [AucctusQueryKeys.nucleusDocuments],
-        (oldData) => {
-          if (!oldData) return oldData;
-          return oldData.map((doc) =>
-            doc.uuid === message.sourceUuid
-              ? {
-                  ...doc,
-                  processingStatus:
-                    message.processingStatus as DocumentWithUsage['processingStatus'],
-                }
-              : doc,
-          );
-        },
-      );
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.nucleusDocuments],
+      });
     }
 
     if (message.stage === 'completed') {
