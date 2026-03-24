@@ -12,17 +12,17 @@ import {
   useRef,
   useState,
 } from 'react';
+import CustomerAlternatives from './CustomerAlternatives';
 import CustomerConversation from './CustomerConversation';
 import CustomerJobs from './CustomerJobs';
+import CustomerKeyFacts from './CustomerKeyFacts';
+import CustomerMotivationsAndBehaviours from './CustomerMotivationsAndBehaviours';
 import CustomerOverview from './CustomerOverview';
 import CustomerPains from './CustomerPains';
-import CustomerAlternatives from './CustomerAlternatives';
 import CustomerSocialValues from './CustomerSocialValues';
-import CustomerMotivationsAndBehaviours from './CustomerMotivationsAndBehaviours';
-import CustomerKeyFacts from './CustomerKeyFacts';
 import PersonaQuotesCarousel from './PersonaQuotesCarousel';
-import WorkdayJourney from './WorkdayJourney';
 import UserJourneyFlow from './UserJourneyFlow';
+import WorkdayJourney from './WorkdayJourney';
 import RealWorldSignalList from './signals/RealWorldSignalList';
 
 const {
@@ -137,7 +137,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
   return (
     <div
       className={cn(
-        'flex h-full w-full flex-col items-start gap-6 self-stretch pb-32',
+        'flex h-full w-full flex-col items-start gap-6 self-stretch',
         className,
       )}
     >

@@ -35,7 +35,7 @@ export const IdeaPlaygroundSeedDisplay: React.FC<
     const questionsWithContent =
       anchorThought.questions?.filter(
         (q) =>
-          q.userAnswer ||
+          (q.userAnswers && q.userAnswers.length > 0) ||
           (q.possibleAnswers && q.possibleAnswers.length > 0) ||
           (q.researchInsights && q.researchInsights.length > 0),
       ).length || 0;
@@ -47,7 +47,7 @@ export const IdeaPlaygroundSeedDisplay: React.FC<
     const totalAnswers =
       anchorThought.questions?.reduce(
         (sum, q) =>
-          sum + (q.possibleAnswers?.length || 0) + (q.userAnswer ? 1 : 0),
+          sum + (q.possibleAnswers?.length || 0) + (q.userAnswers?.length || 0),
         0,
       ) || 0;
 

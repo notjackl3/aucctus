@@ -5,6 +5,7 @@ import Badge from './Badges'; // Object with badge components - keep for compati
 import Button from './Button';
 import Card from './Card'; // Object with card components - keep for compatibility
 import Chart from './Charts'; // Object with chart components - keep for compatibility
+import { ColorPicker } from './ColorPicker';
 import Container from './Container';
 import FileDropzone from './FileDropzone';
 import Header from './Header';
@@ -89,6 +90,7 @@ export {
   Chart, // This is an object with chart components - keep for compatibility
   ChromaticGlass,
   ChromaticGlassSelection,
+  ColorPicker,
   ComponentCarousel,
   ComponentTooltip,
   CompanyDetailPanel,

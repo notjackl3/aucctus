@@ -131,7 +131,7 @@ const MustWinPrioritiesWidget: React.FC<MustWinPrioritiesWidgetProps> = ({
         <div className='grid grid-cols-1 gap-3 md:grid-cols-3'>
           {priorities.map((priority, index) => {
             const color =
-              brandColorValues[index % brandColorValues.length] || '#333333';
+              brandColorValues[index % brandColorValues.length] || '#EA3E3E';
             const PriorityIcon = resolveIcon(priority.icon);
             return (
               <div

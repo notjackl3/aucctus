@@ -22,9 +22,9 @@ interface CompanyThesisWidgetProps {
 }
 
 const DEFAULT_COLORS = {
-  teal: '#C1DDDF',
-  purple: '#8F46E2',
-  dark: '#333333',
+  teal: '#EA3E3E',
+  purple: '#F46434',
+  dark: '#E7559E',
 };
 
 /** Inline editable text that becomes an input/textarea on click. */

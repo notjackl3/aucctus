@@ -74,14 +74,14 @@ export const AnchorQuestionCard: React.FC<AnchorQuestionCardProps> = ({
 
   const hasInsights = question.researchInsights?.length > 0;
   const hasPossibleAnswers = question.possibleAnswers?.length > 0;
-  const hasUserAnswer = !!question.userAnswer;
+  const hasUserAnswer = question.userAnswers?.length > 0;
   const hasContent = hasInsights || hasPossibleAnswers || hasUserAnswer;
 
   // Count total items
   const contentCount =
     (question.researchInsights?.length || 0) +
     (question.possibleAnswers?.length || 0) +
-    (question.userAnswer ? 1 : 0);
+    (question.userAnswers?.length || 0);
 
   return (
     <div
@@ -177,12 +177,20 @@ export const AnchorQuestionCard: React.FC<AnchorQuestionCardProps> = ({
             {hasContent ? (
               <div className='flex flex-col gap-6'>
                 {/* User Answer */}
-                {hasUserAnswer && question.userAnswer && (
+                {hasUserAnswer && (
                   <ContentSection
-                    title='Your Answer'
+                    title={
+                      question.userAnswers.length > 1
+                        ? `Your Answers (${question.userAnswers.length})`
+                        : 'Your Answer'
+                    }
                     icon='check-circle-broken'
                   >
-                    <UserAnswerBadge answer={question.userAnswer} />
+                    <div className='flex flex-col gap-2'>
+                      {question.userAnswers.map((ua) => (
+                        <UserAnswerBadge key={ua.uuid} answer={ua} />
+                      ))}
+                    </div>
                   </ContentSection>
                 )}
 

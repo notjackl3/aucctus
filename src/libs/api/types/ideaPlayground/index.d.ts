@@ -65,7 +65,7 @@ export interface ISavedAnchorQuestion {
   description?: string;
   possibleAnswers: ISavedPossibleAnswer[];
   researchInsights: ISavedResearchInsight[];
-  userAnswer?: ISavedUserAnswer | null;
+  userAnswers: ISavedUserAnswer[];
 }
 
 /**
@@ -137,7 +137,7 @@ export interface IAnchorQuestion {
   researchInsights?: IResearchInsight[];
   nucleusInsights?: INucleusInsight[];
   insights?: IResearchInsight[];
-  userAnswer?: IUserAnswer | null; // Single user answer per question
+  userAnswers: IUserAnswer[]; // User answers for this question (max 3)
   includedAnswers?: string[]; // UUIDs of answers that are selected/included for this question
   isCustomQuestion?: boolean; // True if user-created, false/undefined if AI-generated
   createdAt?: string;
@@ -371,7 +371,7 @@ export interface IBulkQuestion {
   research_insights?: IBulkInsight[];
   nucleus_insights?: IBulkInsight[];
   combined_insights?: IBulkInsight[];
-  user_answer?: IBulkUserAnswer | null;
+  user_answers: IBulkUserAnswer[];
   included_answers?: string[];
   is_custom_question?: boolean;
 }

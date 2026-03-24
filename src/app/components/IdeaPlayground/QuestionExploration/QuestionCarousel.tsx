@@ -464,12 +464,13 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
         inputValue.trim(),
       );
       debouncedInvalidate([AucctusQueryKeys.ideaPlaygroundQuestions, seedUuid]);
-      // Clear the input after successful submission
+      // Clear the input and hide the add-another field after successful submission
       setUserInputValue((prev) => {
         const newInput = { ...prev };
         delete newInput[currentQuestion.id];
         return newInput;
       });
+      setShowAddAnotherInput(false);
       telemetry.log('ideaPlayground.userAnswer.submitted', {
         questionUuid: currentQuestion.id,
         answerLength: inputValue.trim().length,
@@ -482,9 +483,21 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     }
   };
 
-  const handleUserAnswerEdit = async (questionId: string, answer: string) => {
+  const handleUserAnswerEdit = async (
+    questionId: string,
+    answer: string,
+    answerUuid?: string,
+  ) => {
     if (!seedUuid) return;
 
+    // Delete old answer before creating the replacement
+    if (answerUuid) {
+      await removeAnswerAsync({
+        seedUuid,
+        questionUuid: questionId,
+        answerUuid,
+      });
+    }
     await api.ideaPlayground.addUserAnswer(seedUuid, questionId, answer.trim());
     debouncedInvalidate([AucctusQueryKeys.ideaPlaygroundQuestions, seedUuid]);
     telemetry.log('ideaPlayground.userAnswer.edited', {
@@ -519,7 +532,11 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
   const handleUserAnswerDelete = async (questionId: string, card: any) => {
     if (!seedUuid) return;
     if (card.isSaved && card.userAnswerUuid) {
-      await removeAnswerAsync({ seedUuid, questionUuid: questionId });
+      await removeAnswerAsync({
+        seedUuid,
+        questionUuid: questionId,
+        answerUuid: card.userAnswerUuid,
+      });
     }
   };
 
@@ -527,8 +544,7 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     const question = apiQuestions.find((q) => q.uuid === questionId);
     const hasIncludedAnswers =
       question?.includedAnswers && question.includedAnswers.length > 0;
-    const hasUserAnswer =
-      question?.userAnswer !== undefined && question?.userAnswer !== null;
+    const hasUserAnswer = (question?.userAnswers?.length ?? 0) > 0;
     const hasSelectedInsights = (selectedInsights[questionId] || []).length > 0;
     return hasIncludedAnswers || hasUserAnswer || hasSelectedInsights;
   };
@@ -737,11 +753,19 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     return { isLoading: false, message: '' };
   }, [currentQuestion?.id, loadingOperations, apiQuestions]);
 
-  const hasUserAnswerOnScreen = useMemo(() => {
-    if (!currentQuestion?.id) return false;
+  const userAnswerCount = useMemo(() => {
+    if (!currentQuestion?.id) return 0;
     const currentApiQ = apiQuestions.find((q) => q.uuid === currentQuestion.id);
-    return !!currentApiQ?.userAnswer;
+    return currentApiQ?.userAnswers?.length ?? 0;
   }, [currentQuestion?.id, apiQuestions]);
+
+  // State for showing the "add another answer" input
+  const [showAddAnotherInput, setShowAddAnotherInput] = useState(false);
+
+  // Reset add-another input when navigating to a different question
+  useEffect(() => {
+    setShowAddAnotherInput(false);
+  }, [currentQuestion?.id]);
 
   // Render
   return (
@@ -807,7 +831,9 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
                   <QuestionCard
                     question={currentQuestion}
                     isAnswered={isQuestionAnswered(currentQuestion.id)}
-                    hasUserAnswer={hasUserAnswerOnScreen}
+                    userAnswerCount={userAnswerCount}
+                    showAddAnotherInput={showAddAnotherInput}
+                    onAddAnotherAnswer={() => setShowAddAnotherInput(true)}
                     customQuestionInput={
                       customQuestionInput[currentQuestion.id]
                     }

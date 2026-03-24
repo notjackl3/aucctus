@@ -52,6 +52,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { ColorPicker } from '@components/ColorPicker';
 
 /* ------------------------------------------------------------------ */
 /* Sortable color swatch                                               */
@@ -154,13 +155,6 @@ const PersonalizationTab: React.FC = () => {
     if (isEditingDomain) domainInputRef.current?.focus();
   }, [isEditingDomain]);
 
-  // Auto-open native color picker when panel opens
-  useEffect(() => {
-    if (colorPickerOpen) {
-      requestAnimationFrame(() => colorInputRef.current?.click());
-    }
-  }, [colorPickerOpen]);
-
   const saveName = useCallback(() => {
     const trimmed = editName.trim();
     if (trimmed && trimmed !== account?.name) {
@@ -177,7 +171,7 @@ const PersonalizationTab: React.FC = () => {
     setIsEditingDomain(false);
   }, [editDomain, account?.domain, updateAccountMutation]);
 
-  const colorInputRef = useRef<HTMLInputElement>(null);
+  const addColorBtnRef = useRef<HTMLButtonElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const hqInputRef = useRef<HTMLInputElement>(null);
 
@@ -258,13 +252,6 @@ const PersonalizationTab: React.FC = () => {
     },
     [uploadHqMutation],
   );
-
-  const addColor = useCallback(() => {
-    if (brandColors.length >= 5) return;
-    updateMutation.mutate({ colors: [...brandColors, newColor] });
-    setColorPickerOpen(false);
-    setNewColor('#6366F1');
-  }, [brandColors, newColor, updateMutation]);
 
   const removeColor = useCallback(
     (index: number) => {
@@ -455,48 +442,36 @@ const PersonalizationTab: React.FC = () => {
                 </SortableContext>
               </DndContext>
 
-              {brandColors.length < 5 && !colorPickerOpen && (
+              {brandColors.length < 5 && (
                 <motion.button
+                  ref={addColorBtnRef}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  onClick={() => setColorPickerOpen(true)}
+                  onClick={() => setColorPickerOpen((prev) => !prev)}
                   className='border-border/60 bg-muted/20 hover:border-primary/50 hover:bg-muted/40 flex h-14 w-14 items-center justify-center rounded-lg border-2 border-dashed transition-all'
                 >
                   <Plus className='aucctus-text-tertiary h-4 w-4' />
                 </motion.button>
               )}
 
-              {colorPickerOpen && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className='group relative'
-                >
-                  <input
-                    ref={colorInputRef}
-                    type='color'
+              <AnimatePresence>
+                {colorPickerOpen && (
+                  <ColorPicker
                     value={newColor}
-                    onChange={(e) => setNewColor(e.target.value)}
-                    className='border-border/40 h-14 w-14 cursor-pointer rounded-lg border'
+                    anchorRef={addColorBtnRef}
+                    onChange={(hex) => {
+                      if (brandColors.length < 5) {
+                        updateMutation.mutate({
+                          colors: [...brandColors, hex],
+                        });
+                      }
+                      setColorPickerOpen(false);
+                      setNewColor('#6366F1');
+                    }}
+                    onClose={() => setColorPickerOpen(false)}
                   />
-                  <div className='mt-1 flex items-center justify-center gap-1'>
-                    <button
-                      onClick={() => setColorPickerOpen(false)}
-                      className='aucctus-text-tertiary hover:aucctus-text-primary hover:bg-muted flex h-5 w-5 items-center justify-center rounded transition-colors'
-                      title='Cancel'
-                    >
-                      <X className='h-3 w-3' />
-                    </button>
-                    <button
-                      onClick={addColor}
-                      className='flex h-5 w-5 items-center justify-center rounded text-emerald-400 transition-colors hover:bg-emerald-500/20 hover:text-emerald-300'
-                      title='Save color'
-                    >
-                      <Check className='h-3 w-3' />
-                    </button>
-                  </div>
-                </motion.div>
-              )}
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         </div>

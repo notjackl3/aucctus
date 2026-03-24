@@ -68,12 +68,10 @@ export const useBulkQuestionsUpdate = ({
                 citation_validation_status: ri.citationValidationStatus,
               };
             }) || [],
-          user_answer: q.userAnswer
-            ? {
-                uuid: q.userAnswer.uuid,
-                answer: q.userAnswer.answer,
-              }
-            : null,
+          user_answers: q.userAnswers.map((ua) => ({
+            uuid: ua.uuid,
+            answer: ua.answer,
+          })),
           included_answers: q.includedAnswers || [],
           is_custom_question: q.isCustomQuestion || false,
         })),

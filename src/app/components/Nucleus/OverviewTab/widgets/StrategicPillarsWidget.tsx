@@ -204,7 +204,7 @@ const StrategicPillarsWidget: React.FC<StrategicPillarsWidgetProps> = ({
         {pillars.map((pillar, index) => {
           const isExpanded = expandedIndex === index;
           const color =
-            brandColorValues[index % brandColorValues.length] || '#333333';
+            brandColorValues[index % brandColorValues.length] || '#EA3E3E';
           const isLast = index === pillars.length - 1;
           const PillarIcon = resolveIcon(pillar.icon);
 

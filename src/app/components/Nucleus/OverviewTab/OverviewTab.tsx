@@ -147,7 +147,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
   const account = useStore((state) => state.auth.account);
   const accountUuid = account?.uuid;
 
-  const brandColors = branding?.colors ?? [];
+  // Fall back to Aucctus default palette (matches FloatingSearchBar orb fallbacks)
+  // when no custom brand colors are set, instead of Beems-era widget defaults.
+  const brandColors =
+    branding?.colors && branding.colors.length > 0
+      ? branding.colors
+      : ['#EA3E3E', '#F46434', '#E7559E', '#F2995A'];
 
   // Edit mode state
   const [isEditMode, setIsEditMode] = useState(false);

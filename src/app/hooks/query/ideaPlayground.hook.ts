@@ -12,6 +12,8 @@ import type {
   IResearchInsight,
   IPossibleAnswer,
   IConceptGenerationResponse,
+  IAnchorQuestion,
+  IUserAnswer,
 } from '@libs/api/types';
 
 /**
@@ -404,21 +406,64 @@ export const useAddUserAnswer = (seedUuid: string, questionUuid: string) => {
         answer,
       );
     },
+    onMutate: async (answer: string) => {
+      // Cancel outgoing refetches so they don't overwrite our optimistic update
+      await queryClient.cancelQueries([
+        AucctusQueryKeys.ideaPlaygroundQuestions,
+        seedUuid,
+      ]);
+      const previousQuestions = queryClient.getQueryData<IAnchorQuestion[]>([
+        AucctusQueryKeys.ideaPlaygroundQuestions,
+        seedUuid,
+      ]);
+      // Optimistically append a temporary answer
+      if (previousQuestions) {
+        const tempUuid = crypto.randomUUID();
+        const optimisticAnswer: IUserAnswer = {
+          uuid: tempUuid,
+          questionUuid,
+          answer,
+          createdAt: new Date().toISOString(),
+        };
+        queryClient.setQueryData<IAnchorQuestion[]>(
+          [AucctusQueryKeys.ideaPlaygroundQuestions, seedUuid],
+          previousQuestions.map((q) =>
+            q.uuid === questionUuid
+              ? {
+                  ...q,
+                  userAnswers: [...q.userAnswers, optimisticAnswer],
+                  includedAnswers: [...(q.includedAnswers || []), tempUuid],
+                }
+              : q,
+          ),
+        );
+      }
+      return { previousQuestions };
+    },
     onSuccess: () => {
       toast.success('Answer saved');
       telemetry.log('ideaPlayground.userAnswer.saved', {
         questionUuid,
       });
-      // Invalidate questions to refresh included_answers list
+    },
+    onError: (e: AxiosError, _answer, context) => {
+      // Rollback on error
+      if (context?.previousQuestions) {
+        queryClient.setQueryData(
+          [AucctusQueryKeys.ideaPlaygroundQuestions, seedUuid],
+          context.previousQuestions,
+        );
+      }
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to save answer. Please try again.');
+      telemetry.error('ideaPlayground.userAnswer.save.failed', e);
+    },
+    onSettled: () => {
+      // Always refetch to get the real server data
       queryClient.invalidateQueries([
         AucctusQueryKeys.ideaPlaygroundQuestions,
         seedUuid,
       ]);
-    },
-    onError: (e: AxiosError) => {
-      const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to save answer. Please try again.');
-      telemetry.error('ideaPlayground.userAnswer.save.failed', e);
     },
   });
 
@@ -656,8 +701,8 @@ export const useExcludeAnswerLight = (successCallback?: () => void) => {
 };
 
 /**
- * Custom hook for removing the user's answer from a question entirely.
- * Deletes the single user answer for the question.
+ * Custom hook for removing a specific user answer from a question.
+ * Accepts answerUuid to delete an individual answer from the userAnswers list.
  *
  * This hook accepts parameters dynamically in the mutation function, making it suitable
  * for components that work with multiple questions (like carousels).
@@ -669,29 +714,75 @@ export const useRemoveUserAnswer = () => {
     mutationFn: async ({
       seedUuid,
       questionUuid,
+      answerUuid,
     }: {
       seedUuid: string;
       questionUuid: string;
+      answerUuid: string;
     }) => {
-      if (!seedUuid || !questionUuid) {
-        throw new Error('Seed UUID and Question UUID are required');
+      if (!seedUuid || !questionUuid || !answerUuid) {
+        throw new Error(
+          'Seed UUID, Question UUID, and Answer UUID are required',
+        );
       }
-      return await api.ideaPlayground.removeUserAnswer(seedUuid, questionUuid);
+      return await api.ideaPlayground.removeUserAnswer(
+        seedUuid,
+        questionUuid,
+        answerUuid,
+      );
     },
-    onSuccess: (_, { seedUuid, questionUuid }) => {
+    onMutate: async ({ seedUuid, questionUuid, answerUuid }) => {
+      await queryClient.cancelQueries([
+        AucctusQueryKeys.ideaPlaygroundQuestions,
+        seedUuid,
+      ]);
+      const previousQuestions = queryClient.getQueryData<IAnchorQuestion[]>([
+        AucctusQueryKeys.ideaPlaygroundQuestions,
+        seedUuid,
+      ]);
+      // Optimistically filter the answer from the list
+      if (previousQuestions) {
+        queryClient.setQueryData<IAnchorQuestion[]>(
+          [AucctusQueryKeys.ideaPlaygroundQuestions, seedUuid],
+          previousQuestions.map((q) =>
+            q.uuid === questionUuid
+              ? {
+                  ...q,
+                  userAnswers: q.userAnswers.filter(
+                    (ua) => ua.uuid !== answerUuid,
+                  ),
+                  includedAnswers: (q.includedAnswers || []).filter(
+                    (id) => id !== answerUuid,
+                  ),
+                }
+              : q,
+          ),
+        );
+      }
+      return { previousQuestions };
+    },
+    onSuccess: (_, { questionUuid }) => {
       telemetry.log('ideaPlayground.userAnswer.removed', {
         questionUuid,
       });
-      // Invalidate questions to refresh userAnswer field
+    },
+    onError: (e: AxiosError, { seedUuid }, context) => {
+      // Rollback on error
+      if (context?.previousQuestions) {
+        queryClient.setQueryData(
+          [AucctusQueryKeys.ideaPlaygroundQuestions, seedUuid],
+          context.previousQuestions,
+        );
+      }
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to remove answer. Please try again.');
+      telemetry.error('ideaPlayground.userAnswer.remove.failed', e);
+    },
+    onSettled: (_, __, { seedUuid }) => {
       queryClient.invalidateQueries([
         AucctusQueryKeys.ideaPlaygroundQuestions,
         seedUuid,
       ]);
-    },
-    onError: (e: AxiosError) => {
-      const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to remove answer. Please try again.');
-      telemetry.error('ideaPlayground.userAnswer.remove.failed', e);
     },
   });
 

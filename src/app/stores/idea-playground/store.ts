@@ -28,7 +28,7 @@ import {
  * - questions → useQuestions(seedUuid)
  * - possibleAnswers → questions[n].possibleAnswers
  * - researchInsights → questions[n].researchInsights
- * - userAnswers → questions[n].userAnswer
+ * - userAnswers → questions[n].userAnswers
  * - generatedConcepts → useConcepts(seedUuid) or query data
  * - loading states → React Query provides isLoading, isFetching
  */

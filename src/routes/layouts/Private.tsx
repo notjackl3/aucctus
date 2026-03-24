@@ -8,12 +8,12 @@ import { usePersonas } from '@hooks/query/persona.hook';
 import { useOverseerRouteConfig } from '@hooks/useOverseerRouteConfig';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
-import useStore from '@stores/store';
 import { useLayoutEditStore } from '@stores/layout-edit.store';
 import type {
   IOverseerPendingImage,
   MentionItem,
 } from '@stores/overseer/types';
+import useStore from '@stores/store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
@@ -58,7 +58,7 @@ const PrivateLayout = () => {
 
   // Floating search bar visibility — shown on all pages except excluded routes
   const isSearchBarVisible =
-    location.pathname !== '/playground' &&
+    !location.pathname.startsWith('/playground') &&
     !location.pathname.startsWith('/concept/incubate') &&
     !isOpen &&
     !isEditingLayout;
@@ -136,6 +136,7 @@ const PrivateLayout = () => {
               'w-[calc(100vw-15.5rem)]': !navCollapsed,
               'ml-[15.5rem]': !navCollapsed,
               'pr-[412px]': shouldApplyDockPadding,
+              'pb-20': isSearchBarVisible,
             },
           )}
         >

@@ -903,8 +903,9 @@ export class Endpoints {
   static ideaPlaygroundRemoveUserAnswer(
     seedUuid: string,
     questionUuid: string,
+    answerUuid: string,
   ) {
-    return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}/user-answer`;
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}/user-answer/${answerUuid}`;
   }
 
   static ideaPlaygroundGenerateIdeas(seedUuid: string) {

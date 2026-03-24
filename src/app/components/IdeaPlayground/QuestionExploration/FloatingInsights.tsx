@@ -28,7 +28,11 @@ interface FloatingInsightsProps {
   ) => void;
   onInsightDoubleClick: (insight: InsightCardType) => void;
   onUserAnswerDelete: (questionId: string, card: any) => Promise<void>;
-  onUserAnswerSubmit: (questionId: string, answer: string) => Promise<void>;
+  onUserAnswerSubmit: (
+    questionId: string,
+    answer: string,
+    answerUuid?: string,
+  ) => Promise<void>;
 }
 
 /**
@@ -81,23 +85,23 @@ const FloatingInsights: React.FC<FloatingInsightsProps> = ({
     });
   }
 
-  // Use a stable ID for both input and saved states to prevent re-animation
-  const manualAnswerCardId = `manual-answer-${currentQuestion.id}`;
-
-  // Add the saved user answer if it exists (only show saved answers, not input)
+  // Add saved user answers if they exist (only show saved answers, not input)
   if (
-    currentApiQuestion?.userAnswer &&
+    currentApiQuestion &&
+    currentApiQuestion.userAnswers.length > 0 &&
     !currentQuestion.id.startsWith('custom-')
   ) {
-    allCards.push({
-      id: manualAnswerCardId, // Use stable ID instead of UUID
-      insight: currentApiQuestion.userAnswer.answer,
-      source: 'User Answer',
-      type: 'manual' as any,
-      sentiment: 'neutral' as any,
-      isManual: true,
-      isSaved: true, // Mark as saved to trigger API delete
-      userAnswerUuid: currentApiQuestion.userAnswer.uuid, // Store UUID for deletion
+    currentApiQuestion.userAnswers.forEach((ua) => {
+      allCards.push({
+        id: `manual-answer-${ua.uuid}`, // Stable ID per answer to prevent re-animation
+        insight: ua.answer,
+        source: 'User Answer',
+        type: 'manual' as any,
+        sentiment: 'neutral' as any,
+        isManual: true,
+        isSaved: true, // Mark as saved to trigger API delete
+        userAnswerUuid: ua.uuid, // Store UUID for deletion
+      });
     });
   }
 
@@ -163,7 +167,11 @@ const FloatingInsights: React.FC<FloatingInsightsProps> = ({
                 onDoubleClick={() => onInsightDoubleClick(card)}
                 onDelete={() => onUserAnswerDelete(currentQuestion.id, card)}
                 onSubmit={(answer) =>
-                  onUserAnswerSubmit(currentQuestion.id, answer)
+                  onUserAnswerSubmit(
+                    currentQuestion.id,
+                    answer,
+                    card.userAnswerUuid,
+                  )
                 }
               />
             </div>

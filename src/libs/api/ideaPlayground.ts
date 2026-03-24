@@ -214,12 +214,20 @@ export class IdeaPlaygroundApi extends ApiService {
   }
 
   /**
-   * Remove the user's answer from a question entirely
-   * Deletes the single user answer for the question
+   * Remove a specific user answer from a question
+   * Deletes the user answer identified by answerUuid
    */
-  removeUserAnswer(seedUuid: string, questionUuid: string): Promise<void> {
+  removeUserAnswer(
+    seedUuid: string,
+    questionUuid: string,
+    answerUuid: string,
+  ): Promise<void> {
     return this.delete<void>(
-      endpoints.ideaPlaygroundRemoveUserAnswer(seedUuid, questionUuid),
+      endpoints.ideaPlaygroundRemoveUserAnswer(
+        seedUuid,
+        questionUuid,
+        answerUuid,
+      ),
     );
   }
 

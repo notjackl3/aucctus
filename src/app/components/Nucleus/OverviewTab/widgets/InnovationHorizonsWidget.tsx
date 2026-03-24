@@ -153,8 +153,8 @@ const InnovationHorizonsWidget: React.FC<InnovationHorizonsWidgetProps> = ({
   const current = horizons[selectedIndex];
   /** Resolve color for a horizon from brand colors by index */
   const getHorizonColor = (index: number) =>
-    brandColorValues[index % brandColorValues.length] || '#333';
-  const currentColor = current ? getHorizonColor(selectedIndex) : '#333';
+    brandColorValues[index % brandColorValues.length] || '#EA3E3E';
+  const currentColor = current ? getHorizonColor(selectedIndex) : '#EA3E3E';
   const [isAdding, setIsAdding] = useState(false);
   const [newLabel, setNewLabel] = useState('');
   const [newShortName, setNewShortName] = useState('');

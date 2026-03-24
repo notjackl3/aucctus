@@ -1,12 +1,14 @@
 import React, { useRef, useEffect } from 'react';
 import { Question } from '../types';
 import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
-import { Check } from 'lucide-react';
+import { Check, Plus } from 'lucide-react';
 
 interface QuestionCardProps {
   question: Question;
   isAnswered: boolean;
-  hasUserAnswer?: boolean;
+  userAnswerCount?: number;
+  showAddAnotherInput?: boolean;
+  onAddAnotherAnswer?: () => void;
   customQuestionInput?: string;
   isSubmittingCustomQuestion?: boolean;
   userInputValue?: string;
@@ -18,11 +20,14 @@ interface QuestionCardProps {
 }
 
 const MAX_QUESTION_LENGTH = 500;
+const MAX_USER_ANSWERS = 3;
 
 const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   isAnswered,
-  hasUserAnswer,
+  userAnswerCount = 0,
+  showAddAnotherInput,
+  onAddAnotherAnswer,
   customQuestionInput,
   isSubmittingCustomQuestion,
   userInputValue,
@@ -36,6 +41,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Autofocus the appropriate input when question changes
+  const showInput = userAnswerCount === 0 || showAddAnotherInput;
+
   useEffect(() => {
     const isCustom = question.id.startsWith('custom-');
     const hasQ = question.question;
@@ -44,13 +51,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     const timer = setTimeout(() => {
       if (isCustom && !hasQ) {
         textareaRef.current?.focus();
-      } else if (!isCustom && !hasUserAnswer) {
+      } else if (!isCustom && showInput) {
         inputRef.current?.focus();
       }
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [question.id, question.question, hasUserAnswer]);
+  }, [question.id, question.question, showInput]);
 
   const isCustomQuestion = question.id.startsWith('custom-');
   const hasQuestion = question.question;
@@ -134,8 +141,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             </p>
           </div>
 
-          {/* Inline answer input for non-custom questions without saved user answer */}
-          {!isCustomQuestion && !hasUserAnswer && (
+          {/* Inline answer input for non-custom questions */}
+          {!isCustomQuestion && showInput && (
             <div className='mt-4 border-t border-white/10 pt-4'>
               <input
                 ref={inputRef}
@@ -154,7 +161,11 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                   }
                 }}
                 onClick={(e) => e.stopPropagation()}
-                placeholder='Type your answer or select a bubble...'
+                placeholder={
+                  userAnswerCount > 0
+                    ? 'Type another answer...'
+                    : 'Type your answer or select a bubble...'
+                }
                 className='no-focus-ring w-full border-none bg-transparent text-left text-sm text-white/80 transition-all placeholder:text-white/30 focus:text-white focus:outline-none'
                 disabled={isSubmittingUserInput}
                 data-allow-arrow-navigation='true'
@@ -162,6 +173,28 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
               {isSubmittingUserInput && (
                 <p className='aucctus-text-xs mt-2 animate-pulse text-center text-white/70'>
                   Saving...
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Add another answer button or max reached message */}
+          {!isCustomQuestion && userAnswerCount > 0 && !showAddAnotherInput && (
+            <div className='mt-4 border-t border-white/10 pt-4 text-center'>
+              {userAnswerCount < MAX_USER_ANSWERS ? (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddAnotherAnswer?.();
+                  }}
+                  className='inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs text-white/60 transition-all duration-200 hover:border-white/40 hover:bg-white/10 hover:text-white/80'
+                >
+                  <Plus size={14} />
+                  Add another answer
+                </button>
+              ) : (
+                <p className='aucctus-text-xs text-white/40'>
+                  Maximum of {MAX_USER_ANSWERS} answers reached
                 </p>
               )}
             </div>

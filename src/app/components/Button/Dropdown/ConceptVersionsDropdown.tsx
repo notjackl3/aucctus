@@ -53,7 +53,7 @@ const ConceptVersionsDropdown: React.FC<ConceptVersionsDropdownProps> = ({
           <Loading />
         </span>
       ) : (
-        <div className='flex !max-h-[500px] flex-col gap-2 overflow-auto py-1'>
+        <div className='flex max-h-[350px] flex-col gap-2 overflow-auto py-1'>
           {versions && versions.versions.length > 0 ? (
             versions.versions.map((v: IConceptVersion) => (
               <ConceptVersionCard
