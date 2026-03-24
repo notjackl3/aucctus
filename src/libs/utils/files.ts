@@ -20,6 +20,25 @@ export const downloadPdf = async (
 };
 
 /**
+ * Downloads an Excel file from a blob response
+ * @param xlsxBlob - The Excel blob data
+ * @param fileName - The desired filename for the downloaded file
+ */
+export const downloadExcel = (xlsxBlob: BlobPart, fileName: string): void => {
+  const blob = new Blob([xlsxBlob], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+/**
  * Generates a filename for a concept snapshot
  * @param companyName - The company name
  * @param conceptTitle - The concept title

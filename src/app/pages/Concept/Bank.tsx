@@ -30,9 +30,18 @@ import { AppPath } from '@routes/routes';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import useStore from '@stores/store';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, ChevronDown, Link2, Upload } from 'lucide-react';
+import {
+  Check,
+  ChevronDown,
+  Download,
+  Link2,
+  Loader2,
+  Upload,
+} from 'lucide-react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Lightbulb, Rocket } from 'lucide-react';
+import api from '@libs/api';
+import { downloadExcel } from '@libs/utils/files';
 
 export const CONCEPT_STATUS_LIST_MAP = {
   draft: DRAFT_CONCEPT_STATUS_LIST,
@@ -169,6 +178,58 @@ const ConceptBank: React.FC = () => {
       },
     );
   }, [openModal]);
+
+  const [isExporting, setIsExporting] = React.useState(false);
+  const isExportingRef = React.useRef(false);
+
+  const handleExportCsv = useCallback(async () => {
+    if (isExportingRef.current) return;
+    isExportingRef.current = true;
+    setIsExporting(true);
+    try {
+      const opts = conceptFilterOptions;
+      const xlsxBlob = await api.concept.exportConceptsXlsx({
+        status:
+          opts.status && opts.status.size > 0
+            ? Array.from(opts.status).join(',')
+            : undefined,
+        createdBy:
+          opts.createdBy && opts.createdBy.size > 0
+            ? Array.from(opts.createdBy)
+                .map((user) => `${user.firstName} ${user.lastName}`)
+                .join(',')
+            : undefined,
+        lastModifiedBy:
+          opts.lastModifiedBy && opts.lastModifiedBy.size > 0
+            ? Array.from(opts.lastModifiedBy)
+                .map((user) => `${user.firstName} ${user.lastName}`)
+                .join(',')
+            : undefined,
+        search: opts.search,
+        sort: opts.sort,
+        properties:
+          opts.propertyFilters && opts.propertyFilters.length > 0
+            ? JSON.stringify(
+                opts.propertyFilters.map((filter) => ({
+                  ...filter,
+                  value:
+                    typeof filter.value === 'boolean'
+                      ? String(filter.value)
+                      : filter.value,
+                })),
+              )
+            : undefined,
+      });
+      const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
+      downloadExcel(xlsxBlob, `concepts-export-${date}.xlsx`);
+    } catch {
+      const { toast } = await import('@components');
+      toast.error('Failed to export concepts');
+    } finally {
+      isExportingRef.current = false;
+      setIsExporting(false);
+    }
+  }, [conceptFilterOptions]);
 
   const handleTabChange = useCallback(
     (tabPath: string) => {
@@ -673,6 +734,28 @@ const ConceptBank: React.FC = () => {
                   <Table.PropertyColumns.ColumnVisibilityMenu
                     propertyDefinitions={propertyDefinitions}
                   />
+                  <button
+                    className='aucctus-bg-secondary-hover flex h-8 items-center gap-1.5 rounded-md px-2 transition-colors duration-200'
+                    onClick={handleExportCsv}
+                    disabled={isExporting}
+                    aria-label='Export concepts to Excel'
+                    title='Export to Excel'
+                  >
+                    {isExporting ? (
+                      <Loader2
+                        size={16}
+                        className='aucctus-stroke-secondary animate-spin'
+                      />
+                    ) : (
+                      <Download
+                        size={16}
+                        className='aucctus-stroke-secondary'
+                      />
+                    )}
+                    <span className='aucctus-text-sm aucctus-text-secondary'>
+                      Export
+                    </span>
+                  </button>
                 </>
               )}
 

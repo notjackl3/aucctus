@@ -316,6 +316,13 @@ export class Endpoints {
     return utils.string.queryStringGenerator(this.concept, options);
   }
 
+  static conceptExportXlsx(options?: IConceptQueryOptions) {
+    return utils.string.queryStringGenerator(
+      'api/v1/concept/export/xlsx',
+      options,
+    );
+  }
+
   // TODO: Add trends and drivers and ecosystem endpoints for v2
 
   // Customer Jobs Endpoints

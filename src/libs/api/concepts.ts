@@ -927,4 +927,13 @@ export class ConceptApi extends ApiService {
       data,
     );
   }
+
+  /**
+   * Export concepts matching the current filters as a branded Excel file.
+   */
+  exportConceptsXlsx(options?: IConceptQueryOptions) {
+    return this.get<Blob>(endpoints.conceptExportXlsx(options), {
+      responseType: 'blob',
+    });
+  }
 }
