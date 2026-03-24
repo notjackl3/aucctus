@@ -250,10 +250,14 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
   ): InsightCardType => ({
     id: insight.uuid,
     insight: insight.insight,
-    source: insight?.sourceTitle || insight?.sourceUrl || 'nucleus',
-    url: insight?.sourceUrl || '',
+    source:
+      insight.sourceType === 'file'
+        ? insight.sourceTitle || 'Uploaded File'
+        : insight?.sourceTitle || insight?.sourceUrl || 'nucleus',
+    url: insight.sourceType === 'file' ? '' : insight?.sourceUrl || '',
     type: 'opportunity' as any,
     sentiment: insight.sentiment,
+    sourceType: insight.sourceType,
     moreDetails: insight.moreDetails,
     whyItMatters: insight.whyItMatters,
     citationValidationStatus: insight.citationValidationStatus,

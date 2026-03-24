@@ -8,4 +8,5 @@
 export { IdeaPlaygroundSeedDisplay } from './IdeaPlaygroundSeedDisplay';
 export { AnchorQuestionCard } from './AnchorQuestionCard';
 export { InsightBadge } from './InsightBadge';
+export { FileInsightBadge } from './FileInsightBadge';
 export { AnswerBadge } from './AnswerBadge';

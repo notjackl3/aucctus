@@ -9,7 +9,7 @@ import {
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { useDebouncedInvalidation } from '@hooks/query/useDebouncedInvalidation';
 import AucctusLogo from '@assets/aucctus_logo.png';
-import { Check, Link, Loader2 } from 'lucide-react';
+import { Check, FileText, Link, Loader2 } from 'lucide-react';
 interface ResearchInsightCardProps {
   card: InsightCardType;
   isSelected: boolean;
@@ -100,14 +100,15 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
 
   const isNucleusInsight =
     card.source?.toLowerCase().includes('nucleus report') || false;
+  const isFileInsight = card.sourceType === 'file';
 
   const handleDoubleClick = () => {
     if (clickTimerRef.current) {
       clearTimeout(clickTimerRef.current);
       clickTimerRef.current = null;
     }
-    // Don't open modal for Nucleus insights
-    if (isNucleusInsight) return;
+    // Don't open modal for Nucleus or File insights
+    if (isNucleusInsight || isFileInsight) return;
     onDoubleClick();
   };
 
@@ -118,6 +119,8 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
       clearTimeout(clickTimerRef.current);
       clickTimerRef.current = null;
     }
+    // File insights have no URL to open
+    if (isFileInsight) return;
     if (card.url) {
       window.open(card.url, '_blank', 'noopener,noreferrer');
     }
@@ -125,6 +128,20 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
 
   // Render source logo similar to SourceInfoBadge
   const renderSourceLogo = useMemo(() => {
+    // File insights: show document icon
+    if (isFileInsight) {
+      return (
+        <div
+          className={cn(
+            'flex items-center justify-center overflow-hidden rounded-full border border-transparent',
+            'h-4 w-4',
+          )}
+        >
+          <FileText size={12} className='aucctus-stroke-white' />
+        </div>
+      );
+    }
+
     const isNucleus = card.source?.toLowerCase().includes('nucleus') || false;
 
     if (isNucleus) {
@@ -167,7 +184,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
         )}
       </div>
     );
-  }, [card.url, card.source]);
+  }, [card.url, card.source, isFileInsight]);
 
   const displayTitle = useMemo(() => {
     let title = card.source;
@@ -223,13 +240,19 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
         <div
           className={cn(
             'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-white/30 bg-white/10 px-1.5 py-0.5 transition-colors',
-            card.source?.includes('Nucleus')
+            isFileInsight || card.source?.includes('Nucleus')
               ? 'cursor-default'
               : 'cursor-pointer hover:bg-white/15',
           )}
           onClick={handleSourceClick}
           onDoubleClick={handleSourceClick}
-          title={card.url ? `Open ${card.source}` : undefined}
+          title={
+            isFileInsight
+              ? card.source
+              : card.url
+                ? `Open ${card.source}`
+                : undefined
+          }
         >
           {getSentimentIcon(card.sentiment)}
 

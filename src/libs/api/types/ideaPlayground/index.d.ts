@@ -55,6 +55,16 @@ export interface ISavedUserAnswer {
 }
 
 /**
+ * Saved File Insight - Insight extracted from an uploaded document
+ */
+export interface ISavedFileInsight {
+  uuid: string;
+  insight: string;
+  sourceTitle: string;
+  sourceCredibility: number;
+}
+
+/**
  * Saved Anchor Question - Question with all nested data from saved seed
  * This is the structure returned when fetching a saved IDEA_PLAYGROUND seed
  */
@@ -65,6 +75,7 @@ export interface ISavedAnchorQuestion {
   description?: string;
   possibleAnswers: ISavedPossibleAnswer[];
   researchInsights: ISavedResearchInsight[];
+  fileInsights: ISavedFileInsight[];
   userAnswers: ISavedUserAnswer[];
 }
 
@@ -198,6 +209,7 @@ export interface IResearchInsight {
   sourceUrl: string;
   sourceTitle: string;
   sourceCredibility: number;
+  sourceType?: 'research' | 'nucleus' | 'file';
   moreDetails?: string | null;
   whyItMatters?: IWhyItMatters | null;
   citationValidationStatus?: CitationValidationStatus;
@@ -215,6 +227,7 @@ export interface INucleusInsight {
   sourceUrl: string;
   sourceTitle: string;
   sourceCredibility: number;
+  sourceType?: 'research' | 'nucleus' | 'file';
   moreDetails?: string | null;
   whyItMatters?: IWhyItMatters | null;
   citationValidationStatus?: CitationValidationStatus;
@@ -347,7 +360,7 @@ export interface IBulkPossibleAnswer {
 export interface IBulkInsight {
   uuid: string;
   insight: string;
-  source_type: 'research' | 'nucleus';
+  source_type: 'research' | 'nucleus' | 'file';
   source_url?: string;
   source_title?: string;
   source_credibility?: number;

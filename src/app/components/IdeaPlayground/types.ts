@@ -43,6 +43,7 @@ export interface InsightCard {
   source: string;
   type: 'data' | 'trend' | 'research' | 'example' | 'manual';
   sentiment: 'headwind' | 'tailwind' | 'neutral';
+  sourceType?: 'research' | 'nucleus' | 'file';
   isManual?: boolean;
   isSaved?: boolean;
   userAnswerUuid?: string;

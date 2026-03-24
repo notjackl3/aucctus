@@ -37,11 +37,15 @@ export const IdeaPlaygroundSeedDisplay: React.FC<
         (q) =>
           (q.userAnswers && q.userAnswers.length > 0) ||
           (q.possibleAnswers && q.possibleAnswers.length > 0) ||
-          (q.researchInsights && q.researchInsights.length > 0),
+          (q.researchInsights && q.researchInsights.length > 0) ||
+          (q.fileInsights && q.fileInsights.length > 0),
       ).length || 0;
     const totalInsights =
       anchorThought.questions?.reduce(
-        (sum, q) => sum + (q.researchInsights?.length || 0),
+        (sum, q) =>
+          sum +
+          (q.researchInsights?.length || 0) +
+          (q.fileInsights?.length || 0),
         0,
       ) || 0;
     const totalAnswers =

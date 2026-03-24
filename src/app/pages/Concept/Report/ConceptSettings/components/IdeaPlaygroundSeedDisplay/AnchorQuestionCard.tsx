@@ -3,6 +3,7 @@ import { Badge } from '@components';
 import type { ISavedAnchorQuestion } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { InsightBadge } from './InsightBadge';
+import { FileInsightBadge } from './FileInsightBadge';
 import { PossibleAnswerBadge, UserAnswerBadge } from './AnswerBadge';
 import { ChevronDown } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
@@ -73,13 +74,16 @@ export const AnchorQuestionCard: React.FC<AnchorQuestionCardProps> = ({
   const config = questionTypeConfig[question.questionType] || defaultConfig;
 
   const hasInsights = question.researchInsights?.length > 0;
+  const hasFileInsights = question.fileInsights?.length > 0;
   const hasPossibleAnswers = question.possibleAnswers?.length > 0;
   const hasUserAnswer = question.userAnswers?.length > 0;
-  const hasContent = hasInsights || hasPossibleAnswers || hasUserAnswer;
+  const hasContent =
+    hasInsights || hasFileInsights || hasPossibleAnswers || hasUserAnswer;
 
   // Count total items
   const contentCount =
     (question.researchInsights?.length || 0) +
+    (question.fileInsights?.length || 0) +
     (question.possibleAnswers?.length || 0) +
     (question.userAnswers?.length || 0);
 
@@ -220,6 +224,23 @@ export const AnchorQuestionCard: React.FC<AnchorQuestionCardProps> = ({
                     <div className='flex flex-col gap-2'>
                       {question.researchInsights?.map((insight) => (
                         <InsightBadge key={insight.uuid} insight={insight} />
+                      ))}
+                    </div>
+                  </ContentSection>
+                )}
+
+                {/* File Insights */}
+                {hasFileInsights && (
+                  <ContentSection
+                    title={`File Insights (${question.fileInsights?.length})`}
+                    icon='file-06'
+                  >
+                    <div className='flex flex-col gap-2'>
+                      {question.fileInsights?.map((insight) => (
+                        <FileInsightBadge
+                          key={insight.uuid}
+                          insight={insight}
+                        />
                       ))}
                     </div>
                   </ContentSection>

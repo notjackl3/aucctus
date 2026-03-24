@@ -47,18 +47,32 @@ export const useBulkQuestionsUpdate = ({
             })) || [],
           combined_insights:
             q.insights?.map((ri) => {
-              // Infer source_type from insight properties:
+              // Determine source_type from explicit field or infer from properties:
+              // - File: No URL and sourceTitle is a filename (not "Nucleus Report")
               // - Nucleus: sourceCredibility === 1 or sourceUrl is null with "Nucleus Report" title
               // - Research: Has actual sourceUrl and sourceTitle values
-              const isNucleus =
+              let sourceType: 'research' | 'nucleus' | 'file' = 'research';
+              if (ri.sourceType) {
+                sourceType = ri.sourceType;
+              } else if (
                 ri.sourceCredibility === 1 ||
-                (!ri.sourceUrl && ri.sourceTitle === 'Nucleus Report');
-              const sourceType = isNucleus ? 'nucleus' : 'research';
+                (!ri.sourceUrl && ri.sourceTitle === 'Nucleus Report')
+              ) {
+                sourceType = 'nucleus';
+              } else if (
+                !ri.sourceUrl &&
+                ri.sourceTitle &&
+                ri.sourceTitle !== 'Nucleus Report'
+              ) {
+                sourceType = 'file';
+              } else {
+                sourceType = 'research';
+              }
 
               return {
                 uuid: ri.uuid,
                 insight: ri.insight,
-                source_type: sourceType as 'research' | 'nucleus',
+                source_type: sourceType,
                 source_url: ri.sourceUrl,
                 source_title: ri.sourceTitle,
                 source_credibility: ri.sourceCredibility,
