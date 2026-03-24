@@ -802,7 +802,8 @@ const UploadsTab: React.FC<UploadsTabProps> = ({ onNavigateToCategory }) => {
                           </>
                         )}
                         {doc.processingStatus &&
-                          doc.processingStatus !== 'completed' && (
+                          doc.processingStatus !== 'completed' &&
+                          doc.categories.length === 0 && (
                             <>
                               <span>&middot;</span>
                               <ProcessingStatusBadge
