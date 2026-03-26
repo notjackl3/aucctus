@@ -8,6 +8,7 @@ import { usePersonas } from '@hooks/query/persona.hook';
 import { useOverseerRouteConfig } from '@hooks/useOverseerRouteConfig';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
+import { useInitiationStore } from '@stores/initiation.store';
 import { useLayoutEditStore } from '@stores/layout-edit.store';
 import type {
   IOverseerPendingImage,
@@ -56,12 +57,16 @@ const PrivateLayout = () => {
   // Hide search bar during persona widget layout editing
   const isEditingLayout = useLayoutEditStore((s) => s.isEditingLayout);
 
+  // Hide search bar during first-run initiation screens
+  const isShowingInitiation = useInitiationStore((s) => s.isShowingInitiation);
+
   // Floating search bar visibility — shown on all pages except excluded routes
   const isSearchBarVisible =
     !location.pathname.startsWith('/playground') &&
     !location.pathname.startsWith('/concept/incubate') &&
     !isOpen &&
-    !isEditingLayout;
+    !isEditingLayout &&
+    !isShowingInitiation;
 
   // Fetch branding for floating search bar orb colors
   const { branding } = useAccountBranding();

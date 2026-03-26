@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { cn } from '@libs/utils/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import images from '@assets/img';
 import { DynamicIcon } from '@libs/utils/iconMap';
+import { useInitiationStore } from '@stores/initiation.store';
 
 /**
  * Feature highlight item for the Watchtower initiation page
@@ -294,6 +295,14 @@ const WatchtowerInitiation: React.FC<WatchtowerInitiationProps> = ({
   onInitialize,
   isInitializing = false,
 }) => {
+  const setShowingInitiation = useInitiationStore(
+    (s) => s.setShowingInitiation,
+  );
+  useEffect(() => {
+    setShowingInitiation(true);
+    return () => setShowingInitiation(false);
+  }, [setShowingInitiation]);
+
   const [showContent, setShowContent] = useState(true);
   const [isFlashing, setIsFlashing] = useState(false);
 

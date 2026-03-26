@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useInitiationStore } from '@stores/initiation.store';
 import {
   ArrowLeft,
   Brain,
@@ -135,6 +136,14 @@ const DEFAULT_CONTEXT_QUESTIONS: Omit<ContextQuestion, 'answer'>[] = [
 const NucleusInitiation: React.FC<NucleusInitiationProps> = ({
   onComplete,
 }) => {
+  const setShowingInitiation = useInitiationStore(
+    (s) => s.setShowingInitiation,
+  );
+  useEffect(() => {
+    setShowingInitiation(true);
+    return () => setShowingInitiation(false);
+  }, [setShowingInitiation]);
+
   const [hasStarted, setHasStarted] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [currentStep, setCurrentStep] = useState<InitiationStep>('company');
