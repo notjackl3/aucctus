@@ -39,6 +39,7 @@ import {
   useDeleteWatchtowerConfigRule,
   useRefreshWatchtower,
   useToggleSignalTracking,
+  useWatchtowerConfigs,
   useWatchtowerDashboard,
   useWatchtowerSocketEvents,
 } from '@hooks/query/watchtower.hook';
@@ -551,6 +552,9 @@ const WatchtowerPageContent: React.FC = () => {
   const { logoUrl } = useAccountLogo();
   const companyLogoUrl = logoUrl || undefined;
 
+  // Fetch watchtower configs for the account
+  const { watchtowerConfigs } = useWatchtowerConfigs();
+
   // Fetch dashboard data from API with concept impacts, scoped by custom watchtower
   const {
     signals: apiSignals,
@@ -624,7 +628,7 @@ const WatchtowerPageContent: React.FC = () => {
 
   const handleRefresh = useCallback(() => {
     startScanning(activeWatchtowerConfigUuid); // Start showing progress immediately
-    triggerRefresh();
+    triggerRefresh(activeWatchtowerConfigUuid);
   }, [triggerRefresh, startScanning, activeWatchtowerConfigUuid]);
 
   // Determine if we're in a scanning state (either from mutation or WebSocket)
@@ -794,13 +798,25 @@ const WatchtowerPageContent: React.FC = () => {
   ];
 
   // Handle first-run initialization
-  const handleFirstRunInitialize = useCallback(async () => {
+  const handleFirstRunInitialize = useCallback(() => {
+    // Auto-select the first available config so the user lands on it
+    const defaultConfig = watchtowerConfigs[0];
+    const configUuid = defaultConfig?.uuid;
+    if (configUuid) {
+      setActiveWatchtowerConfigUuid(configUuid);
+    }
+
     // Set scan start time for progress bar
     setScanStartTime(Date.now());
-    // Trigger the scan
-    startScanning(activeWatchtowerConfigUuid);
-    triggerRefresh();
-  }, [startScanning, triggerRefresh, activeWatchtowerConfigUuid]);
+    // Trigger the scan, passing configUuid directly to bypass stale closure
+    startScanning(configUuid);
+    triggerRefresh(configUuid);
+  }, [
+    startScanning,
+    triggerRefresh,
+    watchtowerConfigs,
+    setActiveWatchtowerConfigUuid,
+  ]);
 
   // Determine which content to render based on current state.
   // The modal is rendered unconditionally below all branches.

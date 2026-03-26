@@ -527,8 +527,10 @@ export const useWatchtowerSocketEvents = (
  */
 export const useRefreshWatchtower = (watchtowerConfigUuid?: string) => {
   const mutation = useMutation({
-    mutationFn: async () => {
-      return await api.watchtower.refreshWatchtower(watchtowerConfigUuid);
+    mutationFn: async (overrideConfigUuid?: string) => {
+      return await api.watchtower.refreshWatchtower(
+        overrideConfigUuid ?? watchtowerConfigUuid,
+      );
     },
     onSuccess: () => {
       toast.success(
