@@ -929,6 +929,13 @@ export class ConceptApi extends ApiService {
   }
 
   /**
+   * Get UUIDs of all concepts matching the current filters (no pagination).
+   */
+  getConceptUuids(options?: IConceptQueryOptions) {
+    return this.get<string[]>(endpoints.conceptUuids(options));
+  }
+
+  /**
    * Export concepts matching the current filters as a branded Excel file.
    */
   exportConceptsXlsx(options?: IConceptQueryOptions) {

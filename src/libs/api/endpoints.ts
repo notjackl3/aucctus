@@ -316,6 +316,10 @@ export class Endpoints {
     return utils.string.queryStringGenerator(this.concept, options);
   }
 
+  static conceptUuids(options?: IConceptQueryOptions) {
+    return utils.string.queryStringGenerator('api/v1/concept/uuids', options);
+  }
+
   static conceptExportXlsx(options?: IConceptQueryOptions) {
     return utils.string.queryStringGenerator(
       'api/v1/concept/export/xlsx',

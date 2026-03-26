@@ -5,7 +5,6 @@ import {
   IConceptFilterOptions,
   useConceptBank,
 } from '@hooks/tables/concept-bank.hook';
-import api from '@libs/api';
 import React, { useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
@@ -15,7 +14,8 @@ type ConceptBankContextType = {
   updateTableFiltering: (value: Partial<IConceptFilterOptions>) => void;
   onSelectionChange: (uuids: string[], isAll: boolean, total: number) => void;
   isBulkEditOpen: boolean;
-  setIsBulkEditOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsBulkEditOpen: () => void;
+  resolvedBulkUuids: string[] | null;
 };
 
 const BankConcepts: React.FC = () => {
@@ -26,6 +26,7 @@ const BankConcepts: React.FC = () => {
     onSelectionChange,
     isBulkEditOpen,
     setIsBulkEditOpen,
+    resolvedBulkUuids,
   } = useOutletContext<ConceptBankContextType>();
 
   const hookResult = useConceptBank(filterOptions, updateTableFiltering);
@@ -37,7 +38,6 @@ const BankConcepts: React.FC = () => {
     numberOfPages,
     isLoading,
     selectedConceptUuids,
-    setRowSelection,
     isAllAcrossPagesSelected,
     totalCount,
     clearSelection,
@@ -66,79 +66,6 @@ const BankConcepts: React.FC = () => {
     onSelectionChange,
   ]);
 
-  // Resolve UUIDs for bulk edit when all-across-pages is selected
-  const [resolvedBulkUuids, setResolvedBulkUuids] = React.useState<
-    string[] | null
-  >(null);
-  const [isResolvingUuids, setIsResolvingUuids] = React.useState(false);
-
-  // When bulk edit opens with all-across-pages, fetch all UUIDs
-  React.useEffect(() => {
-    if (!isBulkEditOpen) {
-      setResolvedBulkUuids(null);
-      return;
-    }
-    if (!isAllAcrossPagesSelected) return;
-
-    let cancelled = false;
-    setIsResolvingUuids(true);
-
-    const fetchAllUuids = async () => {
-      try {
-        const opts = filterOptions;
-        const allData = await api.concept.getConcepts({
-          status:
-            opts.status && opts.status.size > 0
-              ? Array.from(opts.status).join(',')
-              : undefined,
-          createdBy:
-            opts.createdBy && opts.createdBy.size > 0
-              ? Array.from(opts.createdBy)
-                  .map((user) => `${user.firstName} ${user.lastName}`)
-                  .join(',')
-              : undefined,
-          lastModifiedBy:
-            opts.lastModifiedBy && opts.lastModifiedBy.size > 0
-              ? Array.from(opts.lastModifiedBy)
-                  .map((user) => `${user.firstName} ${user.lastName}`)
-                  .join(',')
-              : undefined,
-          search: opts.search,
-          sort: opts.sort,
-          properties:
-            opts.propertyFilters && opts.propertyFilters.length > 0
-              ? JSON.stringify(
-                  opts.propertyFilters.map((filter) => ({
-                    ...filter,
-                    value:
-                      typeof filter.value === 'boolean'
-                        ? String(filter.value)
-                        : filter.value,
-                  })),
-                )
-              : undefined,
-          pageSize: 5000,
-        });
-        if (!cancelled) {
-          setResolvedBulkUuids(allData.results.map((c) => c.uuid));
-        }
-      } catch {
-        if (!cancelled) {
-          const { toast } = await import('@components');
-          toast.error('Failed to load all concepts for bulk edit');
-          setIsBulkEditOpen(false);
-        }
-      } finally {
-        if (!cancelled) setIsResolvingUuids(false);
-      }
-    };
-
-    fetchAllUuids();
-    return () => {
-      cancelled = true;
-    };
-  }, [isBulkEditOpen, isAllAcrossPagesSelected, filterOptions]);
-
   const bulkEditUuids = isAllAcrossPagesSelected
     ? (resolvedBulkUuids ?? selectedConceptUuids)
     : selectedConceptUuids;
@@ -163,8 +90,8 @@ const BankConcepts: React.FC = () => {
 
       {/* Bulk Edit Modal */}
       <BulkEditConceptsModal
-        isOpen={isBulkEditOpen && !isResolvingUuids}
-        onClose={() => setIsBulkEditOpen(false)}
+        isOpen={isBulkEditOpen}
+        onClose={setIsBulkEditOpen}
         selectedConceptUuids={bulkEditUuids}
         onSuccess={clearSelection}
         onRescoreStarted={handleRescoreStarted}

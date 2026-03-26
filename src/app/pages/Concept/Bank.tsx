@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 
 import { Badge, Header, Input, Modal, Table } from '@components';
+import { toast } from '@components/Notification/toast';
 import CompactFilterRibbon from '@components/Tables/ConceptBank/CompactFilterRibbon';
 import { useModal } from '@context/ModalContextProvider';
 import { useAllUsers } from '@hooks/query/account.hook';
@@ -12,6 +13,7 @@ import { useSubmissionLinks } from '@hooks/query/idea-submissions.hook';
 import { usePropertyDefinitions } from '@hooks/query/properties.hook';
 import {
   IConceptFilterOptions,
+  serializeConceptFilters,
   useConceptBank,
 } from '@hooks/tables/concept-bank.hook';
 import {
@@ -157,6 +159,30 @@ const ConceptBank: React.FC = () => {
 
   // Bulk edit modal state (shared between toolbar pencil in Bank and modal in BankConcepts)
   const [isBulkEditOpen, setIsBulkEditOpen] = React.useState(false);
+  const [resolvedBulkUuids, setResolvedBulkUuids] = React.useState<
+    string[] | null
+  >(null);
+  const [isResolvingUuids, setIsResolvingUuids] = React.useState(false);
+
+  // Open bulk edit modal, resolving UUIDs first if all-across-pages is selected
+  const handleBulkEditOpen = useCallback(async () => {
+    if (!isAllAcrossPagesSelected) {
+      setIsBulkEditOpen(true);
+      return;
+    }
+    setIsResolvingUuids(true);
+    try {
+      const uuids = await api.concept.getConceptUuids(
+        serializeConceptFilters(conceptFilterOptions),
+      );
+      setResolvedBulkUuids(uuids);
+      setIsBulkEditOpen(true);
+    } catch {
+      toast.error('Failed to load all concepts for bulk edit');
+    } finally {
+      setIsResolvingUuids(false);
+    }
+  }, [isAllAcrossPagesSelected, conceptFilterOptions]);
 
   // Callback for BankConcepts to report selection changes
   const handleSelectionChange = useCallback(
@@ -209,7 +235,6 @@ const ConceptBank: React.FC = () => {
     isExportingRef.current = true;
     setIsExporting(true);
     try {
-      const opts = conceptFilterOptions;
       const hasIndividualSelection =
         selectedConceptUuids.length > 0 && !isAllAcrossPagesSelected;
 
@@ -217,44 +242,12 @@ const ConceptBank: React.FC = () => {
       // Otherwise export all matching current filters
       const exportParams = hasIndividualSelection
         ? { uuids: selectedConceptUuids.join(',') }
-        : {
-            status:
-              opts.status && opts.status.size > 0
-                ? Array.from(opts.status).join(',')
-                : undefined,
-            createdBy:
-              opts.createdBy && opts.createdBy.size > 0
-                ? Array.from(opts.createdBy)
-                    .map((user) => `${user.firstName} ${user.lastName}`)
-                    .join(',')
-                : undefined,
-            lastModifiedBy:
-              opts.lastModifiedBy && opts.lastModifiedBy.size > 0
-                ? Array.from(opts.lastModifiedBy)
-                    .map((user) => `${user.firstName} ${user.lastName}`)
-                    .join(',')
-                : undefined,
-            search: opts.search,
-            sort: opts.sort,
-            properties:
-              opts.propertyFilters && opts.propertyFilters.length > 0
-                ? JSON.stringify(
-                    opts.propertyFilters.map((filter) => ({
-                      ...filter,
-                      value:
-                        typeof filter.value === 'boolean'
-                          ? String(filter.value)
-                          : filter.value,
-                    })),
-                  )
-                : undefined,
-          };
+        : serializeConceptFilters(conceptFilterOptions);
 
       const xlsxBlob = await api.concept.exportConceptsXlsx(exportParams);
       const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
       downloadExcel(xlsxBlob, `concepts-export-${date}.xlsx`);
     } catch {
-      const { toast } = await import('@components');
       toast.error('Failed to export concepts');
     } finally {
       isExportingRef.current = false;
@@ -485,6 +478,12 @@ const ConceptBank: React.FC = () => {
     ? totalConceptCount
     : selectedConceptUuids.length;
 
+  // Wrap setIsBulkEditOpen to clear resolved UUIDs when closing
+  const handleBulkEditClose = useCallback(() => {
+    setIsBulkEditOpen(false);
+    setResolvedBulkUuids(null);
+  }, []);
+
   // Create context value for child components
   const outletContext = useMemo(
     () => ({
@@ -492,13 +491,16 @@ const ConceptBank: React.FC = () => {
       updateTableFiltering,
       onSelectionChange: handleSelectionChange,
       isBulkEditOpen,
-      setIsBulkEditOpen,
+      setIsBulkEditOpen: handleBulkEditClose,
+      resolvedBulkUuids,
     }),
     [
       filterOptions,
       updateTableFiltering,
       handleSelectionChange,
       isBulkEditOpen,
+      handleBulkEditClose,
+      resolvedBulkUuids,
     ],
   );
 
@@ -804,10 +806,18 @@ const ConceptBank: React.FC = () => {
                   {hasSelection && (
                     <button
                       className='aucctus-bg-secondary-hover relative flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-200'
-                      onClick={() => setIsBulkEditOpen(true)}
+                      onClick={handleBulkEditOpen}
+                      disabled={isResolvingUuids}
                       title={`Edit ${selectionCount} concepts`}
                     >
-                      <Pencil size={16} className='aucctus-stroke-primary' />
+                      {isResolvingUuids ? (
+                        <Loader2
+                          size={16}
+                          className='aucctus-stroke-primary animate-spin'
+                        />
+                      ) : (
+                        <Pencil size={16} className='aucctus-stroke-primary' />
+                      )}
                       <span className='aucctus-bg-brand-solid absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-medium text-white'>
                         {selectionCount}
                       </span>

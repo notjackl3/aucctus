@@ -20,6 +20,7 @@ import {
   ConceptStatus,
   IConcept,
   IConceptPage,
+  IConceptQueryOptions,
   IPropertyFilter,
   IUser,
   SortableConceptProperties,
@@ -78,6 +79,50 @@ const INITIAL_FILTER: IConceptFilterOptions = {
 };
 
 const PAGE_SIZE = 20;
+
+/**
+ * Serialize IConceptFilterOptions into IConceptQueryOptions-compatible params.
+ * Shared across the hook (query), Bank (export), and BankConcepts (UUID resolution).
+ */
+export function serializeConceptFilters(
+  opts: IConceptFilterOptions,
+): Pick<
+  IConceptQueryOptions,
+  'status' | 'createdBy' | 'lastModifiedBy' | 'search' | 'sort' | 'properties'
+> {
+  return {
+    status:
+      opts.status && opts.status.size > 0
+        ? Array.from(opts.status).join(',')
+        : undefined,
+    createdBy:
+      opts.createdBy && opts.createdBy.size > 0
+        ? Array.from(opts.createdBy)
+            .map((user) => `${user.firstName} ${user.lastName}`)
+            .join(',')
+        : undefined,
+    lastModifiedBy:
+      opts.lastModifiedBy && opts.lastModifiedBy.size > 0
+        ? Array.from(opts.lastModifiedBy)
+            .map((user) => `${user.firstName} ${user.lastName}`)
+            .join(',')
+        : undefined,
+    search: opts.search,
+    sort: opts.sort,
+    properties:
+      opts.propertyFilters && opts.propertyFilters.length > 0
+        ? JSON.stringify(
+            opts.propertyFilters.map((filter) => ({
+              ...filter,
+              value:
+                typeof filter.value === 'boolean'
+                  ? String(filter.value)
+                  : filter.value,
+            })),
+          )
+        : undefined,
+  };
+}
 
 function isSortableConceptProperty(
   value: string,
@@ -407,41 +452,12 @@ export const useConceptBank = (
   // Memoize the query options to prevent unnecessary API calls
   const queryOptions = useMemo(
     () => ({
-      status:
-        filterOptions.status && filterOptions.status.size > 0
-          ? Array.from(filterOptions.status).join(',')
-          : undefined,
-      createdBy:
-        filterOptions.createdBy && filterOptions.createdBy.size > 0
-          ? Array.from(filterOptions.createdBy)
-              .map((user) => `${user.firstName} ${user.lastName}`)
-              .join(',')
-          : undefined,
-      lastModifiedBy:
-        filterOptions.lastModifiedBy && filterOptions.lastModifiedBy.size > 0
-          ? Array.from(filterOptions.lastModifiedBy)
-              .map((user) => `${user.firstName} ${user.lastName}`)
-              .join(',')
-          : undefined,
-      search: filterOptions.search,
-      page: page,
-      sort: filterOptions.sort,
-      // Support multiple concurrent property filters with AND logic
-      properties:
-        filterOptions.propertyFilters &&
-        filterOptions.propertyFilters.length > 0
-          ? JSON.stringify(
-              filterOptions.propertyFilters.map((filter) => ({
-                ...filter,
-                // Convert boolean values to strings for API compatibility
-                value:
-                  typeof filter.value === 'boolean'
-                    ? String(filter.value)
-                    : filter.value,
-              })),
-            )
-          : undefined,
+      ...serializeConceptFilters(filterOptions),
+      page,
     }),
+    // Individual fields listed to avoid re-computing when filterOptions reference changes
+    // but values haven't (e.g., sortConfigs changes but API-relevant fields stay the same)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       filterOptions.status,
       filterOptions.createdBy,
@@ -470,9 +486,11 @@ export const useConceptBank = (
     }
   }, [isAllAcrossPagesSelected, data?.results]);
 
-  // Custom row selection handler that clears isAllAcrossPagesSelected when a row is deselected
-  // Uses refs to avoid recreating the callback on every selection change
+  // Custom row selection handler that clears isAllAcrossPagesSelected when a row is deselected.
+  // Uses refs instead of deps to avoid recreating the callback on every selection change,
+  // which would cause TanStack Table to re-render unnecessarily.
   const handleRowSelectionChange: OnChangeFn<RowSelectionState> =
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     React.useCallback((updaterOrValue) => {
       const newSelection =
         typeof updaterOrValue === 'function'
@@ -543,6 +561,10 @@ export const useConceptBank = (
 
   // Reset the filter function
   const resetFilter = React.useCallback(() => {
+    // Clear selection when filters are reset
+    setRowSelection({});
+    setIsAllAcrossPagesSelected(false);
+
     if (externalUpdateTableFiltering) {
       externalUpdateTableFiltering(INITIAL_FILTER);
     } else {
@@ -871,11 +893,9 @@ export const useConceptBank = (
       enableResizing: false,
       enableSorting: false,
       header: ({ table: tbl }) => {
-        const isAllPageSelected = tbl.getIsAllPageRowsSelected();
         const isSomeSelected = tbl.getIsSomePageRowsSelected();
-        const isChecked = isAllAcrossPagesSelected || isAllPageSelected;
-        const isIndeterminate =
-          !isAllAcrossPagesSelected && isSomeSelected && !isAllPageSelected;
+        const isChecked = isAllAcrossPagesSelected;
+        const isIndeterminate = !isAllAcrossPagesSelected && isSomeSelected;
         return (
           <div className='flex items-center justify-center'>
             <input
@@ -885,11 +905,10 @@ export const useConceptBank = (
               }}
               checked={isChecked}
               onChange={() => {
-                if (isAllAcrossPagesSelected || isAllPageSelected) {
+                if (isAllAcrossPagesSelected) {
                   setRowSelection({});
                   setIsAllAcrossPagesSelected(false);
                 } else {
-                  tbl.toggleAllPageRowsSelected(true);
                   setIsAllAcrossPagesSelected(true);
                 }
               }}
