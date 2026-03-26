@@ -36,6 +36,7 @@ import {
   Download,
   Link2,
   Loader2,
+  Pencil,
   Upload,
 } from 'lucide-react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -146,6 +147,27 @@ const ConceptBank: React.FC = () => {
     updateTableFiltering: updateSeedFiltering,
   } = useSeedsBank();
 
+  // Selection state lifted from BankConcepts for toolbar/header access
+  const [selectedConceptUuids, setSelectedConceptUuids] = React.useState<
+    string[]
+  >([]);
+  const [isAllAcrossPagesSelected, setIsAllAcrossPagesSelected] =
+    React.useState(false);
+  const [totalConceptCount, setTotalConceptCount] = React.useState(0);
+
+  // Bulk edit modal state (shared between toolbar pencil in Bank and modal in BankConcepts)
+  const [isBulkEditOpen, setIsBulkEditOpen] = React.useState(false);
+
+  // Callback for BankConcepts to report selection changes
+  const handleSelectionChange = useCallback(
+    (uuids: string[], isAll: boolean, total: number) => {
+      setSelectedConceptUuids(uuids);
+      setIsAllAcrossPagesSelected(isAll);
+      setTotalConceptCount(total);
+    },
+    [],
+  );
+
   // Store users in a ref to avoid infinite re-render loop in useCallback
   // (allUsers array reference changes on every render)
   const allUsersRef = React.useRef(allUsers);
@@ -188,38 +210,47 @@ const ConceptBank: React.FC = () => {
     setIsExporting(true);
     try {
       const opts = conceptFilterOptions;
-      const xlsxBlob = await api.concept.exportConceptsXlsx({
-        status:
-          opts.status && opts.status.size > 0
-            ? Array.from(opts.status).join(',')
-            : undefined,
-        createdBy:
-          opts.createdBy && opts.createdBy.size > 0
-            ? Array.from(opts.createdBy)
-                .map((user) => `${user.firstName} ${user.lastName}`)
-                .join(',')
-            : undefined,
-        lastModifiedBy:
-          opts.lastModifiedBy && opts.lastModifiedBy.size > 0
-            ? Array.from(opts.lastModifiedBy)
-                .map((user) => `${user.firstName} ${user.lastName}`)
-                .join(',')
-            : undefined,
-        search: opts.search,
-        sort: opts.sort,
-        properties:
-          opts.propertyFilters && opts.propertyFilters.length > 0
-            ? JSON.stringify(
-                opts.propertyFilters.map((filter) => ({
-                  ...filter,
-                  value:
-                    typeof filter.value === 'boolean'
-                      ? String(filter.value)
-                      : filter.value,
-                })),
-              )
-            : undefined,
-      });
+      const hasIndividualSelection =
+        selectedConceptUuids.length > 0 && !isAllAcrossPagesSelected;
+
+      // If individual concepts are selected, export only those via uuids param
+      // Otherwise export all matching current filters
+      const exportParams = hasIndividualSelection
+        ? { uuids: selectedConceptUuids.join(',') }
+        : {
+            status:
+              opts.status && opts.status.size > 0
+                ? Array.from(opts.status).join(',')
+                : undefined,
+            createdBy:
+              opts.createdBy && opts.createdBy.size > 0
+                ? Array.from(opts.createdBy)
+                    .map((user) => `${user.firstName} ${user.lastName}`)
+                    .join(',')
+                : undefined,
+            lastModifiedBy:
+              opts.lastModifiedBy && opts.lastModifiedBy.size > 0
+                ? Array.from(opts.lastModifiedBy)
+                    .map((user) => `${user.firstName} ${user.lastName}`)
+                    .join(',')
+                : undefined,
+            search: opts.search,
+            sort: opts.sort,
+            properties:
+              opts.propertyFilters && opts.propertyFilters.length > 0
+                ? JSON.stringify(
+                    opts.propertyFilters.map((filter) => ({
+                      ...filter,
+                      value:
+                        typeof filter.value === 'boolean'
+                          ? String(filter.value)
+                          : filter.value,
+                    })),
+                  )
+                : undefined,
+          };
+
+      const xlsxBlob = await api.concept.exportConceptsXlsx(exportParams);
       const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
       downloadExcel(xlsxBlob, `concepts-export-${date}.xlsx`);
     } catch {
@@ -229,7 +260,7 @@ const ConceptBank: React.FC = () => {
       isExportingRef.current = false;
       setIsExporting(false);
     }
-  }, [conceptFilterOptions]);
+  }, [conceptFilterOptions, selectedConceptUuids, isAllAcrossPagesSelected]);
 
   const handleTabChange = useCallback(
     (tabPath: string) => {
@@ -447,13 +478,28 @@ const ConceptBank: React.FC = () => {
     updateConceptFiltering,
   ]);
 
+  // Derived selection state for UI
+  const hasSelection =
+    selectedConceptUuids.length > 0 || isAllAcrossPagesSelected;
+  const selectionCount = isAllAcrossPagesSelected
+    ? totalConceptCount
+    : selectedConceptUuids.length;
+
   // Create context value for child components
   const outletContext = useMemo(
     () => ({
       filterOptions,
       updateTableFiltering,
+      onSelectionChange: handleSelectionChange,
+      isBulkEditOpen,
+      setIsBulkEditOpen,
     }),
-    [filterOptions, updateTableFiltering],
+    [
+      filterOptions,
+      updateTableFiltering,
+      handleSelectionChange,
+      isBulkEditOpen,
+    ],
   );
 
   return (
@@ -462,6 +508,32 @@ const ConceptBank: React.FC = () => {
       <div className='mb-4 flex flex-row items-start justify-between self-stretch'>
         <Header.One text='Concepts' />
         <div className='flex items-center gap-2'>
+          {/* Export button - only on Concepts tab */}
+          {!isDraftsRoute && !isPortfolioRoute && !isSubmissionsRoute && (
+            <button
+              className='btn btn-secondary relative flex h-10 items-center gap-1.5 px-3'
+              onClick={handleExportCsv}
+              disabled={isExporting}
+              aria-label='Export concepts to Excel'
+              title={
+                hasSelection
+                  ? `Export ${selectionCount} selected concepts`
+                  : 'Export to Excel'
+              }
+            >
+              {isExporting ? (
+                <Loader2 className='h-4 w-4 animate-spin' />
+              ) : (
+                <Download className='h-4 w-4' />
+              )}
+              Export
+              {hasSelection && (
+                <span className='aucctus-bg-brand-solid absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-medium text-white'>
+                  {selectionCount}
+                </span>
+              )}
+            </button>
+          )}
           <button
             className='btn btn-secondary flex h-10 w-10 items-center justify-center p-0'
             onClick={handleOpenImportModal}
@@ -728,34 +800,25 @@ const ConceptBank: React.FC = () => {
                       }
                     }}
                   />
+                  {/* Bulk Edit pencil icon - only visible when concepts are selected */}
+                  {hasSelection && (
+                    <button
+                      className='aucctus-bg-secondary-hover relative flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-200'
+                      onClick={() => setIsBulkEditOpen(true)}
+                      title={`Edit ${selectionCount} concepts`}
+                    >
+                      <Pencil size={16} className='aucctus-stroke-primary' />
+                      <span className='aucctus-bg-brand-solid absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-medium text-white'>
+                        {selectionCount}
+                      </span>
+                    </button>
+                  )}
                   <Table.PropertyColumns.PropertyManager
                     propertyDefinitions={propertyDefinitions}
                   />
                   <Table.PropertyColumns.ColumnVisibilityMenu
                     propertyDefinitions={propertyDefinitions}
                   />
-                  <button
-                    className='aucctus-bg-secondary-hover flex h-8 items-center gap-1.5 rounded-md px-2 transition-colors duration-200'
-                    onClick={handleExportCsv}
-                    disabled={isExporting}
-                    aria-label='Export concepts to Excel'
-                    title='Export to Excel'
-                  >
-                    {isExporting ? (
-                      <Loader2
-                        size={16}
-                        className='aucctus-stroke-secondary animate-spin'
-                      />
-                    ) : (
-                      <Download
-                        size={16}
-                        className='aucctus-stroke-secondary'
-                      />
-                    )}
-                    <span className='aucctus-text-sm aucctus-text-secondary'>
-                      Export
-                    </span>
-                  </button>
                 </>
               )}
 

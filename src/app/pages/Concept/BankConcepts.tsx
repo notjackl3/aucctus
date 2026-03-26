@@ -1,13 +1,11 @@
 import { Container, Table } from '@components';
-import { Pencil } from 'lucide-react';
 import BulkEditConceptsModal from '@components/Modal/BulkEditConceptsModal/BulkEditConceptsModal';
 import { useBulkPrioritySocketEvents } from '@hooks/query/concept-priority.hook';
 import {
   IConceptFilterOptions,
   useConceptBank,
 } from '@hooks/tables/concept-bank.hook';
-import { cn } from '@libs/utils/react';
-import { AnimatePresence, motion } from 'framer-motion';
+import api from '@libs/api';
 import React, { useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
@@ -15,12 +13,20 @@ import { useOutletContext } from 'react-router-dom';
 type ConceptBankContextType = {
   filterOptions: IConceptFilterOptions;
   updateTableFiltering: (value: Partial<IConceptFilterOptions>) => void;
+  onSelectionChange: (uuids: string[], isAll: boolean, total: number) => void;
+  isBulkEditOpen: boolean;
+  setIsBulkEditOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const BankConcepts: React.FC = () => {
   // Get context from parent
-  const { filterOptions, updateTableFiltering } =
-    useOutletContext<ConceptBankContextType>();
+  const {
+    filterOptions,
+    updateTableFiltering,
+    onSelectionChange,
+    isBulkEditOpen,
+    setIsBulkEditOpen,
+  } = useOutletContext<ConceptBankContextType>();
 
   const hookResult = useConceptBank(filterOptions, updateTableFiltering);
 
@@ -32,9 +38,11 @@ const BankConcepts: React.FC = () => {
     isLoading,
     selectedConceptUuids,
     setRowSelection,
+    isAllAcrossPagesSelected,
+    totalCount,
+    clearSelection,
   } = hookResult;
 
-  const [isBulkEditOpen, setIsBulkEditOpen] = React.useState(false);
   const { startCalculating } = useBulkPrioritySocketEvents();
 
   const handleRescoreStarted = useCallback(
@@ -44,44 +52,99 @@ const BankConcepts: React.FC = () => {
     [startCalculating],
   );
 
-  const selectedCount = selectedConceptUuids.length;
+  // Report selection changes to parent (Bank.tsx)
+  React.useEffect(() => {
+    onSelectionChange(
+      selectedConceptUuids,
+      isAllAcrossPagesSelected,
+      totalCount,
+    );
+  }, [
+    selectedConceptUuids,
+    isAllAcrossPagesSelected,
+    totalCount,
+    onSelectionChange,
+  ]);
+
+  // Resolve UUIDs for bulk edit when all-across-pages is selected
+  const [resolvedBulkUuids, setResolvedBulkUuids] = React.useState<
+    string[] | null
+  >(null);
+  const [isResolvingUuids, setIsResolvingUuids] = React.useState(false);
+
+  // When bulk edit opens with all-across-pages, fetch all UUIDs
+  React.useEffect(() => {
+    if (!isBulkEditOpen) {
+      setResolvedBulkUuids(null);
+      return;
+    }
+    if (!isAllAcrossPagesSelected) return;
+
+    let cancelled = false;
+    setIsResolvingUuids(true);
+
+    const fetchAllUuids = async () => {
+      try {
+        const opts = filterOptions;
+        const allData = await api.concept.getConcepts({
+          status:
+            opts.status && opts.status.size > 0
+              ? Array.from(opts.status).join(',')
+              : undefined,
+          createdBy:
+            opts.createdBy && opts.createdBy.size > 0
+              ? Array.from(opts.createdBy)
+                  .map((user) => `${user.firstName} ${user.lastName}`)
+                  .join(',')
+              : undefined,
+          lastModifiedBy:
+            opts.lastModifiedBy && opts.lastModifiedBy.size > 0
+              ? Array.from(opts.lastModifiedBy)
+                  .map((user) => `${user.firstName} ${user.lastName}`)
+                  .join(',')
+              : undefined,
+          search: opts.search,
+          sort: opts.sort,
+          properties:
+            opts.propertyFilters && opts.propertyFilters.length > 0
+              ? JSON.stringify(
+                  opts.propertyFilters.map((filter) => ({
+                    ...filter,
+                    value:
+                      typeof filter.value === 'boolean'
+                        ? String(filter.value)
+                        : filter.value,
+                  })),
+                )
+              : undefined,
+          pageSize: 5000,
+        });
+        if (!cancelled) {
+          setResolvedBulkUuids(allData.results.map((c) => c.uuid));
+        }
+      } catch {
+        if (!cancelled) {
+          const { toast } = await import('@components');
+          toast.error('Failed to load all concepts for bulk edit');
+          setIsBulkEditOpen(false);
+        }
+      } finally {
+        if (!cancelled) setIsResolvingUuids(false);
+      }
+    };
+
+    fetchAllUuids();
+    return () => {
+      cancelled = true;
+    };
+  }, [isBulkEditOpen, isAllAcrossPagesSelected, filterOptions]);
+
+  const bulkEditUuids = isAllAcrossPagesSelected
+    ? (resolvedBulkUuids ?? selectedConceptUuids)
+    : selectedConceptUuids;
 
   return (
     <>
-      {/* Bulk edit toolbar */}
-      <AnimatePresence>
-        {selectedCount > 0 && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className='overflow-hidden'
-          >
-            <div className='flex items-center gap-3 pb-2'>
-              <button
-                className={cn(
-                  'btn btn-secondary btn-sm relative flex items-center gap-2',
-                )}
-                onClick={() => setIsBulkEditOpen(true)}
-              >
-                <Pencil className='aucctus-stroke-primary h-4 w-4' />
-                Edit
-                <span className='aucctus-bg-brand-solid flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-xs font-medium text-white'>
-                  {selectedCount}
-                </span>
-              </button>
-              <button
-                className='btn btn-no-border btn-sm aucctus-text-tertiary'
-                onClick={() => setRowSelection({})}
-              >
-                Clear selection
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Table */}
       <Container.ConceptTableWrapper
         isLoading={isLoading}
@@ -100,10 +163,10 @@ const BankConcepts: React.FC = () => {
 
       {/* Bulk Edit Modal */}
       <BulkEditConceptsModal
-        isOpen={isBulkEditOpen}
+        isOpen={isBulkEditOpen && !isResolvingUuids}
         onClose={() => setIsBulkEditOpen(false)}
-        selectedConceptUuids={selectedConceptUuids}
-        onSuccess={() => setRowSelection({})}
+        selectedConceptUuids={bulkEditUuids}
+        onSuccess={clearSelection}
         onRescoreStarted={handleRescoreStarted}
       />
     </>

@@ -161,6 +161,9 @@ interface UseConceptBankResult {
     React.SetStateAction<Record<string, boolean>>
   >;
   selectedConceptUuids: string[];
+  isAllAcrossPagesSelected: boolean;
+  totalCount: number;
+  clearSelection: () => void;
 }
 
 export const useConceptBank = (
@@ -375,6 +378,14 @@ export const useConceptBank = (
     { id: 'createdAt', desc: true },
   ]);
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
+  const [isAllAcrossPagesSelected, setIsAllAcrossPagesSelected] =
+    React.useState(false);
+
+  // Refs for stable callback access (avoids recreating handleRowSelectionChange on every selection)
+  const rowSelectionRef = React.useRef(rowSelection);
+  rowSelectionRef.current = rowSelection;
+  const isAllAcrossPagesSelectedRef = React.useRef(isAllAcrossPagesSelected);
+  isAllAcrossPagesSelectedRef.current = isAllAcrossPagesSelected;
 
   // If we receive external filter options, use those instead
   React.useEffect(() => {
@@ -445,6 +456,49 @@ export const useConceptBank = (
   // Fetch concepts with memoized query options
   const { data, isLoading } = useConcepts(queryOptions);
 
+  // Ref for stable access to current page results
+  const dataResultsRef = React.useRef(data?.results);
+  dataResultsRef.current = data?.results;
+
+  // Auto-select all rows on current page when isAllAcrossPagesSelected and page data changes
+  React.useEffect(() => {
+    if (isAllAcrossPagesSelected && data?.results) {
+      const allPageRows = Object.fromEntries(
+        data.results.map((r) => [r.uuid, true]),
+      );
+      setRowSelection(allPageRows);
+    }
+  }, [isAllAcrossPagesSelected, data?.results]);
+
+  // Custom row selection handler that clears isAllAcrossPagesSelected when a row is deselected
+  // Uses refs to avoid recreating the callback on every selection change
+  const handleRowSelectionChange: OnChangeFn<RowSelectionState> =
+    React.useCallback((updaterOrValue) => {
+      const newSelection =
+        typeof updaterOrValue === 'function'
+          ? updaterOrValue(rowSelectionRef.current)
+          : updaterOrValue;
+
+      if (isAllAcrossPagesSelectedRef.current) {
+        const currentPageUuids =
+          dataResultsRef.current?.map((r) => r.uuid) || [];
+        const allCurrentPageSelected = currentPageUuids.every(
+          (uuid) => newSelection[uuid],
+        );
+        if (!allCurrentPageSelected) {
+          setIsAllAcrossPagesSelected(false);
+        }
+      }
+
+      setRowSelection(newSelection);
+    }, []);
+
+  // Atomically clear both row selection and all-across-pages state
+  const clearSelection = React.useCallback(() => {
+    setRowSelection({});
+    setIsAllAcrossPagesSelected(false);
+  }, []);
+
   // Fetch concept priorities
   const { priorities } = useConceptPriorities();
 
@@ -467,6 +521,10 @@ export const useConceptBank = (
   const updateTableFiltering = React.useCallback(
     (value: Partial<IConceptFilterOptions>) => {
       setPage(1); // avoid pagination issues
+
+      // Clear selection when filters change
+      setRowSelection({});
+      setIsAllAcrossPagesSelected(false);
 
       // Use external update function if provided, otherwise update local state
       if (externalUpdateTableFiltering) {
@@ -813,17 +871,28 @@ export const useConceptBank = (
       enableResizing: false,
       enableSorting: false,
       header: ({ table: tbl }) => {
-        const isAllSelected = tbl.getIsAllPageRowsSelected();
+        const isAllPageSelected = tbl.getIsAllPageRowsSelected();
         const isSomeSelected = tbl.getIsSomePageRowsSelected();
+        const isChecked = isAllAcrossPagesSelected || isAllPageSelected;
+        const isIndeterminate =
+          !isAllAcrossPagesSelected && isSomeSelected && !isAllPageSelected;
         return (
           <div className='flex items-center justify-center'>
             <input
               type='checkbox'
               ref={(el) => {
-                if (el) el.indeterminate = isSomeSelected && !isAllSelected;
+                if (el) el.indeterminate = isIndeterminate;
               }}
-              checked={isAllSelected}
-              onChange={tbl.getToggleAllPageRowsSelectedHandler()}
+              checked={isChecked}
+              onChange={() => {
+                if (isAllAcrossPagesSelected || isAllPageSelected) {
+                  setRowSelection({});
+                  setIsAllAcrossPagesSelected(false);
+                } else {
+                  tbl.toggleAllPageRowsSelected(true);
+                  setIsAllAcrossPagesSelected(true);
+                }
+              }}
               className='ml-1 h-4 w-4 cursor-pointer rounded-md border border-gray-300 accent-primary-500'
             />
           </div>
@@ -1399,6 +1468,7 @@ export const useConceptBank = (
     updateTableFiltering,
     localColumnOrder,
     wrappedColumns,
+    isAllAcrossPagesSelected,
   ]);
 
   // Initialize or update column order when columns change
@@ -1522,7 +1592,7 @@ export const useConceptBank = (
       sorting,
       rowSelection,
     },
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: handleRowSelectionChange,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: handleSortingChange,
     enableColumnResizing: true,
@@ -1558,10 +1628,14 @@ export const useConceptBank = (
       rowSelection,
       setRowSelection,
       selectedConceptUuids,
+      isAllAcrossPagesSelected,
+      totalCount: data?.count || 0,
+      clearSelection,
     }),
     [
       isLoading,
       data?.numberOfPages,
+      data?.count,
       page,
       setPage,
       table,
@@ -1574,6 +1648,8 @@ export const useConceptBank = (
       rowSelection,
       setRowSelection,
       selectedConceptUuids,
+      clearSelection,
+      isAllAcrossPagesSelected,
     ],
   );
 };
