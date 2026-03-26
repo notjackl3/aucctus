@@ -145,7 +145,7 @@ export const useRegisterAccount = () => {
   >({
     mutationFn: async (details) => await api.account.createAccount(details),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: [AucctusQueryKeys.userDetails],
       });
       setAccount(data);
