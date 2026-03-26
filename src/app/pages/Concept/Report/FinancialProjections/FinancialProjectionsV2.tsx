@@ -40,8 +40,8 @@ const FinancialProjectionsV2: React.FC = () => {
       return 'revenue';
     if (!financialProjectionV2) return null;
     const hasCostSavingsData =
-      financialProjectionV2.savingMethod !== undefined ||
-      financialProjectionV2.savingsModel !== undefined ||
+      !!financialProjectionV2.savingMethod ||
+      !!financialProjectionV2.savingsModel ||
       financialProjectionV2.impactSizings.length > 0 ||
       financialProjectionV2.costInterferences.length > 0 ||
       financialProjectionV2.targetSavingsAreas.length > 0;
