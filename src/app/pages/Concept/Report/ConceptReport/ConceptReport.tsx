@@ -244,6 +244,21 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
       });
     }
 
+    // Add Magic Share tab (icon only) for aucctus/disruptiveedge users
+    if (isMagicShareUser && !concept?.isHistoricalVersion) {
+      tabs.push({
+        label: 'Magic Share',
+        value: 'magic-share',
+        icon: Wand2,
+        onAction: () =>
+          openModal(
+            Modal.MagicShare,
+            { conceptUuid },
+            { hideBodyScroll: true },
+          ),
+      });
+    }
+
     // Add Versioning tab (icon only) if feature enabled and not historical
     if (FEATURE_CONCEPT_VERSIONING && !concept?.isHistoricalVersion) {
       tabs.push({
@@ -258,21 +273,6 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
           });
           setShowVersions((v) => !v);
         },
-      });
-    }
-
-    // Add Magic Share tab (icon only) for aucctus/disruptiveedge users
-    if (isMagicShareUser && !concept?.isHistoricalVersion) {
-      tabs.push({
-        label: 'Magic Share',
-        value: 'magic-share',
-        icon: Wand2,
-        onAction: () =>
-          openModal(
-            Modal.MagicShare,
-            { conceptUuid },
-            { hideBodyScroll: true },
-          ),
       });
     }
 

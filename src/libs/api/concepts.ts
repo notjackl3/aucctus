@@ -928,6 +928,68 @@ export class ConceptApi extends ApiService {
     );
   }
 
+  // =========================================================================
+  // Training Documents & Evidence
+  // =========================================================================
+
+  getTrainingDocuments(conceptUuid: string) {
+    return this.get<
+      import('./types/conceptTrainingDocument').IConceptTrainingDocument[]
+    >(endpoints.conceptTrainingDocuments(conceptUuid));
+  }
+
+  uploadTrainingDocument(conceptUuid: string, file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.postFormData<
+      import('./types/conceptTrainingDocument').IConceptTrainingDocumentUploadResponse
+    >(endpoints.conceptTrainingDocuments(conceptUuid), formData);
+  }
+
+  deleteTrainingDocument(conceptUuid: string, documentUuid: string) {
+    return this.delete<{ detail: string }>(
+      endpoints.conceptTrainingDocument(conceptUuid, documentUuid),
+    );
+  }
+
+  getEvidence(
+    conceptUuid: string,
+    status?: import('./types/conceptTrainingDocument').ConceptEvidenceStatus,
+  ) {
+    return this.get<
+      import('./types/conceptTrainingDocument').IConceptEvidence[]
+    >(endpoints.conceptEvidence(conceptUuid, status));
+  }
+
+  acceptEvidence(conceptUuid: string, evidenceUuid: string) {
+    return this.post<
+      import('./types/conceptTrainingDocument').IConceptEvidence
+    >(endpoints.conceptEvidenceAccept(conceptUuid, evidenceUuid));
+  }
+
+  ignoreEvidence(conceptUuid: string, evidenceUuid: string) {
+    return this.post<
+      import('./types/conceptTrainingDocument').IConceptEvidence
+    >(endpoints.conceptEvidenceIgnore(conceptUuid, evidenceUuid));
+  }
+
+  acceptAllEvidence(conceptUuid: string) {
+    return this.post<{ detail: string }>(
+      endpoints.conceptEvidenceAcceptAll(conceptUuid),
+    );
+  }
+
+  applyEvidenceBatch(
+    conceptUuid: string,
+    evidenceUuids: string[],
+    ignoredUuids: string[] = [],
+  ) {
+    return this.post<{ status: string; message: string; sections: string[] }>(
+      endpoints.conceptEvidenceApply(conceptUuid),
+      { evidence_uuids: evidenceUuids, ignored_uuids: ignoredUuids },
+    );
+  }
+
   /**
    * Get UUIDs of all concepts matching the current filters (no pagination).
    */

@@ -1427,7 +1427,11 @@ export type InboundSocketEvent<C = {}> =
   | IPersonaChatStreamEvent
   | IPersonaChatTypingMessage
   | IPersonaChatErrorMessage
-  | IPersonaChatToolActivityMessage;
+  | IPersonaChatToolActivityMessage
+  | IConceptDocumentProcessingProgressMessage
+  | IConceptDocumentProcessingCompletedMessage
+  | IConceptDocumentProcessingErrorMessage
+  | IConceptEvidenceDiscoveredMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];
 
@@ -1546,6 +1550,57 @@ export interface ILivingPersonasPersonaReadyMessage extends BaseSocketEvent {
   type: 'living_personas.persona.ready.account';
   accountUuid: string;
   personaUuid: string;
+  evidenceCount: number;
+  message: string;
+}
+
+// ----------------
+// Concept Document Processing
+// ----------------
+
+export interface IConceptDocumentProcessingProgressMessage
+  extends BaseSocketEvent {
+  type: 'concept.document.processing.progress.account';
+  accountUuid: string;
+  conceptUuid: string;
+  documentUuid: string;
+  stage:
+    | 'started'
+    | 'extracting'
+    | 'analyzing'
+    | 'creating_evidence'
+    | 'completed'
+    | 'failed';
+  progress: number;
+  message: string;
+  errorMessage?: string;
+}
+
+export interface IConceptDocumentProcessingCompletedMessage
+  extends BaseSocketEvent {
+  type: 'concept.document.processing.completed.account';
+  accountUuid: string;
+  conceptUuid: string;
+  documentUuid: string;
+  evidenceCount: number;
+  message: string;
+}
+
+export interface IConceptDocumentProcessingErrorMessage
+  extends BaseSocketEvent {
+  type: 'concept.document.processing.error.account';
+  accountUuid: string;
+  conceptUuid: string;
+  documentUuid: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
+export interface IConceptEvidenceDiscoveredMessage extends BaseSocketEvent {
+  type: 'concept.evidence.discovered.account';
+  accountUuid: string;
+  conceptUuid: string;
   evidenceCount: number;
   message: string;
 }

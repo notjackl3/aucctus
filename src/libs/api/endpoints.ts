@@ -1358,6 +1358,36 @@ export class Endpoints {
     return `/api/v1/personas/${personaUuid}/evidence/accept-all`;
   }
 
+  // Concept training documents & evidence
+  static conceptTrainingDocuments(conceptUuid: string) {
+    return `/api/v1/concept/${conceptUuid}/training-documents`;
+  }
+
+  static conceptTrainingDocument(conceptUuid: string, documentUuid: string) {
+    return `/api/v1/concept/${conceptUuid}/training-documents/${documentUuid}`;
+  }
+
+  static conceptEvidence(conceptUuid: string, status?: string) {
+    const base = `/api/v1/concept/${conceptUuid}/evidence`;
+    return status ? `${base}?status=${status}` : base;
+  }
+
+  static conceptEvidenceAccept(conceptUuid: string, evidenceUuid: string) {
+    return `/api/v1/concept/${conceptUuid}/evidence/${evidenceUuid}/accept`;
+  }
+
+  static conceptEvidenceIgnore(conceptUuid: string, evidenceUuid: string) {
+    return `/api/v1/concept/${conceptUuid}/evidence/${evidenceUuid}/ignore`;
+  }
+
+  static conceptEvidenceAcceptAll(conceptUuid: string) {
+    return `/api/v1/concept/${conceptUuid}/evidence/accept-all`;
+  }
+
+  static conceptEvidenceApply(conceptUuid: string) {
+    return `/api/v1/concept/${conceptUuid}/evidence/apply`;
+  }
+
   // Persona chat
   static personaChatSessions(personaUuid: string) {
     return `/api/v1/personas/${personaUuid}/chat/sessions`;
