@@ -38,8 +38,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
   const [showOpportunityMap, setShowOpportunityMap] = useState(false);
   // Track if data is ready to show carousel (after loading transition completes)
   const [isDataReady, setIsDataReady] = useState(false);
-  // Track selected file for upload
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  // Track selected files for upload (max 3)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   // Track if logo animation intro has completed (for showing title)
   const [showLogoTitle, setShowLogoTitle] = useState(false);
   // Track selected living personas for tagging (max 4)
@@ -253,7 +253,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
       // Create seed with the selected anchor thought using hook (with optional file and personas)
       const { seedUuid } = await createSeedAsync({
         thoughtText: thought.thought,
-        file: selectedFile || undefined,
+        files: selectedFiles.length > 0 ? selectedFiles : undefined,
         livingPersonaUuids:
           selectedPersonas.length > 0
             ? selectedPersonas.map((p) => p.id)
@@ -263,9 +263,9 @@ const IdeaPlaygroundQBased: React.FC = () => {
       // Set seed UUID in local state (synchronized with URL)
       setCurrentSeedUuid(seedUuid);
 
-      // Reset carousel to first question and clear file
+      // Reset carousel to first question and clear files
       ideaPlaygroundStore.reset();
-      setSelectedFile(null);
+      setSelectedFiles([]);
 
       // Mark this as a newly created seed (not a restoration)
       setIsNewlyCreatedSeed(true);
@@ -295,10 +295,10 @@ const IdeaPlaygroundQBased: React.FC = () => {
     setHasStartedTyping(true);
 
     try {
-      // Create seed with custom input using hook (with optional file and personas)
+      // Create seed with custom input using hook (with optional files and personas)
       const { seedUuid } = await createSeedAsync({
         thoughtText,
-        file: selectedFile || undefined,
+        files: selectedFiles.length > 0 ? selectedFiles : undefined,
         livingPersonaUuids:
           selectedPersonas.length > 0
             ? selectedPersonas.map((p) => p.id)
@@ -308,9 +308,9 @@ const IdeaPlaygroundQBased: React.FC = () => {
       // Set seed UUID in local state (synchronized with URL)
       setCurrentSeedUuid(seedUuid);
 
-      // Reset carousel to first question and clear file
+      // Reset carousel to first question and clear files
       ideaPlaygroundStore.reset();
-      setSelectedFile(null);
+      setSelectedFiles([]);
 
       // Mark this as a newly created seed (not a restoration)
       setIsNewlyCreatedSeed(true);
@@ -321,7 +321,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
       telemetry.log('ideaPlayground.seed.created.custom', {
         seedUuid,
         thoughtLength: thoughtText.length,
-        hasFile: !!selectedFile,
+        hasFiles: selectedFiles.length > 0,
+        fileCount: selectedFiles.length,
         personaCount: selectedPersonas.length,
       });
     } catch (error) {
@@ -345,7 +346,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
     setHasRestoredSession(false);
     setIsNewlyCreatedSeed(false);
     setIsDataReady(false);
-    setSelectedFile(null);
+    setSelectedFiles([]);
     setShowLogoTitle(false);
     setSelectedPersonas([]);
     // Clear URL parameter and reset UI state
@@ -463,8 +464,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
               onInputChange={handleInputChange}
               onKeyDown={handleKeyDown}
               onSubmit={handleSubmit}
-              onFileChange={setSelectedFile}
-              selectedFile={selectedFile}
+              onFilesChange={setSelectedFiles}
+              selectedFiles={selectedFiles}
               style={{ opacity: 1 }}
               personaItems={personaItems}
               selectedPersonas={selectedPersonas}

@@ -51,18 +51,20 @@ export class IdeaPlaygroundApi extends ApiService {
   /**
    * Create a new seed with an anchor thought
    * @param thoughtText - The anchor thought text
-   * @param file - Optional file to upload (max 10MB, supports PDF, DOCX, TXT, HTML, XLSX, CSV, PPTX, PNG, JPG, WEBP, GIF, MP3, WAV, MP4, MOV)
+   * @param files - Optional files to upload (max 3 files, 50MB each, 100MB aggregate)
    */
   createSeedWithThought(
     thoughtText: string,
-    file?: File,
+    files?: File[],
     livingPersonaUuids?: string[],
   ): Promise<ICreateSeedResponse> {
-    if (file) {
+    if (files?.length) {
       // Use multipart/form-data for file upload
       const formData = new FormData();
       formData.append('thought_text', thoughtText);
-      formData.append('file', file);
+      for (const file of files) {
+        formData.append('file', file);
+      }
       if (livingPersonaUuids?.length) {
         for (const uuid of livingPersonaUuids) {
           formData.append('living_persona_uuids', uuid);

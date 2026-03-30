@@ -189,9 +189,13 @@ const calculatePositionsFromCenters = (
   const startAngle = -Math.PI / 2;
   const angle = startAngle + (index / totalCards) * 2 * Math.PI;
 
+  // Push non-cardinal (diagonal) cards further from origin.
+  // sin(2θ) peaks at 45° diagonals and is 0 at cardinal directions.
+  const diagonalBoost = 1 + 0.18 * Math.abs(Math.sin(2 * angle));
+
   return {
-    x: radiusX * Math.cos(angle),
-    y: radiusY * Math.sin(angle),
+    x: radiusX * Math.cos(angle) * diagonalBoost,
+    y: radiusY * Math.sin(angle) * diagonalBoost,
   };
 };
 

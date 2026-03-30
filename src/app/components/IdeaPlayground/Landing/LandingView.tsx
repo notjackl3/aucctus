@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from '@components';
 import { cn } from '@libs/utils/react';
 import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
@@ -10,8 +10,14 @@ import {
 } from '@components/shared/MentionMenu';
 import type { MentionItem } from '@stores/overseer/types';
 
-/** Maximum file size: 10MB */
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
+/** Maximum file size per file: 50MB (matches backend MAX_FILE_SIZE) */
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+
+/** Maximum aggregate size for all files: 100MB */
+const MAX_AGGREGATE_SIZE = 100 * 1024 * 1024;
+
+/** Maximum number of files per seed */
+const MAX_FILES = 3;
 
 /** Supported file extensions for Gemini API */
 const SUPPORTED_EXTENSIONS = [
@@ -38,8 +44,8 @@ interface LandingViewProps {
   onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onSubmit?: () => void;
-  onFileChange?: (file: File | null) => void;
-  selectedFile?: File | null;
+  onFilesChange?: (files: File[]) => void;
+  selectedFiles?: File[];
   style?: any;
   personaItems?: MentionItem[];
   selectedPersonas?: MentionItem[];
@@ -52,8 +58,8 @@ const LandingView: React.FC<LandingViewProps> = ({
   onInputChange,
   onKeyDown,
   onSubmit,
-  onFileChange,
-  selectedFile,
+  onFilesChange,
+  selectedFiles = [],
   style,
   personaItems = [],
   selectedPersonas = [],
@@ -124,7 +130,7 @@ const LandingView: React.FC<LandingViewProps> = ({
     // Check file size
     if (file.size > MAX_FILE_SIZE) {
       toast.error(
-        `File size (${(file.size / (1024 * 1024)).toFixed(1)}MB) exceeds maximum allowed size (10MB).`,
+        `File "${file.name}" (${(file.size / (1024 * 1024)).toFixed(1)}MB) exceeds maximum allowed size (50MB).`,
       );
       return false;
     }
@@ -141,16 +147,47 @@ const LandingView: React.FC<LandingViewProps> = ({
     return true;
   };
 
-  const handleFileSelect = (file: File | null) => {
-    if (file && !validateFile(file)) {
-      return;
+  const addFiles = (newFiles: File[]) => {
+    const combined = [...selectedFiles];
+
+    for (const file of newFiles) {
+      // Check max file count
+      if (combined.length >= MAX_FILES) {
+        toast.error(`Maximum ${MAX_FILES} files allowed.`);
+        break;
+      }
+
+      // Skip duplicates by name
+      if (combined.some((f) => f.name === file.name && f.size === file.size)) {
+        continue;
+      }
+
+      // Validate individual file
+      if (!validateFile(file)) {
+        continue;
+      }
+
+      // Check aggregate size
+      const aggregateSize =
+        combined.reduce((sum, f) => sum + f.size, 0) + file.size;
+      if (aggregateSize > MAX_AGGREGATE_SIZE) {
+        toast.error(
+          `Total file size exceeds 100MB limit. Remove a file before adding more.`,
+        );
+        break;
+      }
+
+      combined.push(file);
     }
-    onFileChange?.(file);
+
+    onFilesChange?.(combined);
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    handleFileSelect(file);
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      addFiles(Array.from(files));
+    }
     // Reset input so the same file can be selected again
     e.target.value = '';
   };
@@ -172,12 +209,14 @@ const LandingView: React.FC<LandingViewProps> = ({
     e.stopPropagation();
     setIsDragging(false);
 
-    const file = e.dataTransfer.files?.[0] || null;
-    handleFileSelect(file);
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      addFiles(Array.from(files));
+    }
   };
 
-  const handleRemoveFile = () => {
-    onFileChange?.(null);
+  const handleRemoveFile = (index: number) => {
+    onFilesChange?.(selectedFiles.filter((_, i) => i !== index));
   };
 
   const handleUploadClick = () => {
@@ -331,32 +370,41 @@ const LandingView: React.FC<LandingViewProps> = ({
                   {/* Spacer */}
                   <div className='flex-1' />
 
-                  {/* Selected file indicator (inline) */}
-                  {selectedFile && (
-                    <div className='flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[10px] text-white/60'>
-                      <File className='h-3 w-3 stroke-current' />
-                      <span className='max-w-20 truncate'>
-                        {selectedFile.name}
-                      </span>
-                      <button
-                        type='button'
-                        onClick={handleRemoveFile}
-                        className='transition-colors hover:text-white'
+                  {/* Selected file chips */}
+                  <AnimatePresence>
+                    {selectedFiles.map((file, index) => (
+                      <motion.div
+                        key={`${file.name}-${file.size}`}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className='flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[10px] text-white/60'
                       >
-                        <X size={10} className='stroke-current' />
-                      </button>
-                    </div>
-                  )}
+                        <File className='h-3 w-3 shrink-0 stroke-current' />
+                        <span className='max-w-20 truncate'>{file.name}</span>
+                        <button
+                          type='button'
+                          onClick={() => handleRemoveFile(index)}
+                          className='transition-colors hover:text-white'
+                        >
+                          <X size={10} className='stroke-current' />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
 
                   {/* Upload button */}
                   <button
                     type='button'
                     onClick={handleUploadClick}
+                    disabled={selectedFiles.length >= MAX_FILES}
                     className={cn(
                       'rounded-lg p-2 transition-all',
-                      selectedFile
-                        ? 'bg-white/10 text-white/50'
-                        : 'text-white/20 hover:bg-white/[0.08] hover:text-white/50',
+                      selectedFiles.length >= MAX_FILES
+                        ? 'cursor-not-allowed text-white/10'
+                        : selectedFiles.length > 0
+                          ? 'bg-white/10 text-white/50'
+                          : 'text-white/20 hover:bg-white/[0.08] hover:text-white/50',
                     )}
                     aria-label='Upload file'
                   >
@@ -385,6 +433,7 @@ const LandingView: React.FC<LandingViewProps> = ({
               <input
                 ref={fileInputRef}
                 type='file'
+                multiple
                 onChange={handleFileInputChange}
                 accept={SUPPORTED_EXTENSIONS.map((ext) => `.${ext}`).join(',')}
                 className='hidden'

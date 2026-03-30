@@ -125,7 +125,7 @@ export interface ICreateSeedResponse {
   seedUuid: string;
   anchorThought: IAnchorThought;
   title?: string;
-  file?: ISeedFile | null;
+  files: ISeedFile[];
   livingPersonaUuids?: string[];
 }
 

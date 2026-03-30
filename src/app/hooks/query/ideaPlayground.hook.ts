@@ -48,7 +48,7 @@ export const useAnchorThoughts = () => {
  */
 interface ICreateSeedInput {
   thoughtText: string;
-  file?: File;
+  files?: File[];
   livingPersonaUuids?: string[];
 }
 
@@ -64,7 +64,7 @@ export const useCreateSeed = () => {
     mutationFn: async (input: ICreateSeedInput | string) => {
       // Support both string (legacy) and object (with file) inputs
       const thoughtText = typeof input === 'string' ? input : input.thoughtText;
-      const file = typeof input === 'string' ? undefined : input.file;
+      const files = typeof input === 'string' ? undefined : input.files;
       const livingPersonaUuids =
         typeof input === 'string' ? undefined : input.livingPersonaUuids;
 
@@ -73,18 +73,20 @@ export const useCreateSeed = () => {
       }
       return await api.ideaPlayground.createSeedWithThought(
         thoughtText,
-        file,
+        files,
         livingPersonaUuids,
       );
     },
     onSuccess: (data, input) => {
-      const hasFile = typeof input !== 'string' && !!input.file;
+      const hasFiles = typeof input !== 'string' && !!input.files?.length;
       telemetry.log('ideaPlayground.seed.created', {
         seedUuid: data.seedUuid,
         thoughtLength: data.anchorThought.thought.length,
-        hasFile,
-        fileName:
-          hasFile && typeof input !== 'string' ? input.file?.name : undefined,
+        hasFiles,
+        fileNames:
+          hasFiles && typeof input !== 'string'
+            ? input.files?.map((f) => f.name)
+            : undefined,
       });
       // Invalidate and refetch questions for this seed
       queryClient.invalidateQueries([
