@@ -21,7 +21,7 @@ import {
   TrendingDown,
   X,
 } from 'lucide-react';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { cn } from '@libs/utils/react';
 import type {
@@ -128,6 +128,20 @@ const CustomTimeline: React.FC<CustomTimelineProps> = ({
   const [editDescription, setEditDescription] = useState('');
 
   const entries = widget.timelineEntries;
+  const [canScroll, setCanScroll] = useState(false);
+
+  const checkOverflow = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      setCanScroll(el.scrollWidth > el.clientWidth);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkOverflow();
+    window.addEventListener('resize', checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
+  }, [checkOverflow, entries.length]);
 
   const scrollBy = useCallback((direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -321,14 +335,14 @@ const CustomTimeline: React.FC<CustomTimelineProps> = ({
         </motion.div>
       ) : (
         <div className='relative'>
-          {entries.length > 4 && (
+          {canScroll && (
             <>
               <motion.button
                 aria-label='Scroll timeline left'
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => scrollBy('left')}
-                className='aucctus-bg-primary absolute left-0 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full shadow-md'
+                className='aucctus-bg-primary aucctus-border-secondary absolute -left-4 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border shadow-md'
               >
                 <ChevronLeft className='aucctus-text-secondary h-4 w-4' />
               </motion.button>
@@ -337,7 +351,7 @@ const CustomTimeline: React.FC<CustomTimelineProps> = ({
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => scrollBy('right')}
-                className='aucctus-bg-primary absolute right-0 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full shadow-md'
+                className='aucctus-bg-primary aucctus-border-secondary absolute -right-4 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border shadow-md'
               >
                 <ChevronRight className='aucctus-text-secondary h-4 w-4' />
               </motion.button>

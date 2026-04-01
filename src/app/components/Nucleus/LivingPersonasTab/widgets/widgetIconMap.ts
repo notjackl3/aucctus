@@ -29,6 +29,7 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
+import { resolveIcon } from '@libs/utils/iconMap';
 
 /** Map of icon string names to lucide-react components */
 export const WIDGET_ICON_MAP: Record<string, LucideIcon> = {
@@ -58,7 +59,7 @@ export const WIDGET_ICON_MAP: Record<string, LucideIcon> = {
 /** All available widget icon names */
 export const WIDGET_ICON_NAMES = Object.keys(WIDGET_ICON_MAP);
 
-/** Get a lucide icon component by name, with optional fallback */
-export const getWidgetIcon = (name: string): LucideIcon | undefined => {
-  return WIDGET_ICON_MAP[name];
+/** Get a lucide icon component by name, falling back to the general icon map */
+export const getWidgetIcon = (name: string): LucideIcon => {
+  return WIDGET_ICON_MAP[name] ?? resolveIcon(name);
 };

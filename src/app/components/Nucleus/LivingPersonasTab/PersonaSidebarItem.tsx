@@ -9,6 +9,7 @@
  */
 
 import React, { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { ComponentTooltip } from '@components';
 import { cn } from '@libs/utils/react';
 
@@ -28,6 +29,8 @@ export interface PersonaSidebarItemProps {
   isSelected?: boolean;
   /** Whether the sidebar is expanded */
   isExpanded?: boolean;
+  /** Whether this persona is still generating (not yet initialized) */
+  isGenerating?: boolean;
   /** Click handler */
   onClick?: () => void;
 }
@@ -57,6 +60,7 @@ const PersonaSidebarItem: React.FC<PersonaSidebarItemProps> = ({
   themeColor,
   isSelected = false,
   isExpanded = false,
+  isGenerating = false,
   onClick,
 }) => {
   // Compute background color from theme for initials fallback
@@ -66,6 +70,95 @@ const PersonaSidebarItem: React.FC<PersonaSidebarItemProps> = ({
     }),
     [themeColor],
   );
+
+  // Theme-tinted color for generating state
+  const generatingColor = themeColor ? `hsl(${themeColor})` : '#6366F1';
+
+  // Generating skeleton state with themed shimmer
+  if (isGenerating) {
+    const skeletonContent = (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className='relative flex items-center overflow-hidden rounded-lg'
+        style={{
+          padding: isExpanded ? '6px 8px' : '6px',
+          justifyContent: isExpanded ? 'flex-start' : 'center',
+          gap: isExpanded ? '10px' : '0',
+        }}
+      >
+        {/* Themed avatar placeholder with pulse */}
+        <motion.div
+          className='relative flex h-11 w-11 shrink-0 items-center justify-center rounded-lg'
+          style={{
+            background: `linear-gradient(135deg, ${generatingColor}20, ${generatingColor}10)`,
+            border: `1px solid ${generatingColor}25`,
+          }}
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        >
+          <motion.div
+            className='h-2 w-2 rounded-full'
+            style={{ backgroundColor: generatingColor }}
+            animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.4, 0.8, 0.4] }}
+            transition={{
+              duration: 1.8,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+        </motion.div>
+
+        {/* Text skeleton with theme tint */}
+        <div
+          className='flex min-w-0 flex-1 flex-col gap-1.5'
+          style={{
+            opacity: isExpanded ? 1 : 0,
+            width: isExpanded ? 'auto' : 0,
+            overflow: 'hidden',
+            transition: 'opacity 150ms ease-out',
+          }}
+        >
+          <motion.div
+            className='h-3 w-24 rounded'
+            style={{ background: `${generatingColor}15` }}
+            animate={{ opacity: [0.4, 0.8, 0.4] }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+          <motion.div
+            className='h-2.5 w-16 rounded'
+            style={{ background: `${generatingColor}10` }}
+            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: 0.3,
+            }}
+          />
+        </div>
+      </motion.div>
+    );
+
+    if (!isExpanded) {
+      return (
+        <ComponentTooltip tip={`${segment} — Generating...`}>
+          {skeletonContent}
+        </ComponentTooltip>
+      );
+    }
+
+    return <React.Fragment>{skeletonContent}</React.Fragment>;
+  }
 
   const avatarElement = avatar ? (
     <div className='aucctus-border-secondary h-11 w-11 shrink-0 overflow-hidden rounded-lg border'>

@@ -125,6 +125,7 @@ export interface IPersonaListItem {
   conceptCount: number;
   documentCount: number;
   lastEngagedAt?: string;
+  isInitialized: boolean;
 }
 
 export interface IPersona {
