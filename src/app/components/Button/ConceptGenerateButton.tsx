@@ -19,20 +19,26 @@ type ConceptRowButtonProps = {
   dateReportStarted?: string;
   dateReportCompleted?: string;
   conceptUuid?: string;
+  size?: 'xs' | 'sm';
 };
 
-const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
+const getButtonContext = (
+  variant: ConceptRowButtonProps['variant'],
+  size: 'xs' | 'sm' = 'sm',
+) => {
+  const btnSize = `btn-${size}`;
+  const iconSize = size === 'xs' ? 14 : 20;
   const variantContext: Record<
     ConceptReportStatus,
     { style: string; label: string | ReactNode }
   > = {
     complete: {
-      style: `btn btn-light btn-bold btn-sm`,
+      style: `btn btn-light btn-bold ${btnSize}`,
       label: 'Open',
     },
 
     pending: {
-      style: `btn btn-light btn-bold btn-sm`,
+      style: `btn btn-light btn-bold ${btnSize}`,
       label: (
         <span className='flex flex-row gap-2'>
           Loading
@@ -41,20 +47,20 @@ const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
       ),
     },
     notStarted: {
-      style: `btn btn-primary btn-bold btn-sm`,
+      style: `btn btn-primary btn-bold ${btnSize}`,
       label: 'Generate',
     },
 
     error: {
-      style: `btn btn-light btn-bold btn-sm`,
+      style: `btn btn-light btn-bold ${btnSize}`,
       label: (
         <>
-          <RefreshCw size={20} /> Retry
+          <RefreshCw size={iconSize} /> Retry
         </>
       ),
     },
     draft: {
-      style: `btn btn-light btn-bold btn-sm`,
+      style: `btn btn-light btn-bold ${btnSize}`,
       label: 'Continue',
     },
   };
@@ -70,6 +76,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
   dateReportStarted,
   dateReportCompleted,
   conceptUuid,
+  size = 'sm',
 }) => {
   const canOpenWhilePending = canOpenConceptWhilePending(
     reportStatusBySection,
@@ -89,6 +96,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
         dateReportCompleted={dateReportCompleted}
         conceptUuid={conceptUuid}
         animatedMaxWidth={animatedMaxWidth}
+        size={size}
       />
     );
   }
@@ -101,7 +109,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
     variant === 'pending' && canOpenWhilePending ? 'complete' : variant;
 
   // Get button style and label
-  const { style, label } = getButtonContext(effectiveVariant);
+  const { style, label } = getButtonContext(effectiveVariant, size);
   const isUpdating = variant === 'pending' && canOpenWhilePending;
 
   const resolvedLabel = isUpdating ? (

@@ -4,6 +4,7 @@ import PriorityCell from '@components/Tables/ConceptBank/PriorityCell';
 import { UnseenChangesTooltip } from '@components/ToolTip/UnseenChangesTooltip';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 import { useConceptPriorities } from '@hooks/query/concept-priority.hook';
+import { IConceptPrioritySummary } from '@libs/api/types/concept/concept_priority';
 import {
   doFullConceptInvalidation,
   useConceptReportGenerate,
@@ -195,6 +196,7 @@ interface UseConceptBankResult {
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
   table: ReturnType<typeof useReactTable<IConcept>>;
+  concepts: IConcept[];
   updateTableFiltering: (value: Partial<IConceptFilterOptions>) => void;
   resetFilter: () => void;
   filterOptions: IConceptFilterOptions;
@@ -207,8 +209,10 @@ interface UseConceptBankResult {
   >;
   selectedConceptUuids: string[];
   isAllAcrossPagesSelected: boolean;
+  setIsAllAcrossPagesSelected: React.Dispatch<React.SetStateAction<boolean>>;
   totalCount: number;
   clearSelection: () => void;
+  priorityMap: Map<string, IConceptPrioritySummary>;
 }
 
 export const useConceptBank = (
@@ -1638,6 +1642,7 @@ export const useConceptBank = (
       page,
       setPage,
       table,
+      concepts: data?.results || [],
       updateTableFiltering,
       resetFilter,
       filterOptions,
@@ -1648,12 +1653,15 @@ export const useConceptBank = (
       setRowSelection,
       selectedConceptUuids,
       isAllAcrossPagesSelected,
+      setIsAllAcrossPagesSelected,
       totalCount: data?.count || 0,
       clearSelection,
+      priorityMap,
     }),
     [
       isLoading,
       data?.numberOfPages,
+      data?.results,
       data?.count,
       page,
       setPage,
@@ -1669,6 +1677,8 @@ export const useConceptBank = (
       selectedConceptUuids,
       clearSelection,
       isAllAcrossPagesSelected,
+      setIsAllAcrossPagesSelected,
+      priorityMap,
     ],
   );
 };

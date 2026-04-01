@@ -10,6 +10,7 @@ type ConceptGeneratingButtonProps = {
   dateReportCompleted?: string;
   conceptUuid?: string;
   animatedMaxWidth?: string;
+  size?: 'xs' | 'sm';
 };
 
 const ConceptGeneratingButton: FunctionComponent<
@@ -20,6 +21,7 @@ const ConceptGeneratingButton: FunctionComponent<
   dateReportCompleted,
   conceptUuid,
   animatedMaxWidth,
+  size = 'sm',
 }) => {
   const ButtonComponent = animatedMaxWidth ? motion.button : 'button';
 
@@ -46,7 +48,7 @@ const ConceptGeneratingButton: FunctionComponent<
       hideDelay={0}
     >
       <ButtonComponent
-        className='btn btn-generating btn-bold btn-sm'
+        className={`btn btn-generating btn-bold btn-${size}`}
         disabled
         {...motionProps}
       >

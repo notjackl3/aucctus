@@ -36,7 +36,9 @@ import {
   Check,
   ChevronDown,
   Download,
+  LayoutGrid,
   Link2,
+  List,
   Loader2,
   Pencil,
   Upload,
@@ -148,6 +150,15 @@ const ConceptBank: React.FC = () => {
     filterOptions: seedFilterOptions,
     updateTableFiltering: updateSeedFiltering,
   } = useSeedsBank();
+
+  // View mode state (grid vs list) with localStorage persistence
+  const [viewMode, setViewMode] = React.useState<'grid' | 'list'>(() => {
+    const saved = localStorage.getItem('concept-bank-view-preference');
+    return (saved as 'grid' | 'list') || 'grid';
+  });
+  React.useEffect(() => {
+    localStorage.setItem('concept-bank-view-preference', viewMode);
+  }, [viewMode]);
 
   // Selection state lifted from BankConcepts for toolbar/header access
   const [selectedConceptUuids, setSelectedConceptUuids] = React.useState<
@@ -493,6 +504,7 @@ const ConceptBank: React.FC = () => {
       isBulkEditOpen,
       setIsBulkEditOpen: handleBulkEditClose,
       resolvedBulkUuids,
+      viewMode,
     }),
     [
       filterOptions,
@@ -501,6 +513,7 @@ const ConceptBank: React.FC = () => {
       isBulkEditOpen,
       handleBulkEditClose,
       resolvedBulkUuids,
+      viewMode,
     ],
   );
 
@@ -829,6 +842,40 @@ const ConceptBank: React.FC = () => {
                   <Table.PropertyColumns.ColumnVisibilityMenu
                     propertyDefinitions={propertyDefinitions}
                   />
+                  <div className='aucctus-bg-secondary flex rounded-lg p-1'>
+                    <motion.button
+                      aria-label='Grid view'
+                      aria-pressed={viewMode === 'grid'}
+                      onClick={() => setViewMode('grid')}
+                      className={cn(
+                        'rounded-md p-1.5 transition-colors',
+                        viewMode === 'grid'
+                          ? 'aucctus-bg-primary aucctus-text-brand-primary shadow-sm'
+                          : 'aucctus-text-tertiary hover:aucctus-text-secondary',
+                      )}
+                      title='Grid View'
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <LayoutGrid className='h-4 w-4' />
+                    </motion.button>
+                    <motion.button
+                      aria-label='List view'
+                      aria-pressed={viewMode === 'list'}
+                      onClick={() => setViewMode('list')}
+                      className={cn(
+                        'rounded-md p-1.5 transition-colors',
+                        viewMode === 'list'
+                          ? 'aucctus-bg-primary aucctus-text-brand-primary shadow-sm'
+                          : 'aucctus-text-tertiary hover:aucctus-text-secondary',
+                      )}
+                      title='List View'
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <List className='h-4 w-4' />
+                    </motion.button>
+                  </div>
                 </>
               )}
 

@@ -137,7 +137,7 @@ export interface IConceptOverview extends IBaseConceptEntity {
   whatIsThis: string; // concise product definition
   shouldWeDoThis: string; // executive recommendation
   heroImagePrompt: string; // detailed prompt for image generation
-  conceptImageUrl: string;
+  conceptImageUrl: string | null;
   customImageUrl?: string; // S3 URL for user-uploaded custom image
   useCustomImage: boolean; // whether to display custom image instead of AI-generated
   conceptVideoUrl?: string; // S3 URL for AI generated video
