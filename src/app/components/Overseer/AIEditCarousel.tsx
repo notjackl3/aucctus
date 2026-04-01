@@ -221,42 +221,43 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
 
       {/* Global actions */}
       {!readOnly && (
-        <div className='flex items-center gap-1.5'>
-          <button
-            onClick={handleAcceptAll}
-            disabled={isLoading}
-            className='flex items-center gap-1 rounded-full border border-white/[0.05] bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-white/45 backdrop-blur-sm transition-colors hover:text-white/70 disabled:cursor-not-allowed disabled:opacity-40'
-          >
-            <CheckCircle2 size={12} className='stroke-current' />
-            Accept all
-          </button>
+        <div className='flex items-center gap-2'>
           {(acceptedEdits.length > 0 || allDecided) && (
             <button
               onClick={handleContinue}
-              disabled={isLoading}
+              disabled={isLoading || acceptedEdits.length === 0}
               className={cn(
-                'flex items-center gap-1 rounded-full border border-white/[0.12] bg-white/[0.10] px-2.5 py-1 text-[10px] font-medium backdrop-blur-sm transition-colors',
+                'flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-[11px] font-semibold transition-all',
                 isLoading
-                  ? 'cursor-not-allowed text-white/30'
-                  : 'text-white/60 hover:text-white/90',
+                  ? 'cursor-not-allowed bg-emerald-500/20 text-emerald-300/50'
+                  : acceptedEdits.length === 0
+                    ? 'cursor-not-allowed bg-white/[0.06] text-white/30'
+                    : 'bg-emerald-500/90 text-white shadow-[0_0_12px_rgba(16,185,129,0.25)] hover:bg-emerald-500 hover:shadow-[0_0_16px_rgba(16,185,129,0.35)]',
               )}
             >
               <DynamicIcon
                 variant={isLoading ? 'loading-02' : 'arrowright'}
-                width={12}
-                height={12}
+                width={13}
+                height={13}
                 className={cn('stroke-current', isLoading && 'animate-spin')}
               />
-              {isLoading ? 'Applying...' : 'Continue'}
-              {!isLoading && acceptedEdits.length > 0
-                ? ` (${acceptedEdits.length})`
-                : ''}
+              {isLoading
+                ? 'Applying...'
+                : `Apply ${acceptedEdits.length} edit${acceptedEdits.length !== 1 ? 's' : ''}`}
             </button>
           )}
           <button
+            onClick={handleAcceptAll}
+            disabled={isLoading || allDecided}
+            className='flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.06] px-2.5 py-1.5 text-[10px] font-medium text-white/50 backdrop-blur-sm transition-colors hover:bg-white/[0.10] hover:text-white/75 disabled:cursor-not-allowed disabled:opacity-30'
+          >
+            <CheckCircle2 size={12} className='stroke-current' />
+            Accept all
+          </button>
+          <button
             onClick={onCancel}
             disabled={isLoading}
-            className='flex items-center gap-1 rounded-full border border-white/[0.05] bg-white/[0.04] px-2.5 py-1 text-[10px] font-medium text-white/35 transition-colors hover:text-white/55 disabled:cursor-not-allowed disabled:opacity-40'
+            className='flex items-center gap-1 rounded-lg border border-white/[0.05] bg-white/[0.04] px-2.5 py-1.5 text-[10px] font-medium text-white/35 transition-colors hover:text-white/55 disabled:cursor-not-allowed disabled:opacity-30'
           >
             Dismiss
           </button>

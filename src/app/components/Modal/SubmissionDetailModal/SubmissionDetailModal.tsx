@@ -1,4 +1,9 @@
-import { Loading, ScoringCriteriaSection, toast } from '@components';
+import {
+  Loading,
+  ScoreGauge,
+  ScoringCriteriaSection,
+  toast,
+} from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { useSubmissionDetail } from '@hooks/query/idea-submissions.hook';
 import api from '@libs/api';
@@ -15,7 +20,6 @@ import {
   Lightbulb,
   Link2,
   Loader2,
-  Star,
   User,
   X,
 } from 'lucide-react';
@@ -497,7 +501,7 @@ const SubmissionDetailModal: FunctionComponent<SubmissionDetailModalProps> = ({
 
         {/* Score Display */}
         <motion.div
-          className='mb-6 rounded-xl bg-amber-50 p-6'
+          className='aucctus-bg-secondary mb-6 flex flex-col items-center rounded-xl p-6'
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{
@@ -507,34 +511,12 @@ const SubmissionDetailModal: FunctionComponent<SubmissionDetailModalProps> = ({
             damping: 25,
           }}
         >
-          <div className='flex items-center gap-4'>
-            <motion.div
-              className='flex h-16 w-16 items-center justify-center'
-              initial={{ rotate: -20, scale: 0 }}
-              animate={{ rotate: 0, scale: 1 }}
-              transition={{
-                delay: 0.3,
-                type: 'spring',
-                stiffness: 200,
-                damping: 15,
-              }}
-            >
-              <Star className='h-12 w-12 fill-amber-400 stroke-amber-500' />
-            </motion.div>
-            <motion.div
-              className='text-4xl font-bold text-amber-600'
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.35, duration: 0.3 }}
-            >
-              {submission.totalScore ?? '--'}
-            </motion.div>
-          </div>
+          <ScoreGauge score={submission.totalScore ?? 0} />
           <motion.p
-            className='aucctus-text-sm mt-4 text-amber-800'
+            className='aucctus-text-sm aucctus-text-secondary text-center'
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.45 }}
+            transition={{ delay: 0.35 }}
           >
             {getScoreInterpretation(submission.totalScore)}
           </motion.p>

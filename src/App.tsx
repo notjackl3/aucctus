@@ -127,6 +127,7 @@ function App() {
           pauseOnHover
           theme='colored'
           transition={Slide}
+          limit={3}
         />
       </Suspense>
     </div>

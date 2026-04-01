@@ -214,7 +214,7 @@ const ConceptHero: React.FC<ConceptHeroProps> = ({
 
       {/* Concept image */}
       <div className='group relative w-1/2 flex-shrink-0 p-3 pl-0'>
-        <div className='aucctus-bg-secondary h-full w-full overflow-hidden rounded-lg'>
+        <div className='aucctus-bg-secondary aspect-video w-full overflow-hidden rounded-lg'>
           <img
             src={resolvedImage}
             alt={imageAlt}

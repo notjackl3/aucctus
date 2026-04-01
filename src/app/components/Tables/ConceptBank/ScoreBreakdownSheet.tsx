@@ -3,7 +3,7 @@
  */
 
 import images from '@assets/img';
-import { ScoringCategoryCard } from '@components';
+import { ScoreGauge, ScoringCategoryCard } from '@components';
 import {
   useConceptPriorityDetail,
   useUpdateQuestionScore,
@@ -52,57 +52,6 @@ interface ScoreBreakdownSheetProps {
 // Default empty reasons when no data is available
 const DEFAULT_REASONS_TO_BELIEVE: string[] = [];
 const DEFAULT_REASONS_TO_CHALLENGE: string[] = [];
-
-/**
- * Semicircle Score Gauge component
- */
-const ScoreGauge: React.FC<{ score: number }> = ({ score }) => {
-  const clampedScore = Math.max(0, Math.min(100, score));
-
-  const getGaugeColor = (score: number) => {
-    if (score >= 80) return '#16a34a'; // Green
-    if (score >= 70) return '#eab308'; // Yellow
-    if (score >= 60) return '#f97316'; // Orange
-    return '#ef4444'; // Red
-  };
-
-  const gaugeColor = getGaugeColor(clampedScore);
-
-  return (
-    <svg width='160' height='96' viewBox='0 0 160 96' className='mb-4'>
-      {/* Gray background arc (full) */}
-      <path
-        d='M 16 80 A 64 64 0 0 1 144 80'
-        fill='none'
-        stroke='#e5e7eb'
-        strokeWidth='14'
-        strokeLinecap='round'
-      />
-
-      {/* Colored progress arc (proportional to score) */}
-      <path
-        d='M 16 80 A 64 64 0 0 1 144 80'
-        fill='none'
-        stroke={gaugeColor}
-        strokeWidth='14'
-        strokeLinecap='round'
-        pathLength={100}
-        strokeDasharray={`${clampedScore} 100`}
-      />
-
-      {/* Score number in center */}
-      <text
-        x='80'
-        y='72'
-        textAnchor='middle'
-        className='fill-current'
-        style={{ fontSize: '36px', fontWeight: 'bold' }}
-      >
-        {clampedScore}
-      </text>
-    </svg>
-  );
-};
 
 /**
  * Get score description based on score value

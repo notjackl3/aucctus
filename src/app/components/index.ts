@@ -54,6 +54,9 @@ export * from './Nucleus';
 // Scoring Components
 export * from './Scoring';
 
+// Score Gauge
+export { ScoreGauge } from './ScoreGauge';
+
 // Concept Overview Components
 import ConceptOverview from './ConceptOverview';
 

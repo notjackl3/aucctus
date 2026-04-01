@@ -530,6 +530,9 @@ export type IAiEditingSuggestionsStreamEvent = StreamEvent<
 export interface IConceptWorkflowMessage extends BaseSocketEvent {
   type: 'concept.workflow.update.account';
 
+  // User who triggered the workflow (used to scope toasts to triggering user)
+  userUuid?: string;
+
   // Core identifiers
   conceptUuid: string;
   conceptRootIdentifier?: string;

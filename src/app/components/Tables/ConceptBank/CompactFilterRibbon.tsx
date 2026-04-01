@@ -90,6 +90,7 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
 
     const iconMap: Record<string, string> = {
       title: 'lightbulb',
+      priority__overall_priority_score: 'trendup',
       status: 'loading-02',
       createdBy: 'user-group',
       created_at: 'calendar',
@@ -115,6 +116,7 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
 
     const nameMap: Record<string, string> = {
       title: 'Concept',
+      priority__overall_priority_score: 'Score',
       status: 'Status',
       created_at: 'Created Date',
       created_by__first_name: 'Created By',
@@ -158,17 +160,17 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
           onOpenChange={(open) => setOpenDropdown(open ? dropdownKey : null)}
         >
           <Popover.Trigger asChild>
-            <div className='aucctus-bg-secondary flex max-w-xs items-center gap-1.5 rounded-md px-2 py-1'>
+            <div className='flex max-w-xs items-center gap-1.5 rounded-md border border-blue-100 bg-blue-25 px-2 py-1'>
               <DynamicIcon
                 variant={icon as any}
-                className='aucctus-stroke-tertiary h-3.5 w-3.5 flex-shrink-0'
+                className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-800'
               />
-              <span className='aucctus-text-sm aucctus-text-secondary truncate'>
+              <span className='aucctus-text-sm truncate text-blue-800'>
                 {name}
               </span>
               <DynamicIcon
                 variant={directionIcon as any}
-                className='aucctus-stroke-brand-primary h-3.5 w-3.5 flex-shrink-0'
+                className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-800'
               />
               <button className='aucctus-bg-tertiary-hover ml-0.5 flex-shrink-0 rounded p-0.5'>
                 <ChevronDown className='aucctus-stroke-tertiary h-3 w-3' />

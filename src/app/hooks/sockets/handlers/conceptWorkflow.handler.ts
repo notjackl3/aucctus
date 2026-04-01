@@ -373,17 +373,26 @@ export const useConceptWorkflowHandler = (
   useSocketEvent<'concept.workflow.update.account', IConceptWorkflowMessage>(
     'concept.workflow.update.account',
     (message) => {
+      // Only show toasts to the user who triggered the workflow.
+      // When userUuid is absent (backward compat), show to everyone.
+      const currentUserUuid = useStore.getState().auth.user?.uuid;
+      const shouldShowToast =
+        !message.userUuid || message.userUuid === currentUserUuid;
+
       if (
-        message.eventType === 'section_started' ||
-        message.eventType === 'section_completed' ||
-        message.eventType === 'workflow_completed' ||
-        message.eventType === 'workflow_error'
+        shouldShowToast &&
+        (message.eventType === 'section_started' ||
+          message.eventType === 'section_completed' ||
+          message.eventType === 'workflow_completed' ||
+          message.eventType === 'workflow_error')
       ) {
         upsertConceptWorkflowToast(message);
       }
 
       if (message.eventType === 'workflow_completed') {
-        finalizeConceptWorkflowToast(message);
+        if (shouldShowToast) {
+          finalizeConceptWorkflowToast(message);
+        }
 
         const messageKey = `${message.eventType}-${message.conceptRootIdentifier || 'unknown'}`;
         if (preventDuplicate(messageKey)) return;
@@ -418,25 +427,27 @@ export const useConceptWorkflowHandler = (
           });
         }
 
-        const currentActiveConceptUuid =
-          useStore.getState().conceptReport.conceptUuid;
-        const matchesActive =
-          message.conceptUuid === currentActiveConceptUuid ||
-          message.conceptRootIdentifier === currentActiveConceptUuid;
+        if (shouldShowToast) {
+          const currentActiveConceptUuid =
+            useStore.getState().conceptReport.conceptUuid;
+          const matchesActive =
+            message.conceptUuid === currentActiveConceptUuid ||
+            message.conceptRootIdentifier === currentActiveConceptUuid;
 
-        if (matchesActive || !currentActiveConceptUuid) {
-          toast.deferred.completed(
-            'Concept Report Ready',
-            message.conceptTitle,
-            undefined,
-            () => {
-              const conceptUrl = AppPath.ConceptOverview.replace(
-                ':id',
-                message.conceptRootIdentifier ?? '',
-              );
-              navigate(conceptUrl);
-            },
-          );
+          if (matchesActive || !currentActiveConceptUuid) {
+            toast.deferred.completed(
+              'Concept Report Ready',
+              message.conceptTitle,
+              undefined,
+              () => {
+                const conceptUrl = AppPath.ConceptOverview.replace(
+                  ':id',
+                  message.conceptRootIdentifier ?? '',
+                );
+                navigate(conceptUrl);
+              },
+            );
+          }
         }
       } else if (message.eventType === 'section_completed') {
         if (message.reportStatusBySection && message.conceptUuid) {
@@ -537,7 +548,11 @@ export const useConceptWorkflowHandler = (
           const matchesActiveConcept =
             activeConceptUuid && message.conceptUuid === activeConceptUuid;
 
-          if (matchesActiveConcept && !hasActiveProgressToast) {
+          if (
+            shouldShowToast &&
+            matchesActiveConcept &&
+            !hasActiveProgressToast
+          ) {
             toast.deferred.success(
               `Section updated successfully!`,
               message.message || 'Your changes have been applied.',
@@ -546,23 +561,27 @@ export const useConceptWorkflowHandler = (
           }
         }
       } else if (message.eventType === 'workflow_error') {
-        finalizeConceptWorkflowToast(message, 4000);
+        if (shouldShowToast) {
+          finalizeConceptWorkflowToast(message, 4000);
+        }
 
         const messageKey = `${message.eventType}-${message.message || 'unknown'}`;
         if (preventDuplicate(messageKey)) return;
 
-        const currentActiveConceptUuid =
-          useStore.getState().conceptReport.conceptUuid;
-        const matchesActive =
-          message.conceptUuid === currentActiveConceptUuid ||
-          message.conceptRootIdentifier === currentActiveConceptUuid;
+        if (shouldShowToast) {
+          const currentActiveConceptUuid =
+            useStore.getState().conceptReport.conceptUuid;
+          const matchesActive =
+            message.conceptUuid === currentActiveConceptUuid ||
+            message.conceptRootIdentifier === currentActiveConceptUuid;
 
-        if (matchesActive || !currentActiveConceptUuid) {
-          toast.deferred.error(
-            'Concept Generation Failed',
-            message.message ||
-              'An error occurred while generating your concept report',
-          );
+          if (matchesActive || !currentActiveConceptUuid) {
+            toast.deferred.error(
+              'Concept Generation Failed',
+              message.message ||
+                'An error occurred while generating your concept report',
+            );
+          }
         }
       }
     },
