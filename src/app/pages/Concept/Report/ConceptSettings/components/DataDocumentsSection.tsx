@@ -26,13 +26,13 @@ import type {
 } from '@libs/api/types/concept/concepts';
 
 interface DataDocumentsSectionProps {
-  conceptUuid: string;
+  identifier: string;
   concept?: IConcept;
   isReadOnly?: boolean;
 }
 
 const DataDocumentsSection: React.FC<DataDocumentsSectionProps> = ({
-  conceptUuid,
+  identifier,
   concept,
   isReadOnly = false,
 }) => {
@@ -43,37 +43,39 @@ const DataDocumentsSection: React.FC<DataDocumentsSectionProps> = ({
   );
   const [showCarousel, setShowCarousel] = useState(true);
 
+  const conceptUuid = concept?.uuid ?? '';
+
   // Fetch section data for strikethrough on "change" actions.
-  // These queries use long staleTime so they hit cache if the user already visited the tab.
+  // Deferred until modal opens; staleTime means they hit cache if the user already visited the tab.
   const { data: overviewData } = useQuery<IConceptOverview>({
     queryKey: [AucctusQueryKeys.conceptOverview, conceptUuid],
     queryFn: () => api.concept.getConceptOverview(conceptUuid),
     staleTime: 1000 * 60 * 5,
-    enabled: !!conceptUuid,
+    enabled: !!conceptUuid && isModalOpen,
   });
   const { data: financialData } = useQuery({
     queryKey: [AucctusQueryKeys.financialProjectionV2, conceptUuid],
     queryFn: () => api.financialProjection.getFinancialProjection(conceptUuid),
     staleTime: 1000 * 60 * 5,
-    enabled: !!conceptUuid,
+    enabled: !!conceptUuid && isModalOpen,
   });
   const { data: marketScanData } = useQuery({
     queryKey: [AucctusQueryKeys.marketScan, conceptUuid],
     queryFn: () => api.marketScan.getMarketScan(conceptUuid),
     staleTime: 1000 * 60 * 5,
-    enabled: !!conceptUuid,
+    enabled: !!conceptUuid && isModalOpen,
   });
   const { data: customerProfilesData } = useQuery({
     queryKey: [AucctusQueryKeys.customerProfiles, conceptUuid],
     queryFn: () => api.concept.getConceptCustomerProfiles(conceptUuid),
     staleTime: 1000 * 60 * 5,
-    enabled: !!conceptUuid,
+    enabled: !!conceptUuid && isModalOpen,
   });
   const { data: execSummaries } = useQuery<IExecutiveSummaries>({
     queryKey: [AucctusQueryKeys.conceptExecutiveSummaries, conceptUuid],
     queryFn: () => api.concept.getConceptExecutiveSummaries(conceptUuid),
     staleTime: 1000 * 60 * 5,
-    enabled: !!conceptUuid,
+    enabled: !!conceptUuid && isModalOpen,
   });
 
   // Build flat map of target_field → current_value for strikethrough display
@@ -127,12 +129,12 @@ const DataDocumentsSection: React.FC<DataDocumentsSectionProps> = ({
 
   // Queries
   const { documents, isLoading: isLoadingDocs } =
-    useConceptTrainingDocuments(conceptUuid);
+    useConceptTrainingDocuments(identifier);
   const {
     evidence,
     pendingCount,
     refetch: refetchEvidence,
-  } = useConceptEvidence(conceptUuid, 'pending');
+  } = useConceptEvidence(identifier, 'pending');
 
   // Mutations
   const { uploadDocumentAsync } = useUploadConceptTrainingDocument();
@@ -140,24 +142,24 @@ const DataDocumentsSection: React.FC<DataDocumentsSectionProps> = ({
 
   // WebSocket
   const { isProcessingDocument, processingProgress } =
-    useConceptDocumentSocketEvents(conceptUuid);
+    useConceptDocumentSocketEvents(identifier);
 
   const handleUploadFile = useCallback(
     async (file: File) => {
-      return await uploadDocumentAsync({ conceptUuid, file });
+      return await uploadDocumentAsync({ identifier, file });
     },
-    [conceptUuid, uploadDocumentAsync],
+    [identifier, uploadDocumentAsync],
   );
 
   const handleRefetchEvidence = useCallback(async () => {
     await queryClient.invalidateQueries({
-      queryKey: conceptDocumentKeys.evidence(conceptUuid),
+      queryKey: conceptDocumentKeys.evidence(identifier),
     });
     return await refetchEvidence();
-  }, [conceptUuid, queryClient, refetchEvidence]);
+  }, [identifier, queryClient, refetchEvidence]);
 
   const handleDelete = (documentUuid: string) => {
-    deleteDocument({ conceptUuid, documentUuid });
+    deleteDocument({ identifier, documentUuid });
   };
 
   const handleOpenUpload = useCallback(() => {
@@ -174,7 +176,7 @@ const DataDocumentsSection: React.FC<DataDocumentsSectionProps> = ({
     async (uuid: string) => {
       try {
         const response = await api.concept.applyEvidenceBatch(
-          conceptUuid,
+          identifier,
           [uuid],
           [],
         );
@@ -189,7 +191,7 @@ const DataDocumentsSection: React.FC<DataDocumentsSectionProps> = ({
         }
 
         queryClient.invalidateQueries({
-          queryKey: conceptDocumentKeys.evidence(conceptUuid),
+          queryKey: conceptDocumentKeys.evidence(identifier),
         });
         toast.success(
           'Evidence Applied',
@@ -199,22 +201,22 @@ const DataDocumentsSection: React.FC<DataDocumentsSectionProps> = ({
         toast.error('Action Failed', 'Unable to accept evidence.');
       }
     },
-    [conceptUuid, concept, queryClient],
+    [identifier, concept, queryClient],
   );
 
   const handleIgnoreEvidence = useCallback(
     async (uuid: string) => {
       try {
-        await api.concept.ignoreEvidence(conceptUuid, uuid);
+        await api.concept.ignoreEvidence(identifier, uuid);
         queryClient.invalidateQueries({
-          queryKey: conceptDocumentKeys.evidence(conceptUuid),
+          queryKey: conceptDocumentKeys.evidence(identifier),
         });
         toast.success('Evidence Ignored', 'The suggestion has been dismissed.');
       } catch {
         toast.error('Action Failed', 'Unable to ignore evidence.');
       }
     },
-    [conceptUuid, queryClient],
+    [identifier, queryClient],
   );
 
   return (
@@ -321,7 +323,7 @@ const DataDocumentsSection: React.FC<DataDocumentsSectionProps> = ({
       <ConceptDocumentModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        conceptUuid={conceptUuid}
+        identifier={identifier}
         concept={concept}
         cachedSectionValues={cachedSectionValues}
         processingProgress={processingProgress}

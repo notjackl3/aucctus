@@ -1359,33 +1359,33 @@ export class Endpoints {
   }
 
   // Concept training documents & evidence
-  static conceptTrainingDocuments(conceptUuid: string) {
-    return `/api/v1/concept/${conceptUuid}/training-documents`;
+  static conceptTrainingDocuments(identifier: string) {
+    return `/api/v1/concept/${identifier}/training-documents`;
   }
 
-  static conceptTrainingDocument(conceptUuid: string, documentUuid: string) {
-    return `/api/v1/concept/${conceptUuid}/training-documents/${documentUuid}`;
+  static conceptTrainingDocument(identifier: string, documentUuid: string) {
+    return `/api/v1/concept/${identifier}/training-documents/${documentUuid}`;
   }
 
-  static conceptEvidence(conceptUuid: string, status?: string) {
-    const base = `/api/v1/concept/${conceptUuid}/evidence`;
+  static conceptEvidence(identifier: string, status?: string) {
+    const base = `/api/v1/concept/${identifier}/evidence`;
     return status ? `${base}?status=${status}` : base;
   }
 
-  static conceptEvidenceAccept(conceptUuid: string, evidenceUuid: string) {
-    return `/api/v1/concept/${conceptUuid}/evidence/${evidenceUuid}/accept`;
+  static conceptEvidenceAccept(identifier: string, evidenceUuid: string) {
+    return `/api/v1/concept/${identifier}/evidence/${evidenceUuid}/accept`;
   }
 
-  static conceptEvidenceIgnore(conceptUuid: string, evidenceUuid: string) {
-    return `/api/v1/concept/${conceptUuid}/evidence/${evidenceUuid}/ignore`;
+  static conceptEvidenceIgnore(identifier: string, evidenceUuid: string) {
+    return `/api/v1/concept/${identifier}/evidence/${evidenceUuid}/ignore`;
   }
 
-  static conceptEvidenceAcceptAll(conceptUuid: string) {
-    return `/api/v1/concept/${conceptUuid}/evidence/accept-all`;
+  static conceptEvidenceAcceptAll(identifier: string) {
+    return `/api/v1/concept/${identifier}/evidence/accept-all`;
   }
 
-  static conceptEvidenceApply(conceptUuid: string) {
-    return `/api/v1/concept/${conceptUuid}/evidence/apply`;
+  static conceptEvidenceApply(identifier: string) {
+    return `/api/v1/concept/${identifier}/evidence/apply`;
   }
 
   // Persona chat

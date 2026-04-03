@@ -24,10 +24,10 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 export const conceptDocumentKeys = {
   all: ['conceptDocuments'] as const,
-  trainingDocuments: (conceptUuid: string) =>
-    [...conceptDocumentKeys.all, 'trainingDocuments', conceptUuid] as const,
-  evidence: (conceptUuid: string) =>
-    [...conceptDocumentKeys.all, 'evidence', conceptUuid] as const,
+  trainingDocuments: (identifier: string) =>
+    [...conceptDocumentKeys.all, 'trainingDocuments', identifier] as const,
+  evidence: (identifier: string) =>
+    [...conceptDocumentKeys.all, 'evidence', identifier] as const,
 };
 
 const STALE_TIME = 1000 * 60 * 2; // 2 minutes
@@ -36,13 +36,13 @@ const STALE_TIME = 1000 * 60 * 2; // 2 minutes
 // Training Document Queries
 // ---------------------------------------------------------------------------
 
-export const useConceptTrainingDocuments = (conceptUuid: string) => {
+export const useConceptTrainingDocuments = (identifier: string) => {
   const query = useQuery({
-    queryKey: conceptDocumentKeys.trainingDocuments(conceptUuid),
+    queryKey: conceptDocumentKeys.trainingDocuments(identifier),
     queryFn: async (): Promise<IConceptTrainingDocument[]> => {
-      return await api.concept.getTrainingDocuments(conceptUuid);
+      return await api.concept.getTrainingDocuments(identifier);
     },
-    enabled: !!conceptUuid,
+    enabled: !!identifier,
     staleTime: STALE_TIME,
     onError: (e: AxiosError) => {
       if (e.response?.status !== 404) {
@@ -71,17 +71,17 @@ export const useUploadConceptTrainingDocument = () => {
 
   const mutation = useMutation({
     mutationFn: async ({
-      conceptUuid,
+      identifier,
       file,
     }: {
-      conceptUuid: string;
+      identifier: string;
       file: File;
     }) => {
-      return await api.concept.uploadTrainingDocument(conceptUuid, file);
+      return await api.concept.uploadTrainingDocument(identifier, file);
     },
-    onSuccess: (result, { conceptUuid }) => {
+    onSuccess: (result, { identifier }) => {
       queryClient.invalidateQueries({
-        queryKey: conceptDocumentKeys.trainingDocuments(conceptUuid),
+        queryKey: conceptDocumentKeys.trainingDocuments(identifier),
       });
       toast.success(
         'Document Uploaded',
@@ -106,23 +106,20 @@ export const useDeleteConceptTrainingDocument = () => {
 
   const mutation = useMutation({
     mutationFn: async ({
-      conceptUuid,
+      identifier,
       documentUuid,
     }: {
-      conceptUuid: string;
+      identifier: string;
       documentUuid: string;
     }) => {
-      return await api.concept.deleteTrainingDocument(
-        conceptUuid,
-        documentUuid,
-      );
+      return await api.concept.deleteTrainingDocument(identifier, documentUuid);
     },
-    onSuccess: (_, { conceptUuid }) => {
+    onSuccess: (_, { identifier }) => {
       queryClient.invalidateQueries({
-        queryKey: conceptDocumentKeys.trainingDocuments(conceptUuid),
+        queryKey: conceptDocumentKeys.trainingDocuments(identifier),
       });
       queryClient.invalidateQueries({
-        queryKey: conceptDocumentKeys.evidence(conceptUuid),
+        queryKey: conceptDocumentKeys.evidence(identifier),
       });
       toast.success('Document Deleted', 'Training document removed.');
     },
@@ -143,15 +140,15 @@ export const useDeleteConceptTrainingDocument = () => {
 // ---------------------------------------------------------------------------
 
 export const useConceptEvidence = (
-  conceptUuid: string,
+  identifier: string,
   status?: ConceptEvidenceStatus,
 ) => {
   const query = useQuery({
-    queryKey: [...conceptDocumentKeys.evidence(conceptUuid), status],
+    queryKey: [...conceptDocumentKeys.evidence(identifier), status],
     queryFn: async (): Promise<IConceptEvidence[]> => {
-      return await api.concept.getEvidence(conceptUuid, status);
+      return await api.concept.getEvidence(identifier, status);
     },
-    enabled: !!conceptUuid,
+    enabled: !!identifier,
     staleTime: STALE_TIME,
     onError: (e: AxiosError) => {
       if (e.response?.status !== 404) {
@@ -184,7 +181,7 @@ const DEFAULT_PROCESSING_PROGRESS: IConceptDocumentProcessingProgress = {
   message: '',
 };
 
-export const useConceptDocumentSocketEvents = (conceptUuid: string) => {
+export const useConceptDocumentSocketEvents = (identifier: string) => {
   const queryClient = useQueryClient();
   const [processingProgress, setProcessingProgress] =
     useState<IConceptDocumentProcessingProgress>(DEFAULT_PROCESSING_PROGRESS);
@@ -192,11 +189,12 @@ export const useConceptDocumentSocketEvents = (conceptUuid: string) => {
   // Listen for document processing progress
   // NOTE: BaseOutboundMessage uses alias_generator=to_camel, so all
   // snake_case Python fields arrive as camelCase on the frontend.
+  // The backend sends concept_root.identifier as the concept_uuid field value.
   useSocketEvent(
     'concept.document.processing.progress.account',
     useCallback(
       (data: IConceptDocumentProcessingProgressMessage) => {
-        if (data.conceptUuid !== conceptUuid) return;
+        if (data.conceptUuid !== identifier) return;
 
         if (data.stage === 'completed') {
           setProcessingProgress({
@@ -207,10 +205,10 @@ export const useConceptDocumentSocketEvents = (conceptUuid: string) => {
             message: 'Document processed successfully!',
           });
           queryClient.invalidateQueries({
-            queryKey: conceptDocumentKeys.trainingDocuments(conceptUuid),
+            queryKey: conceptDocumentKeys.trainingDocuments(identifier),
           });
           queryClient.invalidateQueries({
-            queryKey: conceptDocumentKeys.evidence(conceptUuid),
+            queryKey: conceptDocumentKeys.evidence(identifier),
           });
         } else if (data.stage === 'failed') {
           setProcessingProgress({
@@ -234,7 +232,7 @@ export const useConceptDocumentSocketEvents = (conceptUuid: string) => {
           });
         }
       },
-      [conceptUuid, queryClient],
+      [identifier, queryClient],
     ),
   );
 
@@ -243,17 +241,17 @@ export const useConceptDocumentSocketEvents = (conceptUuid: string) => {
     'concept.evidence.discovered.account',
     useCallback(
       (data: IConceptEvidenceDiscoveredMessage) => {
-        if (data.conceptUuid !== conceptUuid) return;
+        if (data.conceptUuid !== identifier) return;
 
         queryClient.invalidateQueries({
-          queryKey: conceptDocumentKeys.evidence(conceptUuid),
+          queryKey: conceptDocumentKeys.evidence(identifier),
         });
         toast.info(
           'New Evidence Found',
           data.message || 'New potential updates discovered.',
         );
       },
-      [conceptUuid, queryClient],
+      [identifier, queryClient],
     ),
   );
 
@@ -262,7 +260,7 @@ export const useConceptDocumentSocketEvents = (conceptUuid: string) => {
     'concept.document.processing.error.account',
     useCallback(
       (data: IConceptDocumentProcessingErrorMessage) => {
-        if (data.conceptUuid !== conceptUuid) return;
+        if (data.conceptUuid !== identifier) return;
 
         setProcessingProgress({
           isProcessing: false,
@@ -272,7 +270,7 @@ export const useConceptDocumentSocketEvents = (conceptUuid: string) => {
           message: data.message || 'Processing failed',
         });
       },
-      [conceptUuid],
+      [identifier],
     ),
   );
 
@@ -281,16 +279,16 @@ export const useConceptDocumentSocketEvents = (conceptUuid: string) => {
     'concept.document.processing.completed.account',
     useCallback(
       (data: IConceptDocumentProcessingCompletedMessage) => {
-        if (data.conceptUuid !== conceptUuid) return;
+        if (data.conceptUuid !== identifier) return;
 
         queryClient.invalidateQueries({
-          queryKey: conceptDocumentKeys.trainingDocuments(conceptUuid),
+          queryKey: conceptDocumentKeys.trainingDocuments(identifier),
         });
         queryClient.invalidateQueries({
-          queryKey: conceptDocumentKeys.evidence(conceptUuid),
+          queryKey: conceptDocumentKeys.evidence(identifier),
         });
       },
-      [conceptUuid, queryClient],
+      [identifier, queryClient],
     ),
   );
 

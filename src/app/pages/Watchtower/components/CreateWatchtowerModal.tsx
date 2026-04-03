@@ -4,6 +4,7 @@ import {
   useCreateWatchtowerConfig,
   useGenerateWatchtowerRules,
   useScanWatchtowerConfig,
+  useWatchtowerConfigs,
 } from '@hooks/query/watchtower.hook';
 import { cn } from '@libs/utils/react';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
@@ -63,6 +64,12 @@ const CreateWatchtowerModal: React.FC<CreateWatchtowerModalProps> = ({
   const { createWatchtowerAsync: createWatchtower, isCreating } =
     useCreateWatchtowerConfig();
   const { scanWatchtower } = useScanWatchtowerConfig();
+  const { watchtowerConfigs } = useWatchtowerConfigs();
+
+  const existingNames = watchtowerConfigs.map((c) => c.name.toLowerCase());
+  const isNameDuplicate =
+    viewName.trim() !== '' &&
+    existingNames.includes(viewName.trim().toLowerCase());
 
   const reset = useCallback(() => {
     setStep('describe');
@@ -329,8 +336,12 @@ const CreateWatchtowerModal: React.FC<CreateWatchtowerModalProps> = ({
               onBack={() => setStep('describe')}
               onApprove={handleApprove}
               isApproveDisabled={
-                suggestedRules.length === 0 || !viewName.trim() || isCreating
+                suggestedRules.length === 0 ||
+                !viewName.trim() ||
+                isCreating ||
+                isNameDuplicate
               }
+              isNameDuplicate={isNameDuplicate}
             />
           )}
 

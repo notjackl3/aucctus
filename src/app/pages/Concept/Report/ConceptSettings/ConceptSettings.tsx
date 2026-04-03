@@ -114,7 +114,7 @@ const ConceptSettings: React.FC = () => {
     useState<SettingsSection>('seed-summary');
 
   // Fetch pending evidence count for sidebar badge
-  const { pendingCount } = useConceptEvidence(concept.uuid, 'pending');
+  const { pendingCount } = useConceptEvidence(concept.identifier, 'pending');
 
   // Get all ignition questions
   const ignitionQuestions = React.useMemo(
@@ -238,7 +238,7 @@ const ConceptSettings: React.FC = () => {
             {/* ============================================ */}
             {activeSection === 'data-documents' && (
               <DataDocumentsSection
-                conceptUuid={concept.uuid}
+                identifier={concept.identifier}
                 concept={concept}
                 isReadOnly={isReadOnly}
               />

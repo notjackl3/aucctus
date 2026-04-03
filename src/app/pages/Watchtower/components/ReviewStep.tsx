@@ -17,6 +17,7 @@ interface ReviewStepProps {
   onBack: () => void;
   onApprove: () => void;
   isApproveDisabled: boolean;
+  isNameDuplicate?: boolean;
 }
 
 const ReviewStep: React.FC<ReviewStepProps> = ({
@@ -29,6 +30,7 @@ const ReviewStep: React.FC<ReviewStepProps> = ({
   onBack,
   onApprove,
   isApproveDisabled,
+  isNameDuplicate,
 }) => {
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
   const [editingRuleText, setEditingRuleText] = useState('');
@@ -84,8 +86,17 @@ const ReviewStep: React.FC<ReviewStepProps> = ({
         <input
           value={viewName}
           onChange={(e) => onViewNameChange(e.target.value)}
-          className='h-9 w-full rounded-md border border-white/[0.08] bg-white/[0.04] px-3 text-sm text-white focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/10'
+          className={`h-9 w-full rounded-md border bg-white/[0.04] px-3 text-sm text-white focus:outline-none focus:ring-1 ${
+            isNameDuplicate
+              ? 'border-red-400/50 focus:border-red-400/70 focus:ring-red-400/20'
+              : 'border-white/[0.08] focus:border-white/20 focus:ring-white/10'
+          }`}
         />
+        {isNameDuplicate && (
+          <p className='mt-1 text-xs text-red-400'>
+            A watchtower with this name already exists
+          </p>
+        )}
       </div>
 
       {/* Rules list */}

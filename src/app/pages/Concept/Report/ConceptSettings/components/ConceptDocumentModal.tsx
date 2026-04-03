@@ -49,7 +49,7 @@ import { conceptDocumentKeys } from '@hooks/query/conceptTrainingDocument.hook';
 export interface ConceptDocumentModalProps {
   open: boolean;
   onClose: () => void;
-  conceptUuid: string;
+  identifier: string;
   concept?: IConcept;
   cachedSectionValues?: Record<string, string>;
   processingProgress: IConceptDocumentProcessingProgress;
@@ -66,7 +66,7 @@ export interface ConceptDocumentModalProps {
 const ConceptDocumentModal: React.FC<ConceptDocumentModalProps> = ({
   open,
   onClose,
-  conceptUuid,
+  identifier,
   concept,
   cachedSectionValues,
   processingProgress,
@@ -294,7 +294,7 @@ const ConceptDocumentModal: React.FC<ConceptDocumentModalProps> = ({
     setIsSaving(true);
     try {
       const response = await api.concept.applyEvidenceBatch(
-        conceptUuid,
+        identifier,
         approved.map((i) => i.uuid),
         rejected.map((i) => i.uuid),
       );
@@ -314,7 +314,7 @@ const ConceptDocumentModal: React.FC<ConceptDocumentModalProps> = ({
       );
 
       queryClient.invalidateQueries({
-        queryKey: conceptDocumentKeys.evidence(conceptUuid),
+        queryKey: conceptDocumentKeys.evidence(identifier),
       });
       handleClose();
     } catch {
@@ -322,7 +322,7 @@ const ConceptDocumentModal: React.FC<ConceptDocumentModalProps> = ({
     } finally {
       setIsSaving(false);
     }
-  }, [insights, conceptUuid, concept, queryClient, handleClose]);
+  }, [insights, identifier, concept, queryClient, handleClose]);
 
   return (
     <LiquidGlassModal

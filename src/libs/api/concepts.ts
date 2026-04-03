@@ -932,60 +932,60 @@ export class ConceptApi extends ApiService {
   // Training Documents & Evidence
   // =========================================================================
 
-  getTrainingDocuments(conceptUuid: string) {
+  getTrainingDocuments(identifier: string) {
     return this.get<
       import('./types/conceptTrainingDocument').IConceptTrainingDocument[]
-    >(endpoints.conceptTrainingDocuments(conceptUuid));
+    >(endpoints.conceptTrainingDocuments(identifier));
   }
 
-  uploadTrainingDocument(conceptUuid: string, file: File) {
+  uploadTrainingDocument(identifier: string, file: File) {
     const formData = new FormData();
     formData.append('file', file);
     return this.postFormData<
       import('./types/conceptTrainingDocument').IConceptTrainingDocumentUploadResponse
-    >(endpoints.conceptTrainingDocuments(conceptUuid), formData);
+    >(endpoints.conceptTrainingDocuments(identifier), formData);
   }
 
-  deleteTrainingDocument(conceptUuid: string, documentUuid: string) {
+  deleteTrainingDocument(identifier: string, documentUuid: string) {
     return this.delete<{ detail: string }>(
-      endpoints.conceptTrainingDocument(conceptUuid, documentUuid),
+      endpoints.conceptTrainingDocument(identifier, documentUuid),
     );
   }
 
   getEvidence(
-    conceptUuid: string,
+    identifier: string,
     status?: import('./types/conceptTrainingDocument').ConceptEvidenceStatus,
   ) {
     return this.get<
       import('./types/conceptTrainingDocument').IConceptEvidence[]
-    >(endpoints.conceptEvidence(conceptUuid, status));
+    >(endpoints.conceptEvidence(identifier, status));
   }
 
-  acceptEvidence(conceptUuid: string, evidenceUuid: string) {
+  acceptEvidence(identifier: string, evidenceUuid: string) {
     return this.post<
       import('./types/conceptTrainingDocument').IConceptEvidence
-    >(endpoints.conceptEvidenceAccept(conceptUuid, evidenceUuid));
+    >(endpoints.conceptEvidenceAccept(identifier, evidenceUuid));
   }
 
-  ignoreEvidence(conceptUuid: string, evidenceUuid: string) {
+  ignoreEvidence(identifier: string, evidenceUuid: string) {
     return this.post<
       import('./types/conceptTrainingDocument').IConceptEvidence
-    >(endpoints.conceptEvidenceIgnore(conceptUuid, evidenceUuid));
+    >(endpoints.conceptEvidenceIgnore(identifier, evidenceUuid));
   }
 
-  acceptAllEvidence(conceptUuid: string) {
+  acceptAllEvidence(identifier: string) {
     return this.post<{ detail: string }>(
-      endpoints.conceptEvidenceAcceptAll(conceptUuid),
+      endpoints.conceptEvidenceAcceptAll(identifier),
     );
   }
 
   applyEvidenceBatch(
-    conceptUuid: string,
+    identifier: string,
     evidenceUuids: string[],
     ignoredUuids: string[] = [],
   ) {
     return this.post<{ status: string; message: string; sections: string[] }>(
-      endpoints.conceptEvidenceApply(conceptUuid),
+      endpoints.conceptEvidenceApply(identifier),
       { evidence_uuids: evidenceUuids, ignored_uuids: ignoredUuids },
     );
   }

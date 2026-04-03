@@ -1,6 +1,6 @@
 export interface IConceptTrainingDocument {
   uuid: string;
-  conceptUuid: string;
+  identifier: string;
   filename: string;
   fileType: string;
   fileUrl: string | null;
@@ -22,7 +22,7 @@ export interface IConceptTrainingDocumentUploadResponse {
 
 export interface IConceptEvidence {
   uuid: string;
-  conceptUuid: string;
+  identifier: string;
   trainingDocumentUuid: string | null;
   type: 'document';
   title: string;
