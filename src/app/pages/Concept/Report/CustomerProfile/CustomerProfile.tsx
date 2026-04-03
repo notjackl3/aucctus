@@ -33,6 +33,7 @@ import {
 } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useConceptReportContext } from '../ConceptReport/ConceptReportContext';
+import DeleteCustomerProfileModal from './DeleteCustomerProfileModal';
 import CustomerDetails from './Details/CustomerDetails';
 import LivingPersonaProfile from './LivingPersonaProfile';
 
@@ -100,6 +101,42 @@ const CustomerProfile: FunctionComponent = () => {
     [concept?.livingPersonaUuids],
   );
   const hasLivingPersonas = livingPersonaUuids.length > 0;
+
+  // --- Customer profile delete management ---
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [profileToDelete, setProfileToDelete] = useState<{
+    uuid: string;
+    name: string;
+  } | null>(null);
+
+  const handleDeleteProfile = useCallback((profile: ICustomerProfile) => {
+    setProfileToDelete({ uuid: profile.uuid, name: profile.segment });
+    setDeleteModalOpen(true);
+  }, []);
+
+  const handleDeleteSuccess = useCallback(() => {
+    if (!profileToDelete) return;
+    const remaining = profiles.filter((p) => p.uuid !== profileToDelete.uuid);
+    if (remaining.length > 0) {
+      // If deleted profile was selected, select next/previous
+      if (selectedProfileName === profileToDelete.name) {
+        const deletedIndex = profiles.findIndex(
+          (p) => p.uuid === profileToDelete.uuid,
+        );
+        const nextProfile =
+          deletedIndex < remaining.length
+            ? remaining[deletedIndex]
+            : remaining[remaining.length - 1];
+        setSearchParams((prev) => {
+          prev.set('persona', nextProfile.segment);
+          return prev;
+        });
+      }
+    }
+    setProfileToDelete(null);
+  }, [profileToDelete, profiles, selectedProfileName, setSearchParams]);
+
+  const isLastProfile = profiles.length <= 1;
 
   // --- Living persona add/remove management ---
   const MAX_PERSONAS = 4;
@@ -681,7 +718,7 @@ const CustomerProfile: FunctionComponent = () => {
                               }}
                               onClick={() => onProfileSelect(profile.segment)}
                               className={cn(
-                                'flex cursor-pointer items-center rounded-lg transition-colors',
+                                'group/cp flex cursor-pointer items-center rounded-lg transition-colors',
                                 isActive
                                   ? 'aucctus-text-brand-primary'
                                   : 'aucctus-text-tertiary aucctus-bg-secondary-hover hover:aucctus-text-secondary',
@@ -718,6 +755,33 @@ const CustomerProfile: FunctionComponent = () => {
                                   {profile.name}
                                 </span>
                               </div>
+                              {/* Delete button - only when expanded and not read-only */}
+                              {sidebarExpanded &&
+                                !isReadOnly &&
+                                (isLastProfile ? (
+                                  <ComponentTooltip tip='Cannot delete the last customer profile'>
+                                    <button
+                                      type='button'
+                                      disabled
+                                      className='aucctus-text-tertiary flex-shrink-0 cursor-not-allowed rounded p-1 opacity-50 group-hover/cp:opacity-50'
+                                      aria-label='Cannot delete the last customer profile'
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  </ComponentTooltip>
+                                ) : (
+                                  <button
+                                    type='button'
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteProfile(profile);
+                                    }}
+                                    className='aucctus-text-tertiary flex-shrink-0 rounded p-1 opacity-0 transition-all hover:text-red-500 group-hover/cp:opacity-100'
+                                    aria-label={`Delete ${profile.segment}`}
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                ))}
                             </div>
                           );
 
@@ -915,6 +979,16 @@ const CustomerProfile: FunctionComponent = () => {
           </div>
         )}
       </div>
+
+      {profileToDelete && (
+        <DeleteCustomerProfileModal
+          profileUuid={profileToDelete.uuid}
+          profileName={profileToDelete.name}
+          open={deleteModalOpen}
+          onOpenChange={setDeleteModalOpen}
+          onDeleted={handleDeleteSuccess}
+        />
+      )}
     </>
   );
 };

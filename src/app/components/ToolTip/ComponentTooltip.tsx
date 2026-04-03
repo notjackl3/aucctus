@@ -149,14 +149,20 @@ const ComponentTooltip: FunctionComponent<ComponentTooltipProps> = ({
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            {isValidElement(tip) && calculatedMaxHeight !== undefined
-              ? cloneElement(tip, {
-                  style: {
-                    ...((tip.props as any).style || {}),
-                    maxHeight: `${calculatedMaxHeight}px`,
-                  },
-                } as any)
-              : tip}
+            {isValidElement(tip) && calculatedMaxHeight !== undefined ? (
+              cloneElement(tip, {
+                style: {
+                  ...((tip.props as any).style || {}),
+                  maxHeight: `${calculatedMaxHeight}px`,
+                },
+              } as any)
+            ) : typeof tip === 'string' ? (
+              <span className='aucctus-bg-tertiary aucctus-text-secondary rounded-md px-2.5 py-1.5 text-xs shadow-lg'>
+                {tip}
+              </span>
+            ) : (
+              tip
+            )}
           </div>,
           document.body,
         )}

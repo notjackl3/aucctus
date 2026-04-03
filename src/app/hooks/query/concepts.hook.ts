@@ -3068,3 +3068,39 @@ export const useConceptNotifyOnComplete = () => {
     },
   });
 };
+
+export const useCompareConcepts = () => {
+  return useMutation({
+    mutationFn: async (conceptUuids: string[]) =>
+      await api.concept.compareConcepts(conceptUuids),
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Comparison Failed',
+        message || 'Unable to compare concepts. Please try again.',
+      );
+    },
+  });
+};
+
+export const useExportConceptReport = () => {
+  return useMutation({
+    mutationFn: async (params: {
+      conceptUuid: string;
+      sections: string[];
+      format: 'xlsx' | 'csv';
+    }) =>
+      await api.concept.exportConceptReport(
+        params.conceptUuid,
+        params.sections,
+        params.format,
+      ),
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Export Failed',
+        message || 'Unable to export concept report. Please try again.',
+      );
+    },
+  });
+};

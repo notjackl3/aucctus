@@ -320,6 +320,12 @@ export class Endpoints {
     return utils.string.queryStringGenerator('api/v1/concept/uuids', options);
   }
 
+  static conceptCompare = '/api/v1/concept/compare';
+
+  static conceptReportExport(conceptUuid: string) {
+    return `/api/v1/concept/${conceptUuid}/export/report`;
+  }
+
   static conceptExportXlsx(options?: IConceptQueryOptions) {
     return utils.string.queryStringGenerator(
       'api/v1/concept/export/xlsx',

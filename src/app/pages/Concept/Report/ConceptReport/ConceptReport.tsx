@@ -29,6 +29,7 @@ import {
   BookOpen,
   ClockArrowDown,
   DollarSign,
+  Download,
   FlaskConical,
   Globe,
   Settings,
@@ -51,6 +52,7 @@ import {
   type IConceptReportContext,
 } from './ConceptReportContext';
 import ConceptReportSocketWrapper from './ConceptReportSocketWrapper';
+import ExportReportPopover from './ExportReportPopover';
 import ShareReportDialog from './ShareReportDialog';
 
 const { SkeletonBlock } = ConceptReportSkeletons;
@@ -142,8 +144,15 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
     right: 0,
   });
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [showExportPopover, setShowExportPopover] = useState(false);
+  const [exportDropdownPos, setExportDropdownPos] =
+    useState<React.CSSProperties>({});
   const versionsRef = useRef<HTMLDivElement>(null);
   const versionsHideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const versionsTriggerRef = useRef<Element | null>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
+  const exportHideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const exportTriggerRef = useRef<Element | null>(null);
 
   const { branding } = useAccountBranding();
 
@@ -224,6 +233,60 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
   // Hero description
   const heroDescription = useMemo(() => concept?.summary || '', [concept]);
 
+  // Recalculate dropdown positions from trigger element rects
+  const updateVersionsPosition = useCallback(() => {
+    const el = versionsTriggerRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    setVersionsDropdownPos({
+      top: rect.bottom + 10,
+      right: window.innerWidth - rect.right,
+    });
+  }, []);
+
+  const updateExportPosition = useCallback(() => {
+    const el = exportTriggerRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const dropdownWidth = 280;
+    const dropdownHeight = 380;
+    const pad = 10;
+
+    const spaceBelow = window.innerHeight - rect.bottom - pad;
+    const pos: React.CSSProperties =
+      spaceBelow >= dropdownHeight
+        ? { top: rect.bottom + 4 }
+        : { bottom: window.innerHeight - rect.top + 4 };
+
+    let rightPos = window.innerWidth - rect.right;
+    if (rightPos + dropdownWidth > window.innerWidth - pad) {
+      rightPos = window.innerWidth - pad - dropdownWidth;
+    }
+    if (rightPos < pad) {
+      rightPos = pad;
+    }
+    pos.right = rightPos;
+
+    setExportDropdownPos(pos);
+  }, []);
+
+  // Reposition open dropdowns on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (showVersions) updateVersionsPosition();
+      if (showExportPopover) updateExportPosition();
+    };
+    if (showVersions || showExportPopover) {
+      window.addEventListener('scroll', handleScroll, true);
+      return () => window.removeEventListener('scroll', handleScroll, true);
+    }
+  }, [
+    showVersions,
+    showExportPopover,
+    updateVersionsPosition,
+    updateExportPosition,
+  ]);
+
   // Build tabs dynamically
   const conceptTabs = useMemo(() => {
     const tabs: {
@@ -266,11 +329,8 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
         value: 'versions',
         icon: ClockArrowDown,
         onAction: (e: React.MouseEvent) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          setVersionsDropdownPos({
-            top: rect.bottom + 10,
-            right: window.innerWidth - rect.right,
-          });
+          versionsTriggerRef.current = e.currentTarget;
+          updateVersionsPosition();
           setShowVersions((v) => !v);
         },
       });
@@ -282,6 +342,18 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
       value: 'share',
       icon: Share2,
       onAction: () => setShowShareDialog(true),
+    });
+
+    // Add Export tab (icon only)
+    tabs.push({
+      label: '',
+      value: 'export',
+      icon: Download,
+      onAction: (e: React.MouseEvent) => {
+        exportTriggerRef.current = e.currentTarget;
+        updateExportPosition();
+        setShowExportPopover((v) => !v);
+      },
     });
 
     // Add Settings tab (icon only, no label) if concept has seed
@@ -308,6 +380,7 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
         isLoading,
       } as ConceptTab;
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     concept?.featureVersions?.assumptions,
     concept?.hasSeed,
@@ -383,6 +456,45 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
     return clearVersionsHideTimer;
   }, [showVersions, startVersionsHideTimer, clearVersionsHideTimer]);
 
+  // Close export popover on click outside
+  useEffect(() => {
+    if (!showExportPopover) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        exportRef.current &&
+        !exportRef.current.contains(event.target as Node)
+      ) {
+        setShowExportPopover(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showExportPopover]);
+
+  // Auto-hide export popover after 2s of mouse not hovering
+  const startExportHideTimer = useCallback(() => {
+    exportHideTimer.current = setTimeout(
+      () => setShowExportPopover(false),
+      2000,
+    );
+  }, []);
+
+  const clearExportHideTimer = useCallback(() => {
+    if (exportHideTimer.current) {
+      clearTimeout(exportHideTimer.current);
+      exportHideTimer.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showExportPopover) {
+      startExportHideTimer();
+    } else {
+      clearExportHideTimer();
+    }
+    return clearExportHideTimer;
+  }, [showExportPopover, startExportHideTimer, clearExportHideTimer]);
+
   // Show toast and redirect if concept not found
   const shouldRedirect = !concept && !isConceptLoading && !isConceptFetching;
   useEffect(() => {
@@ -403,6 +515,30 @@ const ConceptReport: FunctionComponent<ConceptReportProps> = ({
         open={showShareDialog}
         onOpenChange={setShowShareDialog}
       />
+      <AnimatePresence>
+        {showExportPopover && conceptUuid && (
+          <motion.div
+            ref={exportRef}
+            initial={{
+              opacity: 0,
+              y: exportDropdownPos.top !== undefined ? -8 : 8,
+            }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className='fixed z-40'
+            style={exportDropdownPos}
+            onMouseEnter={clearExportHideTimer}
+            onMouseLeave={startExportHideTimer}
+          >
+            <ExportReportPopover
+              conceptUuid={conceptUuid}
+              conceptTitle={concept?.title}
+              onClose={() => setShowExportPopover(false)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div
         className={cn('mx-auto my-0 flex min-h-full w-full flex-col p-8')}
         style={navBrandStyles}

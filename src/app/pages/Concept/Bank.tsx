@@ -41,12 +41,14 @@ import {
   List,
   Loader2,
   Pencil,
+  Scale,
   Upload,
 } from 'lucide-react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Lightbulb, Rocket } from 'lucide-react';
 import api from '@libs/api';
 import { downloadExcel } from '@libs/utils/files';
+import ConceptComparisonModal from './ConceptComparisonModal';
 
 export const CONCEPT_STATUS_LIST_MAP = {
   draft: DRAFT_CONCEPT_STATUS_LIST,
@@ -170,6 +172,7 @@ const ConceptBank: React.FC = () => {
 
   // Bulk edit modal state (shared between toolbar pencil in Bank and modal in BankConcepts)
   const [isBulkEditOpen, setIsBulkEditOpen] = React.useState(false);
+  const [isCompareOpen, setIsCompareOpen] = React.useState(false);
   const [resolvedBulkUuids, setResolvedBulkUuids] = React.useState<
     string[] | null
   >(null);
@@ -817,24 +820,55 @@ const ConceptBank: React.FC = () => {
                   />
                   {/* Bulk Edit pencil icon - only visible when concepts are selected */}
                   {hasSelection && (
-                    <button
-                      className='aucctus-bg-secondary-hover relative flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-200'
-                      onClick={handleBulkEditOpen}
-                      disabled={isResolvingUuids}
-                      title={`Edit ${selectionCount} concepts`}
-                    >
-                      {isResolvingUuids ? (
-                        <Loader2
-                          size={16}
-                          className='aucctus-stroke-primary animate-spin'
-                        />
-                      ) : (
-                        <Pencil size={16} className='aucctus-stroke-primary' />
-                      )}
-                      <span className='aucctus-bg-brand-solid absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-medium text-white'>
-                        {selectionCount}
-                      </span>
-                    </button>
+                    <>
+                      <button
+                        className='aucctus-bg-secondary-hover relative flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-200'
+                        onClick={handleBulkEditOpen}
+                        disabled={isResolvingUuids}
+                        title={`Edit ${selectionCount} concepts`}
+                      >
+                        {isResolvingUuids ? (
+                          <Loader2
+                            size={16}
+                            className='aucctus-stroke-primary animate-spin'
+                          />
+                        ) : (
+                          <Pencil
+                            size={16}
+                            className='aucctus-stroke-primary'
+                          />
+                        )}
+                        <span className='aucctus-bg-brand-solid absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-medium text-white'>
+                          {selectionCount}
+                        </span>
+                      </button>
+                      <button
+                        className={cn(
+                          'aucctus-bg-secondary-hover relative flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-200',
+                          (selectionCount < 2 || selectionCount > 5) &&
+                            'cursor-not-allowed opacity-50',
+                        )}
+                        onClick={() => {
+                          if (selectionCount > 5) {
+                            toast.error('Select up to 5 concepts to compare');
+                            return;
+                          }
+                          if (isAllAcrossPagesSelected) {
+                            toast.error(
+                              'Please select individual concepts to compare (2-5)',
+                            );
+                            return;
+                          }
+                          setIsCompareOpen(true);
+                        }}
+                        disabled={
+                          selectionCount < 2 || isAllAcrossPagesSelected
+                        }
+                        title={`Compare ${selectionCount} concepts`}
+                      >
+                        <Scale size={16} className='aucctus-stroke-primary' />
+                      </button>
+                    </>
                   )}
                   <Table.PropertyColumns.PropertyManager
                     propertyDefinitions={propertyDefinitions}
@@ -925,6 +959,12 @@ const ConceptBank: React.FC = () => {
         {/* Outlet component will render the child routes with context */}
         <Outlet context={outletContext} />
       </div>
+
+      <ConceptComparisonModal
+        conceptUuids={selectedConceptUuids}
+        open={isCompareOpen}
+        onOpenChange={setIsCompareOpen}
+      />
     </div>
   );
 };

@@ -39,6 +39,8 @@ import {
   NotificationSectionKey,
   IBulkConceptUpdate,
   IBulkConceptUpdateResponse,
+  ICompareConceptsRequest,
+  ICompareConceptsResponse,
 } from './types'; // Import the missing type
 import {
   IConceptVersionList,
@@ -1004,5 +1006,36 @@ export class ConceptApi extends ApiService {
     return this.get<Blob>(endpoints.conceptExportXlsx(options), {
       responseType: 'blob',
     });
+  }
+
+  /**
+   * Compare multiple concepts using AI.
+   * Analyzes 2-5 concepts and returns pros, cons, unknowns for each,
+   * along with a recommended winner.
+   * @param conceptUuids - Array of 2-5 concept UUIDs to compare
+   */
+  compareConcepts(conceptUuids: string[]) {
+    return this.post<ICompareConceptsResponse, ICompareConceptsRequest>(
+      endpoints.conceptCompare,
+      { conceptUuids },
+    );
+  }
+
+  /**
+   * Export a concept report with selected sections as xlsx or csv.
+   * @param conceptUuid - The concept UUID to export
+   * @param sections - Array of section group keys to include
+   * @param format - Export format: 'xlsx' or 'csv'
+   */
+  exportConceptReport(
+    conceptUuid: string,
+    sections: string[],
+    format: 'xlsx' | 'csv',
+  ) {
+    return this.post<Blob>(
+      endpoints.conceptReportExport(conceptUuid),
+      { sections, format },
+      { responseType: 'blob' },
+    );
   }
 }

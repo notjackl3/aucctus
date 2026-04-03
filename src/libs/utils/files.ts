@@ -39,6 +39,25 @@ export const downloadExcel = (xlsxBlob: BlobPart, fileName: string): void => {
 };
 
 /**
+ * Triggers a browser download for a CSV file from a Blob.
+ * @param csvBlob - The CSV data as a BlobPart
+ * @param fileName - The desired filename for the downloaded file
+ */
+export const downloadCsv = (csvBlob: BlobPart, fileName: string): void => {
+  const blob = new Blob([csvBlob], {
+    type: 'text/csv',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+/**
  * Generates a filename for a concept snapshot
  * @param companyName - The company name
  * @param conceptTitle - The concept title
