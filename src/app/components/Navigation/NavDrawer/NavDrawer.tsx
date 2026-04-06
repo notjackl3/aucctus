@@ -3,7 +3,6 @@ import NavWord from '@assets/aucctus_nav_word.png';
 import { Avatar } from '@components';
 import { useClerk } from '@clerk/clerk-react';
 import { cn } from '@libs/utils/react';
-import { isAucctusAdmin } from '@libs/utils/account';
 import { AppPath } from '@routes/routes';
 import useStore, { resetAllStoreData } from '@stores/store';
 import { useMemo, useState } from 'react';
@@ -22,7 +21,6 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
   const [collapsed, setCollapsed] = useState(true);
 
   const navigate = useNavigate();
-  const isAdmin = useMemo(() => isAucctusAdmin(user), [user]);
 
   // Build playground path with cached seed if available
   const playgroundPath = useMemo(() => {
@@ -97,14 +95,12 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
           icon='route'
           collapsed={collapsed}
         />
-        {isAdmin && (
-          <NavButton
-            to={AppPath.Watchtower}
-            title='Watchtower'
-            icon='signal-02'
-            collapsed={collapsed}
-          />
-        )}
+        <NavButton
+          to={AppPath.Watchtower}
+          title='Watchtower'
+          icon='signal-02'
+          collapsed={collapsed}
+        />
         {/* Competitor Assessment - disabled, feature dormant */}
         {/* {isAdmin && (
           <NavButton
