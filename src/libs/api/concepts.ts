@@ -40,8 +40,7 @@ import {
   IBulkConceptUpdate,
   IBulkConceptUpdateResponse,
   ICompareConceptsRequest,
-  ICompareConceptsResponse,
-} from './types'; // Import the missing type
+} from './types';
 import {
   IConceptVersionList,
   IConceptVersionRevertRequestPayload,
@@ -1015,10 +1014,10 @@ export class ConceptApi extends ApiService {
    * @param conceptUuids - Array of 2-5 concept UUIDs to compare
    */
   compareConcepts(conceptUuids: string[]) {
-    return this.post<ICompareConceptsResponse, ICompareConceptsRequest>(
-      endpoints.conceptCompare,
-      { conceptUuids },
-    );
+    return this.post<
+      { taskId: string; message: string },
+      ICompareConceptsRequest
+    >(endpoints.conceptCompare, { conceptUuids });
   }
 
   /**

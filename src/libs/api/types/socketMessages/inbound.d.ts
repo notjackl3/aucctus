@@ -6,6 +6,10 @@ import {
   ConceptReportStatusBySection,
 } from '../concept/concepts';
 import {
+  IConceptAnalysis,
+  IConceptComparisonWinner,
+} from '../concept/conceptComparer';
+import {
   IAISuggestionList,
   IAISuggestionsContext,
 } from '../incubation/aiSuggestions';
@@ -1240,6 +1244,24 @@ export interface IPortfolioInsightsErrorMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// Concept Comparison Messages
+// ==========================================
+
+export interface IConceptComparisonCompletedMessage extends BaseSocketEvent {
+  type: 'concept.comparison.completed.user';
+  accountUuid: string;
+  concepts: IConceptAnalysis[];
+  winner: IConceptComparisonWinner;
+}
+
+export interface IConceptComparisonErrorMessage extends BaseSocketEvent {
+  type: 'concept.comparison.error.user';
+  accountUuid: string;
+  error: string;
+  message: string;
+}
+
+// ==========================================
 // Concept Priority Messages
 // ==========================================
 
@@ -1385,6 +1407,8 @@ export type InboundSocketEvent<C = {}> =
   | IPortfolioExecutiveSummaryGenerationErrorMessage
   | IPortfolioInsightsGeneratedMessage
   | IPortfolioInsightsErrorMessage
+  | IConceptComparisonCompletedMessage
+  | IConceptComparisonErrorMessage
   | IConceptPriorityCompletedMessage
   | IConceptPriorityErrorMessage
   | IBulkPriorityProgressMessage

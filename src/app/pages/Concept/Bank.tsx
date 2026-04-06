@@ -198,12 +198,25 @@ const ConceptBank: React.FC = () => {
     }
   }, [isAllAcrossPagesSelected, conceptFilterOptions]);
 
+  // Map of concept UUID → identifier for navigation
+  const [conceptUuidToIdentifier, setConceptUuidToIdentifier] = React.useState<
+    Record<string, string>
+  >({});
+
   // Callback for BankConcepts to report selection changes
   const handleSelectionChange = useCallback(
-    (uuids: string[], isAll: boolean, total: number) => {
+    (
+      uuids: string[],
+      isAll: boolean,
+      total: number,
+      uuidIdentifierMap?: Record<string, string>,
+    ) => {
       setSelectedConceptUuids(uuids);
       setIsAllAcrossPagesSelected(isAll);
       setTotalConceptCount(total);
+      if (uuidIdentifierMap) {
+        setConceptUuidToIdentifier(uuidIdentifierMap);
+      }
     },
     [],
   );
@@ -962,6 +975,7 @@ const ConceptBank: React.FC = () => {
 
       <ConceptComparisonModal
         conceptUuids={selectedConceptUuids}
+        conceptUuidToIdentifier={conceptUuidToIdentifier}
         open={isCompareOpen}
         onOpenChange={setIsCompareOpen}
       />

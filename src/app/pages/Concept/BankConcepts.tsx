@@ -33,7 +33,12 @@ const gridCardVariants = {
 type ConceptBankContextType = {
   filterOptions: IConceptFilterOptions;
   updateTableFiltering: (value: Partial<IConceptFilterOptions>) => void;
-  onSelectionChange: (uuids: string[], isAll: boolean, total: number) => void;
+  onSelectionChange: (
+    uuids: string[],
+    isAll: boolean,
+    total: number,
+    uuidIdentifierMap?: Record<string, string>,
+  ) => void;
   isBulkEditOpen: boolean;
   setIsBulkEditOpen: () => void;
   resolvedBulkUuids: string[] | null;
@@ -87,16 +92,22 @@ const BankConcepts: React.FC = () => {
 
   // Report selection changes to parent (Bank.tsx)
   React.useEffect(() => {
+    const uuidIdentifierMap: Record<string, string> = {};
+    for (const c of concepts) {
+      uuidIdentifierMap[c.uuid] = c.identifier;
+    }
     onSelectionChange(
       selectedConceptUuids,
       isAllAcrossPagesSelected,
       totalCount,
+      uuidIdentifierMap,
     );
   }, [
     selectedConceptUuids,
     isAllAcrossPagesSelected,
     totalCount,
     onSelectionChange,
+    concepts,
   ]);
 
   const bulkEditUuids = isAllAcrossPagesSelected

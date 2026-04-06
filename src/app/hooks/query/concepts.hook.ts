@@ -3077,7 +3077,7 @@ export const useCompareConcepts = () => {
       const message = utils.osiris.parseFormError(e);
       toast.error(
         'Comparison Failed',
-        message || 'Unable to compare concepts. Please try again.',
+        message || 'Unable to dispatch concept comparison. Please try again.',
       );
     },
   });

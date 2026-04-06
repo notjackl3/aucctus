@@ -1,4 +1,4 @@
-import { FunctionComponent, useState, useEffect } from 'react';
+import { FunctionComponent, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Loader2,
@@ -13,14 +13,23 @@ import {
 } from 'lucide-react';
 import LiquidGlassModal from '@components/ui/LiquidGlassModal';
 import { useCompareConcepts } from '@hooks/query/concepts.hook';
+import { useSocketEvent } from '@hooks/sockets/aucctus';
+import { toast } from '@components';
 import {
   ICompareConceptsResponse,
   IConceptAnalysis,
 } from '@libs/api/types/concept/conceptComparer';
+import {
+  IConceptComparisonCompletedMessage,
+  IConceptComparisonErrorMessage,
+} from '@libs/api/types/socketMessages/inbound';
 import { cn } from '@libs/utils/react';
+import { useNavigate } from 'react-router-dom';
+import { AppPath } from '@routes/routes';
 
 interface ConceptComparisonModalProps {
   conceptUuids: string[];
+  conceptUuidToIdentifier: Record<string, string>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -72,29 +81,53 @@ const AnalysisSection: FunctionComponent<{
  */
 const ConceptComparisonModal: FunctionComponent<
   ConceptComparisonModalProps
-> = ({ conceptUuids, open, onOpenChange }) => {
+> = ({ conceptUuids, conceptUuidToIdentifier, open, onOpenChange }) => {
   const [comparisonResult, setComparisonResult] =
     useState<ICompareConceptsResponse | null>(null);
   const [selectedConceptUuid, setSelectedConceptUuid] = useState<string | null>(
     null,
   );
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
+  const navigate = useNavigate();
   const compareMutation = useCompareConcepts();
+
+  // Listen for comparison results via WebSocket
+  useSocketEvent<'concept.comparison.completed.user'>(
+    'concept.comparison.completed.user',
+    useCallback((data: IConceptComparisonCompletedMessage) => {
+      const result: ICompareConceptsResponse = {
+        concepts: data.concepts as IConceptAnalysis[],
+        winner: data.winner as ICompareConceptsResponse['winner'],
+      };
+      setComparisonResult(result);
+      setIsWaiting(false);
+      // Auto-select the winner
+      if (result.winner?.conceptUuid) {
+        setSelectedConceptUuid(result.winner.conceptUuid);
+      } else if (result.concepts.length > 0) {
+        setSelectedConceptUuid(result.concepts[0].conceptUuid);
+      }
+    }, []),
+  );
+
+  // Listen for comparison errors via WebSocket
+  useSocketEvent<'concept.comparison.error.user'>(
+    'concept.comparison.error.user',
+    useCallback((data: IConceptComparisonErrorMessage) => {
+      setIsWaiting(false);
+      setHasError(true);
+      toast.error('Comparison Failed', data.message);
+    }, []),
+  );
 
   // Auto-trigger comparison on mount
   useEffect(() => {
     if (open && conceptUuids.length >= 2) {
-      compareMutation.mutate(conceptUuids, {
-        onSuccess: (data: ICompareConceptsResponse) => {
-          setComparisonResult(data);
-          // Auto-select the winner
-          if (data.winner?.conceptUuid) {
-            setSelectedConceptUuid(data.winner.conceptUuid);
-          } else if (data.concepts.length > 0) {
-            setSelectedConceptUuid(data.concepts[0].conceptUuid);
-          }
-        },
-      });
+      setIsWaiting(true);
+      setHasError(false);
+      compareMutation.mutate(conceptUuids);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -104,6 +137,8 @@ const ConceptComparisonModal: FunctionComponent<
     if (!open) {
       setComparisonResult(null);
       setSelectedConceptUuid(null);
+      setIsWaiting(false);
+      setHasError(false);
     }
   }, [open]);
 
@@ -147,7 +182,7 @@ const ConceptComparisonModal: FunctionComponent<
         </div>
 
         {/* Loading State */}
-        {compareMutation.isLoading && (
+        {isWaiting && (
           <div className='flex flex-1 flex-col items-center justify-center py-16'>
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -167,7 +202,7 @@ const ConceptComparisonModal: FunctionComponent<
         )}
 
         {/* Error State */}
-        {compareMutation.isError && (
+        {hasError && (
           <div className='flex flex-1 flex-col items-center justify-center py-16'>
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -184,7 +219,11 @@ const ConceptComparisonModal: FunctionComponent<
               Unable to compare the selected concepts
             </p>
             <button
-              onClick={() => compareMutation.mutate(conceptUuids)}
+              onClick={() => {
+                setHasError(false);
+                setIsWaiting(true);
+                compareMutation.mutate(conceptUuids);
+              }}
               className='btn btn-secondary btn-md'
             >
               Try Again
@@ -379,9 +418,18 @@ const ConceptComparisonModal: FunctionComponent<
                   </p>
                 </div>
                 <button
-                  onClick={() =>
-                    setSelectedConceptUuid(comparisonResult.winner.conceptUuid)
-                  }
+                  onClick={() => {
+                    const identifier =
+                      conceptUuidToIdentifier[
+                        comparisonResult.winner.conceptUuid
+                      ];
+                    if (identifier) {
+                      onOpenChange(false);
+                      navigate(
+                        AppPath.ConceptOverview.replace(':id', identifier),
+                      );
+                    }
+                  }}
                   className='btn btn-md shrink-0 bg-green-600 text-white hover:bg-green-700'
                 >
                   View Winner
