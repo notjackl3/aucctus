@@ -47,6 +47,7 @@ import type { IWatchtowerSignal } from '@libs/api/types/watchtower';
 import { DynamicIcon } from '@libs/utils/iconMap';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { AppPath } from '@routes/routes';
+import useStore from '@stores/store';
 import {
   AlertCircle,
   AlertTriangle,
@@ -548,6 +549,10 @@ const WatchtowerPageContent: React.FC = () => {
     setShowCreateModal,
   } = useWatchtowerView();
 
+  // Check if current user is admin
+  const { user } = useStore((state: any) => state.auth);
+  const isAdmin = user?.role?.toLowerCase() === 'admin';
+
   // Get account logo from dedicated API endpoint
   const { logoUrl } = useAccountLogo();
   const companyLogoUrl = logoUrl || undefined;
@@ -848,6 +853,7 @@ const WatchtowerPageContent: React.FC = () => {
         helpText='First-time initialization will scan and index available market signals. This process can take up to 10 minutes.'
         onInitialize={handleFirstRunInitialize}
         isInitializing={isScanningActive}
+        isAdmin={isAdmin}
       />
     );
   } else if (isFirstRun && isScanningActive) {
@@ -882,7 +888,10 @@ const WatchtowerPageContent: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
           >
-            <WatchtowerViewDropdown onDeleted={removeTowerProgress} />
+            <WatchtowerViewDropdown
+              onDeleted={removeTowerProgress}
+              isAdmin={isAdmin}
+            />
           </motion.div>
 
           {/* Radar visualization during first scan */}
@@ -941,7 +950,10 @@ const WatchtowerPageContent: React.FC = () => {
             transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
           >
             {/* Watchtower view switcher dropdown */}
-            <WatchtowerViewDropdown onDeleted={removeTowerProgress} />
+            <WatchtowerViewDropdown
+              onDeleted={removeTowerProgress}
+              isAdmin={isAdmin}
+            />
 
             {/* Separator */}
             <div className='h-5 w-px bg-white/20' />
@@ -1143,11 +1155,12 @@ const WatchtowerPageContent: React.FC = () => {
               selectedScanUuid={selectedScanUuid}
               onSelectScan={setSelectedScanUuid}
               watchtowerConfigUuid={activeWatchtowerConfigUuid}
+              isAdmin={isAdmin}
             />
           )}
 
-          {/* Customize button - bottom right */}
-          {!showCustomize && (
+          {/* Customize button - bottom right (admin only) */}
+          {!showCustomize && isAdmin && (
             <motion.button
               onClick={() => setShowCustomize(true)}
               className='absolute bottom-6 right-6 z-10 inline-flex select-none items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium backdrop-blur-md transition-all duration-200 hover:border-white/30 hover:bg-white/15'

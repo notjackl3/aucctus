@@ -18,6 +18,8 @@ interface SignalHistoryPopoverProps {
   selectedScanUuid: string | undefined;
   onSelectScan: (scanUuid: string | undefined) => void;
   watchtowerConfigUuid?: string;
+  /** Whether the current user is an admin (controls refresh access). */
+  isAdmin?: boolean;
 }
 
 const formatScanDate = (isoDate: string): string => {
@@ -45,13 +47,14 @@ const SignalHistoryPopover: React.FC<SignalHistoryPopoverProps> = ({
   selectedScanUuid,
   onSelectScan,
   watchtowerConfigUuid,
+  isAdmin = false,
 }) => {
   const [open, setOpen] = useState(false);
   const { scans } = useWatchtowerScanHistory(watchtowerConfigUuid);
 
   const isViewingHistorical = selectedScanUuid !== undefined;
   const isAllTowersView = watchtowerConfigUuid === undefined;
-  const isRefreshDisabled = isScanningActive || isAllTowersView;
+  const isRefreshDisabled = isScanningActive || isAllTowersView || !isAdmin;
 
   // Find the selected scan to show its date
   const selectedScan = isViewingHistorical
@@ -131,9 +134,11 @@ const SignalHistoryPopover: React.FC<SignalHistoryPopoverProps> = ({
                         : 'text-white/60 hover:bg-white/15 hover:text-white',
                     )}
                     title={
-                      isAllTowersView
-                        ? 'Select a specific tower to refresh'
-                        : 'Refresh signals'
+                      !isAdmin
+                        ? 'Admin access required'
+                        : isAllTowersView
+                          ? 'Select a specific tower to refresh'
+                          : 'Refresh signals'
                     }
                   >
                     <RefreshCw
@@ -145,14 +150,16 @@ const SignalHistoryPopover: React.FC<SignalHistoryPopoverProps> = ({
                     />
                   </button>
                 </Tooltip.Trigger>
-                {isAllTowersView && (
+                {(isAllTowersView || !isAdmin) && (
                   <Tooltip.Portal>
                     <Tooltip.Content
                       side='top'
                       sideOffset={6}
                       className='z-[100] rounded-md border border-white/15 bg-black/95 px-2.5 py-1.5 text-xs text-white/80 shadow-lg backdrop-blur-md'
                     >
-                      Select a specific tower to refresh
+                      {!isAdmin
+                        ? 'Admin access required'
+                        : 'Select a specific tower to refresh'}
                       <Tooltip.Arrow className='fill-black/95' />
                     </Tooltip.Content>
                   </Tooltip.Portal>

@@ -13,10 +13,13 @@ import { useWatchtowerView } from '../WatchtowerViewContext';
 interface WatchtowerViewDropdownProps {
   /** Called after a watchtower config is successfully deleted, with the deleted UUID. */
   onDeleted?: (uuid: string) => void;
+  /** Whether the current user is an admin (controls create/delete access). */
+  isAdmin?: boolean;
 }
 
 const WatchtowerViewDropdown: React.FC<WatchtowerViewDropdownProps> = ({
   onDeleted,
+  isAdmin = false,
 }) => {
   const {
     activeWatchtowerConfigUuid,
@@ -144,7 +147,7 @@ const WatchtowerViewDropdown: React.FC<WatchtowerViewDropdownProps> = ({
                   {activeWatchtowerConfigUuid === watchtower.uuid && (
                     <Check size={12} className='text-white/60' />
                   )}
-                  {watchtowerConfigs.length > 1 && (
+                  {isAdmin && watchtowerConfigs.length > 1 && (
                     <button
                       data-delete-button
                       onClick={(e) =>
@@ -159,19 +162,23 @@ const WatchtowerViewDropdown: React.FC<WatchtowerViewDropdownProps> = ({
               </DropdownMenu.Item>
             ))}
 
-            <DropdownMenu.Separator className='my-1 h-px bg-white/10' />
+            {isAdmin && (
+              <>
+                <DropdownMenu.Separator className='my-1 h-px bg-white/10' />
 
-            <DropdownMenu.Item
-              onSelect={() => {
-                // Defer so the DropdownMenu fully closes before the Dialog opens;
-                // opening a modal Dialog mid-close corrupts the dropdown's internal state.
-                requestAnimationFrame(() => setShowCreateModal(true));
-              }}
-              className='flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1.5 text-white/50 outline-none hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white'
-            >
-              <Plus size={12} />
-              <span className='text-xs'>New Watchtower</span>
-            </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  onSelect={() => {
+                    // Defer so the DropdownMenu fully closes before the Dialog opens;
+                    // opening a modal Dialog mid-close corrupts the dropdown's internal state.
+                    requestAnimationFrame(() => setShowCreateModal(true));
+                  }}
+                  className='flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1.5 text-white/50 outline-none hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white'
+                >
+                  <Plus size={12} />
+                  <span className='text-xs'>New Watchtower</span>
+                </DropdownMenu.Item>
+              </>
+            )}
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
       </DropdownMenu.Root>

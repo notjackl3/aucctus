@@ -49,6 +49,8 @@ export interface WatchtowerInitiationProps {
   onInitialize: () => void | Promise<void>;
   /** Whether initialization is in progress */
   isInitializing?: boolean;
+  /** Whether the current user is an admin (controls initialize access). */
+  isAdmin?: boolean;
 }
 
 /**
@@ -294,6 +296,7 @@ const WatchtowerInitiation: React.FC<WatchtowerInitiationProps> = ({
   badges = [],
   onInitialize,
   isInitializing = false,
+  isAdmin = false,
 }) => {
   const setShowingInitiation = useInitiationStore(
     (s) => s.setShowingInitiation,
@@ -441,7 +444,8 @@ const WatchtowerInitiation: React.FC<WatchtowerInitiationProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.2, duration: 0.6 }}
               onClick={handleActivate}
-              disabled={isInitializing || isFlashing}
+              disabled={isInitializing || isFlashing || !isAdmin}
+              title={!isAdmin ? 'Admin access required' : undefined}
               className='group relative overflow-hidden rounded-full bg-white px-8 py-4 font-semibold text-slate-950 transition-all duration-300 hover:scale-105 hover:bg-white/95 disabled:cursor-not-allowed disabled:opacity-50'
             >
               {/* Animated border trace */}
@@ -485,14 +489,16 @@ const WatchtowerInitiation: React.FC<WatchtowerInitiationProps> = ({
             </motion.button>
 
             {/* Help text */}
-            {helpText && (
+            {(helpText || !isAdmin) && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.4, duration: 0.6 }}
                 className='mt-6 max-w-md text-center text-xs text-white/30'
               >
-                {helpText}
+                {!isAdmin
+                  ? 'Only account admins can initialize Watchtower. Contact your admin to get started.'
+                  : helpText}
               </motion.p>
             )}
           </motion.div>
