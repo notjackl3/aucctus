@@ -18,6 +18,7 @@ import {
   useCreateTestAssumption,
   useDeleteTestAssumption,
   useRegenerateTestDetails,
+  useAcknowledgeProfileChanges,
 } from '@hooks/query/testing.hook';
 import { useModal } from '@context/ModalContextProvider';
 import type { AssumptionCategory } from '@libs/api/types/concept/assumptions';
@@ -78,6 +79,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
     showSuccessToast: false,
   });
   const regenerateTestDetails = useRegenerateTestDetails();
+  const acknowledgeProfileChanges = useAcknowledgeProfileChanges();
 
   // Fetch assumptions to check validation status using V2 API
   // Fetch all assumptions across all categories with a high page size
@@ -629,7 +631,16 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                 });
               }
             }}
+            onAcknowledge={() => {
+              if (testUuid) {
+                acknowledgeProfileChanges.mutate({
+                  conceptUuid,
+                  testUuid,
+                });
+              }
+            }}
             isLoading={regenerateTestDetails.isLoading}
+            isAcknowledging={acknowledgeProfileChanges.isLoading}
           />
         )}
 

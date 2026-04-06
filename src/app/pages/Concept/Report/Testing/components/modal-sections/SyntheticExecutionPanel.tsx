@@ -10,6 +10,7 @@ import { ICustomerProfile } from '@libs/api/types/concept/concepts';
 import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
 import telemetry from '@libs/telemetry';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { getParticipantSourceUuid } from '../../utils/testUtils';
 import CollateralSelectionStep from './components/CollateralSelectionStep';
 import ConfigureLaunchStep from './components/ConfigureLaunchStep';
 import ParticipantSelectionStep from './components/ParticipantSelectionStep';
@@ -64,6 +65,7 @@ interface ISyntheticExecutionPanelProps {
   lockedSkippedParticipants?: Set<string>;
   isCollateralRegenerating?: boolean;
   isViewMode?: boolean;
+  profileBasisStale?: boolean;
 }
 
 /**
@@ -100,6 +102,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   lockedSkippedParticipants,
   isCollateralRegenerating = false,
   isViewMode = false,
+  profileBasisStale = false,
 }) => {
   // Configuration state
   const [selectedCollateralUuids, setSelectedCollateralUuids] = useState<
@@ -149,57 +152,99 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   // Mutation for persisting count changes to backend
   const updateParticipant = useUpdateTestParticipant();
 
-  // Create lookup map: profileUuid → participantUuid
+  // Create lookup map: profileUuid/personaUuid → participantUuid
   const profileToParticipantMap = useMemo(() => {
     const map = new Map<string, string>();
     if (participants) {
       participants.forEach((participant) => {
-        const normalizedProfileUuid = normalizeUuid(
-          participant.customerProfile.uuid,
-        );
-        map.set(normalizedProfileUuid, participant.uuid);
+        const sourceUuid = getParticipantSourceUuid(participant);
+        if (sourceUuid) {
+          const normalizedUuid = normalizeUuid(sourceUuid);
+          map.set(normalizedUuid, participant.uuid);
+        }
       });
     }
     return map;
   }, [participants]);
 
   // Map participants to ICustomerProfile format for use in UI components
-  // This ensures we only show profiles that are actual participants in this test
+  // Includes both profile-based and persona-based participants
   const participantProfiles = useMemo((): ICustomerProfile[] => {
     if (!participants || participants.length === 0) {
       return [];
     }
-    return participants.map((participant) => {
-      const cp = participant.customerProfile;
-      return {
-        uuid: cp.uuid,
-        version: cp.version,
-        name: cp.name,
-        segment: cp.segment,
-        description: cp.description,
-        geoLocation: cp.geoLocation,
-        familySize: cp.familySize,
-        ageUpper: cp.ageUpper,
-        ageLower: cp.ageLower,
-        ageRange: cp.ageRange,
-        incomeUpper: cp.incomeUpper,
-        incomeLower: cp.incomeLower,
-        incomeRange: cp.incomeRange,
-        avatarUrl: cp.avatarUrl,
-        isPrimary: cp.isPrimary,
-        // Cast jobs/pains since participant.customerProfile has slightly different icon type
-        jobs: (cp.jobs || []) as ICustomerProfile['jobs'],
-        pains: (cp.pains || []) as ICustomerProfile['pains'],
-        journey: [],
-        jobsToBeDoneInsight: cp.jobsToBeDoneInsight,
-        painsInsight: cp.painsInsight,
-        alternativesInsight: cp.alternativesInsight,
-        journeyInsight: cp.journeyInsight,
-        customerInsight: cp.customerInsight,
-        createdAt: cp.createdAt,
-        updatedAt: cp.updatedAt,
-      };
-    });
+    return participants
+      .filter(
+        (participant) =>
+          (participant.sourceType === 'customer_profile' &&
+            participant.customerProfile != null) ||
+          (participant.sourceType === 'persona' &&
+            participant.personaUuid != null),
+      )
+      .map((participant) => {
+        // TODO: The persona-to-ICustomerProfile coercion below is a known architectural issue.
+        // Fixing it properly requires changing how downstream components consume participant data.
+        // Tracked for a future refactor.
+        if (participant.sourceType === 'persona' && participant.persona) {
+          const p = participant.persona;
+          return {
+            uuid: participant.personaUuid!,
+            version: 0,
+            name: p.name,
+            segment: p.segment,
+            description: p.overview || '',
+            geoLocation: '',
+            familySize: 0,
+            ageUpper: 0,
+            ageLower: 0,
+            ageRange: '',
+            incomeUpper: 0,
+            incomeLower: 0,
+            incomeRange: '',
+            avatarUrl: p.avatarUrl ?? undefined,
+            isPrimary: true,
+            jobs: [] as ICustomerProfile['jobs'],
+            pains: [] as ICustomerProfile['pains'],
+            journey: [],
+            jobsToBeDoneInsight: '',
+            painsInsight: '',
+            alternativesInsight: '',
+            journeyInsight: '',
+            customerInsight: '',
+            createdAt: '',
+            updatedAt: '',
+          };
+        }
+        const cp = participant.customerProfile!;
+        return {
+          uuid: cp.uuid,
+          version: cp.version,
+          name: cp.name,
+          segment: cp.segment,
+          description: cp.description,
+          geoLocation: cp.geoLocation,
+          familySize: cp.familySize,
+          ageUpper: cp.ageUpper,
+          ageLower: cp.ageLower,
+          ageRange: cp.ageRange,
+          incomeUpper: cp.incomeUpper,
+          incomeLower: cp.incomeLower,
+          incomeRange: cp.incomeRange,
+          avatarUrl: cp.avatarUrl,
+          isPrimary: cp.isPrimary,
+          // Cast jobs/pains since participant.customerProfile has slightly different icon type
+          jobs: (cp.jobs || []) as ICustomerProfile['jobs'],
+          pains: (cp.pains || []) as ICustomerProfile['pains'],
+          journey: [],
+          jobsToBeDoneInsight: cp.jobsToBeDoneInsight,
+          painsInsight: cp.painsInsight,
+          alternativesInsight: cp.alternativesInsight,
+          journeyInsight: cp.journeyInsight,
+          customerInsight: cp.customerInsight,
+          createdAt: cp.createdAt,
+          updatedAt: cp.updatedAt,
+        };
+      });
   }, [participants]);
 
   // Handler to persist count change to backend
@@ -523,9 +568,11 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
     totalTests <= 100 &&
     status === 'idle' &&
     !isExecuting;
-  const collateralBlockedMessage = isCollateralRegenerating
-    ? 'Collateral is regenerating. Wait until the update finishes before running a synthetic test.'
-    : undefined;
+  const collateralBlockedMessage = profileBasisStale
+    ? 'Customer profiles or personas have changed. Review participants and acknowledge changes before running a synthetic test.'
+    : isCollateralRegenerating
+      ? 'Collateral is regenerating. Wait until the update finishes before running a synthetic test.'
+      : undefined;
 
   // Collateral selection handler
   const handleCollateralSelectionChange = (uuids: string[]) => {

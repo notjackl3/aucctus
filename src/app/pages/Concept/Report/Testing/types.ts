@@ -178,14 +178,25 @@ export interface ITestCollateralUpdate {
   userInput?: string;
 }
 
+export interface ILightweightPersona {
+  uuid: string;
+  name: string;
+  segment: string;
+  overview: string;
+  avatarUrl?: string | null;
+  confidence: string;
+}
+
 export interface ITestParticipant {
   uuid: string;
-  customerProfileUuid: string;
+  customerProfileUuid?: string | null;
+  personaUuid?: string | null;
+  sourceType: 'customer_profile' | 'persona';
   count: number;
   notes: string;
   status: 'invited' | 'confirmed' | 'completed' | 'no_show' | 'cancelled';
   testDetailsUuid: string;
-  customerProfile: {
+  customerProfile?: {
     name: string;
     segment: string;
     description: string;
@@ -223,14 +234,17 @@ export interface ITestParticipant {
     customerInsight: string;
     createdAt: string;
     updatedAt: string;
-  };
+  } | null;
+  persona?: ILightweightPersona | null;
   ratioPercentage: number;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface ITestParticipantCreate {
-  customerProfileUuid: string;
+  customerProfileUuid?: string;
+  personaUuid?: string;
+  sourceType?: 'customer_profile' | 'persona';
   count?: number;
   status?: 'invited' | 'confirmed' | 'completed' | 'no_show' | 'cancelled';
   notes?: string;
@@ -238,6 +252,8 @@ export interface ITestParticipantCreate {
 
 export interface ITestParticipantUpdate {
   customerProfileUuid?: string;
+  personaUuid?: string;
+  sourceType?: 'customer_profile' | 'persona';
   count?: number;
   status?: 'invited' | 'confirmed' | 'completed' | 'no_show' | 'cancelled';
   notes?: string;

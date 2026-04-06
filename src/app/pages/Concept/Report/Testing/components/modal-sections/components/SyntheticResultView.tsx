@@ -68,7 +68,7 @@ const SyntheticResultView: React.FC<SyntheticResultViewProps> = ({
             </div>
           )}
 
-          {result.willingnessToPayFeedback && (
+          {result.willingnessToPay && (
             <div className='space-y-3'>
               <div className='flex items-center gap-2'>
                 <DollarSign className='aucctus-stroke-brand-primary h-4 w-4' />
@@ -77,7 +77,7 @@ const SyntheticResultView: React.FC<SyntheticResultViewProps> = ({
                 </h3>
               </div>
               <p className='aucctus-text-sm aucctus-text-secondary leading-relaxed'>
-                {result.willingnessToPayFeedback}
+                {result.willingnessToPay}
               </p>
             </div>
           )}
@@ -100,7 +100,7 @@ const SyntheticResultView: React.FC<SyntheticResultViewProps> = ({
           {!result.keyInsights &&
             !result.painPoints &&
             !result.solutionFeedback &&
-            !result.willingnessToPayFeedback &&
+            !result.willingnessToPay &&
             !result.overallSentiment &&
             result.summary && (
               <div className='space-y-3'>

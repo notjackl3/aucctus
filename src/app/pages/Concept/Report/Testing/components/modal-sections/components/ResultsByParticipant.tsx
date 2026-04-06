@@ -1,6 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { ITestResult, ITestLearning } from '@libs/api/types/concept/testing';
 import { ITestParticipant } from '../../../types';
+import {
+  getParticipantSourceUuid,
+  getParticipantDisplayInfo,
+} from '../../../utils/testUtils';
 import { cn } from '@libs/utils/react';
 import SourceBadges from './SourceBadges';
 import { ChevronDown, ChevronUp, MessageCircle, User } from 'lucide-react';
@@ -50,12 +54,13 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
   const resultsByProfile = useMemo(() => {
     const map = new Map<string, ITestResult[]>();
 
-    // Initialize map with participant profile UUIDs
+    // Initialize map with participant profile/persona UUIDs
     participants.forEach((participant) => {
-      const normalizedUuid =
-        normalizeUuid(participant.customerProfile.uuid) ??
-        participant.customerProfile.uuid.toLowerCase();
-      map.set(normalizedUuid, []);
+      const sourceUuid = getParticipantSourceUuid(participant);
+      const normalizedUuid = normalizeUuid(sourceUuid) ?? '';
+      if (normalizedUuid) {
+        map.set(normalizedUuid, []);
+      }
     });
 
     results?.forEach((result) => {
@@ -80,17 +85,22 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
       // Fallback: match by persona name if UUID matching failed
       if (!matched && result.personaName) {
         const personaName = normalizeName(result.personaName);
-        const matchingParticipant = participants.find(
-          (participant) =>
-            normalizeName(participant.customerProfile.name) === personaName,
-        );
+        const matchingParticipant = participants.find((participant) => {
+          const participantName =
+            participant.sourceType === 'persona'
+              ? participant.persona?.name
+              : participant.customerProfile?.name;
+          return normalizeName(participantName) === personaName;
+        });
 
         if (matchingParticipant) {
+          const sourceUuid = getParticipantSourceUuid(matchingParticipant);
           const normalizedProfileUuid =
-            normalizeUuid(matchingParticipant.customerProfile.uuid) ??
-            matchingParticipant.customerProfile.uuid.toLowerCase();
-          const existing = map.get(normalizedProfileUuid) || [];
-          map.set(normalizedProfileUuid, [...existing, result]);
+            normalizeUuid(sourceUuid) ?? (sourceUuid ?? '').toLowerCase();
+          if (normalizedProfileUuid) {
+            const existing = map.get(normalizedProfileUuid) || [];
+            map.set(normalizedProfileUuid, [...existing, result]);
+          }
         }
       }
     });
@@ -146,15 +156,17 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
   const profiles = useMemo(() => {
     return participants
       .map((p) => {
+        const sourceUuid = getParticipantSourceUuid(p);
         const normalizedUuid =
-          normalizeUuid(p.customerProfile.uuid) ??
-          p.customerProfile.uuid.toLowerCase();
+          normalizeUuid(sourceUuid) ?? (sourceUuid ?? '').toLowerCase();
+        const display = getParticipantDisplayInfo(p);
         return {
           uuid: normalizedUuid,
-          originalUuid: p.customerProfile.uuid,
-          name: p.customerProfile.name,
-          segment: p.customerProfile.segment,
-          avatarUrl: p.customerProfile.avatarUrl,
+          originalUuid: sourceUuid ?? '',
+          name: display.name,
+          segment: display.segment,
+          avatarUrl: display.avatarUrl,
+          sourceType: p.sourceType,
         };
       })
       .filter((profile) => {

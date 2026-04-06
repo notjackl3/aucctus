@@ -122,7 +122,7 @@ const TestResultCard: React.FC<TestResultCardPropsExtended> = ({
         (result.keyInsights ||
           result.painPoints ||
           result.solutionFeedback ||
-          result.willingnessToPayFeedback ||
+          result.willingnessToPay ||
           result.overallSentiment ||
           result.summary) && (
           <ExpandCollapse

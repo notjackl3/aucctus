@@ -15,6 +15,7 @@ import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
 import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import SyntheticExecutionPanel from './SyntheticExecutionPanel';
 import { useTestParticipants, useTestResults } from '@hooks/query/testing.hook';
+import { getParticipantSourceUuid } from '../../utils/testUtils';
 import TabBanner from '../common/TabBanner';
 import { Check, Ghost, User, Users, Zap } from 'lucide-react';
 
@@ -27,6 +28,7 @@ interface TestExecutionProps {
   onExecutionStateChange?: (executionState: any) => void; // Expose execution state to parent
   isCollateralRegenerating?: boolean;
   isViewMode?: boolean;
+  profileBasisStale?: boolean;
 }
 
 const TestExecution: React.FC<TestExecutionProps> = ({
@@ -38,6 +40,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
   onExecutionStateChange,
   isCollateralRegenerating = false,
   isViewMode = false,
+  profileBasisStale = false,
 }) => {
   const [selectedMode, setSelectedMode] = useState<string | null>(
     'facilitated',
@@ -81,8 +84,11 @@ const TestExecution: React.FC<TestExecutionProps> = ({
       if (participant.status === 'cancelled') {
         return;
       }
-      const normalized = participant.customerProfile.uuid.replace(/_/g, '-');
-      counts[normalized] = participant.count;
+      const sourceUuid = getParticipantSourceUuid(participant);
+      if (sourceUuid) {
+        const normalized = sourceUuid.replace(/_/g, '-');
+        counts[normalized] = participant.count;
+      }
     });
     return counts;
   }, [participants]);
@@ -94,9 +100,11 @@ const TestExecution: React.FC<TestExecutionProps> = ({
     return new Set(
       participants
         .filter((participant) => participant.status === 'cancelled')
-        .map((participant) =>
-          participant.customerProfile.uuid.replace(/_/g, '-'),
-        ),
+        .map((participant) => {
+          const sourceUuid = getParticipantSourceUuid(participant);
+          return sourceUuid ? sourceUuid.replace(/_/g, '-') : '';
+        })
+        .filter(Boolean),
     );
   }, [participants]);
 
@@ -603,6 +611,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
             lockedSkippedParticipants={skippedParticipantsFromApi}
             isCollateralRegenerating={isCollateralRegenerating}
             isViewMode={isViewMode}
+            profileBasisStale={profileBasisStale}
           />
         </div>
       )}

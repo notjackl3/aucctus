@@ -27,15 +27,17 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   debounceMs = 500,
 }) => {
   // Local state for immediate UI updates
-  const [localCount, setLocalCount] = useState(persona.count);
+  const [localCount, setLocalCount] = useState(
+    Math.min(persona.count, maxParticipants),
+  );
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastSentCountRef = useRef(persona.count);
 
   // Sync local state when prop changes (e.g., after API response)
   useEffect(() => {
-    setLocalCount(persona.count);
+    setLocalCount(Math.min(persona.count, maxParticipants));
     lastSentCountRef.current = persona.count;
-  }, [persona.count]);
+  }, [persona.count, maxParticipants]);
 
   // Cleanup timer on unmount
   useEffect(() => {

@@ -2,6 +2,36 @@
  * Utilities for testing components
  */
 
+import { ITestParticipant } from '../types';
+
+/** Get the source UUID from a polymorphic test participant. */
+export function getParticipantSourceUuid(
+  participant: ITestParticipant,
+): string | undefined {
+  return participant.sourceType === 'persona'
+    ? (participant.personaUuid ?? undefined)
+    : (participant.customerProfileUuid ?? undefined);
+}
+
+/** Get display fields (name, segment, description, avatar) from a polymorphic participant. */
+export function getParticipantDisplayInfo(participant: ITestParticipant) {
+  const isPersona = participant.sourceType === 'persona';
+  return {
+    name: isPersona
+      ? (participant.persona?.name ?? '')
+      : (participant.customerProfile?.name ?? ''),
+    segment: isPersona
+      ? (participant.persona?.segment ?? '')
+      : (participant.customerProfile?.segment ?? ''),
+    description: isPersona
+      ? (participant.persona?.overview ?? '')
+      : (participant.customerProfile?.description ?? ''),
+    avatarUrl: isPersona
+      ? (participant.persona?.avatarUrl ?? undefined)
+      : (participant.customerProfile?.avatarUrl ?? undefined),
+  };
+}
+
 /**
  * Format test type for display
  */

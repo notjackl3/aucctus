@@ -11,7 +11,7 @@ interface PersonaDistribution {
   name: string;
   segment: string;
   description: string;
-  avatar: string;
+  avatar?: string;
   count: number;
   ratio: number;
   status: string;
@@ -23,6 +23,7 @@ interface PersonaDistribution {
   occupation: string;
   notes: string;
   color: string;
+  sourceType?: 'customer_profile' | 'persona';
 }
 
 interface ParticipantsListProps {

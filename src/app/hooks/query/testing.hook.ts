@@ -294,6 +294,44 @@ export const useRegenerateTestDetails = () => {
 };
 
 /**
+ * Custom hook for acknowledging profile/persona changes on a test.
+ * Clears the profile_basis_stale flag, unblocking synthetic execution.
+ */
+export const useAcknowledgeProfileChanges = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: { conceptUuid: string; testUuid: string }) => {
+      const { conceptUuid, testUuid } = params;
+      return await api.testing.acknowledgeProfileChanges(conceptUuid, testUuid);
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testDetail,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+      toast.success(
+        'Changes Acknowledged',
+        'Profile changes have been acknowledged. You can now run synthetic execution.',
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Acknowledge Failed',
+        message || 'Unable to acknowledge changes. Please try again.',
+      );
+    },
+  });
+};
+
+/**
  * Custom hook for deleting test details.
  * @returns The result of the useMutation hook.
  */

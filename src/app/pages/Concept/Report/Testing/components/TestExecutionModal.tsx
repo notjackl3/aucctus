@@ -459,6 +459,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             testUuid={testUuid}
             testName={testDetail?.name}
             isCollateralRegenerating={isCollateralRegenerating}
+            profileBasisStale={testDetail?.profileBasisStale}
             onNavigateToCollateral={(collateralUuid) => {
               // Set the selected collateral UUID
               setSelectedCollateralUuid(collateralUuid);

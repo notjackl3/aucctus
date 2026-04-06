@@ -106,6 +106,16 @@ export class TestingApi extends ApiService {
     );
   }
 
+  async acknowledgeProfileChanges(
+    conceptUuid: string,
+    testUuid: string,
+  ): Promise<{ detail: string }> {
+    return this.post<{ detail: string }>(
+      endpoints.conceptTestingAcknowledgeProfileChanges(conceptUuid, testUuid),
+      {},
+    );
+  }
+
   async deleteTestDetail(conceptUuid: string, testUuid: string): Promise<void> {
     return this.delete<void>(
       endpoints.conceptTestingDetail(conceptUuid, testUuid),

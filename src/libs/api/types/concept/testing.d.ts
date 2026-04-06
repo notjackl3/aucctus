@@ -38,6 +38,7 @@ export interface ITestResult {
 
   // Synthetic testing fields
   isSynthetic?: boolean; // Maps to is_synthetic from Django model
+  isPersonaBased?: boolean; // Maps to is_persona_based — true for living persona interviews
   personaName?: string; // Maps to persona_name from Django model
   personaUuid?: string; // Maps to persona_uuid from Django model
 
@@ -51,7 +52,7 @@ export interface ITestResult {
   keyInsights?: string; // Maps to key_insights from Django model
   painPoints?: string; // Maps to pain_points from Django model
   solutionFeedback?: string; // Maps to solution_feedback from Django model
-  willingnessToPayFeedback?: string; // Maps to willingness_to_pay from Django model
+  willingnessToPay?: string; // Maps to willingness_to_pay from Django model
   overallSentiment?: string; // Maps to overall_sentiment from Django model
   rawInterviewTranscript?: string; // Maps to raw_interview_transcript from Django model
   keyQuotes?: string[]; // Maps to key_quotes from Django model

@@ -456,6 +456,13 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/testing/generate-next`;
   }
 
+  static conceptTestingAcknowledgeProfileChanges(
+    conceptUuid: string,
+    testUuid: string,
+  ) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/acknowledge-profile-changes`;
+  }
+
   static conceptTestCollateral(conceptUuid: string, testUuid: string) {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/collateral`;
   }
