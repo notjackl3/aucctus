@@ -1,0 +1,39 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# SQLite data
+backend/data/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Claude
+.claude/
+
+# Root planning/task docs
+/*.md
+!README.md

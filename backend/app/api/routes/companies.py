@@ -1,0 +1,89 @@
+"""Company + strategy lens endpoints."""
+
+import json
+
+from fastapi import APIRouter, BackgroundTasks, HTTPException
+
+from app.api.schemas import (
+    CompanyResponse, CreateCompanyRequest, UpdateCompanyContextRequest,
+)
+from app.config import use_real_apis
+from app.persistence import repositories as repo
+from app.strategy.engine import build_strategy_lens
+
+router = APIRouter(prefix="/companies", tags=["companies"])
+
+
+@router.post("", response_model=CompanyResponse, status_code=201)
+async def create_company(req: CreateCompanyRequest):
+    company = await repo.create_company(name=req.name, context=req.context)
+    return CompanyResponse(id=company.id, name=company.name, context=company.context,
+                           created_at=company.created_at, updated_at=company.updated_at)
+
+
+@router.get("", response_model=list[CompanyResponse])
+async def list_companies():
+    companies = await repo.list_companies()
+    return [CompanyResponse(id=c.id, name=c.name, context=c.context,
+                            created_at=c.created_at, updated_at=c.updated_at) for c in companies]
+
+
+@router.get("/{company_id}", response_model=CompanyResponse)
+async def get_company(company_id: str):
+    company = await repo.get_company(company_id)
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    return CompanyResponse(id=company.id, name=company.name, context=company.context,
+                           created_at=company.created_at, updated_at=company.updated_at)
+
+
+@router.put("/{company_id}/context")
+async def update_context(company_id: str, req: UpdateCompanyContextRequest):
+    company = await repo.get_company(company_id)
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    await repo.update_company_context(company_id, req.context)
+    return {"status": "ok"}
+
+
+@router.post("/{company_id}/strategy")
+async def build_strategy(company_id: str):
+    """Build or rebuild the strategy lens for a company."""
+    company = await repo.get_company(company_id)
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    if not company.context:
+        raise HTTPException(status_code=400, detail="Company has no context — add context first")
+
+    if not use_real_apis():
+        # Return a minimal mock lens
+        from app.strategy.engine import _minimal_lens
+        lens = _minimal_lens(company.name)
+        lens_id = await repo.save_strategy_lens(company_id, json.dumps(lens), "Mock lens — no API keys configured")
+        stored = await repo.get_latest_strategy_lens(company_id)
+        return stored
+
+    # Get document texts if available
+    docs = await repo.get_documents_for_company(company_id)
+    doc_texts = [d.raw_text for d in docs if d.raw_text]
+
+    lens = await build_strategy_lens(company.name, company.context, doc_texts or None)
+    confidence_note = f"Built from company context ({len(company.context)} chars)"
+    if doc_texts:
+        confidence_note += f" and {len(doc_texts)} documents"
+
+    await repo.save_strategy_lens(company_id, json.dumps(lens), confidence_note)
+    stored = await repo.get_latest_strategy_lens(company_id)
+    return stored
+
+
+@router.get("/{company_id}/strategy")
+async def get_strategy(company_id: str):
+    """Get the latest strategy lens for a company."""
+    company = await repo.get_company(company_id)
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    lens = await repo.get_latest_strategy_lens(company_id)
+    if not lens:
+        raise HTTPException(status_code=404, detail="No strategy lens built yet")
+    return lens
