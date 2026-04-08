@@ -30,11 +30,9 @@ class EmergingAnalysis(BaseModel):
 
 
 SEARCH_QUERIES = [
-    "{market_space} startup funding recent",
-    "{market_space} series A B seed funding 2024 2025",
-    "{market_space} emerging companies startups",
-    "{market_space} venture capital investment trends",
-    "new {market_space} companies disrupting market",
+    "{market_space} startup funding recent series A B seed 2024 2025",
+    "{market_space} emerging companies startups disrupting market",
+    "{market_space} venture capital investment trends funding activity",
 ]
 
 

@@ -2,7 +2,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import InputPage from './pages/InputPage';
 import AnalysisPage from './pages/AnalysisPage';
-import ResultsPage from './pages/ResultsPage';
+import WorkspacePage from './pages/WorkspacePage';
+import HistoryPage from './pages/HistoryPage';
+import SettingsPage from './pages/SettingsPage';
 
 function App() {
   return (
@@ -11,7 +13,9 @@ function App() {
         <Routes>
           <Route path="/" element={<InputPage />} />
           <Route path="/analysis/:id" element={<AnalysisPage />} />
-          <Route path="/results/:id" element={<ResultsPage />} />
+          <Route path="/workspace/:id" element={<WorkspacePage />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>

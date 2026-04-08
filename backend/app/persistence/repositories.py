@@ -56,6 +56,16 @@ async def get_analysis(analysis_id: str) -> Analysis | None:
     )
 
 
+async def list_analyses() -> list[Analysis]:
+    db = await get_db()
+    rows = await db.execute_fetchall("SELECT * FROM analyses ORDER BY created_at DESC")
+    return [Analysis(
+        id=r["id"], company_name=r["company_name"], market_space=r["market_space"],
+        company_context=r["company_context"], status=AnalysisStatus(r["status"]),
+        result_json=r["result_json"], created_at=r["created_at"], completed_at=r["completed_at"],
+    ) for r in rows]
+
+
 async def update_analysis_status(analysis_id: str, status: AnalysisStatus, completed_at: str | None = None) -> None:
     db = await get_db()
     await db.execute("UPDATE analyses SET status = ?, completed_at = ? WHERE id = ?",

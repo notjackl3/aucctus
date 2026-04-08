@@ -8,6 +8,7 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException
 from app.api.schemas import (
     AnalysisResultResponse,
     AnalysisStatusResponse,
+    AnalysisSummaryResponse,
     CreateAnalysisRequest,
     CreateAnalysisResponse,
     ResearchStepStatusResponse,
@@ -17,6 +18,38 @@ from app.persistence import repositories as repo
 from app.workflows.orchestrator import run_analysis
 
 router = APIRouter(prefix="/analyses", tags=["analyses"])
+
+
+@router.get("", response_model=list[AnalysisSummaryResponse])
+async def list_analyses():
+    """List all analyses with summary data."""
+    analyses = await repo.list_analyses()
+    results = []
+    for a in analyses:
+        recommendation = None
+        score = None
+        confidence_level = None
+        confidence_score = None
+        if a.result_json:
+            try:
+                data = json.loads(a.result_json)
+                oa = data.get("opportunity_assessment") or data.get("opportunityAssessment")
+                if oa:
+                    recommendation = oa.get("recommendation")
+                    score = oa.get("score")
+                    conf = oa.get("confidence")
+                    if conf:
+                        confidence_level = conf.get("level")
+                        confidence_score = conf.get("score")
+            except (json.JSONDecodeError, KeyError):
+                pass
+        results.append(AnalysisSummaryResponse(
+            id=a.id, company_name=a.company_name, market_space=a.market_space,
+            status=a.status.value, recommendation=recommendation, score=score,
+            confidence_level=confidence_level, confidence_score=confidence_score,
+            created_at=a.created_at, completed_at=a.completed_at,
+        ))
+    return results
 
 
 @router.post("", response_model=CreateAnalysisResponse, status_code=201)

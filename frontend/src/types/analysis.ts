@@ -84,10 +84,15 @@ export interface OpportunityAssessment {
   score: number; // 0-100
   headline: string;
   reasoning: string;
+  strategicFitSummary?: string;
   reasonsToBelieve: string[];
   reasonsToChallenge: string[];
+  conditionsToPursue?: string[];
   whiteSpaceOpportunities: string[];
   keyRisks: string[];
+  timingAssessment?: string; // early | on-time | late | unclear
+  rightToWin?: string;
+  needsLeadershipInput?: string[];
   confidence: ConfidenceIndicator;
 }
 

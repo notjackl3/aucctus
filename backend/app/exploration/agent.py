@@ -1,6 +1,7 @@
 """Exploration agent — answers questions, generates insights and follow-ups.
 
-Workflow: planning → retrieval → answering → follow-up generation.
+Workflow: planning → retrieval → conditional search → answering → follow-up generation.
+Tavily is only called when local evidence is insufficient.
 """
 
 import logging
@@ -18,6 +19,9 @@ from app.shared.utils import utc_now
 from app.strategy.engine import critique_with_lens
 
 logger = logging.getLogger(__name__)
+
+# Minimum number of relevant local results before skipping Tavily
+_LOCAL_SUFFICIENCY_THRESHOLD = 5
 
 
 class ExplorationAnswer(BaseModel):
@@ -65,23 +69,35 @@ async def explore_question(
         await repo.update_operation(operation_id, status=OperationStatus.RUNNING,
                                     current_step="Planning research approach...")
 
-        # 1. Retrieve relevant context
+        # 1. Retrieve relevant context from local evidence
         await repo.update_operation(operation_id, current_step="Retrieving relevant evidence...", steps_completed=1)
         context_results = await retriever.hybrid_search(question.question_text, workspace_id, limit=15)
         context_text = "\n\n".join(r.get("text", "")[:500] for r in context_results[:10])
 
-        # 2. Search for new evidence if needed
-        from app.services import search as search_svc
-        from app.config import use_real_apis
+        # 2. Conditionally search Tavily — only if local evidence is insufficient
         new_evidence = ""
-        if use_real_apis():
-            try:
-                search_results = await search_svc.search(
-                    f"{workspace.market_space} {question.question_text}", max_results=4)
-                new_evidence = "\n\n".join(
-                    f"[{r.title}]: {r.content[:500]}" for r in search_results[:4])
-            except Exception as e:
-                logger.warning(f"Exploration search failed: {e}")
+        local_relevant_count = len(context_results)
+
+        if local_relevant_count < _LOCAL_SUFFICIENCY_THRESHOLD:
+            from app.services import search as search_svc
+            from app.config import use_real_apis
+            if use_real_apis():
+                try:
+                    logger.info(
+                        f"Exploration: local evidence insufficient ({local_relevant_count} results), "
+                        f"searching Tavily for: {question.question_text[:60]}..."
+                    )
+                    search_results = await search_svc.search(
+                        f"{workspace.market_space} {question.question_text}", max_results=4)
+                    new_evidence = "\n\n".join(
+                        f"[{r.title}]: {r.content[:500]}" for r in search_results[:4])
+                except Exception as e:
+                    logger.warning(f"Exploration search failed: {e}")
+        else:
+            logger.info(
+                f"Exploration: sufficient local evidence ({local_relevant_count} results), "
+                f"skipping Tavily search"
+            )
 
         # 3. Generate answer
         await repo.update_operation(operation_id, current_step="Generating answer...", steps_completed=2)

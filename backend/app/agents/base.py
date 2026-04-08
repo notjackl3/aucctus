@@ -14,6 +14,7 @@ class AgentContext:
     market_space: str
     company_context: str | None = None
     strategy_lens: dict[str, Any] | None = None
+    evaluation_posture: str = "established_company"  # established_company | adjacency_expansion | new_market_entry | new_venture
 
 
 @dataclass

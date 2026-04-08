@@ -24,11 +24,9 @@ class MarketSizingAnalysis(BaseModel):
 
 
 SEARCH_QUERIES = [
-    "{market_space} market size TAM SAM",
-    "{market_space} market forecast CAGR growth 2025 2030",
-    "{market_space} industry report market analysis",
-    "{market_space} market growth drivers constraints",
-    "{market_space} addressable market opportunity",
+    "{market_space} market size TAM SAM forecast CAGR growth",
+    "{market_space} industry report market analysis 2025 2030",
+    "{market_space} addressable market opportunity growth drivers constraints",
 ]
 
 

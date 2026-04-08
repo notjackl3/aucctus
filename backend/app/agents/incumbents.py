@@ -31,11 +31,9 @@ class IncumbentsAnalysis(BaseModel):
 
 
 SEARCH_QUERIES = [
-    "{market_space} market leaders companies",
-    "{market_space} enterprise players market share",
-    "{market_space} competitive landscape analysis",
-    "largest {market_space} companies revenue",
-    "{market_space} industry leaders strengths weaknesses",
+    "{market_space} market leaders competitive landscape",
+    "{market_space} enterprise players market share revenue",
+    "{market_space} industry leaders strengths weaknesses analysis",
 ]
 
 

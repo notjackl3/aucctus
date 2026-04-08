@@ -36,7 +36,12 @@ ANALYSIS_STEPS = [
 
 # ── Tavily budgets ──
 TAVILY_MAX_RESULTS = 5
-TAVILY_SEARCHES_PER_AGENT = 5
+TAVILY_SEARCHES_PER_AGENT = 3
+TAVILY_DEFAULT_SEARCH_DEPTH = "basic"  # "basic" = 1 credit, "advanced" = 2 credits
+TAVILY_CACHE_TTL_HOURS = 24
+
+# ── Evaluation posture ──
+DEFAULT_EVALUATION_POSTURE = "established_company"  # established_company | adjacency_expansion | new_market_entry | new_venture
 
 # ── Claim extraction ──
 MAX_CLAIMS_PER_AGENT = 8

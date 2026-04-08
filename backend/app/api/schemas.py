@@ -142,6 +142,19 @@ class AnalysisStatusResponse(CamelModel):
     steps: list[ResearchStepStatusResponse]
 
 
+class AnalysisSummaryResponse(CamelModel):
+    id: str
+    company_name: str
+    market_space: str
+    status: str
+    recommendation: str | None = None
+    score: int | None = None
+    confidence_level: str | None = None
+    confidence_score: int | None = None
+    created_at: str
+    completed_at: str | None = None
+
+
 # ══════════════════════════════════════════════
 # Operation schemas
 # ══════════════════════════════════════════════

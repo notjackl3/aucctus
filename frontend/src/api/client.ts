@@ -24,6 +24,46 @@ export interface OperationResponse {
   completedAt: string | null;
 }
 
+export interface AnalysisSummary {
+  id: string;
+  companyName: string;
+  marketSpace: string;
+  status: string;
+  recommendation: Recommendation | null;
+  score: number | null;
+  confidenceLevel: string | null;
+  confidenceScore: number | null;
+  createdAt: string;
+  completedAt: string | null;
+}
+
+export interface CompanyResponse {
+  id: string;
+  name: string;
+  context: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface DocumentResponse {
+  id: string;
+  companyId: string;
+  filename: string;
+  contentType: string;
+  summary: string | null;
+  chunkCount: number;
+  createdAt: string;
+}
+
+export interface StrategyLens {
+  id: string;
+  companyId: string;
+  version: number;
+  confidenceNote: string | null;
+  builtAt: string;
+  [key: string]: unknown;
+}
+
 // ── Fetch helper ──
 
 class ApiError extends Error {
@@ -70,4 +110,73 @@ export async function getAnalysis(id: string): Promise<AnalysisResult> {
 
 export function getOperation(id: string): Promise<OperationResponse> {
   return request(`/api/operations/${id}`);
+}
+
+// ── History (analyses list) ──
+
+export async function listAnalyses(): Promise<AnalysisSummary[]> {
+  const data = await request<AnalysisSummary[]>('/api/analyses');
+  return data.map((a) => ({
+    ...a,
+    recommendation: a.recommendation
+      ? (a.recommendation.toLowerCase() as Recommendation)
+      : null,
+  }));
+}
+
+// ── Companies ──
+
+export function listCompanies(): Promise<CompanyResponse[]> {
+  return request('/api/companies');
+}
+
+export function createCompany(
+  name: string,
+  context?: string,
+): Promise<CompanyResponse> {
+  return request('/api/companies', {
+    method: 'POST',
+    body: JSON.stringify({ name, context: context || null }),
+  });
+}
+
+export function updateCompanyContext(
+  companyId: string,
+  context: string,
+): Promise<{ status: string }> {
+  return request(`/api/companies/${companyId}/context`, {
+    method: 'PUT',
+    body: JSON.stringify({ context }),
+  });
+}
+
+// ── Strategy Lens ──
+
+export function getStrategy(companyId: string): Promise<StrategyLens> {
+  return request(`/api/companies/${companyId}/strategy`);
+}
+
+export function buildStrategy(companyId: string): Promise<StrategyLens> {
+  return request(`/api/companies/${companyId}/strategy`, { method: 'POST' });
+}
+
+// ── Documents ──
+
+export function listDocuments(companyId: string): Promise<DocumentResponse[]> {
+  return request(`/api/documents/by-company/${companyId}`);
+}
+
+export async function uploadDocument(
+  companyId: string,
+  file: File,
+): Promise<{ documentId: string; operationId: string; status: string }> {
+  const form = new FormData();
+  form.append('company_id', companyId);
+  form.append('file', file);
+  const res = await fetch('/api/documents', { method: 'POST', body: form });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(body || res.statusText);
+  }
+  return res.json();
 }

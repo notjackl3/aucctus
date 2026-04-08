@@ -11,7 +11,8 @@ import traceback
 
 from app.agents.base import AgentContext, AgentResult
 from app.agents import incumbents, emerging, market_sizing, synthesis
-from app.config import ANALYSIS_STEPS, use_real_apis
+from app.config import ANALYSIS_STEPS, DEFAULT_EVALUATION_POSTURE, use_real_apis
+from app.services.search import get_tavily_stats, reset_tavily_stats
 from app.domain.enums import AnalysisStatus, OperationStatus
 from app.evidence.claims import find_contradictions, merge_duplicate_claims
 from app.mock.data import build_mock_result
@@ -28,6 +29,7 @@ async def run_analysis(
     market_space: str,
     company_context: str | None = None,
     strategy_lens: dict | None = None,
+    evaluation_posture: str | None = None,
 ) -> None:
     """Run the full analysis pipeline. Called as a background task."""
     try:
@@ -39,12 +41,15 @@ async def run_analysis(
             await _run_mock_pipeline(analysis_id, operation_id, company_name, market_space, company_context)
             return
 
+        reset_tavily_stats()
+
         ctx = AgentContext(
             analysis_id=analysis_id,
             company_name=company_name,
             market_space=market_space,
             company_context=company_context,
             strategy_lens=strategy_lens,
+            evaluation_posture=evaluation_posture or DEFAULT_EVALUATION_POSTURE,
         )
 
         steps = await repo.get_analysis_steps(analysis_id)
@@ -120,6 +125,10 @@ async def run_analysis(
         workspace = await repo.create_workspace(analysis_id, None, company_name, market_space)
         for ins_data in all_insights:
             await repo.create_insight(workspace.id, ins_data)
+
+        # Log Tavily usage
+        stats = get_tavily_stats()
+        logger.info(f"Analysis {analysis_id} Tavily usage: {stats['calls']} calls, ~{stats['estimated_credits']} credits")
 
         # Mark operation completed
         has_errors = any(r.error for r in [inc_result, emg_result, mkt_result, syn_result])

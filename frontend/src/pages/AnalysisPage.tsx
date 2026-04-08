@@ -33,7 +33,7 @@ export default function AnalysisPage() {
         // If already completed, update steps and navigate
         if (data.status === 'completed') {
           setSteps(data.steps);
-          setTimeout(() => navigate(`/results/${analysisId}`), 500);
+          setTimeout(() => navigate(`/workspace/${analysisId}`), 500);
         } else if (data.steps?.length) {
           setSteps(data.steps);
         }
@@ -71,7 +71,7 @@ export default function AnalysisPage() {
             const analysis = await getAnalysis(analysisId);
             if (analysis.steps?.length) setSteps(analysis.steps);
           } catch { /* navigate anyway */ }
-          setTimeout(() => navigate(`/results/${analysisId}`), 800);
+          setTimeout(() => navigate(`/workspace/${analysisId}`), 800);
         } else if (op.status === 'error') {
           clearInterval(pollRef.current);
           setError(op.errorMessage || 'Analysis failed');

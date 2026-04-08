@@ -33,9 +33,9 @@ export default function InputPage() {
       <div className="flex-1 flex items-start justify-center px-8 pt-16 pb-12">
         <form onSubmit={handleSubmit} className="w-full max-w-2xl space-y-6">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white">Competitive Landscape Analysis</h1>
+            <h1 className="text-3xl font-bold text-white">Strategic Opportunity Assessment</h1>
             <p className="text-sm text-text-secondary mt-2">
-              Evaluate market fit by analyzing incumbents, emerging competitors, and market opportunity.
+              Should your company pursue this opportunity? Assess market reality, competitive position, strategic fit, and conditions for success.
             </p>
           </div>
           {/* Company Name */}
@@ -78,12 +78,12 @@ export default function InputPage() {
             <textarea
               value={companyContext}
               onChange={(e) => setCompanyContext(e.target.value)}
-              placeholder="Paste any strategic context, notes, or background about the company that might help the analysis..."
+              placeholder="Describe the company's strengths, strategic priorities, existing assets, or constraints that should inform the assessment..."
               rows={4}
               className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all text-sm resize-none"
             />
             <p className="text-xs text-text-muted mt-1.5">
-              This helps the AI better understand the company's strengths, strategy, and positioning.
+              Helps assess strategic fit, right to win, and conditions for pursuit.
             </p>
           </div>
 
@@ -121,13 +121,13 @@ export default function InputPage() {
           {/* Info */}
           <div className="bg-white/5 border border-border rounded-xl p-4">
             <p className="text-xs text-text-secondary leading-relaxed">
-              <strong className="text-text-primary">How it works:</strong> Our AI agents will
-              research three dimensions of the competitive landscape — established incumbents,
-              emerging competitors and funding activity, and quantitative market sizing — then
-              synthesize findings into an actionable Go / No-Go recommendation.
+              <strong className="text-text-primary">How it works:</strong> AI research agents assess
+              three dimensions — established incumbents, emerging competitors and funding, and
+              market sizing — then synthesize findings into a strategic recommendation with
+              conditions for pursuit, risks, and questions requiring your judgment.
             </p>
             <div className="flex gap-6 mt-3">
-              {['Incumbents', 'Emerging Competitors', 'Market Sizing', 'Synthesis'].map((s) => (
+              {['Incumbents', 'Emerging Competitors', 'Market Sizing', 'Strategic Assessment'].map((s) => (
                 <div key={s} className="flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-brand/40" />
                   <span className="text-xs text-text-muted">{s}</span>
