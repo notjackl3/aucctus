@@ -17,6 +17,15 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/documents", tags=["documents"])
 
 
+@router.post("/extract-text")
+async def extract_text(file: UploadFile = File(...)):
+    """Extract text from an uploaded file (PDF, TXT, etc.) without ingesting it."""
+    content = await file.read()
+    content_type = file.content_type or "text/plain"
+    text = extract_text_from_bytes(content, content_type)
+    return {"text": text, "filename": file.filename or "unnamed"}
+
+
 @router.post("", response_model=UploadDocumentResponse, status_code=201)
 async def upload_document(
     company_id: str = Form(...),

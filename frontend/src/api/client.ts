@@ -87,14 +87,22 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 // ── API functions ──
 
-export function createAnalysis(
-  companyName: string,
-  marketSpace: string,
-  companyContext?: string,
-): Promise<CreateAnalysisResponse> {
+export function createAnalysis(params: {
+  companyName: string;
+  marketSpace: string;
+  companyContext?: string;
+  companyId?: string;
+  framingQuestion?: string;
+}): Promise<CreateAnalysisResponse> {
   return request('/api/analyses', {
     method: 'POST',
-    body: JSON.stringify({ companyName, marketSpace, companyContext: companyContext || null }),
+    body: JSON.stringify({
+      companyName: params.companyName,
+      marketSpace: params.marketSpace,
+      companyContext: params.companyContext || null,
+      companyId: params.companyId || null,
+      framingQuestion: params.framingQuestion || null,
+    }),
   });
 }
 
@@ -164,6 +172,19 @@ export function buildStrategy(companyId: string): Promise<StrategyLens> {
 
 export function listDocuments(companyId: string): Promise<DocumentResponse[]> {
   return request(`/api/documents/by-company/${companyId}`);
+}
+
+export async function extractTextFromFile(
+  file: File,
+): Promise<{ text: string; filename: string }> {
+  const form = new FormData();
+  form.append('file', file);
+  const res = await fetch('/api/documents/extract-text', { method: 'POST', body: form });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(body || res.statusText);
+  }
+  return res.json();
 }
 
 export async function uploadDocument(

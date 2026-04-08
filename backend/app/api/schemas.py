@@ -25,6 +25,8 @@ class CreateAnalysisRequest(CamelModel):
     company_name: str
     market_space: str
     company_context: str | None = None
+    company_id: str | None = None
+    framing_question: str | None = None
 
 
 class CreateAnalysisResponse(CamelModel):

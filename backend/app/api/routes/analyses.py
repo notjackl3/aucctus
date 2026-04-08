@@ -54,11 +54,32 @@ async def list_analyses():
 
 @router.post("", response_model=CreateAnalysisResponse, status_code=201)
 async def create_analysis(req: CreateAnalysisRequest, background_tasks: BackgroundTasks):
-    """Create a new competitive landscape analysis."""
+    """Create a new strategic opportunity assessment."""
+    # Resolve company context: explicit > company profile > None
+    company_context = req.company_context
+    strategy_lens = None
+    if not company_context and req.company_id:
+        company = await repo.get_company(req.company_id)
+        if company and company.context:
+            company_context = company.context
+        # Also try to load strategy lens
+        lens_row = await repo.get_latest_strategy_lens(req.company_id)
+        if lens_row:
+            import json as _json
+            try:
+                strategy_lens = _json.loads(lens_row.lens_json) if hasattr(lens_row, 'lens_json') else None
+            except Exception:
+                pass
+
+    # Append framing question to context if provided
+    effective_context = company_context or ""
+    if req.framing_question:
+        effective_context = f"{effective_context}\n\nFraming question: {req.framing_question}".strip()
+
     analysis = await repo.create_analysis(
         company_name=req.company_name,
         market_space=req.market_space,
-        company_context=req.company_context,
+        company_context=effective_context or None,
     )
 
     await repo.create_analysis_steps(analysis.id, ANALYSIS_STEPS)
@@ -76,7 +97,8 @@ async def create_analysis(req: CreateAnalysisRequest, background_tasks: Backgrou
         operation_id=operation.id,
         company_name=req.company_name,
         market_space=req.market_space,
-        company_context=req.company_context,
+        company_context=effective_context or None,
+        strategy_lens=strategy_lens,
     )
 
     return CreateAnalysisResponse(id=analysis.id, operation_id=operation.id)

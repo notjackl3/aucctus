@@ -29,10 +29,13 @@ import {
   buildStrategy,
   listDocuments,
   uploadDocument,
+  extractTextFromFile,
 } from '../api/client';
 import type { CompanyResponse, DocumentResponse, StrategyLens } from '../api/client';
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
+const ACTIVE_COMPANY_KEY = 'aucctus_active_company_id';
 
 export default function SettingsPage() {
   // Company state
@@ -55,6 +58,11 @@ export default function SettingsPage() {
   const [lensBuilding, setLensBuilding] = useState(false);
   const [lensError, setLensError] = useState<string | null>(null);
 
+  // PDF context import
+  const [extracting, setExtracting] = useState(false);
+  const [extractedFilename, setExtractedFilename] = useState<string | null>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
+
   // Documents
   const [documents, setDocuments] = useState<DocumentResponse[]>([]);
   const [docsLoading, setDocsLoading] = useState(false);
@@ -67,7 +75,9 @@ export default function SettingsPage() {
       .then((data) => {
         setCompanies(data);
         if (data.length > 0) {
-          setSelectedCompanyId(data[0].id);
+          const savedId = localStorage.getItem(ACTIVE_COMPANY_KEY);
+          const active = data.find((c) => c.id === savedId) || data[0];
+          setSelectedCompanyId(active.id);
         }
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load'))
@@ -125,6 +135,7 @@ export default function SettingsPage() {
       const company = await createCompany(newCompanyName.trim());
       setCompanies((prev) => [company, ...prev]);
       setSelectedCompanyId(company.id);
+      localStorage.setItem(ACTIVE_COMPANY_KEY, company.id);
       setNewCompanyName('');
       setShowNewCompanyForm(false);
     } catch {
@@ -145,6 +156,28 @@ export default function SettingsPage() {
       setLensError(err instanceof Error ? err.message : 'Failed to build strategy lens');
     } finally {
       setLensBuilding(false);
+    }
+  };
+
+  const handleImportPdf = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setExtracting(true);
+    setExtractedFilename(null);
+    try {
+      const { text, filename } = await extractTextFromFile(file);
+      if (text.trim()) {
+        const separator = companyContext.trim() ? '\n\n---\n\n' : '';
+        setCompanyContext((prev) => prev + separator + text.trim());
+        setExtractedFilename(filename);
+        setContextSaveStatus('idle');
+        setTimeout(() => setExtractedFilename(null), 3000);
+      }
+    } catch {
+      // extraction failed silently
+    } finally {
+      setExtracting(false);
+      if (pdfInputRef.current) pdfInputRef.current.value = '';
     }
   };
 
@@ -255,7 +288,10 @@ export default function SettingsPage() {
                   <div className="relative">
                     <select
                       value={selectedCompanyId || ''}
-                      onChange={(e) => setSelectedCompanyId(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedCompanyId(e.target.value);
+                        localStorage.setItem(ACTIVE_COMPANY_KEY, e.target.value);
+                      }}
                       className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-surface text-sm text-text-primary appearance-none focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 cursor-pointer transition-all"
                     >
                       {companies.map((c) => (
@@ -325,7 +361,40 @@ export default function SettingsPage() {
                     placeholder="Describe your company's strategic position, priorities, target customers, competitive advantages, constraints, and anything else that should inform how opportunities are evaluated..."
                     className="w-full px-3.5 py-3 rounded-xl border border-border bg-surface text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all resize-y"
                   />
-                  <div className="flex items-center justify-between mt-2">
+                  {/* PDF import */}
+                  <div className="flex items-center gap-3 mt-3 p-3 rounded-xl bg-white/5 border border-dashed border-border">
+                    <input
+                      type="file"
+                      ref={pdfInputRef}
+                      onChange={handleImportPdf}
+                      className="hidden"
+                      accept=".pdf,.txt,.md,.doc,.docx"
+                    />
+                    <button
+                      onClick={() => pdfInputRef.current?.click()}
+                      disabled={extracting}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-brand hover:bg-brand/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                    >
+                      {extracting ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Upload size={14} />
+                      )}
+                      Import from PDF
+                    </button>
+                    <span className="text-xs text-text-muted">
+                      {extractedFilename ? (
+                        <span className="text-go flex items-center gap-1">
+                          <CheckCircle2 size={12} />
+                          Imported text from {extractedFilename}
+                        </span>
+                      ) : (
+                        'Upload a PDF, TXT, or DOC to extract and append its text to the context above.'
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-3">
                     <p className="text-xs text-text-muted flex items-center gap-1.5">
                       <Info size={12} />
                       This context shapes the strategy lens and how analyses evaluate fit for your company.
