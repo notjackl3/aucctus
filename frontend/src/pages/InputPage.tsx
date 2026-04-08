@@ -123,7 +123,7 @@ export default function InputPage() {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-text-primary">New Opportunity Assessment</h1>
             <p className="text-sm text-text-secondary mt-1.5">
-              What market or opportunity should {activeCompany.name} evaluate?
+              Define a market or adjacency for {activeCompany.name} to evaluate
             </p>
           </div>
 
@@ -221,7 +221,7 @@ export default function InputPage() {
             ) : (
               <>
                 <Search size={16} />
-                Run Assessment
+                Run Opportunity Assessment
                 <ArrowRight size={16} />
               </>
             )}
@@ -230,10 +230,12 @@ export default function InputPage() {
           {/* Info */}
           <div className="bg-gray-50 border border-border rounded-xl p-4">
             <p className="text-xs text-text-secondary leading-relaxed">
-              <strong className="text-text-primary">How it works:</strong> AI research agents assess
-              incumbents, emerging competitors, and market sizing — then synthesize a strategic
-              recommendation with conditions for pursuit, risks, and questions requiring your judgment.
-              Your company profile is automatically used to evaluate strategic fit.
+              <strong className="text-text-primary">How it works:</strong> AI research agents investigate
+              three areas — <strong className="text-text-primary">incumbents</strong>,{' '}
+              <strong className="text-text-primary">emerging competitors</strong>, and{' '}
+              <strong className="text-text-primary">market sizing</strong> — then synthesize a
+              strategic recommendation with conditions for pursuit, key risks, and questions
+              requiring leadership judgment. Your company profile is applied to evaluate strategic fit.
             </p>
           </div>
         </form>

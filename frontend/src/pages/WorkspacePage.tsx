@@ -23,6 +23,7 @@ import {
   HelpCircle,
   CheckCircle2,
   Crosshair,
+  Eye,
 } from 'lucide-react';
 import { getAnalysis } from '../api/client';
 import type {
@@ -41,7 +42,7 @@ import ConfidenceBadge from '../components/ConfidenceBadge';
 import SourceCard from '../components/SourceCard';
 import FindingsTray, { type PinnedFinding } from '../components/FindingsTray';
 
-type CategoryKey = 'assessment' | 'incumbents' | 'emerging' | 'market' | 'risks' | 'sources';
+type CategoryKey = 'incumbents' | 'emerging' | 'market' | 'risks' | 'sources';
 
 export default function WorkspacePage() {
   const navigate = useNavigate();
@@ -107,8 +108,8 @@ export default function WorkspacePage() {
     ...(market?.sources || []),
   ];
 
-  // Build category list
-  const categories: {
+  // Research foundation cards — the 3 core research spaces
+  const researchCategories: {
     key: CategoryKey;
     icon: React.ComponentType<{ size?: number; className?: string }>;
     title: string;
@@ -119,16 +120,6 @@ export default function WorkspacePage() {
     countLabel?: string;
     available: boolean;
   }[] = [
-    {
-      key: 'assessment',
-      icon: Target,
-      title: 'Pursuit Assessment',
-      summary: assessment?.headline || 'Assessment not yet available',
-      confidence: assessment?.confidence || null,
-      count: assessment ? (assessment.reasonsToBelieve.length + assessment.reasonsToChallenge.length) : undefined,
-      countLabel: 'signals',
-      available: !!assessment,
-    },
     {
       key: 'incumbents',
       icon: Building2,
@@ -160,27 +151,37 @@ export default function WorkspacePage() {
       confidence: market?.confidence || null,
       available: !!market,
     },
+  ];
+
+  // Analysis cards — synthesis and evidence
+  const analysisCategories: typeof researchCategories = [
     {
       key: 'risks',
       icon: Shield,
-      title: 'Risks & Unknowns',
+      title: 'Risks & Open Questions',
       summary: assessment?.keyRisks?.[0] || 'No risks identified yet',
       confidence: null,
-      count: assessment?.keyRisks?.length,
-      countLabel: 'risks',
-      available: !!(assessment?.keyRisks?.length),
+      count: (assessment?.keyRisks?.length || 0) + (assessment?.needsLeadershipInput?.length || 0),
+      countLabel: 'items',
+      available: !!(assessment?.keyRisks?.length || assessment?.needsLeadershipInput?.length),
     },
     {
       key: 'sources',
       icon: FileText,
       title: 'Sources & Evidence',
-      summary: `${allSources.length} sources collected across all research areas`,
+      summary: `${allSources.length} sources across all research areas`,
       confidence: null,
       count: allSources.length,
       countLabel: 'sources',
       available: allSources.length > 0,
     },
   ];
+
+  // Find the lowest-confidence research area for guidance
+  const confidenceRanking = researchCategories
+    .filter((c) => c.available && c.confidence)
+    .sort((a, b) => (a.confidence?.score || 0) - (b.confidence?.score || 0));
+  const weakestArea = confidenceRanking[0];
 
   return (
     <div className="min-h-screen">
@@ -197,7 +198,7 @@ export default function WorkspacePage() {
                 <h1 className="text-2xl font-bold text-text-primary">{data.request.companyName}</h1>
                 {assessment && <RecommendationBadge recommendation={assessment.recommendation} />}
               </div>
-              <p className="text-sm text-text-secondary">{data.request.marketSpace} — Strategic Opportunity Assessment</p>
+              <p className="text-sm text-text-secondary">{data.request.marketSpace}</p>
             </div>
           </div>
           {data.completedAt && (
@@ -212,8 +213,8 @@ export default function WorkspacePage() {
 
       <div className="max-w-6xl mx-auto px-8 pb-8">
         <div className="flex gap-6">
-          {/* Left column: strategic recommendation + category cards */}
-          <div className="w-80 shrink-0 space-y-3">
+          {/* Left column: recommendation + research + analysis */}
+          <div className="w-80 shrink-0 space-y-1">
             {/* Strategic Recommendation hero */}
             {assessment && (
               <div className="p-5 rounded-xl bg-white border border-border mb-4">
@@ -225,22 +226,36 @@ export default function WorkspacePage() {
                 <p className="text-sm text-text-secondary leading-relaxed mt-3">
                   {assessment.headline}
                 </p>
-                {/* Timing signal */}
-                {assessment.timingAssessment && (
-                  <div className="flex items-center gap-1.5 mt-3">
-                    <Clock size={12} className="text-text-muted" />
-                    <span className="text-xs text-text-muted">Timing: </span>
-                    <span className="text-xs font-medium text-text-secondary capitalize">{assessment.timingAssessment}</span>
-                  </div>
-                )}
+                {/* Key signals at a glance */}
+                <div className="mt-3 space-y-1.5">
+                  {assessment.timingAssessment && (
+                    <div className="flex items-center gap-1.5">
+                      <Clock size={12} className="text-text-muted" />
+                      <span className="text-xs text-text-secondary">
+                        <span className="font-medium capitalize">{assessment.timingAssessment}</span> timing
+                      </span>
+                    </div>
+                  )}
+                  {assessment.keyRisks?.[0] && (
+                    <div className="flex items-center gap-1.5">
+                      <AlertTriangle size={12} className="text-maybe" />
+                      <span className="text-xs text-text-secondary line-clamp-1">
+                        {assessment.keyRisks[0]}
+                      </span>
+                    </div>
+                  )}
+                </div>
                 <div className="mt-3">
                   <ConfidenceBadge confidence={assessment.confidence} />
                 </div>
               </div>
             )}
 
-            {/* Category cards */}
-            {categories.filter((c) => c.available).map((cat) => (
+            {/* Research Foundation */}
+            <div className="pt-1 pb-2">
+              <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">Research Foundation</span>
+            </div>
+            {researchCategories.filter((c) => c.available).map((cat) => (
               <CategoryCard
                 key={cat.key}
                 icon={cat.icon}
@@ -255,8 +270,31 @@ export default function WorkspacePage() {
               />
             ))}
 
-            {/* Footer actions */}
-            <div className="pt-4 space-y-2">
+            {/* Synthesis & Evidence */}
+            {analysisCategories.some((c) => c.available) && (
+              <>
+                <div className="pt-3 pb-2">
+                  <span className="text-[10px] font-semibold text-text-muted uppercase tracking-widest">Synthesis & Evidence</span>
+                </div>
+                {analysisCategories.filter((c) => c.available).map((cat) => (
+                  <CategoryCard
+                    key={cat.key}
+                    icon={cat.icon}
+                    title={cat.title}
+                    summary={cat.summary}
+                    stat={cat.stat}
+                    confidence={cat.confidence}
+                    count={cat.count}
+                    countLabel={cat.countLabel}
+                    active={activeCategory === cat.key}
+                    onClick={() => setActiveCategory(activeCategory === cat.key ? null : cat.key)}
+                  />
+                ))}
+              </>
+            )}
+
+            {/* Footer */}
+            <div className="pt-4">
               <button onClick={() => navigate('/')}
                 className="w-full text-sm text-brand hover:text-brand-dark font-medium transition-colors py-2">
                 Run another assessment
@@ -267,9 +305,11 @@ export default function WorkspacePage() {
           {/* Right column: detail panel */}
           <div className="flex-1 min-w-0">
             {!activeCategory ? (
-              <EmptyDetailState />
-            ) : activeCategory === 'assessment' && assessment ? (
-              <AssessmentDetail assessment={assessment} companyName={data.request.companyName} onPin={pinFinding} />
+              <OverviewState
+                assessment={assessment}
+                weakestArea={weakestArea}
+                onSelectCategory={setActiveCategory}
+              />
             ) : activeCategory === 'incumbents' && incumbents ? (
               <IncumbentsDetail data={incumbents} onPin={pinFinding} />
             ) : activeCategory === 'emerging' && emerging ? (
@@ -281,7 +321,11 @@ export default function WorkspacePage() {
             ) : activeCategory === 'sources' ? (
               <SourcesDetail sources={allSources} />
             ) : (
-              <EmptyDetailState />
+              <OverviewState
+                assessment={assessment}
+                weakestArea={weakestArea}
+                onSelectCategory={setActiveCategory}
+              />
             )}
           </div>
         </div>
@@ -294,15 +338,154 @@ export default function WorkspacePage() {
 }
 
 
-// ── Empty state ──
+// ── Overview state (replaces empty detail) ──
 
-function EmptyDetailState() {
+function OverviewState({ assessment, weakestArea, onSelectCategory }: {
+  assessment?: OpportunityAssessment;
+  weakestArea?: { key: CategoryKey; title: string; confidence: ConfidenceIndicator | null };
+  onSelectCategory: (key: CategoryKey) => void;
+}) {
+  if (!assessment) {
+    return (
+      <div className="flex items-center justify-center h-96 rounded-2xl border border-dashed border-border">
+        <div className="text-center">
+          <Target size={32} className="text-text-muted mx-auto mb-3" />
+          <p className="text-sm text-text-muted">Select a research area to explore</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center justify-center h-96 rounded-2xl border border-dashed border-border">
-      <div className="text-center">
-        <Target size={32} className="text-text-muted mx-auto mb-3" />
-        <p className="text-sm text-text-muted">Select a category to explore</p>
-        <p className="text-xs text-text-muted mt-1">Click any card on the left to review the research</p>
+    <div className="space-y-5">
+      {/* Reasoning — the full strategic argument */}
+      <div className="bg-white rounded-2xl border border-border p-6">
+        <h2 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+          <Crosshair size={14} className="text-brand" />
+          Strategic Assessment
+        </h2>
+        <p className="text-sm text-text-secondary leading-relaxed">
+          {assessment.reasoning}
+        </p>
+        {assessment.strategicFitSummary && (
+          <p className="text-sm text-text-secondary leading-relaxed mt-3">
+            {assessment.strategicFitSummary}
+          </p>
+        )}
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          {assessment.rightToWin && (
+            <div className="p-3 rounded-lg bg-gray-50 border border-border">
+              <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Right to Win</p>
+              <p className="text-sm text-text-secondary leading-relaxed">{assessment.rightToWin}</p>
+            </div>
+          )}
+          {assessment.timingAssessment && (
+            <div className="p-3 rounded-lg bg-gray-50 border border-border">
+              <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Market Timing</p>
+              <p className="text-sm text-text-secondary leading-relaxed capitalize">{assessment.timingAssessment}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Conditions to Pursue */}
+      {assessment.conditionsToPursue && assessment.conditionsToPursue.length > 0 && (
+        <div className="bg-white rounded-2xl border border-border p-6">
+          <h3 className="text-sm font-semibold text-text-primary mb-2 flex items-center gap-2">
+            <CheckCircle2 size={14} className="text-brand" />
+            Conditions to Pursue
+          </h3>
+          <p className="text-xs text-text-muted mb-3">What must be true for this opportunity to be worth pursuing</p>
+          <ul className="space-y-2">
+            {assessment.conditionsToPursue.map((condition, i) => (
+              <li key={i} className="flex items-start gap-2.5">
+                <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-brand" />
+                <span className="text-sm text-text-secondary leading-relaxed">{condition}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Believe / Challenge — side by side for quick scanning */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-white rounded-2xl border border-border p-5">
+          <h3 className="text-sm font-semibold text-go mb-3 flex items-center gap-2">
+            <ThumbsUp size={14} />
+            Reasons to Believe ({assessment.reasonsToBelieve.length})
+          </h3>
+          <ul className="space-y-2">
+            {assessment.reasonsToBelieve.map((r, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-go" />
+                <span className="text-xs text-text-secondary leading-relaxed">{r}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="bg-white rounded-2xl border border-border p-5">
+          <h3 className="text-sm font-semibold text-maybe mb-3 flex items-center gap-2">
+            <AlertTriangle size={14} />
+            Reasons to Challenge ({assessment.reasonsToChallenge.length})
+          </h3>
+          <ul className="space-y-2">
+            {assessment.reasonsToChallenge.map((r, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 bg-maybe" />
+                <span className="text-xs text-text-secondary leading-relaxed">{r}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* What to inspect next — guidance */}
+      <div className="bg-gray-50 rounded-xl border border-border p-4">
+        <h3 className="text-xs font-semibold text-text-primary mb-2 flex items-center gap-2">
+          <Eye size={12} className="text-brand" />
+          Where to Look Next
+        </h3>
+        <div className="space-y-2">
+          {weakestArea && weakestArea.confidence && (
+            <button
+              onClick={() => onSelectCategory(weakestArea.key as CategoryKey)}
+              className="w-full text-left flex items-center gap-3 p-2.5 rounded-lg hover:bg-white transition-colors group"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-maybe shrink-0" />
+              <div className="flex-1">
+                <span className="text-xs font-medium text-text-primary group-hover:text-brand transition-colors">
+                  Review {weakestArea.title}
+                </span>
+                <span className="text-xs text-text-muted ml-1.5">
+                  — lowest confidence ({weakestArea.confidence.score}%)
+                </span>
+              </div>
+              <ChevronRight size={12} className="text-text-muted group-hover:text-brand" />
+            </button>
+          )}
+          {assessment.needsLeadershipInput && assessment.needsLeadershipInput.length > 0 && (
+            <button
+              onClick={() => onSelectCategory('risks')}
+              className="w-full text-left flex items-center gap-3 p-2.5 rounded-lg hover:bg-white transition-colors group"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-nogo shrink-0" />
+              <div className="flex-1">
+                <span className="text-xs font-medium text-text-primary group-hover:text-brand transition-colors">
+                  {assessment.needsLeadershipInput.length} question{assessment.needsLeadershipInput.length > 1 ? 's' : ''} requiring leadership judgment
+                </span>
+              </div>
+              <ChevronRight size={12} className="text-text-muted group-hover:text-brand" />
+            </button>
+          )}
+          {assessment.whiteSpaceOpportunities.length > 0 && (
+            <div className="flex items-start gap-3 p-2.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-brand mt-1 shrink-0" />
+              <span className="text-xs text-text-secondary">
+                {assessment.whiteSpaceOpportunities.length} white space opportunit{assessment.whiteSpaceOpportunities.length > 1 ? 'ies' : 'y'} identified — review in research detail
+              </span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -343,149 +526,6 @@ function PinnableItem({ text, category, type, onPin }: {
 }
 
 
-// ── Assessment Detail ──
-
-function AssessmentDetail({ assessment, companyName, onPin }: {
-  assessment: OpportunityAssessment;
-  companyName: string;
-  onPin: (f: Omit<PinnedFinding, 'id'>) => void;
-}) {
-  const [tab, setTab] = useState<'believe' | 'challenge'>('believe');
-
-  return (
-    <div className="space-y-5">
-      {/* Hero */}
-      <div className="bg-white rounded-2xl border border-border p-6">
-        <div className="flex items-start gap-6">
-          <div className="flex-1">
-            <RecommendationBadge recommendation={assessment.recommendation} size="lg" />
-            <p className="text-lg text-text-primary font-medium mt-4 leading-relaxed">
-              {assessment.headline}
-            </p>
-            <p className="text-sm text-text-secondary mt-2 leading-relaxed">
-              {assessment.reasoning}
-            </p>
-            <div className="mt-4">
-              <ConfidenceBadge confidence={assessment.confidence} showReasoning />
-            </div>
-          </div>
-          <div className="shrink-0">
-            <ScoreGauge score={assessment.score} size="lg" label="Opportunity Score" />
-          </div>
-        </div>
-      </div>
-
-      {/* Strategic Fit + Right to Win + Timing */}
-      {(assessment.strategicFitSummary || assessment.rightToWin || assessment.timingAssessment) && (
-        <div className="bg-white rounded-2xl border border-border p-6">
-          <h3 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
-            <Crosshair size={14} className="text-brand" />
-            Strategic Fit
-          </h3>
-          {assessment.strategicFitSummary && (
-            <p className="text-sm text-text-secondary leading-relaxed mb-4">
-              {assessment.strategicFitSummary}
-            </p>
-          )}
-          <div className="grid grid-cols-2 gap-4">
-            {assessment.rightToWin && (
-              <div className="p-3 rounded-lg bg-gray-50 border border-border">
-                <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Right to Win</p>
-                <p className="text-sm text-text-secondary leading-relaxed">{assessment.rightToWin}</p>
-              </div>
-            )}
-            {assessment.timingAssessment && (
-              <div className="p-3 rounded-lg bg-gray-50 border border-border">
-                <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Market Timing</p>
-                <p className="text-sm text-text-secondary leading-relaxed capitalize">{assessment.timingAssessment}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Conditions to Pursue */}
-      {assessment.conditionsToPursue && assessment.conditionsToPursue.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border p-6">
-          <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
-            <CheckCircle2 size={14} className="text-brand" />
-            Conditions to Pursue
-          </h3>
-          <p className="text-xs text-text-muted mb-3">What would need to be true for this opportunity to be worth pursuing</p>
-          <ul className="space-y-2.5">
-            {assessment.conditionsToPursue.map((condition, i) => (
-              <PinnableItem key={i} text={condition} category="Conditions to Pursue" type="opportunity" onPin={onPin} />
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Believe / Challenge tabs */}
-      <div className="bg-white rounded-2xl border border-border p-6">
-        <div className="flex gap-0 mb-4 border-b border-border">
-          <button onClick={() => setTab('believe')}
-            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              tab === 'believe' ? 'border-go text-go' : 'border-transparent text-text-muted hover:text-text-secondary'
-            }`}>
-            <ThumbsUp size={14} />
-            Reasons to Believe ({assessment.reasonsToBelieve.length})
-          </button>
-          <button onClick={() => setTab('challenge')}
-            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              tab === 'challenge' ? 'border-maybe text-maybe' : 'border-transparent text-text-muted hover:text-text-secondary'
-            }`}>
-            <AlertTriangle size={14} />
-            Reasons to Challenge ({assessment.reasonsToChallenge.length})
-          </button>
-        </div>
-        <ul className="space-y-2.5">
-          {(tab === 'believe' ? assessment.reasonsToBelieve : assessment.reasonsToChallenge).map((reason, i) => (
-            <PinnableItem
-              key={i}
-              text={reason}
-              category="Pursuit Assessment"
-              type={tab === 'believe' ? 'belief' : 'challenge'}
-              onPin={onPin}
-            />
-          ))}
-        </ul>
-      </div>
-
-      {/* Leadership Input Required */}
-      {assessment.needsLeadershipInput && assessment.needsLeadershipInput.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border p-6">
-          <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
-            <HelpCircle size={14} className="text-maybe" />
-            Needs Leadership Input
-          </h3>
-          <p className="text-xs text-text-muted mb-3">Questions that require human judgment before deciding</p>
-          <ul className="space-y-2.5">
-            {assessment.needsLeadershipInput.map((q, i) => (
-              <PinnableItem key={i} text={q} category="Leadership Input" type="insight" onPin={onPin} />
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* White space */}
-      {assessment.whiteSpaceOpportunities.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border p-6">
-          <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
-            <Target size={14} className="text-brand" />
-            White Space Opportunities
-          </h3>
-          <ul className="space-y-2.5">
-            {assessment.whiteSpaceOpportunities.map((opp, i) => (
-              <PinnableItem key={i} text={opp} category="White Space" type="opportunity" onPin={onPin} />
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-}
-
-
 // ── Incumbents Detail ──
 
 function IncumbentsDetail({ data, onPin }: {
@@ -506,7 +546,10 @@ function IncumbentsDetail({ data, onPin }: {
     <div className="space-y-4">
       <div className="bg-white rounded-2xl border border-border p-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide">Incumbents</h2>
+          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide flex items-center gap-2">
+            <Building2 size={14} className="text-brand" />
+            Incumbents
+          </h2>
           <ConfidenceBadge confidence={data.confidence} />
         </div>
         <p className="text-sm text-text-secondary leading-relaxed mb-2">{data.summary}</p>
@@ -592,7 +635,10 @@ function EmergingDetail({ data, onPin }: {
     <div className="space-y-4">
       <div className="bg-white rounded-2xl border border-border p-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide">Emerging Competitors</h2>
+          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide flex items-center gap-2">
+            <Rocket size={14} className="text-brand" />
+            Emerging Competitors
+          </h2>
           <ConfidenceBadge confidence={data.confidence} />
         </div>
         <p className="text-sm text-text-secondary leading-relaxed mb-4">{data.summary}</p>
@@ -673,7 +719,10 @@ function MarketDetail({ data, onPin }: {
     <div className="space-y-4">
       <div className="bg-white rounded-2xl border border-border p-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide">Market Sizing</h2>
+          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide flex items-center gap-2">
+            <TrendingUp size={14} className="text-brand" />
+            Market Sizing
+          </h2>
           <ConfidenceBadge confidence={data.confidence} />
         </div>
         <p className="text-sm text-text-secondary leading-relaxed mb-4">{data.summary}</p>
@@ -721,7 +770,7 @@ function MarketDetail({ data, onPin }: {
 }
 
 
-// ── Risks Detail ──
+// ── Risks & Open Questions Detail ──
 
 function RisksDetail({ assessment, onPin }: {
   assessment: OpportunityAssessment;
@@ -729,42 +778,47 @@ function RisksDetail({ assessment, onPin }: {
 }) {
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-border p-6">
-        <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
-          <Shield size={14} className="text-nogo" />
-          Key Risks
-        </h2>
-        <ul className="space-y-2.5">
-          {assessment.keyRisks.map((risk, i) => (
-            <PinnableItem key={i} text={risk} category="Risks" type="risk" onPin={onPin} />
-          ))}
-        </ul>
-      </div>
-
-      {assessment.reasonsToChallenge.length > 0 && (
+      {/* Key Risks */}
+      {assessment.keyRisks.length > 0 && (
         <div className="bg-white rounded-2xl border border-border p-6">
           <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
-            <AlertTriangle size={14} className="text-maybe" />
-            Reasons to Challenge
+            <Shield size={14} className="text-nogo" />
+            Key Risks
           </h2>
           <ul className="space-y-2.5">
-            {assessment.reasonsToChallenge.map((reason, i) => (
-              <PinnableItem key={i} text={reason} category="Challenges" type="challenge" onPin={onPin} />
+            {assessment.keyRisks.map((risk, i) => (
+              <PinnableItem key={i} text={risk} category="Risks" type="risk" onPin={onPin} />
             ))}
           </ul>
         </div>
       )}
 
-      {/* Needs Leadership Input */}
+      {/* Leadership Input */}
       {assessment.needsLeadershipInput && assessment.needsLeadershipInput.length > 0 && (
         <div className="bg-white rounded-2xl border border-border p-6">
-          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-2 flex items-center gap-2">
             <HelpCircle size={14} className="text-maybe" />
-            Needs Leadership Input
+            Leadership Judgment Needed
           </h2>
+          <p className="text-xs text-text-muted mb-4">These questions cannot be answered by research alone — they require strategic judgment from your team.</p>
           <ul className="space-y-2.5">
             {assessment.needsLeadershipInput.map((q, i) => (
               <PinnableItem key={i} text={q} category="Leadership Input" type="insight" onPin={onPin} />
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* White Space */}
+      {assessment.whiteSpaceOpportunities.length > 0 && (
+        <div className="bg-white rounded-2xl border border-border p-6">
+          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
+            <Target size={14} className="text-brand" />
+            White Space Opportunities
+          </h2>
+          <ul className="space-y-2.5">
+            {assessment.whiteSpaceOpportunities.map((opp, i) => (
+              <PinnableItem key={i} text={opp} category="White Space" type="opportunity" onPin={onPin} />
             ))}
           </ul>
         </div>

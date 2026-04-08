@@ -132,6 +132,14 @@ export async function listAnalyses(): Promise<AnalysisSummary[]> {
   }));
 }
 
+export async function deleteAnalysis(id: string): Promise<void> {
+  const res = await fetch(`/api/analyses/${id}`, { method: 'DELETE' });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new ApiError(res.status, body || res.statusText);
+  }
+}
+
 // ── Companies ──
 
 export function listCompanies(): Promise<CompanyResponse[]> {

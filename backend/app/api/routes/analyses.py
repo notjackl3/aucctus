@@ -104,6 +104,14 @@ async def create_analysis(req: CreateAnalysisRequest, background_tasks: Backgrou
     return CreateAnalysisResponse(id=analysis.id, operation_id=operation.id)
 
 
+@router.delete("/{analysis_id}", status_code=204)
+async def delete_analysis(analysis_id: str):
+    """Delete an analysis and all related data."""
+    deleted = await repo.delete_analysis(analysis_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+
+
 @router.get("/{analysis_id}", response_model=AnalysisResultResponse)
 async def get_analysis(analysis_id: str):
     """Get analysis result."""

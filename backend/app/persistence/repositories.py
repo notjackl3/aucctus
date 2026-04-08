@@ -80,6 +80,37 @@ async def store_analysis_result(analysis_id: str, result_json: str) -> None:
     await db.commit()
 
 
+async def delete_analysis(analysis_id: str) -> bool:
+    """Hard-delete an analysis and all related data."""
+    db = await get_db()
+    exists = await db.execute_fetchall("SELECT id FROM analyses WHERE id = ?", (analysis_id,))
+    if not exists:
+        return False
+    # Cascade: delete related rows from all dependent tables
+    # Workspace chain: insights, questions, follow-ups, reports
+    ws_rows = await db.execute_fetchall("SELECT id FROM workspaces WHERE analysis_id = ?", (analysis_id,))
+    for ws in ws_rows:
+        wid = ws["id"]
+        # Follow-ups depend on questions
+        q_rows = await db.execute_fetchall("SELECT id FROM workspace_questions WHERE workspace_id = ?", (wid,))
+        for q in q_rows:
+            await db.execute("DELETE FROM follow_up_questions WHERE parent_question_id = ?", (q["id"],))
+        await db.execute("DELETE FROM workspace_questions WHERE workspace_id = ?", (wid,))
+        await db.execute("DELETE FROM insights WHERE workspace_id = ?", (wid,))
+        await db.execute("DELETE FROM reports WHERE workspace_id = ?", (wid,))
+    await db.execute("DELETE FROM workspaces WHERE analysis_id = ?", (analysis_id,))
+    # Direct dependents
+    await db.execute("DELETE FROM analysis_steps WHERE analysis_id = ?", (analysis_id,))
+    await db.execute("DELETE FROM sources WHERE analysis_id = ?", (analysis_id,))
+    await db.execute("DELETE FROM claims WHERE analysis_id = ?", (analysis_id,))
+    await db.execute("DELETE FROM contradictions WHERE analysis_id = ?", (analysis_id,))
+    await db.execute("DELETE FROM operations WHERE parent_id = ?", (analysis_id,))
+    # Finally, the analysis itself
+    await db.execute("DELETE FROM analyses WHERE id = ?", (analysis_id,))
+    await db.commit()
+    return True
+
+
 # ═══════════════════════════════════════════════════════════════
 # Analysis Steps
 # ═══════════════════════════════════════════════════════════════

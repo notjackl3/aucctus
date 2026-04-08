@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  Settings,
   Building2,
   Brain,
   FileText,
@@ -12,7 +11,6 @@ import {
   ChevronDown,
   Upload,
   RefreshCw,
-  Info,
   Shield,
   Target,
   MapPin,
@@ -20,6 +18,7 @@ import {
   TrendingUp,
   AlertTriangle,
   Compass,
+  Layers,
 } from 'lucide-react';
 import {
   listCompanies,
@@ -116,7 +115,6 @@ export default function SettingsPage() {
     try {
       await updateCompanyContext(selectedCompanyId, companyContext);
       setContextSaveStatus('saved');
-      // Update local state
       setCompanies((prev) =>
         prev.map((c) =>
           c.id === selectedCompanyId ? { ...c, context: companyContext } : c,
@@ -187,11 +185,10 @@ export default function SettingsPage() {
     setUploading(true);
     try {
       await uploadDocument(selectedCompanyId, file);
-      // Refresh documents list
       const docs = await listDocuments(selectedCompanyId);
       setDocuments(docs);
     } catch {
-      // silently fail — the document list will just not update
+      // silently fail
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -210,7 +207,7 @@ export default function SettingsPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <AlertCircle size={40} className="text-nogo" />
-        <h1 className="text-xl font-bold text-text-primary">Failed to Load Settings</h1>
+        <h1 className="text-xl font-bold text-text-primary">Failed to Load</h1>
         <p className="text-sm text-text-secondary">{error}</p>
       </div>
     );
@@ -218,26 +215,42 @@ export default function SettingsPage() {
 
   const selectedCompany = companies.find((c) => c.id === selectedCompanyId);
 
+  // Compute readiness indicators
+  const hasContext = !!(selectedCompany?.context?.trim());
+  const hasLens = !!lens;
+  const hasDocs = documents.length > 0;
+
   return (
     <div className="min-h-screen bg-surface-secondary">
       <div className="max-w-4xl mx-auto px-8 pt-10 pb-8">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
-            <Settings size={20} className="text-brand" />
+            <Layers size={20} className="text-brand" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-text-primary">Settings</h1>
+            <h1 className="text-2xl font-bold text-text-primary">Company Intelligence</h1>
             <p className="text-sm text-text-secondary">
-              Company context, strategy lens, and evaluation configuration
+              Configure how your company evaluates strategic opportunities
             </p>
           </div>
         </div>
 
+        {/* Readiness indicator */}
+        {selectedCompany && (
+          <div className="flex items-center gap-4 mb-8 mt-4 ml-[52px]">
+            <ReadinessStep label="Profile" done={hasContext} step={1} />
+            <div className="w-6 h-px bg-border" />
+            <ReadinessStep label="Strategy Lens" done={hasLens} step={2} />
+            <div className="w-6 h-px bg-border" />
+            <ReadinessStep label="Documents" done={hasDocs} step={3} optional />
+          </div>
+        )}
+
         <div className="space-y-6">
-          {/* ═══ Section A: Company Profile ═══ */}
+          {/* ═══ Section 1: Company Profile ═══ */}
           <section className="bg-surface rounded-2xl border border-border p-6">
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2.5">
                 <Building2 size={16} className="text-brand" />
                 <h2 className="text-base font-semibold text-text-primary">Company Profile</h2>
@@ -250,6 +263,9 @@ export default function SettingsPage() {
                 New Company
               </button>
             </div>
+            <p className="text-xs text-text-muted mb-5">
+              Your company's strategic position, priorities, and competitive advantages — used to evaluate fit for every opportunity.
+            </p>
 
             {/* New company form */}
             {showNewCompanyForm && (
@@ -334,7 +350,7 @@ export default function SettingsPage() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="block text-xs font-medium text-text-secondary">
-                      Company Context & Strategy Notes
+                      Strategic Context
                     </label>
                     <div className="flex items-center gap-2">
                       {contextSaveStatus === 'saved' && (
@@ -358,7 +374,7 @@ export default function SettingsPage() {
                       setContextSaveStatus('idle');
                     }}
                     rows={6}
-                    placeholder="Describe your company's strategic position, priorities, target customers, competitive advantages, constraints, and anything else that should inform how opportunities are evaluated..."
+                    placeholder="Describe your company's strategic position, target customers, competitive advantages, and key constraints. This context is used to evaluate strategic fit for every opportunity assessment."
                     className="w-full px-3.5 py-3 rounded-xl border border-border bg-surface text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all resize-y"
                   />
                   {/* PDF import */}
@@ -380,25 +396,21 @@ export default function SettingsPage() {
                       ) : (
                         <Upload size={14} />
                       )}
-                      Import from PDF
+                      Import from File
                     </button>
                     <span className="text-xs text-text-muted">
                       {extractedFilename ? (
                         <span className="text-go flex items-center gap-1">
                           <CheckCircle2 size={12} />
-                          Imported text from {extractedFilename}
+                          Imported from {extractedFilename}
                         </span>
                       ) : (
-                        'Upload a PDF, TXT, or DOC to extract and append its text to the context above.'
+                        'Extract text from a PDF, TXT, or DOC and append it to the context above.'
                       )}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between mt-3">
-                    <p className="text-xs text-text-muted flex items-center gap-1.5">
-                      <Info size={12} />
-                      This context shapes the strategy lens and how analyses evaluate fit for your company.
-                    </p>
+                  <div className="flex items-center justify-end mt-3">
                     <button
                       onClick={handleSaveContext}
                       disabled={
@@ -422,16 +434,16 @@ export default function SettingsPage() {
                 <Building2 size={32} className="text-text-muted mx-auto mb-3" />
                 <p className="text-sm text-text-secondary mb-1">No company profiles yet</p>
                 <p className="text-xs text-text-muted">
-                  Create a company profile to configure your evaluation context.
+                  Create a company profile to start evaluating opportunities.
                 </p>
               </div>
             )}
           </section>
 
-          {/* ═══ Section B: Strategy Lens ═══ */}
+          {/* ═══ Section 2: Strategy Lens ═══ */}
           {selectedCompanyId && (
             <section className="bg-surface rounded-2xl border border-border p-6">
-              <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2.5">
                   <Brain size={16} className="text-brand" />
                   <h2 className="text-base font-semibold text-text-primary">Strategy Lens</h2>
@@ -449,6 +461,9 @@ export default function SettingsPage() {
                   {lens ? 'Rebuild Lens' : 'Build Lens'}
                 </button>
               </div>
+              <p className="text-xs text-text-muted mb-5">
+                A structured view of your strategic priorities, ICP, GTM strengths, and constraints — generated from your company context. Used by the internal critic to evaluate opportunity fit.
+              </p>
 
               {lensError && (
                 <div className="mb-4 p-3 rounded-xl bg-nogo/10 border border-nogo/20 text-xs text-nogo flex items-center gap-2">
@@ -464,26 +479,30 @@ export default function SettingsPage() {
               ) : lens ? (
                 <StrategyLensView lens={lens} />
               ) : (
-                <div className="text-center py-8 border border-dashed border-border rounded-xl">
-                  <Brain size={32} className="text-text-muted mx-auto mb-3" />
-                  <p className="text-sm text-text-secondary mb-1">No strategy lens built yet</p>
-                  <p className="text-xs text-text-muted">
+                <div className="text-center py-10 border border-dashed border-border rounded-xl">
+                  <Brain size={28} className="text-text-muted mx-auto mb-3" />
+                  <p className="text-sm font-medium text-text-primary mb-1">
                     {companyContext.trim()
-                      ? 'Click "Build Lens" to generate a strategy lens from your company context.'
-                      : 'Add company context above first, then build a strategy lens.'}
+                      ? 'Ready to generate your strategy lens'
+                      : 'Add company context first'}
+                  </p>
+                  <p className="text-xs text-text-muted max-w-sm mx-auto">
+                    {companyContext.trim()
+                      ? 'The lens extracts strategic priorities, ICP, GTM strengths, constraints, and fit signals from your context. It shapes how every opportunity is evaluated.'
+                      : 'Write or import your company context above — then build a strategy lens from it.'}
                   </p>
                 </div>
               )}
             </section>
           )}
 
-          {/* ═══ Section C: Data & Uploads ═══ */}
+          {/* ═══ Section 3: Supporting Documents ═══ */}
           {selectedCompanyId && (
             <section className="bg-surface rounded-2xl border border-border p-6">
-              <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2.5">
                   <FileText size={16} className="text-brand" />
-                  <h2 className="text-base font-semibold text-text-primary">Data & Documents</h2>
+                  <h2 className="text-base font-semibold text-text-primary">Supporting Documents</h2>
                 </div>
                 <div>
                   <input
@@ -503,14 +522,12 @@ export default function SettingsPage() {
                     ) : (
                       <Upload size={14} />
                     )}
-                    Upload Document
+                    Upload
                   </button>
                 </div>
               </div>
-
-              <p className="text-xs text-text-muted mb-4 flex items-center gap-1.5">
-                <Info size={12} />
-                Documents are chunked, embedded, and used to enrich the strategy lens and analysis context.
+              <p className="text-xs text-text-muted mb-5">
+                Upload strategy briefs, pitch decks, or market research. Documents are chunked, embedded, and used to enrich the strategy lens and analysis context.
               </p>
 
               {docsLoading ? (
@@ -553,11 +570,10 @@ export default function SettingsPage() {
                 </div>
               ) : (
                 <div className="text-center py-8 border border-dashed border-border rounded-xl">
-                  <FileText size={32} className="text-text-muted mx-auto mb-3" />
-                  <p className="text-sm text-text-secondary mb-1">No documents uploaded</p>
-                  <p className="text-xs text-text-muted">
-                    Upload company docs (pitch decks, strategy briefs, market research) to enrich
-                    analyses.
+                  <FileText size={28} className="text-text-muted mx-auto mb-3" />
+                  <p className="text-sm font-medium text-text-primary mb-1">No documents yet</p>
+                  <p className="text-xs text-text-muted max-w-sm mx-auto">
+                    Upload company documents to enrich your strategy lens and give analyses deeper context. Optional — the profile context above is sufficient to start.
                   </p>
                 </div>
               )}
@@ -569,19 +585,95 @@ export default function SettingsPage() {
   );
 }
 
+
+// ── Readiness step indicator ──
+
+function ReadinessStep({ label, done, step, optional }: {
+  label: string;
+  done: boolean;
+  step: number;
+  optional?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+        done
+          ? 'bg-go text-white'
+          : 'bg-gray-100 text-text-muted'
+      }`}>
+        {done ? <CheckCircle2 size={12} /> : step}
+      </div>
+      <span className={`text-xs font-medium ${done ? 'text-text-primary' : 'text-text-muted'}`}>
+        {label}
+        {optional && !done && <span className="text-text-muted font-normal ml-1">(optional)</span>}
+      </span>
+    </div>
+  );
+}
+
+
 // ── Strategy Lens Viewer ──
 
 const LENS_SECTIONS = [
-  { key: 'strategic_priorities', label: 'Strategic Priorities', icon: Target },
-  { key: 'product_adjacencies', label: 'Product Adjacencies', icon: Compass },
-  { key: 'icp', label: 'Ideal Customer Profile', icon: Users },
-  { key: 'gtm_strengths', label: 'GTM Strengths', icon: TrendingUp },
+  { key: 'strategicPriorities', label: 'Strategic Priorities', icon: Target },
+  { key: 'productAdjacencies', label: 'Product Adjacencies', icon: Compass },
+  { key: 'targetCustomers', label: 'Ideal Customer Profile', icon: Users },
+  { key: 'gtmStrengths', label: 'GTM Strengths', icon: TrendingUp },
   { key: 'constraints', label: 'Constraints', icon: AlertTriangle },
-  { key: 'geographic_focus', label: 'Geographic Focus', icon: MapPin },
-  { key: 'risk_posture', label: 'Risk Posture', icon: Shield },
-  { key: 'fit_signals', label: 'Fit Signals', icon: CheckCircle2 },
-  { key: 'misfit_signals', label: 'Misfit Signals', icon: AlertCircle },
+  { key: 'geographicFocus', label: 'Geographic Focus', icon: MapPin },
+  { key: 'riskPosture', label: 'Risk Posture', icon: Shield },
+  { key: 'internalFitSignals', label: 'Fit Signals', icon: CheckCircle2 },
+  { key: 'internalMisfitSignals', label: 'Misfit Signals', icon: AlertCircle },
 ] as const;
+
+function flattenLensValue(value: unknown): string[] {
+  if (!value) return [];
+  if (typeof value === 'string') return [value];
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => {
+      if (typeof item === 'string') return [item];
+      if (typeof item === 'object' && item !== null) {
+        const obj = item as Record<string, unknown>;
+        // strategicPriorities: {priority, importance, supportingEvidence}
+        if ('priority' in obj) {
+          const tag = obj.importance ? ` [${obj.importance}]` : '';
+          return [`${obj.priority}${tag}`];
+        }
+        // constraints: {constraint, severity, source}
+        if ('constraint' in obj) {
+          const tag = obj.severity ? ` [${obj.severity}]` : '';
+          return [`${obj.constraint}${tag}`];
+        }
+        // Fallback: join non-empty string values
+        return [Object.values(obj).filter((v) => typeof v === 'string' && v).join(' — ')];
+      }
+      return [String(item)];
+    });
+  }
+  if (typeof value === 'object' && value !== null) {
+    const obj = value as Record<string, unknown>;
+    // riskPosture: {level, reasoning, implications}
+    if ('level' in obj && 'reasoning' in obj) {
+      const lines = [`${obj.level}: ${obj.reasoning}`];
+      if (Array.isArray(obj.implications)) {
+        lines.push(...obj.implications.map(String));
+      }
+      return lines;
+    }
+    // targetCustomers: {segments, painPoints, buyingCriteria, antiPatterns}
+    const items: string[] = [];
+    for (const [k, v] of Object.entries(obj)) {
+      if (Array.isArray(v) && v.length > 0) {
+        const label = k.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+        items.push(`${label}: ${v.join(', ')}`);
+      } else if (typeof v === 'string' && v) {
+        items.push(v);
+      }
+    }
+    return items;
+  }
+  return [String(value)];
+}
 
 function StrategyLensView({ lens }: { lens: StrategyLens }) {
   return (
@@ -602,40 +694,28 @@ function StrategyLensView({ lens }: { lens: StrategyLens }) {
         {lens.confidenceNote && <span>{lens.confidenceNote}</span>}
       </div>
 
-      {/* Lens sections */}
-      <div className="grid grid-cols-1 gap-3">
+      {/* Lens sections — 2 column grid for density */}
+      <div className="grid grid-cols-2 gap-3">
         {LENS_SECTIONS.map(({ key, label, icon: Icon }) => {
-          const value = lens[key];
-          if (!value) return null;
-
-          const items = Array.isArray(value)
-            ? value
-            : typeof value === 'string'
-              ? [value]
-              : typeof value === 'object'
-                ? Object.entries(value as Record<string, unknown>).map(
-                    ([k, v]) => `${k}: ${v}`,
-                  )
-                : [String(value)];
-
+          const items = flattenLensValue(lens[key]);
           if (items.length === 0) return null;
 
           return (
             <div key={key} className="p-3.5 rounded-xl bg-gray-50 border border-border">
               <div className="flex items-center gap-2 mb-2">
-                <Icon size={14} className="text-brand" />
-                <h4 className="text-xs font-semibold text-text-primary uppercase tracking-wide">
+                <Icon size={13} className="text-brand" />
+                <h4 className="text-[10px] font-semibold text-text-muted uppercase tracking-wide">
                   {label}
                 </h4>
               </div>
               {items.length === 1 ? (
-                <p className="text-sm text-text-secondary">{items[0]}</p>
+                <p className="text-xs text-text-secondary leading-relaxed">{items[0]}</p>
               ) : (
                 <ul className="space-y-1">
-                  {(items as string[]).map((item, i) => (
+                  {items.map((item, i) => (
                     <li key={i} className="flex items-start gap-2">
-                      <div className="w-1 h-1 rounded-full bg-brand mt-2 shrink-0" />
-                      <span className="text-sm text-text-secondary">{String(item)}</span>
+                      <div className="w-1 h-1 rounded-full bg-brand mt-1.5 shrink-0" />
+                      <span className="text-xs text-text-secondary leading-relaxed">{item}</span>
                     </li>
                   ))}
                 </ul>

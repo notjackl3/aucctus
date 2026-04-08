@@ -9,8 +9,9 @@ import {
   Search,
   Target,
   Clock,
+  Trash2,
 } from 'lucide-react';
-import { listAnalyses } from '../api/client';
+import { listAnalyses, deleteAnalysis } from '../api/client';
 import type { AnalysisSummary } from '../api/client';
 import RecommendationBadge from '../components/RecommendationBadge';
 import ScoreGauge from '../components/ScoreGauge';
@@ -26,6 +27,7 @@ export default function HistoryPage() {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortKey>('date');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     listAnalyses()
@@ -33,6 +35,18 @@ export default function HistoryPage() {
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load'))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleDelete = async (id: string) => {
+    setDeleting(id);
+    try {
+      await deleteAnalysis(id);
+      setAnalyses((prev) => prev.filter((a) => a.id !== id));
+    } catch {
+      // failed silently — item stays in list
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -181,7 +195,13 @@ export default function HistoryPage() {
         {/* Analysis list */}
         <div className="space-y-3">
           {filtered.map((a) => (
-            <AnalysisCard key={a.id} analysis={a} navigate={navigate} />
+            <AnalysisCard
+              key={a.id}
+              analysis={a}
+              navigate={navigate}
+              onDelete={handleDelete}
+              isDeleting={deleting === a.id}
+            />
           ))}
         </div>
       </div>
@@ -192,20 +212,31 @@ export default function HistoryPage() {
 function AnalysisCard({
   analysis: a,
   navigate,
+  onDelete,
+  isDeleting,
 }: {
   analysis: AnalysisSummary;
   navigate: ReturnType<typeof useNavigate>;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
 }) {
   const isCompleted = a.status === 'completed';
   const isRunning = a.status === 'running' || a.status === 'pending';
   const isError = a.status === 'error';
 
   const handleClick = () => {
+    if (isDeleting) return;
     if (isCompleted) {
       navigate(`/workspace/${a.id}`);
     } else if (isRunning) {
       navigate(`/analysis/${a.id}`);
     }
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isDeleting) return;
+    onDelete(a.id);
   };
 
   const formatDate = (iso: string) =>
@@ -222,13 +253,14 @@ function AnalysisCard({
     });
 
   return (
-    <button
+    <div
       onClick={handleClick}
-      disabled={isError}
-      className={`w-full text-left p-5 rounded-xl bg-surface border transition-all group ${
+      className={`relative w-full text-left p-5 rounded-xl bg-surface border transition-all group ${
         isError
-          ? 'border-nogo/20 opacity-70 cursor-not-allowed'
-          : 'border-border hover:border-brand/30 hover:shadow-sm cursor-pointer'
+          ? 'border-nogo/20 opacity-70'
+          : isDeleting
+            ? 'border-border opacity-50 pointer-events-none'
+            : 'border-border hover:border-brand/30 hover:shadow-sm cursor-pointer'
       }`}
     >
       <div className="flex items-center gap-5">
@@ -296,16 +328,28 @@ function AnalysisCard({
           </div>
         </div>
 
-        {/* Right: Action arrow */}
-        {!isError && (
-          <div className="shrink-0">
+        {/* Right: Delete + Arrow */}
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={handleDeleteClick}
+            disabled={isDeleting}
+            className="p-2 rounded-lg text-text-muted hover:text-nogo hover:bg-nogo/10 opacity-0 group-hover:opacity-100 transition-all disabled:opacity-50"
+            title="Delete analysis"
+          >
+            {isDeleting ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Trash2 size={16} />
+            )}
+          </button>
+          {!isError && (
             <ArrowRight
               size={18}
               className="text-text-muted group-hover:text-brand transition-colors"
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </button>
+    </div>
   );
 }
