@@ -32,11 +32,11 @@ export default function FindingsTray({ findings, onRemove, onClear }: Props) {
   return (
     <div className="fixed bottom-0 left-20 right-0 z-40">
       <div className="max-w-5xl mx-auto px-8">
-        <div className="bg-surface border border-border border-b-0 rounded-t-xl shadow-2xl">
+        <div className="bg-white border border-border border-b-0 rounded-t-xl shadow-2xl">
           {/* Header */}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="w-full flex items-center justify-between px-5 py-3 hover:bg-white/[0.02] transition-colors"
+            className="w-full flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors"
           >
             <div className="flex items-center gap-2">
               <Pin size={14} className="text-brand" />
@@ -61,7 +61,7 @@ export default function FindingsTray({ findings, onRemove, onClear }: Props) {
               {findings.map((f) => (
                 <div
                   key={f.id}
-                  className="flex items-start gap-2 px-3 py-2 rounded-lg bg-white/5 group"
+                  className="flex items-start gap-2 px-3 py-2 rounded-lg bg-gray-50 group"
                 >
                   <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${typeColors[f.type].replace('text-', 'bg-')}`} />
                   <div className="flex-1 min-w-0">
@@ -70,7 +70,7 @@ export default function FindingsTray({ findings, onRemove, onClear }: Props) {
                   </div>
                   <button
                     onClick={() => onRemove(f.id)}
-                    className="shrink-0 p-0.5 rounded hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="shrink-0 p-0.5 rounded hover:bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <X size={12} className="text-text-muted" />
                   </button>

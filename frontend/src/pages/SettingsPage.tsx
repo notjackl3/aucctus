@@ -210,7 +210,7 @@ export default function SettingsPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <AlertCircle size={40} className="text-nogo" />
-        <h1 className="text-xl font-bold text-white">Failed to Load Settings</h1>
+        <h1 className="text-xl font-bold text-text-primary">Failed to Load Settings</h1>
         <p className="text-sm text-text-secondary">{error}</p>
       </div>
     );
@@ -227,7 +227,7 @@ export default function SettingsPage() {
             <Settings size={20} className="text-brand" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Settings</h1>
+            <h1 className="text-2xl font-bold text-text-primary">Settings</h1>
             <p className="text-sm text-text-secondary">
               Company context, strategy lens, and evaluation configuration
             </p>
@@ -253,7 +253,7 @@ export default function SettingsPage() {
 
             {/* New company form */}
             {showNewCompanyForm && (
-              <div className="mb-5 p-4 rounded-xl bg-white/5 border border-border">
+              <div className="mb-5 p-4 rounded-xl bg-gray-50 border border-border">
                 <label className="block text-xs font-medium text-text-secondary mb-2">
                   Company Name
                 </label>
@@ -362,7 +362,7 @@ export default function SettingsPage() {
                     className="w-full px-3.5 py-3 rounded-xl border border-border bg-surface text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all resize-y"
                   />
                   {/* PDF import */}
-                  <div className="flex items-center gap-3 mt-3 p-3 rounded-xl bg-white/5 border border-dashed border-border">
+                  <div className="flex items-center gap-3 mt-3 p-3 rounded-xl bg-gray-50 border border-dashed border-border">
                     <input
                       type="file"
                       ref={pdfInputRef}
@@ -522,7 +522,7 @@ export default function SettingsPage() {
                   {documents.map((doc) => (
                     <div
                       key={doc.id}
-                      className="flex items-center gap-3 p-3.5 rounded-xl bg-white/5 border border-border"
+                      className="flex items-center gap-3 p-3.5 rounded-xl bg-gray-50 border border-border"
                     >
                       <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center shrink-0">
                         <FileText size={14} className="text-brand" />
@@ -621,7 +621,7 @@ function StrategyLensView({ lens }: { lens: StrategyLens }) {
           if (items.length === 0) return null;
 
           return (
-            <div key={key} className="p-3.5 rounded-xl bg-white/5 border border-border">
+            <div key={key} className="p-3.5 rounded-xl bg-gray-50 border border-border">
               <div className="flex items-center gap-2 mb-2">
                 <Icon size={14} className="text-brand" />
                 <h4 className="text-xs font-semibold text-text-primary uppercase tracking-wide">

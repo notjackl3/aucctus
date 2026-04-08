@@ -46,7 +46,7 @@ export default function HistoryPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <AlertCircle size={40} className="text-nogo" />
-        <h1 className="text-xl font-bold text-white">Failed to Load History</h1>
+        <h1 className="text-xl font-bold text-text-primary">Failed to Load History</h1>
         <p className="text-sm text-text-secondary">{error}</p>
         <button
           onClick={() => navigate('/')}
@@ -94,7 +94,7 @@ export default function HistoryPage() {
               <BarChart3 size={20} className="text-brand" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Analysis History</h1>
+              <h1 className="text-2xl font-bold text-text-primary">Analysis History</h1>
               <p className="text-sm text-text-secondary">
                 {analyses.length} analysis {analyses.length === 1 ? 'run' : 'runs'}
               </p>

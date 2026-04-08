@@ -95,7 +95,7 @@ export default function InputPage() {
       <div className="flex-1 flex items-start justify-center px-8 pt-12 pb-12">
         <form onSubmit={handleSubmit} className="w-full max-w-2xl space-y-6">
           {/* Company profile header */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-surface border border-border">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-white border border-border">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center">
                 <Building2 size={18} className="text-brand" />
@@ -112,7 +112,7 @@ export default function InputPage() {
             <button
               type="button"
               onClick={() => navigate('/settings')}
-              className="p-2 rounded-lg hover:bg-white/10 text-text-muted hover:text-text-primary transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-100 text-text-muted hover:text-text-primary transition-colors"
               title="Edit company profile"
             >
               <Settings size={16} />
@@ -121,7 +121,7 @@ export default function InputPage() {
 
           {/* Title */}
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-white">New Opportunity Assessment</h1>
+            <h1 className="text-2xl font-bold text-text-primary">New Opportunity Assessment</h1>
             <p className="text-sm text-text-secondary mt-1.5">
               What market or opportunity should {activeCompany.name} evaluate?
             </p>
@@ -138,7 +138,7 @@ export default function InputPage() {
               value={marketSpace}
               onChange={(e) => setMarketSpace(e.target.value)}
               placeholder="e.g. AI-Powered Expense Management, Developer Analytics, Cloud Security"
-              className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all text-sm"
               autoFocus
             />
           </div>
@@ -155,7 +155,7 @@ export default function InputPage() {
               value={framingQuestion}
               onChange={(e) => setFramingQuestion(e.target.value)}
               placeholder="e.g. Should we pursue this? What gives us a right to win?"
-              className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all text-sm"
             />
             <div className="flex flex-wrap gap-1.5 mt-2">
               {FRAMING_SUGGESTIONS.map((q) => (
@@ -191,7 +191,7 @@ export default function InputPage() {
                 onChange={(e) => setAdditionalContext(e.target.value)}
                 placeholder="Any run-specific context, constraints, or focus areas beyond the company profile..."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-border bg-surface text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all text-sm resize-none mt-2"
+                className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all text-sm resize-none mt-2"
               />
             )}
           </div>
@@ -210,7 +210,7 @@ export default function InputPage() {
             className={`w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all ${
               canSubmit
                 ? 'bg-brand text-white hover:bg-brand-dark shadow-sm hover:shadow-md cursor-pointer'
-                : 'bg-white/10 text-text-muted cursor-not-allowed'
+                : 'bg-gray-100 text-text-muted cursor-not-allowed'
             }`}
           >
             {submitting ? (
@@ -228,7 +228,7 @@ export default function InputPage() {
           </button>
 
           {/* Info */}
-          <div className="bg-white/5 border border-border rounded-xl p-4">
+          <div className="bg-gray-50 border border-border rounded-xl p-4">
             <p className="text-xs text-text-secondary leading-relaxed">
               <strong className="text-text-primary">How it works:</strong> AI research agents assess
               incumbents, emerging competitors, and market sizing — then synthesize a strategic

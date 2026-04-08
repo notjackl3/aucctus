@@ -30,7 +30,6 @@ export default function AnalysisPage() {
     getAnalysis(analysisId)
       .then((data) => {
         setSubtitle(`${data.request.companyName} — ${data.request.marketSpace}`);
-        // If already completed, update steps and navigate
         if (data.status === 'completed') {
           setSteps(data.steps);
           setTimeout(() => navigate(`/workspace/${analysisId}`), 500);
@@ -52,9 +51,8 @@ export default function AnalysisPage() {
       try {
         const op = await getOperation(operationId);
 
-        // Derive step statuses from operation progress
         if (op.progress) {
-          const { stepsCompleted, stepsTotal } = op.progress;
+          const { stepsCompleted } = op.progress;
           setSteps((prev) =>
             prev.map((s, i) => {
               if (i < stepsCompleted) return { ...s, status: 'completed' };
@@ -66,7 +64,6 @@ export default function AnalysisPage() {
 
         if (op.status === 'completed' || op.status === 'completed_with_warnings') {
           clearInterval(pollRef.current);
-          // Fetch final steps from the analysis
           try {
             const analysis = await getAnalysis(analysisId);
             if (analysis.steps?.length) setSteps(analysis.steps);
@@ -77,12 +74,10 @@ export default function AnalysisPage() {
           setError(op.errorMessage || 'Analysis failed');
         }
       } catch (err) {
-        // Don't clear interval on transient errors — keep polling
         console.error('Poll error:', err);
       }
     };
 
-    // Poll immediately, then every 1.5s
     poll();
     pollRef.current = setInterval(poll, 1500);
 
@@ -104,7 +99,7 @@ export default function AnalysisPage() {
         <div className="flex-1 flex items-start justify-center px-8 pt-16 pb-12">
           <div className="w-full max-w-lg space-y-6 text-center">
             <AlertCircle size={40} className="text-nogo mx-auto" />
-            <h1 className="text-xl font-bold text-white">Analysis Failed</h1>
+            <h1 className="text-xl font-bold text-text-primary">Analysis Failed</h1>
             <p className="text-sm text-text-secondary">{error}</p>
             <button
               onClick={() => navigate('/')}
@@ -125,7 +120,7 @@ export default function AnalysisPage() {
           <div className="text-center mb-4">
             <div className="flex items-center justify-center gap-3 mb-2">
               <Loader2 size={22} className="text-brand animate-spin" />
-              <h1 className="text-2xl font-bold text-white">Analysis in Progress</h1>
+              <h1 className="text-2xl font-bold text-text-primary">Analysis in Progress</h1>
             </div>
             {subtitle && (
               <p className="text-sm text-text-secondary">{subtitle}</p>
@@ -139,7 +134,7 @@ export default function AnalysisPage() {
               </span>
               <span className="text-xs text-text-muted">{elapsedSeconds}s elapsed</span>
             </div>
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
               <div
                 className="h-full bg-brand rounded-full transition-all duration-700 ease-out"
                 style={{ width: `${progress}%` }}

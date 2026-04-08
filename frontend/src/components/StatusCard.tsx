@@ -10,16 +10,16 @@ const stepIcons = {
 
 const stepStyles = {
   pending: {
-    bg: 'bg-white/5',
+    bg: 'bg-gray-50',
     border: 'border-border',
     icon: 'text-text-muted',
     text: 'text-text-muted',
   },
   running: {
-    bg: 'bg-blue-900/20',
-    border: 'border-blue-800',
-    icon: 'text-blue-400',
-    text: 'text-blue-400',
+    bg: 'bg-blue-50',
+    border: 'border-blue-200',
+    icon: 'text-blue-600',
+    text: 'text-blue-600',
   },
   completed: {
     bg: 'bg-go-light',
@@ -59,7 +59,7 @@ export default function StatusCard({ step }: { step: ResearchStepStatus }) {
         <p className={`text-xs ${style.text} mt-0.5`}>{statusLabels[step.status]}</p>
       </div>
       {step.status === 'running' && (
-        <div className="w-16 h-1.5 bg-blue-900/30 rounded-full overflow-hidden">
+        <div className="w-16 h-1.5 bg-blue-100 rounded-full overflow-hidden">
           <div className="h-full bg-blue-500 rounded-full animate-pulse w-2/3" />
         </div>
       )}

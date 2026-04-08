@@ -85,7 +85,7 @@ export default function WorkspacePage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <AlertCircle size={40} className="text-nogo" />
-        <h1 className="text-xl font-bold text-white">Failed to Load</h1>
+        <h1 className="text-xl font-bold text-text-primary">Failed to Load</h1>
         <p className="text-sm text-text-secondary">{error || 'Unknown error'}</p>
         <button onClick={() => navigate('/')}
           className="px-6 py-2.5 rounded-xl bg-brand text-white text-sm font-medium hover:bg-brand-dark transition-colors">
@@ -189,12 +189,12 @@ export default function WorkspacePage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => navigate('/')}
-              className="p-1.5 rounded-lg hover:bg-white/10 text-text-muted hover:text-text-primary transition-colors">
+              className="p-1.5 rounded-lg hover:bg-gray-100 text-text-muted hover:text-text-primary transition-colors">
               <ArrowLeft size={18} />
             </button>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-white">{data.request.companyName}</h1>
+                <h1 className="text-2xl font-bold text-text-primary">{data.request.companyName}</h1>
                 {assessment && <RecommendationBadge recommendation={assessment.recommendation} />}
               </div>
               <p className="text-sm text-text-secondary">{data.request.marketSpace} — Strategic Opportunity Assessment</p>
@@ -212,11 +212,11 @@ export default function WorkspacePage() {
 
       <div className="max-w-6xl mx-auto px-8 pb-8">
         <div className="flex gap-6">
-          {/* ── Left column: strategic recommendation + category cards ── */}
+          {/* Left column: strategic recommendation + category cards */}
           <div className="w-80 shrink-0 space-y-3">
             {/* Strategic Recommendation hero */}
             {assessment && (
-              <div className="p-5 rounded-xl bg-surface border border-border mb-4">
+              <div className="p-5 rounded-xl bg-white border border-border mb-4">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-text-muted uppercase tracking-wide">Strategic Recommendation</span>
                   <ScoreGauge score={assessment.score} size="sm" />
@@ -264,7 +264,7 @@ export default function WorkspacePage() {
             </div>
           </div>
 
-          {/* ── Right column: detail panel ── */}
+          {/* Right column: detail panel */}
           <div className="flex-1 min-w-0">
             {!activeCategory ? (
               <EmptyDetailState />
@@ -333,7 +333,7 @@ function PinnableItem({ text, category, type, onPin }: {
       <span className="text-sm text-text-secondary leading-relaxed flex-1">{text}</span>
       <button
         onClick={() => onPin({ text, category, type })}
-        className="shrink-0 p-1 rounded hover:bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="shrink-0 p-1 rounded hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity"
         title="Pin this finding"
       >
         <Pin size={12} className="text-text-muted" />
@@ -343,7 +343,7 @@ function PinnableItem({ text, category, type, onPin }: {
 }
 
 
-// ── Assessment Detail (reframed for strategic opportunity assessment) ──
+// ── Assessment Detail ──
 
 function AssessmentDetail({ assessment, companyName, onPin }: {
   assessment: OpportunityAssessment;
@@ -355,7 +355,7 @@ function AssessmentDetail({ assessment, companyName, onPin }: {
   return (
     <div className="space-y-5">
       {/* Hero */}
-      <div className="bg-surface rounded-2xl border border-border p-6">
+      <div className="bg-white rounded-2xl border border-border p-6">
         <div className="flex items-start gap-6">
           <div className="flex-1">
             <RecommendationBadge recommendation={assessment.recommendation} size="lg" />
@@ -377,7 +377,7 @@ function AssessmentDetail({ assessment, companyName, onPin }: {
 
       {/* Strategic Fit + Right to Win + Timing */}
       {(assessment.strategicFitSummary || assessment.rightToWin || assessment.timingAssessment) && (
-        <div className="bg-surface rounded-2xl border border-border p-6">
+        <div className="bg-white rounded-2xl border border-border p-6">
           <h3 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
             <Crosshair size={14} className="text-brand" />
             Strategic Fit
@@ -389,13 +389,13 @@ function AssessmentDetail({ assessment, companyName, onPin }: {
           )}
           <div className="grid grid-cols-2 gap-4">
             {assessment.rightToWin && (
-              <div className="p-3 rounded-lg bg-white/5 border border-border">
+              <div className="p-3 rounded-lg bg-gray-50 border border-border">
                 <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Right to Win</p>
                 <p className="text-sm text-text-secondary leading-relaxed">{assessment.rightToWin}</p>
               </div>
             )}
             {assessment.timingAssessment && (
-              <div className="p-3 rounded-lg bg-white/5 border border-border">
+              <div className="p-3 rounded-lg bg-gray-50 border border-border">
                 <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Market Timing</p>
                 <p className="text-sm text-text-secondary leading-relaxed capitalize">{assessment.timingAssessment}</p>
               </div>
@@ -406,7 +406,7 @@ function AssessmentDetail({ assessment, companyName, onPin }: {
 
       {/* Conditions to Pursue */}
       {assessment.conditionsToPursue && assessment.conditionsToPursue.length > 0 && (
-        <div className="bg-surface rounded-2xl border border-border p-6">
+        <div className="bg-white rounded-2xl border border-border p-6">
           <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
             <CheckCircle2 size={14} className="text-brand" />
             Conditions to Pursue
@@ -421,7 +421,7 @@ function AssessmentDetail({ assessment, companyName, onPin }: {
       )}
 
       {/* Believe / Challenge tabs */}
-      <div className="bg-surface rounded-2xl border border-border p-6">
+      <div className="bg-white rounded-2xl border border-border p-6">
         <div className="flex gap-0 mb-4 border-b border-border">
           <button onClick={() => setTab('believe')}
             className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
@@ -453,7 +453,7 @@ function AssessmentDetail({ assessment, companyName, onPin }: {
 
       {/* Leadership Input Required */}
       {assessment.needsLeadershipInput && assessment.needsLeadershipInput.length > 0 && (
-        <div className="bg-surface rounded-2xl border border-border p-6">
+        <div className="bg-white rounded-2xl border border-border p-6">
           <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
             <HelpCircle size={14} className="text-maybe" />
             Needs Leadership Input
@@ -469,7 +469,7 @@ function AssessmentDetail({ assessment, companyName, onPin }: {
 
       {/* White space */}
       {assessment.whiteSpaceOpportunities.length > 0 && (
-        <div className="bg-surface rounded-2xl border border-border p-6">
+        <div className="bg-white rounded-2xl border border-border p-6">
           <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
             <Target size={14} className="text-brand" />
             White Space Opportunities
@@ -504,7 +504,7 @@ function IncumbentsDetail({ data, onPin }: {
 
   return (
     <div className="space-y-4">
-      <div className="bg-surface rounded-2xl border border-border p-6">
+      <div className="bg-white rounded-2xl border border-border p-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide">Incumbents</h2>
           <ConfidenceBadge confidence={data.confidence} />
@@ -516,9 +516,9 @@ function IncumbentsDetail({ data, onPin }: {
       {data.players.map((player) => {
         const isExpanded = expandedPlayers.has(player.name);
         return (
-          <div key={player.name} className="bg-surface rounded-xl border border-border overflow-hidden">
+          <div key={player.name} className="bg-white rounded-xl border border-border overflow-hidden">
             <button onClick={() => togglePlayer(player.name)}
-              className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-white/5 transition-colors">
+              className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors">
               {isExpanded
                 ? <ChevronDown size={16} className="text-text-muted shrink-0" />
                 : <ChevronRight size={16} className="text-text-muted shrink-0" />
@@ -527,7 +527,7 @@ function IncumbentsDetail({ data, onPin }: {
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-text-primary">{player.name}</span>
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                    player.marketPosition === 'Leader' ? 'bg-go-light text-go' : 'bg-white/10 text-text-secondary'
+                    player.marketPosition === 'Leader' ? 'bg-go-light text-go' : 'bg-gray-100 text-text-secondary'
                   }`}>{player.marketPosition}</span>
                 </div>
                 <p className="text-xs text-text-muted mt-0.5 truncate">{player.description}</p>
@@ -590,7 +590,7 @@ function EmergingDetail({ data, onPin }: {
 }) {
   return (
     <div className="space-y-4">
-      <div className="bg-surface rounded-2xl border border-border p-6">
+      <div className="bg-white rounded-2xl border border-border p-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide">Emerging Competitors</h2>
           <ConfidenceBadge confidence={data.confidence} />
@@ -598,21 +598,21 @@ function EmergingDetail({ data, onPin }: {
         <p className="text-sm text-text-secondary leading-relaxed mb-4">{data.summary}</p>
 
         <div className="flex gap-4">
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-border">
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gray-50 border border-border">
             <DollarSign size={16} className="text-brand" />
             <div>
               <p className="text-lg font-bold text-text-primary">{data.totalFundingInSpace}</p>
               <p className="text-xs text-text-muted">Total Funding</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-border">
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gray-50 border border-border">
             <TrendingUp size={16} className="text-brand" />
             <div>
               <p className="text-lg font-bold text-text-primary capitalize">{data.fundingTrend}</p>
               <p className="text-xs text-text-muted">Trend</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-border">
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gray-50 border border-border">
             <Users size={16} className="text-brand" />
             <div>
               <p className="text-lg font-bold text-text-primary">{data.competitors.length}</p>
@@ -623,10 +623,10 @@ function EmergingDetail({ data, onPin }: {
       </div>
 
       {data.competitors.map((comp) => (
-        <div key={comp.name} className="bg-surface rounded-xl border border-border p-5">
+        <div key={comp.name} className="bg-white rounded-xl border border-border p-5">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-sm font-semibold text-text-primary">{comp.name}</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-900/30 text-blue-400 font-medium">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">
               {comp.fundingStage}
             </span>
             {comp.fundingAmount && (
@@ -634,7 +634,7 @@ function EmergingDetail({ data, onPin }: {
             )}
           </div>
           <p className="text-xs text-text-muted mb-2">{comp.description}</p>
-          <div className="bg-white/5 rounded-lg p-2.5 text-xs text-text-secondary mb-2">
+          <div className="bg-gray-50 rounded-lg p-2.5 text-xs text-text-secondary mb-2">
             <strong className="text-text-primary">Differentiator:</strong> {comp.differentiator}
           </div>
           <div className="flex items-center justify-between">
@@ -642,13 +642,13 @@ function EmergingDetail({ data, onPin }: {
               <div className="flex items-center gap-2">
                 <span className="text-xs text-text-muted">Investors:</span>
                 {comp.investors.map((inv) => (
-                  <span key={inv} className="text-xs px-2 py-0.5 rounded bg-white/10 text-text-secondary">{inv}</span>
+                  <span key={inv} className="text-xs px-2 py-0.5 rounded bg-gray-100 text-text-secondary">{inv}</span>
                 ))}
               </div>
             )}
             <button
               onClick={() => onPin({ text: `${comp.name}: ${comp.differentiator}`, category: 'Emerging Competitors', type: 'insight' })}
-              className="p-1 rounded hover:bg-white/10 transition-colors"
+              className="p-1 rounded hover:bg-gray-100 transition-colors"
               title="Pin this competitor"
             >
               <Pin size={12} className="text-text-muted" />
@@ -671,7 +671,7 @@ function MarketDetail({ data, onPin }: {
 }) {
   return (
     <div className="space-y-4">
-      <div className="bg-surface rounded-2xl border border-border p-6">
+      <div className="bg-white rounded-2xl border border-border p-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide">Market Sizing</h2>
           <ConfidenceBadge confidence={data.confidence} />
@@ -685,7 +685,7 @@ function MarketDetail({ data, onPin }: {
             { label: 'SOM', value: data.som || 'N/A', sub: 'Obtainable' },
             { label: 'CAGR', value: data.cagr, sub: data.timeframe },
           ].map((item) => (
-            <div key={item.label} className="text-center p-3 rounded-xl bg-white/5 border border-border">
+            <div key={item.label} className="text-center p-3 rounded-xl bg-gray-50 border border-border">
               <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">{item.label}</p>
               <p className="text-xl font-bold text-text-primary mt-1">{item.value}</p>
               <p className="text-[10px] text-text-muted mt-0.5">{item.sub}</p>
@@ -694,7 +694,7 @@ function MarketDetail({ data, onPin }: {
         </div>
       </div>
 
-      <div className="bg-surface rounded-2xl border border-border p-6">
+      <div className="bg-white rounded-2xl border border-border p-6">
         <div className="grid grid-cols-2 gap-6">
           <div>
             <h3 className="text-xs font-semibold text-go uppercase tracking-wide mb-3">Growth Drivers</h3>
@@ -729,7 +729,7 @@ function RisksDetail({ assessment, onPin }: {
 }) {
   return (
     <div className="space-y-4">
-      <div className="bg-surface rounded-2xl border border-border p-6">
+      <div className="bg-white rounded-2xl border border-border p-6">
         <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
           <Shield size={14} className="text-nogo" />
           Key Risks
@@ -742,7 +742,7 @@ function RisksDetail({ assessment, onPin }: {
       </div>
 
       {assessment.reasonsToChallenge.length > 0 && (
-        <div className="bg-surface rounded-2xl border border-border p-6">
+        <div className="bg-white rounded-2xl border border-border p-6">
           <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
             <AlertTriangle size={14} className="text-maybe" />
             Reasons to Challenge
@@ -755,9 +755,9 @@ function RisksDetail({ assessment, onPin }: {
         </div>
       )}
 
-      {/* Needs Leadership Input (also shown here for visibility) */}
+      {/* Needs Leadership Input */}
       {assessment.needsLeadershipInput && assessment.needsLeadershipInput.length > 0 && (
-        <div className="bg-surface rounded-2xl border border-border p-6">
+        <div className="bg-white rounded-2xl border border-border p-6">
           <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
             <HelpCircle size={14} className="text-maybe" />
             Needs Leadership Input
@@ -781,7 +781,7 @@ function SourcesDetail({ sources }: { sources: Source[] }) {
   const visible = showAll ? sources : sources.slice(0, 8);
 
   return (
-    <div className="bg-surface rounded-2xl border border-border p-6">
+    <div className="bg-white rounded-2xl border border-border p-6">
       <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
         <FileText size={14} className="text-brand" />
         Sources & Evidence ({sources.length})
@@ -811,7 +811,7 @@ function SourcesBlock({ sources }: { sources: Source[] }) {
   if (sources.length === 0) return null;
 
   return (
-    <div className="bg-surface rounded-xl border border-border p-5">
+    <div className="bg-white rounded-xl border border-border p-5">
       <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">
         Sources ({sources.length})
       </h3>

@@ -29,7 +29,7 @@ export default function ScoreGauge({ score, size = 'md', label }: ScoreGaugeProp
         <path
           d={`M ${sw / 2} ${dim / 2} A ${radius} ${radius} 0 0 1 ${dim - sw / 2} ${dim / 2}`}
           fill="none"
-          stroke="#2a2020"
+          stroke="#e8e0dd"
           strokeWidth={sw}
           strokeLinecap="round"
         />
