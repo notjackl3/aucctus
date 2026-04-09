@@ -25,7 +25,7 @@ import {
   Eye,
   RefreshCw,
 } from 'lucide-react';
-import { getAnalysis, getDecisionQuestions, answerDecisionQuestion, applyAnswers, getOperation } from '../api/client';
+import { getAnalysis, getDecisionQuestions, answerDecisionQuestion, replaceDecisionQuestion, generateDecisionQuestion, applyAnswers, getOperation } from '../api/client';
 import type {
   AnalysisResult,
   DecisionQuestion,
@@ -67,6 +67,7 @@ export default function WorkspacePage() {
   // Decision questions state
   const [questions, setQuestions] = useState<DecisionQuestion[]>([]);
   const [savingQ, setSavingQ] = useState<Record<string, boolean>>({});
+  const [replacingQ, setReplacingQ] = useState<Record<string, boolean>>({});
   const [applyingAnswers, setApplyingAnswers] = useState(false);
   const [applyError, setApplyError] = useState<string | null>(null);
   const [applySuccess, setApplySuccess] = useState(false);
@@ -86,8 +87,22 @@ export default function WorkspacePage() {
       const updated = await answerDecisionQuestion(id, questionId, value);
       setQuestions((prev) => prev.map((q) => (q.id === questionId ? { ...q, answerValue: updated.answerValue } : q)));
       setApplySuccess(false);
+      // Fire-and-forget: generate a new question to keep the unresolved pool replenished
+      generateDecisionQuestion(id)
+        .then((newQ) => setQuestions((prev) => [...prev, newQ]))
+        .catch(() => {}); // silently ignore if generation fails
     } catch { /* user can retry */ }
     finally { setSavingQ((prev) => ({ ...prev, [questionId]: false })); }
+  }, [id]);
+
+  const handleReplaceQuestion = useCallback(async (questionId: string) => {
+    if (!id) return;
+    setReplacingQ((prev) => ({ ...prev, [questionId]: true }));
+    try {
+      const newQ = await replaceDecisionQuestion(id, questionId);
+      setQuestions((prev) => prev.map((q) => (q.id === questionId ? newQ : q)));
+    } catch { /* silently fail — question stays */ }
+    finally { setReplacingQ((prev) => ({ ...prev, [questionId]: false })); }
   }, [id]);
 
   const handleApplyAnswers = useCallback(async () => {
@@ -366,7 +381,9 @@ export default function WorkspacePage() {
                 onSelectCategory={setActiveCategory}
                 questions={questions}
                 savingQ={savingQ}
+                replacingQ={replacingQ}
                 onAnswerQuestion={handleAnswerQuestion}
+                onReplaceQuestion={handleReplaceQuestion}
                 applyingAnswers={applyingAnswers}
                 applyError={applyError}
                 applySuccess={applySuccess}
@@ -389,7 +406,9 @@ export default function WorkspacePage() {
                 onSelectCategory={setActiveCategory}
                 questions={questions}
                 savingQ={savingQ}
+                replacingQ={replacingQ}
                 onAnswerQuestion={handleAnswerQuestion}
+                onReplaceQuestion={handleReplaceQuestion}
                 applyingAnswers={applyingAnswers}
                 applyError={applyError}
                 applySuccess={applySuccess}
@@ -444,13 +463,15 @@ export default function WorkspacePage() {
 
 // ── Overview state (replaces empty detail) ──
 
-function OverviewState({ assessment, weakestArea, onSelectCategory, questions, savingQ, onAnswerQuestion, applyingAnswers, applyError, applySuccess, onApplyAnswers }: {
+function OverviewState({ assessment, weakestArea, onSelectCategory, questions, savingQ, replacingQ, onAnswerQuestion, onReplaceQuestion, applyingAnswers, applyError, applySuccess, onApplyAnswers }: {
   assessment?: OpportunityAssessment;
   weakestArea?: { key: CategoryKey; title: string; confidence: ConfidenceIndicator | null };
   onSelectCategory: (key: CategoryKey) => void;
   questions: DecisionQuestion[];
   savingQ: Record<string, boolean>;
+  replacingQ: Record<string, boolean>;
   onAnswerQuestion: (questionId: string, value: string) => void;
+  onReplaceQuestion: (questionId: string) => void;
   applyingAnswers: boolean;
   applyError: string | null;
   applySuccess: boolean;
@@ -553,69 +574,17 @@ function OverviewState({ assessment, weakestArea, onSelectCategory, questions, s
 
       {/* Decision Questions — inline */}
       {questions.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border p-5">
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
-              <HelpCircle size={14} className="text-brand" />
-              Decision Questions
-            </h3>
-            <span className="text-[10px] text-text-muted">
-              {questions.filter((q) => q.answerValue !== null).length}/{questions.length} answered
-            </span>
-          </div>
-          <p className="text-xs text-text-muted mb-4">
-            Answer these to refine the recommendation with your strategic judgment.
-          </p>
-          <div className="space-y-3">
-            {questions.map((q) => (
-              <InlineQuestionCard
-                key={q.id}
-                question={q}
-                saving={savingQ[q.id] || false}
-                onAnswer={(v) => onAnswerQuestion(q.id, v)}
-              />
-            ))}
-          </div>
-
-          {/* Apply footer */}
-          {questions.some((q) => q.answerValue !== null) && (
-            <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-text-primary">
-                  {applySuccess ? 'Assessment updated.' : 'Ready to update assessment'}
-                </p>
-                <p className="text-[10px] text-text-muted mt-0.5">
-                  {applySuccess ? 'Score reflects your inputs.' : 'Re-runs synthesis only — no new research.'}
-                </p>
-              </div>
-              <button
-                onClick={onApplyAnswers}
-                disabled={applyingAnswers || applySuccess}
-                className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                  applySuccess
-                    ? 'bg-go-light text-go cursor-default'
-                    : applyingAnswers
-                      ? 'bg-brand/10 text-brand cursor-wait'
-                      : 'bg-brand text-white hover:bg-brand-dark'
-                }`}
-              >
-                {applyingAnswers ? (
-                  <><Loader2 size={12} className="animate-spin" /> Updating...</>
-                ) : applySuccess ? (
-                  <><CheckCircle2 size={12} /> Applied</>
-                ) : (
-                  <><RefreshCw size={12} /> Update Assessment</>
-                )}
-              </button>
-            </div>
-          )}
-          {applyError && (
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-nogo">
-              <AlertTriangle size={12} />
-              {applyError}
-            </div>
-          )}
-        </div>
+        <DecisionQuestionsPanel
+          questions={questions}
+          savingQ={savingQ}
+          replacingQ={replacingQ}
+          onAnswerQuestion={onAnswerQuestion}
+          onReplaceQuestion={onReplaceQuestion}
+          applyingAnswers={applyingAnswers}
+          applyError={applyError}
+          applySuccess={applySuccess}
+          onApplyAnswers={onApplyAnswers}
+        />
       )}
     </div>
     </SelectableBlock>
@@ -635,6 +604,168 @@ function ListItem({ text, dotColor }: { text: string; dotColor: string }) {
 }
 
 
+// ── Decision Questions Panel (tabbed) ──
+
+function DecisionQuestionsPanel({
+  questions, savingQ, replacingQ, onAnswerQuestion, onReplaceQuestion,
+  applyingAnswers, applyError, applySuccess, onApplyAnswers,
+}: {
+  questions: DecisionQuestion[];
+  savingQ: Record<string, boolean>;
+  replacingQ: Record<string, boolean>;
+  onAnswerQuestion: (id: string, value: string) => void;
+  onReplaceQuestion: (id: string) => void;
+  applyingAnswers: boolean;
+  applyError: string | null;
+  applySuccess: boolean;
+  onApplyAnswers: () => void;
+}) {
+  const unresolved = questions.filter((q) => q.answerValue === null);
+  const resolved = questions.filter((q) => q.answerValue !== null);
+  const [tab, setTab] = useState<'unresolved' | 'resolved'>('unresolved');
+
+  // Auto-switch to resolved tab if all questions are answered
+  const activeTab = unresolved.length === 0 && resolved.length > 0 ? 'resolved' : tab;
+
+  return (
+    <div className="bg-white rounded-2xl border border-border p-5">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+          <HelpCircle size={14} className="text-brand" />
+          Decision Questions
+        </h3>
+        <span className="text-[10px] text-text-muted">{resolved.length}/{questions.length} resolved</span>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-4">
+        <button
+          onClick={() => setTab('unresolved')}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+            activeTab === 'unresolved'
+              ? 'bg-white text-text-primary shadow-sm'
+              : 'text-text-muted hover:text-text-secondary'
+          }`}
+        >
+          Unresolved
+          {unresolved.length > 0 && (
+            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${
+              activeTab === 'unresolved' ? 'bg-brand/10 text-brand' : 'bg-gray-200 text-text-muted'
+            }`}>
+              {unresolved.length}
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setTab('resolved')}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+            activeTab === 'resolved'
+              ? 'bg-white text-text-primary shadow-sm'
+              : 'text-text-muted hover:text-text-secondary'
+          }`}
+        >
+          Resolved
+          {resolved.length > 0 && (
+            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${
+              activeTab === 'resolved' ? 'bg-go/20 text-go' : 'bg-gray-200 text-text-muted'
+            }`}>
+              {resolved.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Unresolved tab */}
+      {activeTab === 'unresolved' && (
+        unresolved.length > 0 ? (
+          <div className="space-y-3">
+            {unresolved.map((q) => (
+              <InlineQuestionCard
+                key={q.id}
+                question={q}
+                saving={savingQ[q.id] || false}
+                replacing={replacingQ[q.id] || false}
+                onAnswer={(v) => onAnswerQuestion(q.id, v)}
+                onReplace={() => onReplaceQuestion(q.id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="py-8 text-center">
+            <CheckCircle2 size={28} className="text-go mx-auto mb-2" />
+            <p className="text-sm text-text-primary font-medium">All questions resolved</p>
+            <p className="text-xs text-text-muted mt-1">Switch to Resolved to review your answers.</p>
+          </div>
+        )
+      )}
+
+      {/* Resolved tab */}
+      {activeTab === 'resolved' && (
+        resolved.length > 0 ? (
+          <div className="space-y-2">
+            {resolved.map((q) => (
+              <InlineQuestionCard
+                key={q.id}
+                question={q}
+                saving={savingQ[q.id] || false}
+                replacing={false}
+                onAnswer={(v) => onAnswerQuestion(q.id, v)}
+                onReplace={() => onReplaceQuestion(q.id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="py-8 text-center">
+            <HelpCircle size={28} className="text-text-muted mx-auto mb-2" />
+            <p className="text-xs text-text-muted">No questions answered yet.</p>
+          </div>
+        )
+      )}
+
+      {/* Apply footer — always visible when there are resolved questions */}
+      {resolved.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium text-text-primary">
+              {applySuccess ? 'Assessment updated.' : 'Ready to update assessment'}
+            </p>
+            <p className="text-[10px] text-text-muted mt-0.5">
+              {applySuccess ? 'Score reflects your inputs.' : 'Re-runs synthesis only — no new research.'}
+            </p>
+          </div>
+          <button
+            onClick={onApplyAnswers}
+            disabled={applyingAnswers || applySuccess}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+              applySuccess
+                ? 'bg-go-light text-go cursor-default'
+                : applyingAnswers
+                  ? 'bg-brand/10 text-brand cursor-wait'
+                  : 'bg-brand text-white hover:bg-brand-dark'
+            }`}
+          >
+            {applyingAnswers ? (
+              <><Loader2 size={12} className="animate-spin" /> Updating...</>
+            ) : applySuccess ? (
+              <><CheckCircle2 size={12} /> Applied</>
+            ) : (
+              <><RefreshCw size={12} /> Update Assessment</>
+            )}
+          </button>
+        </div>
+      )}
+      {applyError && (
+        <div className="mt-2 flex items-center gap-1.5 text-xs text-nogo">
+          <AlertTriangle size={12} />
+          {applyError}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 // ── Inline Decision Question Card ──
 
 const IMPORTANCE_COLORS: Record<string, { bg: string; text: string }> = {
@@ -643,10 +774,12 @@ const IMPORTANCE_COLORS: Record<string, { bg: string; text: string }> = {
   low: { bg: 'bg-gray-100', text: 'text-text-muted' },
 };
 
-function InlineQuestionCard({ question: q, saving, onAnswer }: {
+function InlineQuestionCard({ question: q, saving, replacing, onAnswer, onReplace }: {
   question: DecisionQuestion;
   saving: boolean;
+  replacing: boolean;
   onAnswer: (value: string) => void;
+  onReplace: () => void;
 }) {
   const [draft, setDraft] = useState(q.answerValue || '');
   const imp = IMPORTANCE_COLORS[q.importance] || IMPORTANCE_COLORS.medium;
@@ -654,7 +787,7 @@ function InlineQuestionCard({ question: q, saving, onAnswer }: {
 
   return (
     <div className={`rounded-lg border p-3.5 transition-colors ${
-      isAnswered ? 'border-go/30 bg-go/[0.02]' : 'border-border'
+      replacing ? 'border-border opacity-50' : isAnswered ? 'border-go/30 bg-go/[0.02]' : 'border-border'
     }`}>
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <p className="text-xs font-medium text-text-primary leading-snug">{q.questionText}</p>
@@ -663,6 +796,19 @@ function InlineQuestionCard({ question: q, saving, onAnswer }: {
             {q.importance}
           </span>
           {isAnswered && <CheckCircle2 size={12} className="text-go" />}
+          {!isAnswered && (
+            <button
+              onClick={onReplace}
+              disabled={replacing || saving}
+              title="Don't know — replace with a different question"
+              className="p-1 rounded text-text-muted hover:text-brand hover:bg-brand/10 disabled:opacity-40 transition-colors"
+            >
+              {replacing
+                ? <Loader2 size={11} className="animate-spin" />
+                : <RefreshCw size={11} />
+              }
+            </button>
+          )}
         </div>
       </div>
       <p className="text-[10px] text-text-muted mb-2.5">{q.decisionImpact}</p>

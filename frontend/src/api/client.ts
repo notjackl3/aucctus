@@ -212,6 +212,19 @@ export function answerDecisionQuestion(
   });
 }
 
+export function generateDecisionQuestion(analysisId: string): Promise<DecisionQuestion> {
+  return request(`/api/analyses/${analysisId}/decision-questions/generate`, { method: 'POST' });
+}
+
+export function replaceDecisionQuestion(
+  analysisId: string,
+  questionId: string,
+): Promise<DecisionQuestion> {
+  return request(`/api/analyses/${analysisId}/decision-questions/${questionId}/replace`, {
+    method: 'POST',
+  });
+}
+
 export function applyAnswers(analysisId: string): Promise<ApplyAnswersResult> {
   return request(`/api/analyses/${analysisId}/apply-answers`, { method: 'POST' });
 }

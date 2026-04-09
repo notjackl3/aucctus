@@ -926,6 +926,15 @@ async def get_decision_questions(analysis_id: str) -> list[DecisionQuestion]:
     return [_row_to_decision_question(r) for r in rows]
 
 
+async def delete_decision_question(question_id: str) -> bool:
+    db = await get_db()
+    cursor = await db.execute(
+        "DELETE FROM decision_questions WHERE id = ?", (question_id,)
+    )
+    await db.commit()
+    return cursor.rowcount > 0
+
+
 async def update_decision_question_answer(question_id: str, answer_value: str) -> bool:
     db = await get_db()
     cursor = await db.execute(

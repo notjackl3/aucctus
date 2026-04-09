@@ -20,7 +20,7 @@ from app.api.schemas import (
 )
 from app.config import ANALYSIS_STEPS
 from app.persistence import repositories as repo
-from app.workflows.decision_questions import resynthesize_with_answers
+from app.workflows.decision_questions import resynthesize_with_answers, generate_replacement_question, generate_additional_question
 from app.workflows.orchestrator import run_analysis
 
 router = APIRouter(prefix="/analyses", tags=["analyses"])
@@ -201,6 +201,83 @@ async def answer_decision_question(analysis_id: str, question_id: str, req: Answ
 
     question.answer_value = req.answer_value
     return _dq_to_response(question)
+
+
+@router.post("/{analysis_id}/decision-questions/generate", response_model=DecisionQuestionResponse)
+async def generate_new_decision_question(analysis_id: str):
+    """Generate one additional decision question after the user answers one.
+    Returns the new question immediately (single GPT-4o-mini call)."""
+    analysis = await repo.get_analysis(analysis_id)
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+
+    existing = await repo.get_decision_questions(analysis_id)
+
+    synthesis_data: dict = {}
+    if analysis.result_json:
+        try:
+            result_data = json.loads(analysis.result_json)
+            synthesis_data = result_data.get("opportunityAssessment") or {}
+        except Exception:
+            pass
+
+    new_q = await generate_additional_question(
+        analysis_id=analysis_id,
+        existing_questions=existing,
+        synthesis_data=synthesis_data,
+        company_name=analysis.company_name,
+        market_space=analysis.market_space,
+    )
+
+    if not new_q:
+        raise HTTPException(status_code=500, detail="Failed to generate question")
+
+    return _dq_to_response(new_q)
+
+
+@router.post("/{analysis_id}/decision-questions/{question_id}/replace", response_model=DecisionQuestionResponse)
+async def replace_decision_question(analysis_id: str, question_id: str):
+    """Dismiss a decision question and generate a fresh replacement.
+    Deletes the old question and returns a newly generated one."""
+    analysis = await repo.get_analysis(analysis_id)
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+
+    old_q = await repo.get_decision_question(question_id)
+    if not old_q or old_q.analysis_id != analysis_id:
+        raise HTTPException(status_code=404, detail="Decision question not found")
+
+    # Load remaining questions (excluding the one being replaced)
+    all_questions = await repo.get_decision_questions(analysis_id)
+    remaining = [q for q in all_questions if q.id != question_id]
+
+    # Get synthesis data for context
+    synthesis_data: dict = {}
+    if analysis.result_json:
+        try:
+            result_data = json.loads(analysis.result_json)
+            synthesis_data = result_data.get("opportunityAssessment") or {}
+        except Exception:
+            pass
+
+    # Delete the dismissed question
+    await repo.delete_decision_question(question_id)
+
+    # Generate replacement
+    new_q = await generate_replacement_question(
+        analysis_id=analysis_id,
+        dismissed_question_text=old_q.question_text,
+        existing_questions=remaining,
+        synthesis_data=synthesis_data,
+        company_name=analysis.company_name,
+        market_space=analysis.market_space,
+        sort_order=old_q.sort_order,
+    )
+
+    if not new_q:
+        raise HTTPException(status_code=500, detail="Failed to generate replacement question")
+
+    return _dq_to_response(new_q)
 
 
 @router.post("/{analysis_id}/apply-answers", response_model=ApplyAnswersResponse)

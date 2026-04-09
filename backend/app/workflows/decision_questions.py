@@ -214,6 +214,139 @@ def _identify_lens_gaps(lens: dict) -> list[str]:
     return gaps
 
 
+# ── Replacement question generation ──
+
+class _SingleQuestion(BaseModel):
+    question_text: str
+    category: str
+    answer_type: str
+    importance: str
+    decision_impact: str
+    choices: list[str] | None = None
+
+
+async def _generate_one_question(
+    analysis_id: str,
+    existing_questions: list[DecisionQuestion],
+    synthesis_data: dict[str, Any],
+    company_name: str,
+    market_space: str,
+    avoid_texts: list[str],
+    sort_order: int = 0,
+) -> DecisionQuestion | None:
+    """Core helper: generate and persist one new decision question."""
+    recommendation = synthesis_data.get("recommendation", "maybe")
+    score = synthesis_data.get("score", 50)
+    key_risks = synthesis_data.get("keyRisks", [])
+    conditions = synthesis_data.get("conditionsToPursue", [])
+    existing_texts = [q.question_text for q in existing_questions]
+
+    all_avoid = list(dict.fromkeys(avoid_texts + existing_texts))  # deduplicated, order preserved
+
+    prompt = (
+        f"You are helping evaluate whether {company_name} should pursue the {market_space} opportunity.\n"
+        f"Current recommendation: {recommendation} (score: {score}/100)\n"
+        f"Key risks: {'; '.join(key_risks[:3]) if key_risks else 'none'}\n"
+        f"Conditions to pursue: {'; '.join(conditions[:3]) if conditions else 'none'}\n\n"
+        + (
+            "These questions already exist or were dismissed — do NOT repeat them or ask anything similar:\n"
+            + "\n".join(f"  - {t}" for t in all_avoid)
+            + "\n\n"
+            if all_avoid else ""
+        )
+        + "Generate exactly ONE new decision question that:\n"
+        "- Is genuinely different from all the above\n"
+        "- Asks something only the user can answer (not derivable from public research)\n"
+        "- Would materially affect the go/no-go decision if answered\n"
+        "- Can be any answer type: scale_1_5, yes_no, multiple_choice, or short_text\n"
+        "- Has a clear decision_impact explaining how the answer changes the assessment\n"
+        "- Category: strategic_fit, risk_tolerance, capability, market_intent, leadership, or constraints\n"
+        "- Importance: high, medium, or low"
+    )
+
+    try:
+        gq = await llm.chat_structured(
+            prompt=prompt,
+            response_model=_SingleQuestion,
+            model="gpt-4o-mini",
+            system=(
+                "You are a strategy consultant. Generate a single high-value decision question "
+                "that the AI cannot answer from public research alone."
+            ),
+            max_tokens=512,
+        )
+    except Exception as e:
+        logger.error(f"Single question generation failed: {e}")
+        return None
+
+    try:
+        cat = DecisionQuestionCategory(gq.category)
+    except ValueError:
+        cat = DecisionQuestionCategory.STRATEGIC_FIT
+    try:
+        at = AnswerType(gq.answer_type)
+    except ValueError:
+        at = AnswerType.YES_NO
+
+    choices = json.dumps(gq.choices) if gq.choices else None
+    importance = gq.importance if gq.importance in ("high", "medium", "low") else "medium"
+
+    return await repo.create_decision_question(
+        analysis_id=analysis_id,
+        category=cat.value,
+        question_text=gq.question_text,
+        answer_type=at.value,
+        importance=importance,
+        decision_impact=gq.decision_impact,
+        choices_json=choices,
+        sort_order=sort_order,
+    )
+
+
+async def generate_replacement_question(
+    analysis_id: str,
+    dismissed_question_text: str,
+    existing_questions: list[DecisionQuestion],
+    synthesis_data: dict[str, Any],
+    company_name: str,
+    market_space: str,
+    sort_order: int = 0,
+) -> DecisionQuestion | None:
+    """Generate a replacement for a dismissed question."""
+    return await _generate_one_question(
+        analysis_id=analysis_id,
+        existing_questions=existing_questions,
+        synthesis_data=synthesis_data,
+        company_name=company_name,
+        market_space=market_space,
+        avoid_texts=[dismissed_question_text],
+        sort_order=sort_order,
+    )
+
+
+async def generate_additional_question(
+    analysis_id: str,
+    existing_questions: list[DecisionQuestion],
+    synthesis_data: dict[str, Any],
+    company_name: str,
+    market_space: str,
+) -> DecisionQuestion | None:
+    """Generate one new question to add after the user answers one.
+
+    Avoids repeating anything already in the list (answered or not).
+    """
+    sort_order = max((q.sort_order for q in existing_questions), default=0) + 1
+    return await _generate_one_question(
+        analysis_id=analysis_id,
+        existing_questions=existing_questions,
+        synthesis_data=synthesis_data,
+        company_name=company_name,
+        market_space=market_space,
+        avoid_texts=[],
+        sort_order=sort_order,
+    )
+
+
 # ── Re-synthesis with user answers ──
 
 async def resynthesize_with_answers(
