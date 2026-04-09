@@ -380,18 +380,8 @@ const PersonaLiveChat = forwardRef<HTMLDivElement, PersonaLiveChatProps>(
       clearConversation,
     ]);
 
-    // Resume most recent session on mount (load history)
-    useEffect(() => {
-      if (
-        sessions.length > 0 &&
-        !useStore.getState().personaConversations.sessionId
-      ) {
-        setConversation({
-          uuid: sessions[0].uuid,
-          createdAt: sessions[0].startedAt,
-        });
-      }
-    }, [sessions, setConversation]);
+    // Don't auto-select a previous session on page load or navigation.
+    // Users manually click a session in the sidebar to view its history.
 
     // Effect - Rotate loading messages when thinking and it's the first message
     useEffect(() => {

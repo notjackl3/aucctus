@@ -57,7 +57,7 @@ const CustomerConversation = forwardRef<
   // State
   const [activeConversation, setActiveConversation] = useState<
     ICustomerProfileConversation | undefined
-  >(conversations?.[0]);
+  >(undefined);
 
   const [activeMessages, setActiveMessages] = useState<
     CustomerProfileMessage[]
@@ -163,9 +163,12 @@ const CustomerConversation = forwardRef<
 
   const handleSelectConversation = useCallback(
     (conversation: ICustomerProfileConversation) => {
+      if (conversation.uuid === activeConversation?.uuid) return;
+      clearConversation();
+      conversationMessagesRef.current = [];
       setActiveConversation(conversation);
     },
-    [],
+    [clearConversation, activeConversation?.uuid],
   );
 
   const handleSubmitMessage = async () => {
@@ -228,9 +231,16 @@ const CustomerConversation = forwardRef<
   ]);
 
   // Effects - Initialization
+  // Auto-select a newly created conversation (when user sends the first message
+  // and a new session ID appears), but don't auto-select on page load/navigation.
   useEffect(() => {
-    setActiveConversation(conversations?.[0]);
-  }, [conversations]);
+    if (storeSessionId && !activeConversation) {
+      const match = conversations?.find((c) => c.uuid === storeSessionId);
+      if (match) {
+        setActiveConversation(match);
+      }
+    }
+  }, [storeSessionId, activeConversation, conversations]);
 
   useEffect(() => {
     doConversationClear();
