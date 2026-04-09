@@ -959,7 +959,7 @@ const WatchtowerPageContent: React.FC = () => {
             <div className='h-5 w-px bg-white/20' />
 
             {/* Signal type filter dropdown */}
-            <DropdownMenu.Root>
+            <DropdownMenu.Root modal={false}>
               <DropdownMenu.Trigger asChild>
                 <button
                   className={cn(
@@ -1042,7 +1042,7 @@ const WatchtowerPageContent: React.FC = () => {
             </DropdownMenu.Root>
 
             {/* Category filter dropdown */}
-            <DropdownMenu.Root>
+            <DropdownMenu.Root modal={false}>
               <DropdownMenu.Trigger asChild>
                 <button
                   className={cn(

@@ -5,6 +5,7 @@ import {
 import { cn } from '@libs/utils/react';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Check, ChevronDown, Plus, TowerControl, Trash2 } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 
@@ -33,6 +34,7 @@ const WatchtowerViewDropdown: React.FC<WatchtowerViewDropdownProps> = ({
     uuid: string;
     name: string;
   } | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const activeViewName =
     watchtowerConfigs.find((w) => w.uuid === activeWatchtowerConfigUuid)
@@ -78,9 +80,15 @@ const WatchtowerViewDropdown: React.FC<WatchtowerViewDropdownProps> = ({
 
   return (
     <>
-      <DropdownMenu.Root>
+      <DropdownMenu.Root
+        modal={false}
+        open={dropdownOpen}
+        onOpenChange={setDropdownOpen}
+      >
         <DropdownMenu.Trigger asChild>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className={cn(
               'inline-flex select-none items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium backdrop-blur-md transition-all duration-200',
               'border-white/40 bg-white/20 shadow-lg hover:bg-white/25',
@@ -88,137 +96,191 @@ const WatchtowerViewDropdown: React.FC<WatchtowerViewDropdownProps> = ({
           >
             <TowerControl size={12} className='text-white' />
             <span className='font-semibold text-white'>{activeViewName}</span>
-            <ChevronDown size={12} className='text-white/50' />
-          </button>
+            <motion.div
+              animate={{ rotate: dropdownOpen ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown size={12} className='text-white/50' />
+            </motion.div>
+          </motion.button>
         </DropdownMenu.Trigger>
 
-        <DropdownMenu.Portal>
-          <DropdownMenu.Content
-            align='start'
-            sideOffset={10}
-            className='z-50 w-56 rounded-lg border border-white/15 bg-black/95 p-1 shadow-2xl backdrop-blur-xl'
-          >
-            {/* All Signals (default) */}
-            <DropdownMenu.Item
-              onSelect={() => handleSwitchView(undefined)}
-              className='group flex cursor-pointer items-center justify-between rounded-md px-2.5 py-1.5 text-white/90 outline-none hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white'
-            >
-              <span
-                className={cn(
-                  'text-xs',
-                  !activeWatchtowerConfigUuid && 'font-semibold',
-                )}
+        <AnimatePresence>
+          {dropdownOpen && (
+            <DropdownMenu.Portal forceMount>
+              <DropdownMenu.Content
+                align='start'
+                sideOffset={10}
+                asChild
+                forceMount
               >
-                All Towers
-              </span>
-              {!activeWatchtowerConfigUuid && (
-                <Check size={12} className='text-white/60' />
-              )}
-            </DropdownMenu.Item>
-
-            {/* Watchtower configs */}
-            {watchtowerConfigs.map((watchtower) => (
-              <DropdownMenu.Item
-                key={watchtower.uuid}
-                onSelect={(e) => {
-                  // Don't switch if the delete button was clicked
-                  if (
-                    (e.target as HTMLElement).closest('[data-delete-button]')
-                  ) {
-                    e.preventDefault();
-                    return;
-                  }
-                  handleSwitchView(watchtower.uuid);
-                }}
-                className='group flex cursor-pointer items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-white/90 outline-none hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white'
-              >
-                <div className='flex min-w-0 items-center gap-2'>
-                  <span
-                    className={cn(
-                      'max-w-[130px] truncate text-xs',
-                      activeWatchtowerConfigUuid === watchtower.uuid &&
-                        'font-semibold',
-                    )}
-                  >
-                    {watchtower.name}
-                  </span>
-                </div>
-                <div className='flex items-center gap-1'>
-                  {activeWatchtowerConfigUuid === watchtower.uuid && (
-                    <Check size={12} className='text-white/60' />
-                  )}
-                  {isAdmin && watchtowerConfigs.length > 1 && (
-                    <button
-                      data-delete-button
-                      onClick={(e) =>
-                        handleDeleteClick(e, watchtower.uuid, watchtower.name)
-                      }
-                      className='rounded p-0.5 text-white/30 opacity-0 transition-colors hover:text-red-400 group-hover:opacity-100'
-                    >
-                      <Trash2 size={12} />
-                    </button>
-                  )}
-                </div>
-              </DropdownMenu.Item>
-            ))}
-
-            {isAdmin && (
-              <>
-                <DropdownMenu.Separator className='my-1 h-px bg-white/10' />
-
-                <DropdownMenu.Item
-                  onSelect={() => {
-                    // Defer so the DropdownMenu fully closes before the Dialog opens;
-                    // opening a modal Dialog mid-close corrupts the dropdown's internal state.
-                    requestAnimationFrame(() => setShowCreateModal(true));
-                  }}
-                  className='flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1.5 text-white/50 outline-none hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white'
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                  className='z-50 w-56 rounded-lg border border-white/15 bg-black/95 p-1 shadow-2xl backdrop-blur-xl'
                 >
-                  <Plus size={12} />
-                  <span className='text-xs'>New Watchtower</span>
-                </DropdownMenu.Item>
-              </>
-            )}
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
+                  {/* All Signals (default) */}
+                  <DropdownMenu.Item
+                    onSelect={() => handleSwitchView(undefined)}
+                    className='group flex cursor-pointer items-center justify-between rounded-md px-2.5 py-1.5 text-white/90 outline-none hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white'
+                  >
+                    <span
+                      className={cn(
+                        'text-xs',
+                        !activeWatchtowerConfigUuid && 'font-semibold',
+                      )}
+                    >
+                      All Towers
+                    </span>
+                    {!activeWatchtowerConfigUuid && (
+                      <Check size={12} className='text-white/60' />
+                    )}
+                  </DropdownMenu.Item>
+
+                  {/* Watchtower configs */}
+                  {watchtowerConfigs.map((watchtower, index) => (
+                    <motion.div
+                      key={watchtower.uuid}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{
+                        duration: 0.15,
+                        delay: index * 0.03,
+                        ease: 'easeOut',
+                      }}
+                    >
+                      <DropdownMenu.Item
+                        onSelect={(e) => {
+                          // Don't switch if the delete button was clicked
+                          if (
+                            (e.target as HTMLElement).closest(
+                              '[data-delete-button]',
+                            )
+                          ) {
+                            e.preventDefault();
+                            return;
+                          }
+                          handleSwitchView(watchtower.uuid);
+                        }}
+                        className='group flex cursor-pointer items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-white/90 outline-none hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white'
+                      >
+                        <div className='flex min-w-0 items-center gap-2'>
+                          <span
+                            className={cn(
+                              'max-w-[130px] truncate text-xs',
+                              activeWatchtowerConfigUuid === watchtower.uuid &&
+                                'font-semibold',
+                            )}
+                          >
+                            {watchtower.name}
+                          </span>
+                        </div>
+                        <div className='flex items-center gap-1'>
+                          {activeWatchtowerConfigUuid === watchtower.uuid && (
+                            <Check size={12} className='text-white/60' />
+                          )}
+                          {isAdmin && watchtowerConfigs.length > 1 && (
+                            <button
+                              data-delete-button
+                              onClick={(e) =>
+                                handleDeleteClick(
+                                  e,
+                                  watchtower.uuid,
+                                  watchtower.name,
+                                )
+                              }
+                              className='rounded p-0.5 text-white/30 opacity-0 transition-colors hover:text-red-400 group-hover:opacity-100'
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          )}
+                        </div>
+                      </DropdownMenu.Item>
+                    </motion.div>
+                  ))}
+
+                  {isAdmin && (
+                    <>
+                      <DropdownMenu.Separator className='my-1 h-px bg-white/10' />
+
+                      <DropdownMenu.Item
+                        onSelect={() => {
+                          // Defer so the DropdownMenu fully closes before the Dialog opens;
+                          // opening a modal Dialog mid-close corrupts the dropdown's internal state.
+                          requestAnimationFrame(() => setShowCreateModal(true));
+                        }}
+                        className='flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1.5 text-white/50 outline-none hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white'
+                      >
+                        <Plus size={12} />
+                        <span className='text-xs'>New Watchtower</span>
+                      </DropdownMenu.Item>
+                    </>
+                  )}
+                </motion.div>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          )}
+        </AnimatePresence>
       </DropdownMenu.Root>
 
       {/* Delete confirmation AlertDialog */}
-      <AlertDialog.Root
-        open={deleteTarget !== null}
-        onOpenChange={(open) => {
-          if (!open) setDeleteTarget(null);
-        }}
-      >
-        <AlertDialog.Portal>
-          <AlertDialog.Overlay className='fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm' />
-          <AlertDialog.Content className='fixed left-1/2 top-1/2 z-[60] w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/15 bg-black/95 p-6 shadow-2xl backdrop-blur-xl'>
-            <AlertDialog.Title className='text-base font-semibold text-white'>
-              Delete watchtower?
-            </AlertDialog.Title>
-            <AlertDialog.Description className='mt-2 text-sm text-white/50'>
-              {deleteTarget
-                ? `"${deleteTarget.name}" and all its scan data will be permanently removed. This cannot be undone.`
-                : 'This watchtower will be permanently removed.'}
-            </AlertDialog.Description>
-            <div className='mt-5 flex justify-end gap-2'>
-              <AlertDialog.Cancel asChild>
-                <button className='rounded-md border border-white/15 px-3 py-1.5 text-sm text-white/60 transition-colors hover:border-white/30 hover:text-white'>
-                  Cancel
-                </button>
-              </AlertDialog.Cancel>
-              <AlertDialog.Action asChild>
-                <button
-                  onClick={handleConfirmDelete}
-                  className='rounded-md bg-red-500/80 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-red-500'
+      <AnimatePresence>
+        {deleteTarget !== null && (
+          <AlertDialog.Root
+            open={deleteTarget !== null}
+            onOpenChange={(open) => {
+              if (!open) setDeleteTarget(null);
+            }}
+          >
+            <AlertDialog.Portal forceMount>
+              <AlertDialog.Overlay asChild forceMount>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className='fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm'
+                />
+              </AlertDialog.Overlay>
+              <AlertDialog.Content asChild forceMount>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className='fixed left-1/2 top-1/2 z-[60] w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/15 bg-black/95 p-6 shadow-2xl backdrop-blur-xl'
                 >
-                  Delete
-                </button>
-              </AlertDialog.Action>
-            </div>
-          </AlertDialog.Content>
-        </AlertDialog.Portal>
-      </AlertDialog.Root>
+                  <AlertDialog.Title className='text-base font-semibold text-white'>
+                    Delete watchtower?
+                  </AlertDialog.Title>
+                  <AlertDialog.Description className='mt-2 text-sm text-white/50'>
+                    {deleteTarget
+                      ? `"${deleteTarget.name}" and all its scan data will be permanently removed. This cannot be undone.`
+                      : 'This watchtower will be permanently removed.'}
+                  </AlertDialog.Description>
+                  <div className='mt-5 flex justify-end gap-2'>
+                    <AlertDialog.Cancel asChild>
+                      <button className='rounded-md border border-white/15 px-3 py-1.5 text-sm text-white/60 transition-colors hover:border-white/30 hover:text-white'>
+                        Cancel
+                      </button>
+                    </AlertDialog.Cancel>
+                    <AlertDialog.Action asChild>
+                      <button
+                        onClick={handleConfirmDelete}
+                        className='rounded-md bg-red-500/80 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-red-500'
+                      >
+                        Delete
+                      </button>
+                    </AlertDialog.Action>
+                  </div>
+                </motion.div>
+              </AlertDialog.Content>
+            </AlertDialog.Portal>
+          </AlertDialog.Root>
+        )}
+      </AnimatePresence>
     </>
   );
 };
