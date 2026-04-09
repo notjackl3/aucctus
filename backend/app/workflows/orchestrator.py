@@ -11,13 +11,16 @@ import traceback
 
 from app.agents.base import AgentContext, AgentResult
 from app.agents import incumbents, emerging, market_sizing, synthesis
-from app.config import ANALYSIS_STEPS, DEFAULT_EVALUATION_POSTURE, use_real_apis
+from app.config import ANALYSIS_STEPS, DEFAULT_EVALUATION_POSTURE, MAX_REFINEMENT_ATTEMPTS, use_real_apis
 from app.services.search import get_tavily_stats, reset_tavily_stats
 from app.domain.enums import AnalysisStatus, OperationStatus
 from app.evidence.claims import find_contradictions, merge_duplicate_claims
 from app.mock.data import build_mock_result
 from app.persistence import repositories as repo
+from app.retrieval.coverage import evaluate_coverage
+from app.retrieval.query_planner import build_query_plan, generate_refinement_queries
 from app.shared.utils import utc_now
+from app.workflows.decision_questions import generate_decision_questions
 
 logger = logging.getLogger(__name__)
 
@@ -43,19 +46,32 @@ async def run_analysis(
 
         reset_tavily_stats()
 
+        posture = evaluation_posture or DEFAULT_EVALUATION_POSTURE
+
+        # ── Query planning phase ──
+        await repo.update_operation(operation_id, current_step="Planning research queries...")
+        query_plan = await build_query_plan(
+            market_space=market_space,
+            company_name=company_name,
+            company_context=company_context,
+            strategy_lens=strategy_lens,
+            evaluation_posture=posture,
+        )
+
         ctx = AgentContext(
             analysis_id=analysis_id,
             company_name=company_name,
             market_space=market_space,
             company_context=company_context,
             strategy_lens=strategy_lens,
-            evaluation_posture=evaluation_posture or DEFAULT_EVALUATION_POSTURE,
+            evaluation_posture=posture,
+            query_plan=query_plan,
         )
 
         steps = await repo.get_analysis_steps(analysis_id)
         step_map = {s.step: s for s in steps}
 
-        # Run 3 research agents in parallel
+        # ── Run 3 research agents in parallel ──
         await repo.update_operation(operation_id, current_step="Researching incumbents, emerging competitors, and market sizing...")
 
         for step_key in ["incumbents", "emerging_competitors", "market_sizing"]:
@@ -67,6 +83,20 @@ async def run_analysis(
         mkt_task = asyncio.create_task(_run_agent_safe(market_sizing.run, ctx, "market_sizing"))
 
         inc_result, emg_result, mkt_result = await asyncio.gather(inc_task, emg_task, mkt_task)
+
+        # ── Coverage evaluation + bounded refinement ──
+        coverage = evaluate_coverage({
+            "incumbents": inc_result.sources,
+            "emerging": emg_result.sources,
+            "market_sizing": mkt_result.sources,
+        })
+
+        if coverage.should_refine:
+            logger.info(f"Coverage weak ({coverage.overall_score:.2f}), running refinement for: {coverage.weak_dimensions}")
+            await repo.update_operation(operation_id, current_step="Refining weak coverage areas...")
+            inc_result, emg_result, mkt_result = await _run_refinement(
+                ctx, query_plan, coverage, inc_result, emg_result, mkt_result
+            )
 
         # Mark research steps completed
         completed_count = 0
@@ -126,6 +156,20 @@ async def run_analysis(
         for ins_data in all_insights:
             await repo.create_insight(workspace.id, ins_data)
 
+        # Generate decision questions from synthesis output (best-effort)
+        if syn_result.data and not syn_result.error:
+            try:
+                await generate_decision_questions(
+                    analysis_id=analysis_id,
+                    synthesis_data=syn_result.data,
+                    company_name=company_name,
+                    market_space=market_space,
+                    company_context=company_context,
+                    strategy_lens=strategy_lens,
+                )
+            except Exception as e:
+                logger.warning(f"Decision question generation failed (non-blocking): {e}")
+
         # Log Tavily usage
         stats = get_tavily_stats()
         logger.info(f"Analysis {analysis_id} Tavily usage: {stats['calls']} calls, ~{stats['estimated_credits']} credits")
@@ -159,6 +203,54 @@ async def _run_agent_safe(agent_fn, ctx: AgentContext, step_name: str) -> AgentR
     except Exception as e:
         logger.error(f"Agent {step_name} failed: {e}")
         return AgentResult(step=step_name, data={}, error=str(e))
+
+
+async def _run_refinement(
+    ctx: AgentContext,
+    query_plan,
+    coverage,
+    inc_result: AgentResult,
+    emg_result: AgentResult,
+    mkt_result: AgentResult,
+) -> tuple[AgentResult, AgentResult, AgentResult]:
+    """Run one bounded refinement pass for weak coverage dimensions.
+
+    Generates additional queries from the query plan and runs targeted
+    supplemental searches. Merges new sources into existing results.
+    """
+    from app.evidence.processor import process_search_results
+    from app.services import search as search_svc
+
+    refinement_queries = generate_refinement_queries(query_plan, coverage.weak_dimensions)
+
+    for dim, pq in refinement_queries.items():
+        try:
+            new_sources = []
+            # Run refinement Tavily queries
+            for query in pq.tavily[:1]:  # At most 1 extra Tavily query per weak dim
+                results = await search_svc.search(query, max_results=5)
+                if results:
+                    if dim == "incumbents":
+                        existing_urls = {s.url for s in inc_result.sources}
+                    elif dim == "emerging":
+                        existing_urls = {s.url for s in emg_result.sources}
+                    else:
+                        existing_urls = {s.url for s in mkt_result.sources}
+                    sources = process_search_results(results, ctx.analysis_id, existing_urls)
+                    new_sources.extend(sources)
+
+            if new_sources:
+                if dim == "incumbents":
+                    inc_result.sources.extend(new_sources)
+                elif dim == "emerging":
+                    emg_result.sources.extend(new_sources)
+                elif dim == "market_sizing":
+                    mkt_result.sources.extend(new_sources)
+                logger.info(f"Refinement added {len(new_sources)} sources for {dim}")
+        except Exception as e:
+            logger.warning(f"Refinement for {dim} failed: {e}")
+
+    return inc_result, emg_result, mkt_result
 
 
 async def _run_mock_pipeline(

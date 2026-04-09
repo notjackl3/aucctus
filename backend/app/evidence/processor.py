@@ -14,6 +14,8 @@ def process_search_results(
     results: list[SearchResult],
     analysis_id: str,
     existing_urls: set[str] | None = None,
+    provider: str = "tavily",
+    source_category: str = "web",
 ) -> list[Source]:
     """Deduplicate and tier search results into Source records."""
     existing_urls = existing_urls or set()
@@ -42,6 +44,8 @@ def process_search_results(
             published_date=result.published_date,
             raw_content=result.content,
             relevance_score=result.score,
+            provider=provider,
+            source_category=source_category,
             created_at=utc_now(),
         ))
 
@@ -79,7 +83,11 @@ def calculate_source_confidence(sources: list[Source]) -> dict:
         level = "low"
 
     tier_breakdown = f"{tier_1_count} tier-1, {sum(1 for s in sources if s.tier == SourceTier.TIER_2)} tier-2"
-    reasoning = f"Based on {len(sources)} sources ({tier_breakdown}). "
+    providers = set(getattr(s, 'provider', 'tavily') for s in sources)
+    provider_note = ""
+    if len(providers) > 1:
+        provider_note = f" Sources from {len(providers)} providers ({', '.join(sorted(providers))})."
+    reasoning = f"Based on {len(sources)} sources ({tier_breakdown}).{provider_note} "
     if tier_1_count > 0:
         reasoning += "Includes major analyst/publication sources."
     else:

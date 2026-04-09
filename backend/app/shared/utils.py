@@ -1,5 +1,7 @@
 """Shared utilities — ID generation, timestamps, text helpers, serialization."""
 
+from __future__ import annotations
+
 import re
 import secrets
 import string

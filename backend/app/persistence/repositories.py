@@ -7,13 +7,13 @@ companies, strategy, workspaces, insights, questions, reports, documents.
 import json
 
 from app.domain.enums import (
-    AnalysisStatus, ClaimType, DisplayStatus, OperationStatus,
-    QuestionStatus, SourceTier,
+    AnalysisStatus, AnswerType, ClaimType, DecisionQuestionCategory,
+    DisplayStatus, OperationStatus, QuestionStatus, SourceTier,
 )
 from app.domain.models import (
     Analysis, AnalysisStep, Claim, Company, ContradictionGroup,
-    Document, DocumentChunk, FollowUpQuestion, InsightNode, Operation,
-    Report, Source, Workspace, WorkspaceQuestion,
+    DecisionQuestion, Document, DocumentChunk, FollowUpQuestion,
+    InsightNode, Operation, Report, Source, Workspace, WorkspaceQuestion,
 )
 from app.persistence.database import get_db
 from app.shared.utils import generate_id, utc_now
@@ -197,10 +197,10 @@ async def update_operation(operation_id: str, *, status: OperationStatus | None 
 async def create_source(source: Source) -> None:
     db = await get_db()
     await db.execute(
-        "INSERT OR IGNORE INTO sources (id, analysis_id, url, title, publisher, tier, snippet, published_date, raw_content, relevance_score, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        "INSERT OR IGNORE INTO sources (id, analysis_id, url, title, publisher, tier, snippet, published_date, raw_content, relevance_score, provider, source_category, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (source.id, source.analysis_id, source.url, source.title, source.publisher,
          source.tier.value, source.snippet, source.published_date, source.raw_content,
-         source.relevance_score, source.created_at),
+         source.relevance_score, source.provider, source.source_category, source.created_at),
     )
     await db.commit()
 
@@ -208,10 +208,37 @@ async def create_source(source: Source) -> None:
 async def get_sources_for_analysis(analysis_id: str) -> list[Source]:
     db = await get_db()
     rows = await db.execute_fetchall("SELECT * FROM sources WHERE analysis_id = ? ORDER BY relevance_score DESC", (analysis_id,))
-    return [Source(id=r["id"], analysis_id=r["analysis_id"], url=r["url"], title=r["title"],
-                   publisher=r["publisher"], tier=SourceTier(r["tier"]), snippet=r["snippet"],
-                   published_date=r["published_date"], raw_content=r["raw_content"],
-                   relevance_score=r["relevance_score"], created_at=r["created_at"]) for r in rows]
+    return [_row_to_source(r) for r in rows]
+
+
+def _row_to_source(r) -> Source:
+    return Source(
+        id=r["id"], analysis_id=r["analysis_id"], url=r["url"], title=r["title"],
+        publisher=r["publisher"], tier=SourceTier(r["tier"]), snippet=r["snippet"],
+        published_date=r["published_date"], raw_content=r["raw_content"],
+        relevance_score=r["relevance_score"],
+        provider=r["provider"] if "provider" in r.keys() else "tavily",
+        source_category=r["source_category"] if "source_category" in r.keys() else "web",
+        created_at=r["created_at"],
+    )
+
+
+async def create_source_metadata(source_id: str, provider: str, metadata_json: str) -> str:
+    db = await get_db()
+    meta_id = generate_id("smeta")
+    await db.execute(
+        "INSERT INTO source_metadata (id, source_id, provider, metadata_json, created_at) VALUES (?,?,?,?,?)",
+        (meta_id, source_id, provider, metadata_json, utc_now()),
+    )
+    await db.commit()
+    return meta_id
+
+
+async def get_source_metadata(source_id: str) -> list[dict]:
+    db = await get_db()
+    rows = await db.execute_fetchall("SELECT * FROM source_metadata WHERE source_id = ?", (source_id,))
+    return [{"id": r["id"], "source_id": r["source_id"], "provider": r["provider"],
+             "metadata_json": r["metadata_json"], "created_at": r["created_at"]} for r in rows]
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -667,3 +694,83 @@ async def search_fts(query: str, limit: int = 20) -> list[dict]:
         (query, limit))
     return [{"source_id": r["source_id"], "source_type": r["source_type"],
              "text": r["text"], "rank": r["rank"]} for r in rows]
+
+
+# ══════════════════════════════════════════════
+# Decision Questions
+# ══════════════════════════════════════════════
+
+async def create_decision_question(
+    analysis_id: str,
+    category: str,
+    question_text: str,
+    answer_type: str,
+    importance: str = "medium",
+    decision_impact: str = "",
+    choices_json: str | None = None,
+    sort_order: int = 0,
+) -> DecisionQuestion:
+    db = await get_db()
+    q_id = generate_id("dq")
+    now = utc_now()
+    await db.execute(
+        "INSERT INTO decision_questions (id, analysis_id, category, question_text, answer_type, importance, decision_impact, choices_json, sort_order, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)",
+        (q_id, analysis_id, category, question_text, answer_type, importance, decision_impact, choices_json, sort_order, now),
+    )
+    await db.commit()
+    return DecisionQuestion(
+        id=q_id, analysis_id=analysis_id,
+        category=DecisionQuestionCategory(category),
+        question_text=question_text,
+        answer_type=AnswerType(answer_type),
+        importance=importance,
+        decision_impact=decision_impact,
+        choices_json=choices_json,
+        sort_order=sort_order,
+        created_at=now,
+    )
+
+
+async def get_decision_questions(analysis_id: str) -> list[DecisionQuestion]:
+    db = await get_db()
+    rows = await db.execute_fetchall(
+        "SELECT * FROM decision_questions WHERE analysis_id = ? ORDER BY sort_order, created_at",
+        (analysis_id,),
+    )
+    return [_row_to_decision_question(r) for r in rows]
+
+
+async def update_decision_question_answer(question_id: str, answer_value: str) -> bool:
+    db = await get_db()
+    cursor = await db.execute(
+        "UPDATE decision_questions SET answer_value = ? WHERE id = ?",
+        (answer_value, question_id),
+    )
+    await db.commit()
+    return cursor.rowcount > 0
+
+
+async def get_decision_question(question_id: str) -> DecisionQuestion | None:
+    db = await get_db()
+    row = await db.execute_fetchall(
+        "SELECT * FROM decision_questions WHERE id = ?", (question_id,),
+    )
+    if not row:
+        return None
+    return _row_to_decision_question(row[0])
+
+
+def _row_to_decision_question(r) -> DecisionQuestion:
+    return DecisionQuestion(
+        id=r["id"],
+        analysis_id=r["analysis_id"],
+        category=DecisionQuestionCategory(r["category"]),
+        question_text=r["question_text"],
+        answer_type=AnswerType(r["answer_type"]),
+        importance=r["importance"],
+        decision_impact=r["decision_impact"] or "",
+        choices_json=r["choices_json"],
+        answer_value=r["answer_value"],
+        sort_order=r["sort_order"],
+        created_at=r["created_at"],
+    )

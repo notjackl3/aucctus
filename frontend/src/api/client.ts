@@ -1,4 +1,4 @@
-import type { AnalysisResult, Recommendation } from '../types/analysis';
+import type { AnalysisResult, DecisionQuestion, ApplyAnswersResult, Recommendation } from '../types/analysis';
 
 // ── Types for API responses ──
 
@@ -194,6 +194,46 @@ export async function extractTextFromFile(
   }
   return res.json();
 }
+
+// ── Decision Questions ──
+
+export function getDecisionQuestions(analysisId: string): Promise<DecisionQuestion[]> {
+  return request(`/api/analyses/${analysisId}/decision-questions`);
+}
+
+export function answerDecisionQuestion(
+  analysisId: string,
+  questionId: string,
+  answerValue: string,
+): Promise<DecisionQuestion> {
+  return request(`/api/analyses/${analysisId}/decision-questions/${questionId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ answerValue }),
+  });
+}
+
+export function applyAnswers(analysisId: string): Promise<ApplyAnswersResult> {
+  return request(`/api/analyses/${analysisId}/apply-answers`, { method: 'POST' });
+}
+
+// ── Ask about selection ──
+
+export function askAboutSelection(
+  analysisId: string,
+  params: {
+    selectedText: string;
+    question: string;
+    blockCategory: string;
+    blockLabel: string;
+  },
+): Promise<{ answer: string }> {
+  return request(`/api/analyses/${analysisId}/ask`, {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+}
+
+// ── Documents ──
 
 export async function uploadDocument(
   companyId: string,

@@ -62,6 +62,16 @@ CREATE TABLE IF NOT EXISTS sources (
 );
 CREATE INDEX IF NOT EXISTS idx_sources_analysis ON sources(analysis_id);
 
+-- ── Evidence: Source Metadata (provider-specific payloads) ──
+CREATE TABLE IF NOT EXISTS source_metadata (
+    id              TEXT PRIMARY KEY,
+    source_id       TEXT NOT NULL,
+    provider        TEXT NOT NULL,
+    metadata_json   TEXT NOT NULL,
+    created_at      TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_source_meta_source ON source_metadata(source_id);
+
 -- ── Evidence: Claims ──
 CREATE TABLE IF NOT EXISTS claims (
     id               TEXT PRIMARY KEY,
@@ -223,6 +233,22 @@ CREATE TABLE IF NOT EXISTS embeddings (
 );
 CREATE INDEX IF NOT EXISTS idx_embeddings_source ON embeddings(source_type, source_id);
 
+-- ── Decision Questions ──
+CREATE TABLE IF NOT EXISTS decision_questions (
+    id              TEXT PRIMARY KEY,
+    analysis_id     TEXT NOT NULL,
+    category        TEXT NOT NULL DEFAULT 'strategic_fit',
+    question_text   TEXT NOT NULL,
+    answer_type     TEXT NOT NULL DEFAULT 'scale_1_5',
+    importance      TEXT NOT NULL DEFAULT 'medium',
+    decision_impact TEXT DEFAULT '',
+    choices_json    TEXT,
+    answer_value    TEXT,
+    sort_order      INTEGER DEFAULT 0,
+    created_at      TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_decision_q_analysis ON decision_questions(analysis_id);
+
 -- ── FTS5 for retrieval ──
 CREATE VIRTUAL TABLE IF NOT EXISTS fts_content USING fts5(
     source_id, source_type, text, tokenize='porter'
@@ -243,9 +269,26 @@ async def get_db() -> aiosqlite.Connection:
 
 
 async def init_db() -> None:
-    """Create tables if they don't exist."""
+    """Create tables if they don't exist, then run migrations."""
     db = await get_db()
     await db.executescript(SCHEMA_SQL)
+    await db.commit()
+    await _run_migrations(db)
+
+
+async def _run_migrations(db: aiosqlite.Connection) -> None:
+    """Additive column migrations for existing databases."""
+    # Check which columns exist on sources table
+    cursor = await db.execute("PRAGMA table_info(sources)")
+    existing_cols = {row[1] for row in await cursor.fetchall()}
+
+    if "provider" not in existing_cols:
+        await db.execute("ALTER TABLE sources ADD COLUMN provider TEXT NOT NULL DEFAULT 'tavily'")
+    if "source_category" not in existing_cols:
+        await db.execute("ALTER TABLE sources ADD COLUMN source_category TEXT NOT NULL DEFAULT 'web'")
+
+    # Ensure index exists (safe to re-run)
+    await db.execute("CREATE INDEX IF NOT EXISTS idx_sources_provider ON sources(provider)")
     await db.commit()
 
 

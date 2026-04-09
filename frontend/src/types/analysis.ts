@@ -96,6 +96,30 @@ export interface OpportunityAssessment {
   confidence: ConfidenceIndicator;
 }
 
+// ─── Decision Questions ───
+
+export interface DecisionQuestion {
+  id: string;
+  analysisId: string;
+  category: string;
+  questionText: string;
+  answerType: 'scale_1_5' | 'yes_no' | 'multiple_choice' | 'short_text';
+  importance: 'high' | 'medium' | 'low';
+  decisionImpact: string;
+  choices: string[] | null;
+  answerValue: string | null;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface ApplyAnswersResult {
+  recommendation: string;
+  score: number;
+  headline: string;
+  userInputsApplied: number;
+  operationId: string;
+}
+
 // ─── Analysis pipeline status ───
 
 export interface ResearchStepStatus {

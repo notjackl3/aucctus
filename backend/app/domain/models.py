@@ -8,8 +8,9 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from app.domain.enums import (
-    AnalysisStatus, ClaimType, DisplayStatus, OperationStatus,
-    QuestionStatus, SourceTier,
+    AnalysisStatus, AnswerType, ClaimType, DecisionQuestionCategory,
+    DisplayStatus, OperationStatus, QuestionStatus, SourceCategory,
+    SourceProvider, SourceTier,
 )
 
 
@@ -69,6 +70,17 @@ class Source:
     published_date: str | None = None
     raw_content: str | None = None
     relevance_score: float = 0.0
+    provider: str = "tavily"
+    source_category: str = "web"
+    created_at: str = ""
+
+
+@dataclass
+class SourceMetadata:
+    id: str
+    source_id: str
+    provider: str
+    metadata_json: str  # JSON string of provider-specific payload
     created_at: str = ""
 
 
@@ -209,4 +221,21 @@ class DocumentChunk:
     chunk_index: int
     text: str
     embedding: list[float] | None = None
+    created_at: str = ""
+
+
+# ── Decision Questions ──
+
+@dataclass
+class DecisionQuestion:
+    id: str
+    analysis_id: str
+    category: DecisionQuestionCategory
+    question_text: str
+    answer_type: AnswerType
+    importance: str = "medium"  # high, medium, low
+    decision_impact: str = ""  # how answering this affects the recommendation
+    choices_json: str | None = None  # JSON array for multiple_choice type
+    answer_value: str | None = None  # user's answer (stored as string)
+    sort_order: int = 0
     created_at: str = ""

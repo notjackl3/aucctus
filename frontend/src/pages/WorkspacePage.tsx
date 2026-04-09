@@ -12,7 +12,6 @@ import {
   AlertCircle,
   ThumbsUp,
   AlertTriangle,
-  Pin,
   ChevronDown,
   ChevronRight,
   DollarSign,
@@ -41,6 +40,10 @@ import RecommendationBadge from '../components/RecommendationBadge';
 import ConfidenceBadge from '../components/ConfidenceBadge';
 import SourceCard from '../components/SourceCard';
 import FindingsTray, { type PinnedFinding } from '../components/FindingsTray';
+import SelectableBlock from '../components/SelectableBlock';
+import SelectionToolbar from '../components/SelectionToolbar';
+import AskAboutPanel from '../components/AskAboutPanel';
+import { useTextSelection } from '../hooks/useTextSelection';
 
 type CategoryKey = 'incumbents' | 'emerging' | 'market' | 'risks' | 'sources';
 
@@ -52,6 +55,12 @@ export default function WorkspacePage() {
   const [error, setError] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null);
   const [pinned, setPinned] = useState<PinnedFinding[]>([]);
+  const { selection, clearSelection } = useTextSelection();
+  const [askContext, setAskContext] = useState<{
+    text: string;
+    blockCategory: string;
+    blockLabel: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!id) { setError('No analysis ID'); setLoading(false); return; }
@@ -147,7 +156,7 @@ export default function WorkspacePage() {
       icon: TrendingUp,
       title: 'Market Sizing',
       summary: market?.summary || 'Not yet researched',
-      stat: market ? `TAM ${market.tam} · CAGR ${market.cagr}` : undefined,
+      stat: market?.tam ? `TAM ${market.tam}` : undefined,
       confidence: market?.confidence || null,
       available: !!market,
     },
@@ -293,6 +302,27 @@ export default function WorkspacePage() {
               </>
             )}
 
+            {/* Decision Questions link */}
+            {id && (
+              <button
+                onClick={() => navigate(`/workspace/${id}/decisions`)}
+                className="w-full mt-2 flex items-center gap-2.5 p-3.5 rounded-xl border border-dashed border-brand/30 bg-brand/[0.02] hover:bg-brand/5 hover:border-brand/50 transition-colors group"
+              >
+                <div className="w-7 h-7 rounded-lg bg-brand/10 flex items-center justify-center shrink-0">
+                  <HelpCircle size={14} className="text-brand" />
+                </div>
+                <div className="text-left flex-1">
+                  <p className="text-sm font-medium text-text-primary group-hover:text-brand transition-colors">
+                    Decision Questions
+                  </p>
+                  <p className="text-[10px] text-text-muted">
+                    Refine the recommendation with your strategic judgment
+                  </p>
+                </div>
+                <ChevronRight size={14} className="text-text-muted group-hover:text-brand transition-colors" />
+              </button>
+            )}
+
             {/* Footer */}
             <div className="pt-4">
               <button onClick={() => navigate('/')}
@@ -311,13 +341,13 @@ export default function WorkspacePage() {
                 onSelectCategory={setActiveCategory}
               />
             ) : activeCategory === 'incumbents' && incumbents ? (
-              <IncumbentsDetail data={incumbents} onPin={pinFinding} />
+              <IncumbentsDetail data={incumbents} />
             ) : activeCategory === 'emerging' && emerging ? (
-              <EmergingDetail data={emerging} onPin={pinFinding} />
+              <EmergingDetail data={emerging} />
             ) : activeCategory === 'market' && market ? (
-              <MarketDetail data={market} onPin={pinFinding} />
+              <MarketDetail data={market} />
             ) : activeCategory === 'risks' && assessment ? (
-              <RisksDetail assessment={assessment} onPin={pinFinding} />
+              <RisksDetail assessment={assessment} />
             ) : activeCategory === 'sources' ? (
               <SourcesDetail sources={allSources} />
             ) : (
@@ -330,6 +360,41 @@ export default function WorkspacePage() {
           </div>
         </div>
       </div>
+
+      {/* Selection toolbar */}
+      {selection && (
+        <SelectionToolbar
+          selection={selection}
+          onPin={() => {
+            pinFinding({
+              text: selection.text,
+              category: selection.blockLabel || selection.blockCategory,
+              type: 'insight',
+            });
+            clearSelection();
+          }}
+          onAsk={() => {
+            setAskContext({
+              text: selection.text,
+              blockCategory: selection.blockCategory,
+              blockLabel: selection.blockLabel,
+            });
+            clearSelection();
+          }}
+          onDismiss={clearSelection}
+        />
+      )}
+
+      {/* Ask about panel */}
+      {askContext && id && (
+        <AskAboutPanel
+          analysisId={id}
+          selectedText={askContext.text}
+          blockCategory={askContext.blockCategory}
+          blockLabel={askContext.blockLabel}
+          onClose={() => setAskContext(null)}
+        />
+      )}
 
       {/* Pinning tray */}
       <FindingsTray findings={pinned} onRemove={removePinned} onClear={clearPinned} />
@@ -357,6 +422,7 @@ function OverviewState({ assessment, weakestArea, onSelectCategory }: {
   }
 
   return (
+    <SelectableBlock blockId="overview" category="assessment" label="Strategic Overview">
     <div className="space-y-5">
       {/* Reasoning — the full strategic argument */}
       <div className="bg-white rounded-2xl border border-border p-6">
@@ -488,39 +554,18 @@ function OverviewState({ assessment, weakestArea, onSelectCategory }: {
         </div>
       </div>
     </div>
+    </SelectableBlock>
   );
 }
 
 
-// ── Pinnable item helper ──
+// ── Simple list item (no pin button — use text selection instead) ──
 
-function PinnableItem({ text, category, type, onPin }: {
-  text: string;
-  category: string;
-  type: PinnedFinding['type'];
-  onPin: (f: Omit<PinnedFinding, 'id'>) => void;
-}) {
-  const dotColor = {
-    belief: 'bg-go',
-    challenge: 'bg-maybe',
-    risk: 'bg-nogo',
-    opportunity: 'bg-brand',
-    insight: 'bg-text-secondary',
-    driver: 'bg-go',
-    constraint: 'bg-maybe',
-  }[type];
-
+function ListItem({ text, dotColor }: { text: string; dotColor: string }) {
   return (
-    <li className="flex items-start gap-2.5 group">
+    <li className="flex items-start gap-2.5">
       <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${dotColor}`} />
-      <span className="text-sm text-text-secondary leading-relaxed flex-1">{text}</span>
-      <button
-        onClick={() => onPin({ text, category, type })}
-        className="shrink-0 p-1 rounded hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity"
-        title="Pin this finding"
-      >
-        <Pin size={12} className="text-text-muted" />
-      </button>
+      <span className="text-sm text-text-secondary leading-relaxed">{text}</span>
     </li>
   );
 }
@@ -528,10 +573,7 @@ function PinnableItem({ text, category, type, onPin }: {
 
 // ── Incumbents Detail ──
 
-function IncumbentsDetail({ data, onPin }: {
-  data: IncumbentsResult;
-  onPin: (f: Omit<PinnedFinding, 'id'>) => void;
-}) {
+function IncumbentsDetail({ data }: { data: IncumbentsResult }) {
   const [expandedPlayers, setExpandedPlayers] = useState<Set<string>>(new Set());
 
   const togglePlayer = (name: string) => {
@@ -543,147 +585,146 @@ function IncumbentsDetail({ data, onPin }: {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-border p-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide flex items-center gap-2">
-            <Building2 size={14} className="text-brand" />
-            Incumbents
-          </h2>
-          <ConfidenceBadge confidence={data.confidence} />
-        </div>
-        <p className="text-sm text-text-secondary leading-relaxed mb-2">{data.summary}</p>
-        <p className="text-xs text-text-muted">{data.players.length} players · {data.marketConcentration}</p>
-      </div>
-
-      {data.players.map((player) => {
-        const isExpanded = expandedPlayers.has(player.name);
-        return (
-          <div key={player.name} className="bg-white rounded-xl border border-border overflow-hidden">
-            <button onClick={() => togglePlayer(player.name)}
-              className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors">
-              {isExpanded
-                ? <ChevronDown size={16} className="text-text-muted shrink-0" />
-                : <ChevronRight size={16} className="text-text-muted shrink-0" />
-              }
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-text-primary">{player.name}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                    player.marketPosition === 'Leader' ? 'bg-go-light text-go' : 'bg-gray-100 text-text-secondary'
-                  }`}>{player.marketPosition}</span>
-                </div>
-                <p className="text-xs text-text-muted mt-0.5 truncate">{player.description}</p>
-              </div>
-              <div className="flex items-center gap-4 shrink-0">
-                {player.estimatedRevenue && (
-                  <span className="flex items-center gap-1 text-xs text-text-muted">
-                    <DollarSign size={12} />{player.estimatedRevenue}
-                  </span>
-                )}
-                {player.founded && (
-                  <span className="flex items-center gap-1 text-xs text-text-muted">
-                    <Calendar size={12} />{player.founded}
-                  </span>
-                )}
-              </div>
-            </button>
-            {isExpanded && (
-              <div className="px-5 pb-5 border-t border-border-light">
-                <div className="grid grid-cols-2 gap-6 mt-4">
-                  <div>
-                    <h4 className="text-xs font-semibold text-go mb-2 uppercase tracking-wide">Strengths</h4>
-                    <ul className="space-y-1.5">
-                      {player.strengths.map((s, i) => (
-                        <PinnableItem key={i} text={s} category={`${player.name} — Strength`} type="insight" onPin={onPin} />
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-semibold text-nogo mb-2 uppercase tracking-wide">Weaknesses</h4>
-                    <ul className="space-y-1.5">
-                      {player.weaknesses.map((w, i) => (
-                        <PinnableItem key={i} text={w} category={`${player.name} — Weakness`} type="challenge" onPin={onPin} />
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-                {player.headquarters && (
-                  <div className="flex items-center gap-1 text-xs text-text-muted mt-4">
-                    <Globe size={12} />{player.headquarters}
-                  </div>
-                )}
-              </div>
-            )}
+    <SelectableBlock blockId="incumbents" category="incumbents" label="Incumbents">
+      <div className="space-y-4">
+        <div className="bg-white rounded-2xl border border-border p-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide flex items-center gap-2">
+              <Building2 size={14} className="text-brand" />
+              Incumbents
+            </h2>
+            <ConfidenceBadge confidence={data.confidence} />
           </div>
-        );
-      })}
+          <p className="text-xs text-text-secondary leading-relaxed mb-2">{data.summary}</p>
+          <p className="text-[10px] text-text-muted">{data.players.length} players · {data.marketConcentration}</p>
+        </div>
 
-      <SourcesBlock sources={data.sources} />
-    </div>
+        {data.players.map((player) => {
+          const isExpanded = expandedPlayers.has(player.name);
+          return (
+            <div key={player.name} className="bg-white rounded-xl border border-border overflow-hidden">
+              <button onClick={() => togglePlayer(player.name)}
+                className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors">
+                {isExpanded
+                  ? <ChevronDown size={16} className="text-text-muted shrink-0" />
+                  : <ChevronRight size={16} className="text-text-muted shrink-0" />
+                }
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-text-primary">{player.name}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                      player.marketPosition === 'Leader' ? 'bg-go-light text-go' : 'bg-gray-100 text-text-secondary'
+                    }`}>{player.marketPosition}</span>
+                  </div>
+                  <p className="text-xs text-text-muted mt-0.5 truncate">{player.description}</p>
+                </div>
+                <div className="flex items-center gap-4 shrink-0">
+                  {player.estimatedRevenue && (
+                    <span className="flex items-center gap-1 text-xs text-text-muted">
+                      <DollarSign size={12} />{player.estimatedRevenue}
+                    </span>
+                  )}
+                  {player.founded && (
+                    <span className="flex items-center gap-1 text-xs text-text-muted">
+                      <Calendar size={12} />{player.founded}
+                    </span>
+                  )}
+                </div>
+              </button>
+              {isExpanded && (
+                <div className="px-5 pb-5 border-t border-border-light">
+                  <div className="grid grid-cols-2 gap-6 mt-4">
+                    <div>
+                      <h4 className="text-xs font-semibold text-go mb-2 uppercase tracking-wide">Strengths</h4>
+                      <ul className="space-y-1.5">
+                        {player.strengths.map((s, i) => (
+                          <ListItem key={i} text={s} dotColor="bg-go" />
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-semibold text-nogo mb-2 uppercase tracking-wide">Weaknesses</h4>
+                      <ul className="space-y-1.5">
+                        {player.weaknesses.map((w, i) => (
+                          <ListItem key={i} text={w} dotColor="bg-nogo" />
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  {player.headquarters && (
+                    <div className="flex items-center gap-1 text-xs text-text-muted mt-4">
+                      <Globe size={12} />{player.headquarters}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        <SourcesBlock sources={data.sources} />
+      </div>
+    </SelectableBlock>
   );
 }
 
 
 // ── Emerging Competitors Detail ──
 
-function EmergingDetail({ data, onPin }: {
-  data: EmergingCompetitorsResult;
-  onPin: (f: Omit<PinnedFinding, 'id'>) => void;
-}) {
+function EmergingDetail({ data }: { data: EmergingCompetitorsResult }) {
   return (
-    <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-border p-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide flex items-center gap-2">
-            <Rocket size={14} className="text-brand" />
-            Emerging Competitors
-          </h2>
-          <ConfidenceBadge confidence={data.confidence} />
-        </div>
-        <p className="text-sm text-text-secondary leading-relaxed mb-4">{data.summary}</p>
+    <SelectableBlock blockId="emerging" category="emerging_competitors" label="Emerging Competitors">
+      <div className="space-y-4">
+        <div className="bg-white rounded-2xl border border-border p-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide flex items-center gap-2">
+              <Rocket size={14} className="text-brand" />
+              Emerging Competitors
+            </h2>
+            <ConfidenceBadge confidence={data.confidence} />
+          </div>
+          <p className="text-xs text-text-secondary leading-relaxed mb-4">{data.summary}</p>
 
-        <div className="flex gap-4">
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gray-50 border border-border">
-            <DollarSign size={16} className="text-brand" />
-            <div>
-              <p className="text-lg font-bold text-text-primary">{data.totalFundingInSpace}</p>
-              <p className="text-xs text-text-muted">Total Funding</p>
+          <div className="flex gap-3">
+            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-gray-50 border border-border">
+              <DollarSign size={14} className="text-brand" />
+              <div>
+                <p className="text-sm font-bold text-text-primary">{data.totalFundingInSpace}</p>
+                <p className="text-[10px] text-text-muted">Total Funding</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gray-50 border border-border">
-            <TrendingUp size={16} className="text-brand" />
-            <div>
-              <p className="text-lg font-bold text-text-primary capitalize">{data.fundingTrend}</p>
-              <p className="text-xs text-text-muted">Trend</p>
+            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-gray-50 border border-border">
+              <TrendingUp size={14} className="text-brand" />
+              <div>
+                <p className="text-sm font-bold text-text-primary capitalize">{data.fundingTrend}</p>
+                <p className="text-[10px] text-text-muted">Trend</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gray-50 border border-border">
-            <Users size={16} className="text-brand" />
-            <div>
-              <p className="text-lg font-bold text-text-primary">{data.competitors.length}</p>
-              <p className="text-xs text-text-muted">Startups</p>
+            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-gray-50 border border-border">
+              <Users size={14} className="text-brand" />
+              <div>
+                <p className="text-sm font-bold text-text-primary">{data.competitors.length}</p>
+                <p className="text-[10px] text-text-muted">Startups</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {data.competitors.map((comp) => (
-        <div key={comp.name} className="bg-white rounded-xl border border-border p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm font-semibold text-text-primary">{comp.name}</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">
-              {comp.fundingStage}
-            </span>
-            {comp.fundingAmount && (
-              <span className="text-xs text-text-muted">{comp.fundingAmount}</span>
-            )}
-          </div>
-          <p className="text-xs text-text-muted mb-2">{comp.description}</p>
-          <div className="bg-gray-50 rounded-lg p-2.5 text-xs text-text-secondary mb-2">
-            <strong className="text-text-primary">Differentiator:</strong> {comp.differentiator}
-          </div>
-          <div className="flex items-center justify-between">
+        {data.competitors.map((comp) => (
+          <div key={comp.name} className="bg-white rounded-xl border border-border p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm font-semibold text-text-primary">{comp.name}</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">
+                {comp.fundingStage}
+              </span>
+              {comp.fundingAmount && (
+                <span className="text-xs text-text-muted">{comp.fundingAmount}</span>
+              )}
+            </div>
+            <p className="text-xs text-text-muted mb-2">{comp.description}</p>
+            <div className="bg-gray-50 rounded-lg p-2.5 text-xs text-text-secondary mb-2">
+              <strong className="text-text-primary">Differentiator:</strong> {comp.differentiator}
+            </div>
             {comp.investors && comp.investors.length > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-xs text-text-muted">Investors:</span>
@@ -692,138 +733,133 @@ function EmergingDetail({ data, onPin }: {
                 ))}
               </div>
             )}
-            <button
-              onClick={() => onPin({ text: `${comp.name}: ${comp.differentiator}`, category: 'Emerging Competitors', type: 'insight' })}
-              className="p-1 rounded hover:bg-gray-100 transition-colors"
-              title="Pin this competitor"
-            >
-              <Pin size={12} className="text-text-muted" />
-            </button>
           </div>
-        </div>
-      ))}
+        ))}
 
-      <SourcesBlock sources={data.sources} />
-    </div>
+        <SourcesBlock sources={data.sources} />
+      </div>
+    </SelectableBlock>
   );
 }
 
 
 // ── Market Sizing Detail ──
 
-function MarketDetail({ data, onPin }: {
-  data: MarketSizingResult;
-  onPin: (f: Omit<PinnedFinding, 'id'>) => void;
-}) {
+function MarketDetail({ data }: { data: MarketSizingResult }) {
   return (
-    <div className="space-y-4">
-      <div className="bg-white rounded-2xl border border-border p-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide flex items-center gap-2">
-            <TrendingUp size={14} className="text-brand" />
-            Market Sizing
-          </h2>
-          <ConfidenceBadge confidence={data.confidence} />
-        </div>
-        <p className="text-sm text-text-secondary leading-relaxed mb-4">{data.summary}</p>
+    <SelectableBlock blockId="market" category="market_sizing" label="Market Sizing">
+      <div className="space-y-4">
+        <div className="bg-white rounded-2xl border border-border p-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide flex items-center gap-2">
+              <TrendingUp size={14} className="text-brand" />
+              Market Sizing
+            </h2>
+            <ConfidenceBadge confidence={data.confidence} />
+          </div>
+          <p className="text-xs text-text-secondary leading-relaxed mb-4">{data.summary}</p>
 
-        <div className="grid grid-cols-4 gap-3">
-          {[
-            { label: 'TAM', value: data.tam, sub: 'Total Addressable' },
-            { label: 'SAM', value: data.sam, sub: 'Serviceable' },
-            { label: 'SOM', value: data.som || 'N/A', sub: 'Obtainable' },
-            { label: 'CAGR', value: data.cagr, sub: data.timeframe },
-          ].map((item) => (
-            <div key={item.label} className="text-center p-3 rounded-xl bg-gray-50 border border-border">
-              <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">{item.label}</p>
-              <p className="text-xl font-bold text-text-primary mt-1">{item.value}</p>
-              <p className="text-[10px] text-text-muted mt-0.5">{item.sub}</p>
+          <div className="space-y-2">
+            {[
+              { label: 'TAM', value: data.tam, sub: 'Total Addressable Market' },
+              { label: 'SAM', value: data.sam, sub: 'Serviceable Available Market' },
+              { label: 'SOM', value: data.som, sub: 'Serviceable Obtainable Market' },
+              { label: 'CAGR', value: data.cagr, sub: data.timeframe || 'Growth Rate' },
+            ]
+              .filter((item) => item.value && item.value !== 'N/A')
+              .map((item) => (
+              <div key={item.label} className="flex items-start gap-3 px-3.5 py-2.5 rounded-lg bg-gray-50 border border-border">
+                <span className="text-[10px] font-bold text-text-muted uppercase tracking-wide w-10 shrink-0 pt-0.5">{item.label}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-text-primary leading-relaxed">{item.value}</p>
+                  <p className="text-[10px] text-text-muted mt-0.5">{item.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-border p-6">
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-xs font-semibold text-go uppercase tracking-wide mb-3">Growth Drivers</h3>
+              <ul className="space-y-2">
+                {data.growthDrivers.map((d, i) => (
+                  <ListItem key={i} text={d} dotColor="bg-go" />
+                ))}
+              </ul>
             </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-white rounded-2xl border border-border p-6">
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-xs font-semibold text-go uppercase tracking-wide mb-3">Growth Drivers</h3>
-            <ul className="space-y-2">
-              {data.growthDrivers.map((d, i) => (
-                <PinnableItem key={i} text={d} category="Market — Driver" type="driver" onPin={onPin} />
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-xs font-semibold text-maybe uppercase tracking-wide mb-3">Constraints</h3>
-            <ul className="space-y-2">
-              {data.constraints.map((c, i) => (
-                <PinnableItem key={i} text={c} category="Market — Constraint" type="constraint" onPin={onPin} />
-              ))}
-            </ul>
+            <div>
+              <h3 className="text-xs font-semibold text-maybe uppercase tracking-wide mb-3">Constraints</h3>
+              <ul className="space-y-2">
+                {data.constraints.map((c, i) => (
+                  <ListItem key={i} text={c} dotColor="bg-maybe" />
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
 
-      <SourcesBlock sources={data.sources} />
-    </div>
+        <SourcesBlock sources={data.sources} />
+      </div>
+    </SelectableBlock>
   );
 }
 
 
 // ── Risks & Open Questions Detail ──
 
-function RisksDetail({ assessment, onPin }: {
-  assessment: OpportunityAssessment;
-  onPin: (f: Omit<PinnedFinding, 'id'>) => void;
-}) {
+function RisksDetail({ assessment }: { assessment: OpportunityAssessment }) {
   return (
-    <div className="space-y-4">
-      {/* Key Risks */}
-      {assessment.keyRisks.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border p-6">
-          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
-            <Shield size={14} className="text-nogo" />
-            Key Risks
-          </h2>
-          <ul className="space-y-2.5">
-            {assessment.keyRisks.map((risk, i) => (
-              <PinnableItem key={i} text={risk} category="Risks" type="risk" onPin={onPin} />
-            ))}
-          </ul>
-        </div>
-      )}
+    <SelectableBlock blockId="risks" category="assessment" label="Risks & Open Questions">
+      <div className="space-y-4">
+        {/* Key Risks */}
+        {assessment.keyRisks.length > 0 && (
+          <div className="bg-white rounded-2xl border border-border p-6">
+            <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
+              <Shield size={14} className="text-nogo" />
+              Key Risks
+            </h2>
+            <ul className="space-y-2.5">
+              {assessment.keyRisks.map((risk, i) => (
+                <ListItem key={i} text={risk} dotColor="bg-nogo" />
+              ))}
+            </ul>
+          </div>
+        )}
 
-      {/* Leadership Input */}
-      {assessment.needsLeadershipInput && assessment.needsLeadershipInput.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border p-6">
-          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-2 flex items-center gap-2">
-            <HelpCircle size={14} className="text-maybe" />
-            Leadership Judgment Needed
-          </h2>
-          <p className="text-xs text-text-muted mb-4">These questions cannot be answered by research alone — they require strategic judgment from your team.</p>
-          <ul className="space-y-2.5">
-            {assessment.needsLeadershipInput.map((q, i) => (
-              <PinnableItem key={i} text={q} category="Leadership Input" type="insight" onPin={onPin} />
-            ))}
-          </ul>
-        </div>
-      )}
+        {/* Leadership Input */}
+        {assessment.needsLeadershipInput && assessment.needsLeadershipInput.length > 0 && (
+          <div className="bg-white rounded-2xl border border-border p-6">
+            <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-2 flex items-center gap-2">
+              <HelpCircle size={14} className="text-maybe" />
+              Leadership Judgment Needed
+            </h2>
+            <p className="text-xs text-text-muted mb-4">These questions cannot be answered by research alone — they require strategic judgment from your team.</p>
+            <ul className="space-y-2.5">
+              {assessment.needsLeadershipInput.map((q, i) => (
+                <ListItem key={i} text={q} dotColor="bg-text-secondary" />
+              ))}
+            </ul>
+          </div>
+        )}
 
-      {/* White Space */}
-      {assessment.whiteSpaceOpportunities.length > 0 && (
-        <div className="bg-white rounded-2xl border border-border p-6">
-          <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
-            <Target size={14} className="text-brand" />
-            White Space Opportunities
-          </h2>
-          <ul className="space-y-2.5">
-            {assessment.whiteSpaceOpportunities.map((opp, i) => (
-              <PinnableItem key={i} text={opp} category="White Space" type="opportunity" onPin={onPin} />
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+        {/* White Space */}
+        {assessment.whiteSpaceOpportunities.length > 0 && (
+          <div className="bg-white rounded-2xl border border-border p-6">
+            <h2 className="text-sm font-semibold text-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
+              <Target size={14} className="text-brand" />
+              White Space Opportunities
+            </h2>
+            <ul className="space-y-2.5">
+              {assessment.whiteSpaceOpportunities.map((opp, i) => (
+                <ListItem key={i} text={opp} dotColor="bg-brand" />
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </SelectableBlock>
   );
 }
 

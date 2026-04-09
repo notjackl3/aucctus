@@ -46,6 +46,8 @@ class SourceResponse(CamelModel):
     publisher: str
     date: str | None = None
     snippet: str | None = None
+    provider: str | None = None
+    source_category: str | None = None
 
 
 class IncumbentResponse(CamelModel):
@@ -351,3 +353,48 @@ class UploadDocumentResponse(CamelModel):
     document_id: str
     operation_id: str
     status: str
+
+
+# ══════════════════════════════════════════════
+# Decision Question schemas
+# ══════════════════════════════════════════════
+
+class DecisionQuestionResponse(CamelModel):
+    id: str
+    analysis_id: str
+    category: str
+    question_text: str
+    answer_type: str
+    importance: str
+    decision_impact: str
+    choices: list[str] | None = None
+    answer_value: str | None = None
+    sort_order: int
+    created_at: str
+
+
+class AnswerDecisionQuestionRequest(CamelModel):
+    answer_value: str
+
+
+class ApplyAnswersResponse(CamelModel):
+    recommendation: str
+    score: int
+    headline: str
+    user_inputs_applied: int
+    operation_id: str
+
+
+# ══════════════════════════════════════════════
+# Ask about selection schemas
+# ══════════════════════════════════════════════
+
+class AskAboutSelectionRequest(CamelModel):
+    selected_text: str
+    question: str
+    block_category: str
+    block_label: str
+
+
+class AskAboutSelectionResponse(CamelModel):
+    answer: str

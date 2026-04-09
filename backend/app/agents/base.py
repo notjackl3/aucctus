@@ -1,9 +1,14 @@
 """BaseAgent context and shared helpers for research agents."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from app.domain.models import Claim, Source
+
+if TYPE_CHECKING:
+    from app.retrieval.query_planner import QueryPlan
 
 
 @dataclass
@@ -15,6 +20,7 @@ class AgentContext:
     company_context: str | None = None
     strategy_lens: dict[str, Any] | None = None
     evaluation_posture: str = "established_company"  # established_company | adjacency_expansion | new_market_entry | new_venture
+    query_plan: QueryPlan | None = None
 
 
 @dataclass

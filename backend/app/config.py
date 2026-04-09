@@ -65,10 +65,32 @@ CONFIDENCE_PIN_THRESHOLD = 80
 INSIGHT_SIMILARITY_MERGE_THRESHOLD = 0.88
 INSIGHT_SIMILARITY_GROUP_THRESHOLD = 0.72
 
+# ── Decision questions ──
+MAX_DECISION_QUESTIONS = 8
+
 # ── Scale limits ──
 MAX_DOCUMENTS_PER_COMPANY = 10
 MAX_CHUNKS_PER_DOCUMENT = 100
 MAX_REPORT_SECTIONS = 6
+
+# ── Query planning budgets ──
+RECON_TAVILY_SEARCHES = 1          # Reconnaissance pass: 1 cheap Tavily search
+RECON_MAX_RESULTS = 5              # Results per recon search
+TAVILY_QUERIES_PER_AGENT = 3      # Max planned Tavily queries per agent (post-planning)
+GDELT_QUERIES_PER_AGENT = 1       # Max GDELT queries per agent
+SEC_EDGAR_QUERIES_PER_AGENT = 1   # Max SEC EDGAR queries per agent
+USPTO_QUERIES_PER_AGENT = 1       # Max USPTO queries per agent
+MAX_REFINEMENT_ATTEMPTS = 1       # Max coverage-driven refinement rounds
+LOCAL_EVIDENCE_SUFFICIENCY = 8    # Local results needed to skip external search
+COVERAGE_SUFFICIENCY_THRESHOLD = 0.6  # 0-1 score above which coverage is "sufficient"
+
+# ── External provider settings ──
+GDELT_ENABLED = True
+SEC_EDGAR_ENABLED = True
+USPTO_ENABLED = True
+GDELT_MAX_RESULTS = 10
+SEC_EDGAR_MAX_RESULTS = 5
+USPTO_MAX_RESULTS = 10
 
 # ── Feature flags ──
 _force_mock: bool = False
