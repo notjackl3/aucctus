@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@libs/utils/react';
 import { AssumptionStatusV2 } from '@libs/api/types';
 import { ASSUMPTION_STATUS_CONFIGS } from '../../constants/statusConfigs';
@@ -67,9 +68,11 @@ const EditableStatusBadge: React.FC<EditableStatusBadgeProps> = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(target) &&
+        !target.closest('[data-aucctus-portal-target]')
       ) {
         setIsOpen(false);
       }
@@ -90,6 +93,58 @@ const EditableStatusBadge: React.FC<EditableStatusBadgeProps> = ({
     'invalidated',
     'untested',
   ];
+
+  const renderDropdown = () => {
+    if (!isOpen || !dropdownRef.current) return null;
+
+    const rect = dropdownRef.current.getBoundingClientRect();
+
+    return createPortal(
+      <div
+        className='aucctus-bg-primary aucctus-border-secondary min-w-[160px] overflow-hidden rounded-md border shadow-lg'
+        style={{
+          position: 'fixed',
+          top: `${rect.bottom + 4}px`,
+          left: `${rect.left}px`,
+          zIndex: 9999,
+          pointerEvents: 'auto',
+        }}
+        data-aucctus-portal-target='true'
+      >
+        {statusOptions.map((statusOption) => {
+          const config = getStatusConfig(statusOption);
+          const isSelected = statusOption === currentStatus;
+          return (
+            <button
+              key={statusOption}
+              type='button'
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSelect(statusOption);
+              }}
+              className={cn(
+                'aucctus-bg-primary-hover flex w-full items-center gap-2 px-3 py-2 text-left transition',
+                isSelected && 'aucctus-bg-secondary',
+              )}
+              data-aucctus-portal-target='true'
+            >
+              <DynamicIcon
+                variant={config.icon as any}
+                className={cn('h-4 w-4', config.stroke)}
+              />
+              <span className={cn('aucctus-text-sm', config.text)}>
+                {config.label}
+              </span>
+              {isSelected && (
+                <Check className={cn('ml-auto h-4 w-4', config.stroke)} />
+              )}
+            </button>
+          );
+        })}
+      </div>,
+      document.body,
+    );
+  };
 
   return (
     <div className='relative' ref={dropdownRef}>
@@ -120,45 +175,7 @@ const EditableStatusBadge: React.FC<EditableStatusBadgeProps> = ({
         )}
       </button>
 
-      {isOpen && (
-        <div
-          className='aucctus-bg-primary aucctus-border-secondary fixed left-0 top-full z-50 mt-1 min-w-[160px] overflow-hidden rounded-md border shadow-lg'
-          style={{
-            left: dropdownRef.current?.getBoundingClientRect().left,
-            top: (dropdownRef.current?.getBoundingClientRect().bottom ?? 0) + 4,
-          }}
-        >
-          {statusOptions.map((statusOption) => {
-            const config = getStatusConfig(statusOption);
-            const isSelected = statusOption === currentStatus;
-            return (
-              <button
-                key={statusOption}
-                type='button'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleSelect(statusOption);
-                }}
-                className={cn(
-                  'aucctus-bg-primary-hover flex w-full items-center gap-2 px-3 py-2 text-left transition',
-                  isSelected && 'aucctus-bg-secondary',
-                )}
-              >
-                <DynamicIcon
-                  variant={config.icon as any}
-                  className={cn('h-4 w-4', config.stroke)}
-                />
-                <span className={cn('aucctus-text-sm', config.text)}>
-                  {config.label}
-                </span>
-                {isSelected && (
-                  <Check className={cn('ml-auto h-4 w-4', config.stroke)} />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {renderDropdown()}
     </div>
   );
 };

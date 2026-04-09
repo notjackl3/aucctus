@@ -254,59 +254,56 @@ const BatchConfirmationModal: React.FC<BatchConfirmationModalProps> = ({
   const isDisabled = isLoading || isProcessing;
 
   return (
-    <div className='aucctus-bg-primary relative inline-flex max-h-[100vh] w-[600px] flex-col items-center justify-start rounded-xl'>
-      {/* Close button - top right */}
-      <button
-        className='aucctus-bg-primary-hover absolute right-4 top-4 z-10 rounded-lg p-2'
-        onClick={handleCancel}
-        aria-label='Close modal'
-        disabled={isDisabled}
-      >
-        <X className='aucctus-stroke-secondary h-6 w-6' />
-      </button>
+    <div className='aucctus-bg-primary relative inline-flex max-h-[90vh] w-[600px] flex-col items-center justify-start rounded-xl'>
+      {/* Sticky Header */}
+      <div className='relative w-full flex-shrink-0 px-6 pb-2 pt-6 text-center'>
+        <button
+          className='aucctus-bg-primary-hover absolute right-4 top-4 z-10 rounded-lg p-2'
+          onClick={handleCancel}
+          aria-label='Close modal'
+          disabled={isDisabled}
+        >
+          <X className='aucctus-stroke-secondary h-6 w-6' />
+        </button>
+        <p className='aucctus-text-xl-semibold aucctus-text-primary mx-auto'>
+          {content.title}
+        </p>
+        <p className='aucctus-text-md aucctus-text-secondary mt-4'>
+          {content.message}
+        </p>
+      </div>
 
-      {/* Content */}
-      <div className='inline-flex w-full items-start justify-start overflow-auto p-6'>
-        <div className='w-full'>
-          {/* Warning Icon and Message */}
-          <div className='mb-6 flex flex-col items-center text-center'>
-            <p className='aucctus-text-xl-semibold aucctus-text-primary mx-auto'>
-              {content.title}
-            </p>
-            <p className='aucctus-text-md aucctus-text-secondary mt-4'>
-              {content.message}
-            </p>
+      {/* Scrollable Content */}
+      <div className='min-h-0 w-full flex-1 overflow-y-auto px-6'>
+        {renderChangesList()}
+      </div>
 
-            {/* Show changes list */}
-            {renderChangesList()}
-          </div>
-
-          {/* Action Buttons */}
-          <div className='flex justify-end gap-3'>
-            <button
-              type='button'
-              className='btn btn-secondary'
-              onClick={handleCancel}
-              disabled={isDisabled}
-            >
-              Cancel
-            </button>
-            <button
-              type='button'
-              className={`btn ${content.confirmButtonVariant}`}
-              onClick={handleConfirm}
-              disabled={isDisabled}
-            >
-              {isDisabled ? (
-                <>
-                  <Loader2 className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin' />
-                  Processing...
-                </>
-              ) : (
-                <>{content.confirmButtonText}</>
-              )}
-            </button>
-          </div>
+      {/* Sticky Footer */}
+      <div className='aucctus-bg-primary aucctus-border-secondary w-full flex-shrink-0 border-t px-6 py-4'>
+        <div className='flex justify-end gap-3'>
+          <button
+            type='button'
+            className='btn btn-secondary'
+            onClick={handleCancel}
+            disabled={isDisabled}
+          >
+            Cancel
+          </button>
+          <button
+            type='button'
+            className={`btn ${content.confirmButtonVariant}`}
+            onClick={handleConfirm}
+            disabled={isDisabled}
+          >
+            {isDisabled ? (
+              <>
+                <Loader2 className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin' />
+                Processing...
+              </>
+            ) : (
+              <>{content.confirmButtonText}</>
+            )}
+          </button>
         </div>
       </div>
     </div>

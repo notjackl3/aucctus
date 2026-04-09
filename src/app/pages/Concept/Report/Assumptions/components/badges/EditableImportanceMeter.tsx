@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@libs/utils/react';
 import { ChevronDown } from 'lucide-react';
 
@@ -89,6 +90,70 @@ const EditableImportanceMeter: React.FC<EditableImportanceMeterProps> = ({
     };
   }, [isOpen]);
 
+  const renderDropdown = () => {
+    if (!isOpen || !dropdownRef.current) return null;
+
+    const rect = dropdownRef.current.getBoundingClientRect();
+
+    return createPortal(
+      <div
+        className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-md border shadow-lg'
+        style={{
+          position: 'fixed',
+          top: `${rect.bottom + 4}px`,
+          left: `${rect.left}px`,
+          zIndex: 9999,
+          pointerEvents: 'auto',
+        }}
+        data-aucctus-portal-target='true'
+      >
+        <button
+          type='button'
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSelect('high');
+          }}
+          className='aucctus-bg-primary-hover flex w-full items-center gap-2 px-3 py-2 text-left transition'
+          data-aucctus-portal-target='true'
+        >
+          <div className='flex gap-0.5'>{getImportanceBlocks('high')}</div>
+          <span className='aucctus-text-sm aucctus-text-error-primary'>
+            High
+          </span>
+        </button>
+        <button
+          type='button'
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSelect('medium');
+          }}
+          className='aucctus-bg-primary-hover flex w-full items-center gap-2 px-3 py-2 text-left transition'
+          data-aucctus-portal-target='true'
+        >
+          <div className='flex gap-0.5'>{getImportanceBlocks('medium')}</div>
+          <span className='aucctus-text-sm aucctus-text-warning-primary'>
+            Medium
+          </span>
+        </button>
+        <button
+          type='button'
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSelect('low');
+          }}
+          className='aucctus-bg-primary-hover flex w-full items-center gap-2 px-3 py-2 text-left transition'
+          data-aucctus-portal-target='true'
+        >
+          <div className='flex gap-0.5'>{getImportanceBlocks('low')}</div>
+          <span className='aucctus-text-sm aucctus-text-success-primary'>
+            Low
+          </span>
+        </button>
+      </div>,
+      document.body,
+    );
+  };
+
   return (
     <div className='relative' ref={dropdownRef}>
       <button
@@ -116,49 +181,7 @@ const EditableImportanceMeter: React.FC<EditableImportanceMeterProps> = ({
         <ChevronDown className='aucctus-stroke-secondary h-3 w-3' />
       </button>
 
-      {isOpen && (
-        <div className='aucctus-bg-primary aucctus-border-secondary absolute left-0 top-full z-50 mt-1 overflow-hidden rounded-md border shadow-lg'>
-          <button
-            type='button'
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSelect('high');
-            }}
-            className='aucctus-bg-primary-hover flex w-full items-center gap-2 px-3 py-2 text-left transition'
-          >
-            <div className='flex gap-0.5'>{getImportanceBlocks('high')}</div>
-            <span className='aucctus-text-sm aucctus-text-error-primary'>
-              High
-            </span>
-          </button>
-          <button
-            type='button'
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSelect('medium');
-            }}
-            className='aucctus-bg-primary-hover flex w-full items-center gap-2 px-3 py-2 text-left transition'
-          >
-            <div className='flex gap-0.5'>{getImportanceBlocks('medium')}</div>
-            <span className='aucctus-text-sm aucctus-text-warning-primary'>
-              Medium
-            </span>
-          </button>
-          <button
-            type='button'
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSelect('low');
-            }}
-            className='aucctus-bg-primary-hover flex w-full items-center gap-2 px-3 py-2 text-left transition'
-          >
-            <div className='flex gap-0.5'>{getImportanceBlocks('low')}</div>
-            <span className='aucctus-text-sm aucctus-text-success-primary'>
-              Low
-            </span>
-          </button>
-        </div>
-      )}
+      {renderDropdown()}
     </div>
   );
 };
