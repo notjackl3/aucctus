@@ -33,6 +33,7 @@ export interface AnalysisSummary {
   score: number | null;
   confidenceLevel: string | null;
   confidenceScore: number | null;
+  headline: string | null;
   createdAt: string;
   completedAt: string | null;
 }
@@ -247,6 +248,14 @@ export function askAboutSelection(
 }
 
 // ── Documents ──
+
+export async function deleteDocument(documentId: string): Promise<void> {
+  const res = await fetch(`/api/documents/${documentId}`, { method: 'DELETE' });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new ApiError(res.status, body || res.statusText);
+  }
+}
 
 export async function uploadDocument(
   companyId: string,

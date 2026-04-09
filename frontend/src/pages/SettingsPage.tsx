@@ -19,6 +19,7 @@ import {
   AlertTriangle,
   Compass,
   Layers,
+  Trash2,
 } from 'lucide-react';
 import {
   listCompanies,
@@ -28,6 +29,7 @@ import {
   buildStrategy,
   listDocuments,
   uploadDocument,
+  deleteDocument,
   extractTextFromFile,
 } from '../api/client';
 import type { CompanyResponse, DocumentResponse, StrategyLens } from '../api/client';
@@ -66,6 +68,7 @@ export default function SettingsPage() {
   const [documents, setDocuments] = useState<DocumentResponse[]>([]);
   const [docsLoading, setDocsLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load companies on mount
@@ -179,6 +182,18 @@ export default function SettingsPage() {
     }
   };
 
+  const handleDeleteDocument = async (docId: string) => {
+    setDeletingDocId(docId);
+    try {
+      await deleteDocument(docId);
+      setDocuments((prev) => prev.filter((d) => d.id !== docId));
+    } catch {
+      // silently fail — item stays in list
+    } finally {
+      setDeletingDocId(null);
+    }
+  };
+
   const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !selectedCompanyId) return;
@@ -225,20 +240,17 @@ export default function SettingsPage() {
       <div className="max-w-4xl mx-auto px-8 pt-10 pb-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
-            <Layers size={20} className="text-brand" />
-          </div>
           <div>
-            <h1 className="text-2xl font-bold text-text-primary">Company Intelligence</h1>
+            <h1 className="text-2xl font-bold text-text-primary">Company Profile</h1>
             <p className="text-sm text-text-secondary">
-              Configure how your company evaluates strategic opportunities
+              Configure how your corporate strategies, company documents, and relevant information.
             </p>
           </div>
         </div>
 
         {/* Readiness indicator */}
         {selectedCompany && (
-          <div className="flex items-center gap-4 mb-8 mt-4 ml-[52px]">
+          <div className="flex items-center gap-2 mb-8 mt-4">
             <ReadinessStep label="Profile" done={hasContext} step={1} />
             <div className="w-6 h-px bg-border" />
             <ReadinessStep label="Strategy Lens" done={hasLens} step={2} />
@@ -253,7 +265,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2.5">
                 <Building2 size={16} className="text-brand" />
-                <h2 className="text-base font-semibold text-text-primary">Company Profile</h2>
+                <h2 className="text-base font-semibold text-text-primary">Basic Information</h2>
               </div>
               <button
                 onClick={() => setShowNewCompanyForm(!showNewCompanyForm)}
@@ -264,7 +276,7 @@ export default function SettingsPage() {
               </button>
             </div>
             <p className="text-xs text-text-muted mb-5">
-              Your company's strategic position, priorities, and competitive advantages — used to evaluate fit for every opportunity.
+              Your company's strategic position, priorities, and competitive advantages.
             </p>
 
             {/* New company form */}
@@ -462,7 +474,7 @@ export default function SettingsPage() {
                 </button>
               </div>
               <p className="text-xs text-text-muted mb-5">
-                A structured view of your strategic priorities, ICP, GTM strengths, and constraints — generated from your company context. Used by the internal critic to evaluate opportunity fit.
+                A structured view of your strategic priorities, ICP, GTM strengths, and constraints.
               </p>
 
               {lensError && (
@@ -527,7 +539,7 @@ export default function SettingsPage() {
                 </div>
               </div>
               <p className="text-xs text-text-muted mb-5">
-                Upload strategy briefs, pitch decks, or market research. Documents are chunked, embedded, and used to enrich the strategy lens and analysis context.
+                Upload strategy briefs, pitch decks, or market research. Documents are embedded and used to enrich the strategy lens and analysis context.
               </p>
 
               {docsLoading ? (
@@ -539,32 +551,32 @@ export default function SettingsPage() {
                   {documents.map((doc) => (
                     <div
                       key={doc.id}
-                      className="flex items-center gap-3 p-3.5 rounded-xl bg-gray-50 border border-border"
+                      className={`flex items-center gap-3 p-3.5 rounded-xl bg-gray-50 border border-border transition-opacity ${
+                        deletingDocId === doc.id ? 'opacity-50 pointer-events-none' : ''
+                      }`}
                     >
-                      <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center shrink-0">
-                        <FileText size={14} className="text-brand" />
-                      </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-text-primary truncate">
                           {doc.filename}
                         </p>
-                        <div className="flex items-center gap-3 mt-0.5">
-                          <span className="text-xs text-text-muted">
-                            {doc.chunkCount} chunks
-                          </span>
-                          <span className="text-xs text-text-muted">
-                            {new Date(doc.createdAt).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                            })}
-                          </span>
-                        </div>
                         {doc.summary && (
                           <p className="text-xs text-text-secondary mt-1.5 line-clamp-2">
                             {doc.summary}
                           </p>
                         )}
                       </div>
+                      <button
+                        onClick={() => handleDeleteDocument(doc.id)}
+                        disabled={deletingDocId === doc.id}
+                        className="p-2 rounded-lg text-text-muted hover:text-nogo hover:bg-nogo/10 transition-colors disabled:opacity-50 shrink-0"
+                        title="Delete document"
+                      >
+                        {deletingDocId === doc.id ? (
+                          <Loader2 size={15} className="animate-spin" />
+                        ) : (
+                          <Trash2 size={15} />
+                        )}
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -691,7 +703,6 @@ function StrategyLensView({ lens }: { lens: StrategyLens }) {
             })}
           </span>
         )}
-        {lens.confidenceNote && <span>{lens.confidenceNote}</span>}
       </div>
 
       {/* Lens sections — 2 column grid for density */}

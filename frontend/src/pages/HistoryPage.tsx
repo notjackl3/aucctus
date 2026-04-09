@@ -17,7 +17,6 @@ import RecommendationBadge from '../components/RecommendationBadge';
 import ScoreGauge from '../components/ScoreGauge';
 
 type SortKey = 'date' | 'score' | 'company';
-type FilterStatus = 'all' | 'completed' | 'running' | 'error';
 
 export default function HistoryPage() {
   const navigate = useNavigate();
@@ -26,7 +25,6 @@ export default function HistoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortKey>('date');
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
@@ -75,15 +73,12 @@ export default function HistoryPage() {
   // Filter and sort
   const filtered = analyses
     .filter((a) => {
-      if (filterStatus !== 'all' && a.status !== filterStatus) return false;
-      if (search) {
-        const q = search.toLowerCase();
-        return (
-          a.companyName.toLowerCase().includes(q) ||
-          a.marketSpace.toLowerCase().includes(q)
-        );
-      }
-      return true;
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return (
+        a.companyName.toLowerCase().includes(q) ||
+        a.marketSpace.toLowerCase().includes(q)
+      );
     })
     .sort((a, b) => {
       if (sortBy === 'score') return (b.score ?? 0) - (a.score ?? 0);
@@ -91,22 +86,12 @@ export default function HistoryPage() {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
-  const statusCounts = {
-    all: analyses.length,
-    completed: analyses.filter((a) => a.status === 'completed').length,
-    running: analyses.filter((a) => a.status === 'running' || a.status === 'pending').length,
-    error: analyses.filter((a) => a.status === 'error').length,
-  };
-
   return (
     <div className="min-h-screen bg-surface-secondary">
       <div className="max-w-5xl mx-auto px-8 pt-10 pb-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand/10 flex items-center justify-center">
-              <BarChart3 size={20} className="text-brand" />
-            </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">Analysis History</h1>
               <p className="text-sm text-text-secondary">
@@ -118,7 +103,6 @@ export default function HistoryPage() {
             onClick={() => navigate('/')}
             className="px-5 py-2.5 rounded-xl bg-brand text-white text-sm font-medium hover:bg-brand-dark transition-colors flex items-center gap-2"
           >
-            <Target size={14} />
             New Analysis
           </button>
         </div>
@@ -135,26 +119,6 @@ export default function HistoryPage() {
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-surface text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all"
             />
-          </div>
-
-          {/* Status filter */}
-          <div className="flex gap-1 bg-surface rounded-xl border border-border p-1">
-            {(['all', 'completed', 'running', 'error'] as FilterStatus[]).map((s) => (
-              <button
-                key={s}
-                onClick={() => setFilterStatus(s)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  filterStatus === s
-                    ? 'bg-brand/10 text-brand'
-                    : 'text-text-muted hover:text-text-secondary'
-                }`}
-              >
-                {s === 'all' ? 'All' : s === 'completed' ? 'Completed' : s === 'running' ? 'In Progress' : 'Failed'}
-                {statusCounts[s] > 0 && (
-                  <span className="ml-1 text-text-muted">({statusCounts[s]})</span>
-                )}
-              </button>
-            ))}
           </div>
 
           {/* Sort */}
@@ -310,6 +274,15 @@ function AnalysisCard({
             </span>
           </div>
         </div>
+
+        {/* Summary snippet */}
+        {isCompleted && a.headline && (
+          <div className="hidden md:block w-56 shrink-0 border-l border-border pl-5">
+            <p className="text-xs text-text-secondary leading-relaxed line-clamp-3">
+              {a.headline}
+            </p>
+          </div>
+        )}
 
         {/* Right: Delete + Arrow */}
         <div className="flex items-center gap-2 shrink-0">

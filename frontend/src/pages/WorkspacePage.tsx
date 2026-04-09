@@ -439,6 +439,11 @@ export default function WorkspacePage() {
             });
             clearSelection();
           }}
+          onSource={() => {
+            // Navigate to the sources view for the selected block's category
+            setActiveCategory('sources');
+            clearSelection();
+          }}
           onDismiss={clearSelection}
         />
       )}

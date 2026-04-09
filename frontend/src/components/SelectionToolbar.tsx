@@ -1,4 +1,4 @@
-import { Pin, MessageCircleQuestion } from 'lucide-react';
+import { Pin, MessageCircleQuestion, ExternalLink } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { SelectionInfo } from '../hooks/useTextSelection';
 
@@ -6,16 +6,17 @@ interface Props {
   selection: SelectionInfo;
   onPin: () => void;
   onAsk: () => void;
+  onSource: () => void;
   onDismiss: () => void;
 }
 
-export default function SelectionToolbar({ selection, onPin, onAsk, onDismiss }: Props) {
+export default function SelectionToolbar({ selection, onPin, onAsk, onSource, onDismiss }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     const { rect } = selection;
-    const toolbarWidth = 180;
+    const toolbarWidth = 260;
     const toolbarHeight = 40;
     const gap = 8;
 
@@ -43,7 +44,6 @@ export default function SelectionToolbar({ selection, onPin, onAsk, onDismiss }:
         }
       };
       document.addEventListener('mousedown', handler);
-      // Store cleanup
       cleanupRef.current = () => document.removeEventListener('mousedown', handler);
     }, 100);
 
@@ -77,6 +77,15 @@ export default function SelectionToolbar({ selection, onPin, onAsk, onDismiss }:
       >
         <MessageCircleQuestion size={12} className="text-brand" />
         Ask
+      </button>
+      <div className="w-px h-5 bg-border" />
+      <button
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={onSource}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-text-primary hover:bg-gray-100 transition-colors"
+      >
+        <ExternalLink size={12} className="text-brand" />
+        Source
       </button>
     </div>
   );

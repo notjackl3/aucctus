@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
+import { CompanyProvider } from './context/CompanyContext';
 import InputPage from './pages/InputPage';
 import AnalysisPage from './pages/AnalysisPage';
 import WorkspacePage from './pages/WorkspacePage';
@@ -10,6 +11,7 @@ import DecisionQuestionsPage from './pages/DecisionQuestionsPage';
 function App() {
   return (
     <BrowserRouter>
+      <CompanyProvider>
       <Layout>
         <Routes>
           <Route path="/" element={<InputPage />} />
@@ -20,6 +22,7 @@ function App() {
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </Layout>
+      </CompanyProvider>
     </BrowserRouter>
   );
 }

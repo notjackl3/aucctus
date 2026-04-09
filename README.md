@@ -1,6 +1,28 @@
 # Aucctus
 
-A competitive landscape research platform that helps companies evaluate whether a market opportunity is worth pursuing. Provide a company profile and a target market — the system researches incumbents, emerging competitors, and market sizing, then synthesizes a Go / No-Go recommendation with evidence-backed reasoning.
+An interactive competitive landscape research workspace. Provide a company profile and a target market — the system researches incumbents, emerging competitors, and market sizing, then synthesizes a Go/No-Go recommendation with evidence-backed reasoning and a 0–100 confidence score.
+
+> For a full technical breakdown, see [ARCHITECTURE_WALKTHROUGH.md](./ARCHITECTURE_WALKTHROUGH.md).
+
+---
+
+## What it does
+
+The system answers one question:
+
+> **"Should this company pursue this opportunity — and under what conditions?"**
+
+It is built for established companies evaluating market opportunities, not startup idea validation.
+
+**Workflow:**
+1. Set up a company profile (name, context, optional internal documents)
+2. Pick a market space and optional framing question
+3. Four AI agents research in parallel — incumbents, emerging competitors, market sizing, synthesis
+4. Interactive workspace: browse findings, pin insights, ask follow-up questions, answer decision questions
+5. AI re-synthesizes the recommendation based on your answers
+6. Compile a report
+
+---
 
 ## Quick Start
 
@@ -18,7 +40,6 @@ cd backend
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# Create .env with your API keys
 cat > .env << 'EOF'
 OPENAI_API_KEY=sk-...
 TAVILY_API_KEY=tvly-...
@@ -37,182 +58,9 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173). The Vite dev server proxies `/api` requests to the backend at port 8000.
 
-> **Mock mode:** If API keys are missing, the system falls back to realistic mock data so you can explore the full UI without incurring any API costs.
+> **Mock mode:** If API keys are not set, the system falls back to realistic mock data so you can explore the full UI without incurring API costs.
 
-## Architecture
-
-### System Overview
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  Frontend (React + TypeScript + Tailwind)                │
-│  InputPage → AnalysisPage (polling) → WorkspacePage     │
-└────────────────────────┬────────────────────────────────┘
-                         │ /api
-┌────────────────────────▼────────────────────────────────┐
-│  FastAPI                                                 │
-│  POST /analyses → Background Task → Operation polling    │
-├──────────────────────────────────────────────────────────┤
-│  Orchestrator                                            │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │  Incumbents   │  │   Emerging   │  │   Market     │  │
-│  │  Agent        │  │   Agent      │  │   Sizing     │  │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  │
-│         │    (parallel)    │                  │          │
-│         └──────────────────┴──────────────────┘          │
-│                            │                             │
-│                  ┌─────────▼─────────┐                   │
-│                  │  Synthesis Agent   │                   │
-│                  │  (Go / No-Go)     │                   │
-│                  └───────────────────┘                   │
-├──────────────────────────────────────────────────────────┤
-│  Evidence Pipeline                                       │
-│  Sources → Tiering → Claims → Dedup → Contradictions    │
-├──────────────────────────────────────────────────────────┤
-│  SQLite (WAL mode, FTS5, embeddings)                    │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Agent Architecture
-
-Four agents, each with a well-scoped research domain:
-
-| Agent | Purpose | Inputs | Outputs |
-|-------|---------|--------|---------|
-| **Incumbents** | Established players — who they are, market share, strengths/weaknesses | 3 Tavily searches | Structured player profiles, market concentration |
-| **Emerging Competitors** | Seed-to-Series B funding activity, new entrants, capital velocity | 3 Tavily searches | Competitor profiles with funding details, trend analysis |
-| **Market Sizing** | TAM/SAM/SOM, CAGR, growth drivers, constraints | 3 Tavily searches | Quantitative market estimates with timeframes |
-| **Synthesis** | Cross-references all three research spaces | Agent outputs + strategy lens | Go/No-Go recommendation, score, strategic fit, conditions to pursue |
-
-The orchestrator runs the three research agents **in parallel**, then feeds their combined output into synthesis. Each agent follows the same pattern: search → process sources → extract claims → LLM structured analysis → generate insights.
-
-### Evidence Pipeline
-
-Every finding traces back to sources:
-
-1. **Search** — Tavily web search with in-memory caching (24h TTL) and credit tracking
-2. **Source processing** — URL dedup, publisher inference, tier assignment (tier 1/2/3 by publisher quality)
-3. **Claim extraction** — LLM extracts structured claims (market size, funding, competitive, trend, etc.)
-4. **Dedup** — Deterministic rules: exact match, Jaccard similarity > 0.80, same-entity numeric overlap
-5. **Contradiction detection** — Deterministic rules before any LLM reasoning: numeric divergence (ratio > 1.25), directional conflicts (growth vs decline), funding discrepancies
-6. **Confidence scoring** — Weighted by source tier, corroboration count, and coverage breadth
-
-### Strategy Lens
-
-Company profiles are stored as first-class entities. When a company has enough context, the system builds a **Strategy Lens** — a structured representation of:
-
-- Strategic priorities (with importance and evidence)
-- Product adjacencies
-- Target customers (segments, pain points, buying criteria, anti-patterns)
-- GTM strengths
-- Constraints (hard/soft with sources)
-- Geographic focus
-- Risk posture (aggressive/moderate/conservative)
-- Fit and misfit signals
-
-The synthesis agent uses the lens to evaluate strategic fit, right to win, and conditions for pursuit. The exploration agent uses it to contextualize follow-up research.
-
-### Data Flow
-
-```
-User submits company + market
-        │
-        ▼
-POST /api/analyses → creates Analysis + Operation
-        │
-        ▼ (background task)
-Orchestrator runs pipeline:
-  1. Three research agents in parallel (Tavily → Sources → Claims → LLM analysis)
-  2. Synthesis agent (cross-references all findings + strategy lens)
-  3. Evidence merge (dedup claims, detect contradictions)
-  4. Workspace creation (seeds 16 initial insights)
-  5. Operation marked complete
-        │
-        ▼
-Frontend polls GET /api/operations/{id} every 1.5s
-        │
-        ▼
-On completion → navigates to Workspace
-  - Browse research categories
-  - Pin key findings
-  - Ask follow-up questions (conditional Tavily, capped at 3 insights per question)
-  - Compile a report
-```
-
-## Key Design Decisions
-
-**Deterministic rules before LLM reasoning.** Claim deduplication, contradiction nomination, and confidence scoring all use rule-based logic. LLMs are reserved for extraction and synthesis where judgment is needed. This makes the evidence pipeline testable and predictable.
-
-**One shared pipeline, posture-adapted synthesis.** The research agents are identical regardless of company type. Only the synthesis layer adapts — via an `evaluation_posture` parameter that adjusts prompt framing for established companies vs. new ventures. This avoids pipeline duplication while allowing strategic nuance.
-
-**Tavily budget control.** Each agent makes exactly 3 searches at basic depth (1 credit each). Results are cached in-memory with a 24-hour TTL. Exploration searches are conditional — Tavily is only called when local retrieval returns fewer than 5 results. A full analysis uses ~12 Tavily credits.
-
-**Local-first retrieval.** No external vector database. Embeddings are cached in SQLite, similarity computed via numpy. FTS5 handles keyword matching. This keeps the stack simple and the system runnable on a single machine with no infrastructure dependencies.
-
-**Operation polling over WebSockets.** All long-running flows (analysis, exploration, report compilation) create an Operation record. The frontend polls a single endpoint. This is simpler to implement, debug, and reason about than WebSocket state management, and the 1.5-second polling interval is imperceptible to users.
-
-**Company profile as a reusable entity.** Company context is defined once and reused across assessments. The main analysis input is opportunity-centric: pick a market, optionally add a framing question, and the system resolves company context automatically. This avoids re-entering the same information for each run.
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Backend | Python, FastAPI, Pydantic v2 |
-| Database | SQLite (WAL mode, FTS5 for full-text search) |
-| LLM | OpenAI GPT-4o (structured extraction), GPT-4o-mini (lightweight tasks) |
-| Search | Tavily (web search API) |
-| Embeddings | OpenAI text-embedding-3-small (1536 dims), stored in SQLite |
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS 4 |
-| Icons | Lucide React |
-
-## Project Structure
-
-```
-backend/
-├── app/
-│   ├── main.py              # FastAPI entry point
-│   ├── config.py            # Centralized configuration
-│   ├── agents/              # Research agents (incumbents, emerging, market_sizing, synthesis)
-│   ├── api/
-│   │   ├── routes/          # REST endpoints
-│   │   └── schemas.py       # Pydantic request/response models (camelCase serialization)
-│   ├── domain/              # Data models and enums
-│   ├── evidence/            # Source processing, claim extraction, contradiction detection
-│   ├── services/            # LLM and search wrappers
-│   ├── workflows/           # Orchestrator (analysis pipeline)
-│   ├── persistence/         # SQLite database + repository layer
-│   ├── retrieval/           # Hybrid FTS5 + embedding search
-│   ├── exploration/         # Follow-up question agent
-│   ├── strategy/            # Strategy lens builder + critic
-│   ├── reports/             # Report compiler
-│   └── mock/               # Mock data fallback
-└── tests/
-
-frontend/
-├── src/
-│   ├── pages/               # InputPage, AnalysisPage, WorkspacePage, HistoryPage, SettingsPage
-│   ├── components/          # ScoreGauge, ConfidenceBadge, RecommendationBadge, SourceCard, etc.
-│   ├── api/client.ts        # Typed API client
-│   └── types/analysis.ts    # TypeScript type contracts
-└── vite.config.ts           # Dev server + API proxy
-```
-
-## API Overview
-
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| POST | `/api/analyses` | Create analysis, starts background research |
-| GET | `/api/analyses` | List all analyses with summaries |
-| GET | `/api/analyses/{id}` | Full analysis result |
-| GET | `/api/operations/{id}` | Poll operation progress |
-| POST | `/api/companies` | Create company profile |
-| GET | `/api/companies` | List companies |
-| PUT | `/api/companies/{id}/context` | Update company context |
-| POST | `/api/companies/{id}/strategy` | Build strategy lens |
-| GET | `/api/workspaces/{id}` | Get workspace |
-| POST | `/api/workspaces/{id}/questions` | Ask exploration question |
-| POST | `/api/reports` | Compile report from workspace |
-| POST | `/api/documents` | Upload company document |
+---
 
 ## Running Tests
 
@@ -221,4 +69,185 @@ cd backend
 python3 -m pytest tests/ -v
 ```
 
-Tests cover deterministic evidence rules (claim dedup, contradiction detection), operation status transitions, and API endpoint contracts.
+Tests cover: claim deduplication rules, contradiction detection, confidence scoring, operation status transitions, decision question generation, ask-about-selection grounding, and API endpoint contracts.
+
+---
+
+## Architecture
+
+### System overview
+
+```
+Frontend (React + TypeScript + Tailwind)
+  InputPage → AnalysisPage (polling) → WorkspacePage → HistoryPage
+       │
+       │  /api (HTTP/JSON, Vite proxy)
+       ▼
+FastAPI + Pydantic v2
+  POST /analyses → BackgroundTask → Operation polling
+       │
+       ▼
+Orchestrator (app/workflows/orchestrator.py)
+  1. Query planning (LLM-assisted)
+  2. Centralized retrieval (one provider pass, partitioned by dimension)
+  3. Three research agents in parallel:
+     ┌─────────────┐  ┌─────────────┐  ┌──────────────┐
+     │ Incumbents  │  │  Emerging   │  │Market Sizing │
+     └─────────────┘  └─────────────┘  └──────────────┘
+  4. Synthesis agent (consumes agent outputs + strategy lens)
+  5. Evidence persistence + workspace seeding (16 insights)
+  6. Decision question generation
+       │
+       ▼
+SQLite (WAL mode, FTS5, embeddings table)
+  16 tables: analyses, operations, sources, claims, contradictions,
+  companies, strategy_lenses, workspaces, insights, questions,
+  reports, documents, document_chunks, embeddings, workspace_interactions
+```
+
+### Agent architecture
+
+| Agent | Purpose | Output |
+|-------|---------|--------|
+| **Incumbents** | Established players — profiles, strengths/weaknesses, market concentration | Structured player list |
+| **Emerging Competitors** | Startup activity — funding stages, investors, differentiators | Competitor list with funding data |
+| **Market Sizing** | TAM/SAM/SOM, CAGR, growth drivers, constraints | Quantified market estimates |
+| **Synthesis** | Cross-references all research + company strategy lens | Go/No-Go score, conditions, risks, right to win |
+
+All three research agents run in parallel. Synthesis runs after they complete. Each agent receives pre-fetched, pre-processed evidence from the centralized retrieval service — agents never make provider calls directly.
+
+### Evidence pipeline
+
+```
+Provider results (Tavily, GDELT, SEC EDGAR, USPTO)
+  → Source tiering (tier 1/2/3 by publisher quality)
+  → Claim extraction (GPT-4o structured output)
+  → Deterministic dedup (Jaccard > 0.80, entity match)
+  → Deterministic contradiction detection (numeric divergence, directional conflicts)
+  → Confidence scoring (tier × corroboration × coverage)
+  → Partitioned by research dimension → agents
+```
+
+### Strategy lens
+
+Company profiles are stored as first-class entities. When a company has enough context, the system builds a **Strategy Lens** — a structured JSON representation of strategic priorities, product adjacencies, ICP, GTM strengths, constraints, geographic focus, risk posture, and fit/misfit signals.
+
+The synthesis agent uses the lens to evaluate strategic fit, right to win, and conditions for market entry.
+
+### Retrieval
+
+| Layer | Technology |
+|-------|-----------|
+| Web search | Tavily (~12 credits per analysis, 24h in-memory cache) |
+| News events | GDELT (conditional) |
+| SEC filings | SEC EDGAR (conditional) |
+| Patent landscape | USPTO (conditional) |
+| Local keyword search | SQLite FTS5 |
+| Local semantic search | numpy cosine similarity over cached 1536-dim embeddings |
+
+Exploration searches are conditional — Tavily is only called when local retrieval returns fewer than 5 results.
+
+### Workspace
+
+After analysis completes, the user lands in a workspace with:
+- **16 seeded insights** (4 per agent), filterable by category
+- **Insight management** — pin, archive, or collapse findings
+- **Exploration questions** — ask follow-up questions with grounded retrieval
+- **Decision questions** — structured inputs that refine the recommendation
+- **Ask-about-selection** — highlight any text and ask a grounded question
+- **User memory** — prior answers and interactions are injected into future prompts
+- **Report compilation** — generate an executive brief from workspace findings
+
+---
+
+## Major Subsystems
+
+| Subsystem | Location |
+|-----------|---------|
+| Orchestrator / pipeline | `backend/app/workflows/orchestrator.py` |
+| Retrieval service | `backend/app/retrieval/retrieval_service.py` |
+| Query planner | `backend/app/retrieval/query_planner.py` |
+| Evidence pipeline | `backend/app/evidence/` |
+| Research agents | `backend/app/agents/` |
+| Strategy lens | `backend/app/strategy/engine.py` |
+| Exploration agent | `backend/app/exploration/agent.py` |
+| Decision questions | `backend/app/workflows/decision_questions.py` |
+| Ask-about-selection | `backend/app/workflows/ask_selection.py` |
+| User memory | `backend/app/workflows/user_memory.py` |
+| Document ingestion | `backend/app/ingestion/document_processor.py` |
+| Report compiler | `backend/app/reports/compiler.py` |
+| Database schema | `backend/app/persistence/database.py` |
+| Repository layer | `backend/app/persistence/repositories.py` |
+| LLM wrapper | `backend/app/services/llm.py` |
+| Search wrapper | `backend/app/services/search.py` |
+| API routes | `backend/app/api/routes/` |
+| Frontend pages | `frontend/src/pages/` |
+| Typed API client | `frontend/src/api/client.ts` |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python 3.11+, FastAPI, Pydantic v2 |
+| Database | SQLite (WAL mode, FTS5 for full-text search) |
+| LLM — structured | OpenAI GPT-4o |
+| LLM — fast | OpenAI GPT-4o-mini |
+| Embeddings | OpenAI text-embedding-3-small (1536 dims) |
+| Web search | Tavily |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS 4 |
+| Icons | Lucide React |
+
+---
+
+## API Overview
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| POST | `/api/analyses` | Create analysis, start background research |
+| GET | `/api/analyses` | List all analyses |
+| GET | `/api/analyses/{id}` | Full analysis result |
+| GET | `/api/operations/{id}` | Poll operation progress |
+| POST | `/api/companies` | Create company profile |
+| GET | `/api/companies` | List companies |
+| PUT | `/api/companies/{id}/context` | Update company context |
+| POST | `/api/companies/{id}/strategy` | Build strategy lens |
+| GET | `/api/workspaces/{id}` | Get workspace |
+| GET | `/api/workspaces/{id}/insights` | List insights |
+| PATCH | `/api/workspaces/{id}/insights/{insightId}` | Update insight display status |
+| POST | `/api/workspaces/{id}/questions` | Ask exploration question |
+| GET | `/api/analyses/{id}/decision-questions` | Get decision questions |
+| PATCH | `/api/analyses/{id}/decision-questions/{questionId}` | Answer a decision question |
+| POST | `/api/analyses/{id}/apply-answers` | Re-synthesize with answered questions |
+| POST | `/api/analyses/{id}/ask` | Ask about selected text |
+| POST | `/api/reports` | Compile report |
+| POST | `/api/documents` | Upload company document |
+
+---
+
+## Key Design Decisions
+
+**Deterministic rules before LLM reasoning.** Claim dedup, contradiction nomination, and confidence scoring use rule-based logic. LLMs are only used for judgment tasks.
+
+**Centralized retrieval.** One provider pass per analysis. Evidence is partitioned to agents — agents never call providers directly. This reduces API spend and enables cross-dimension deduplication.
+
+**SQLite over a vector database.** No infrastructure dependencies. Embeddings cached in SQLite, similarity computed via numpy. Simple and self-contained for local use.
+
+**Operation polling over WebSockets.** All async flows create an Operation record. Frontend polls at 1.5s intervals. Simpler to implement and debug than WebSocket state management.
+
+**Company profile as a reusable entity.** Company context is defined once and reused across analyses. The input is opportunity-centric — pick a market, the system resolves company context automatically.
+
+**One pipeline, posture-adapted synthesis.** Research agents are shared. Only the synthesis prompt framing adapts to `evaluation_posture` (established_company, adjacency_expansion, new_market_entry, new_venture).
+
+---
+
+## Build Progress
+
+- Phase 1 — App skeleton + mock endpoints (complete)
+- Phase 2 — Services + evidence pipeline (complete)
+- Phase 3 — Research agents + orchestration (complete)
+- Phase 4 — Strategy lens + synthesis (complete)
+- Phase 5 — Workspace + exploration (complete)
+- Phase 6 — Reports + documents (complete)
+- Phase 7 — Hardening + tests (in progress)

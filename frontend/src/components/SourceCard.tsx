@@ -1,6 +1,25 @@
 import { ExternalLink } from 'lucide-react';
 import type { Source } from '../types/analysis';
 
+/** Strip common markdown syntax so snippets render as plain readable text. */
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')  // [text](url) → text
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1') // ![alt](url) → alt
+    .replace(/^#{1,6}\s+/gm, '')              // ## headings
+    .replace(/\*\*(.+?)\*\*/g, '$1')          // **bold**
+    .replace(/\*(.+?)\*/g, '$1')              // *italic*
+    .replace(/__(.+?)__/g, '$1')              // __bold__
+    .replace(/_(.+?)_/g, '$1')               // _italic_
+    .replace(/`{1,3}[^`]*`{1,3}/g, '')       // `code`
+    .replace(/^\s*[-*+]\s+/gm, '')           // bullet points
+    .replace(/^\s*\d+\.\s+/gm, '')           // numbered lists
+    .replace(/^>\s+/gm, '')                  // blockquotes
+    .replace(/\n{2,}/g, ' ')                 // collapse multiple newlines
+    .replace(/\n/g, ' ')                     // single newlines → space
+    .trim();
+}
+
 export default function SourceCard({ source }: { source: Source }) {
   return (
     <a
@@ -25,7 +44,7 @@ export default function SourceCard({ source }: { source: Source }) {
           </div>
           {source.snippet && (
             <p className="text-xs text-text-secondary mt-2 line-clamp-2 leading-relaxed">
-              {source.snippet}
+              {stripMarkdown(source.snippet)}
             </p>
           )}
         </div>

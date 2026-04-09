@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Search, ArrowRight, Target, FileText, Loader2, Building2,
-  ChevronDown, HelpCircle, Settings,
+  Search, ArrowRight, ArrowLeft, Loader2, Check,
 } from 'lucide-react';
-import { createAnalysis, listCompanies } from '../api/client';
-import type { CompanyResponse } from '../api/client';
+import { createAnalysis, listDocuments } from '../api/client';
+import type { DocumentResponse } from '../api/client';
 import CompanySetup from '../components/CompanySetup';
-
-const ACTIVE_COMPANY_KEY = 'aucctus_active_company_id';
+import { useCompany } from '../context/CompanyContext';
 
 const FRAMING_SUGGESTIONS = [
   'Should we pursue this opportunity?',
@@ -17,50 +15,66 @@ const FRAMING_SUGGESTIONS = [
   'What are the major risks or unknowns?',
 ];
 
+type Step = 'market' | 'framing' | 'documents' | 'context' | 'review';
+const STEPS: Step[] = ['market', 'framing', 'documents', 'context', 'review'];
+
+const glassInput =
+  'w-full px-5 py-4 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/35 focus:outline-none focus:border-white/40 focus:bg-white/[0.13] transition-all text-base text-center';
+
+const glassTextarea =
+  'w-full px-5 py-4 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/35 focus:outline-none focus:border-white/40 focus:bg-white/[0.13] transition-all text-sm resize-none';
+
 export default function InputPage() {
   const navigate = useNavigate();
-  const [companies, setCompanies] = useState<CompanyResponse[]>([]);
-  const [activeCompany, setActiveCompany] = useState<CompanyResponse | null>(null);
-  const [loadingCompanies, setLoadingCompanies] = useState(true);
+  const { activeCompany, loading: loadingCompanies, addCompany } = useCompany();
   const [showSetup, setShowSetup] = useState(false);
 
+  const [step, setStep] = useState<Step>('market');
   const [marketSpace, setMarketSpace] = useState('');
   const [framingQuestion, setFramingQuestion] = useState('');
   const [additionalContext, setAdditionalContext] = useState('');
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [documents, setDocuments] = useState<DocumentResponse[]>([]);
+  const [selectedDocIds, setSelectedDocIds] = useState<Set<string>>(new Set());
+  const [loadingDocs, setLoadingDocs] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load companies on mount
+  // Load documents when company changes
   useEffect(() => {
-    listCompanies()
-      .then((list) => {
-        setCompanies(list);
-        const savedId = localStorage.getItem(ACTIVE_COMPANY_KEY);
-        const active = list.find((c) => c.id === savedId) || list[0] || null;
-        if (active) {
-          setActiveCompany(active);
-          localStorage.setItem(ACTIVE_COMPANY_KEY, active.id);
-        } else {
-          setShowSetup(true);
-        }
+    if (!activeCompany) return;
+    setLoadingDocs(true);
+    listDocuments(activeCompany.id)
+      .then((docs) => {
+        setDocuments(docs);
+        setSelectedDocIds(new Set(docs.map((d) => d.id)));
       })
-      .catch(() => setShowSetup(true))
-      .finally(() => setLoadingCompanies(false));
-  }, []);
+      .catch(() => setDocuments([]))
+      .finally(() => setLoadingDocs(false));
+  }, [activeCompany?.id]);
 
-  const handleCompanyCreated = (company: CompanyResponse) => {
-    setCompanies((prev) => [...prev, company]);
-    setActiveCompany(company);
-    localStorage.setItem(ACTIVE_COMPANY_KEY, company.id);
-    setShowSetup(false);
+  // Show setup if no company after loading
+  useEffect(() => {
+    if (!loadingCompanies && !activeCompany) setShowSetup(true);
+  }, [loadingCompanies, activeCompany]);
+
+  const effectiveSteps = documents.length > 0
+    ? STEPS
+    : STEPS.filter((s) => s !== 'documents');
+
+  const effectiveIndex = effectiveSteps.indexOf(step);
+  const canAdvance = step !== 'market' || marketSpace.trim().length > 0;
+
+  const goNext = () => {
+    const i = effectiveSteps.indexOf(step);
+    if (i < effectiveSteps.length - 1) setStep(effectiveSteps[i + 1]);
+  };
+  const goBack = () => {
+    const i = effectiveSteps.indexOf(step);
+    if (i > 0) setStep(effectiveSteps[i - 1]);
   };
 
-  const canSubmit = activeCompany && marketSpace.trim() && !submitting;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSubmit || !activeCompany) return;
+  const handleSubmit = async () => {
+    if (!activeCompany || !marketSpace.trim() || submitting) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -78,168 +92,364 @@ export default function InputPage() {
     }
   };
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        if ((e.target as HTMLElement)?.tagName === 'TEXTAREA') return;
+        e.preventDefault();
+        if (step === 'review') handleSubmit();
+        else if (canAdvance) goNext();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [step, canAdvance, marketSpace, activeCompany, submitting, effectiveSteps]);
+
+  const toggleDoc = (docId: string) => {
+    setSelectedDocIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(docId)) next.delete(docId); else next.add(docId);
+      return next;
+    });
+  };
+  const toggleAllDocs = () => {
+    if (selectedDocIds.size === documents.length) setSelectedDocIds(new Set());
+    else setSelectedDocIds(new Set(documents.map((d) => d.id)));
+  };
+
   if (loadingCompanies) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 size={24} className="text-brand animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <Loader2 size={24} className="text-white/40 animate-spin" />
       </div>
     );
   }
 
   if (showSetup || !activeCompany) {
-    return <CompanySetup onComplete={handleCompanyCreated} />;
+    return <CompanySetup onComplete={(company) => { addCompany(company); setShowSetup(false); }} />;
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-1 flex items-start justify-center px-8 pt-12 pb-12">
-        <form onSubmit={handleSubmit} className="w-full max-w-2xl space-y-6">
-          {/* Company profile header */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-white border border-border">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center">
-                <Building2 size={18} className="text-brand" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-text-primary">{activeCompany.name}</p>
-                <p className="text-xs text-text-muted">
-                  {activeCompany.context
-                    ? `Profile: ${activeCompany.context.slice(0, 60)}${activeCompany.context.length > 60 ? '...' : ''}`
-                    : 'No strategic context set'}
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => navigate('/settings')}
-              className="p-2 rounded-lg hover:bg-gray-100 text-text-muted hover:text-text-primary transition-colors"
-              title="Edit company profile"
-            >
-              <Settings size={16} />
-            </button>
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-black">
+      {/* Background blooms */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 60% 40% at 25% -5%, rgba(220,38,38,0.35) 0%, transparent 70%),' +
+            'radial-gradient(ellipse 45% 30% at 78% -8%, rgba(236,72,153,0.22) 0%, transparent 65%),' +
+            'radial-gradient(ellipse 30% 20% at 55% 2%, rgba(251,113,133,0.12) 0%, transparent 60%)',
+        }}
+      />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.03]"
+        style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")', backgroundRepeat: 'repeat' }}
+      />
+
+      {/* Main content */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 py-16">
+        <div className="w-full max-w-lg">
+          {/* Progress dots */}
+          <div className="flex items-center justify-center gap-2 mb-14">
+            {effectiveSteps.map((s, i) => (
+              <button
+                key={s}
+                onClick={() => { if (i <= effectiveIndex) setStep(s); }}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  s === step
+                    ? 'w-7 bg-white'
+                    : i < effectiveIndex
+                    ? 'w-1.5 bg-white/40 cursor-pointer'
+                    : 'w-1.5 bg-white/15 cursor-default'
+                }`}
+              />
+            ))}
           </div>
 
-          {/* Title */}
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-text-primary">New Opportunity Assessment</h1>
-            <p className="text-sm text-text-secondary mt-1.5">
-              Define a market or adjacency for {activeCompany.name} to evaluate
-            </p>
-          </div>
-
-          {/* Market / Opportunity */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-2">
-              <Target size={16} className="text-text-muted" />
-              Market / Opportunity
-            </label>
-            <input
-              type="text"
-              value={marketSpace}
-              onChange={(e) => setMarketSpace(e.target.value)}
-              placeholder="e.g. AI-Powered Expense Management, Developer Analytics, Cloud Security"
-              className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all text-sm"
-              autoFocus
-            />
-          </div>
-
-          {/* Framing Question */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-2">
-              <HelpCircle size={16} className="text-text-muted" />
-              Framing Question
-              <span className="text-text-muted font-normal">(optional)</span>
-            </label>
-            <input
-              type="text"
-              value={framingQuestion}
-              onChange={(e) => setFramingQuestion(e.target.value)}
-              placeholder="e.g. Should we pursue this? What gives us a right to win?"
-              className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all text-sm"
-            />
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {FRAMING_SUGGESTIONS.map((q) => (
-                <button
-                  key={q}
-                  type="button"
-                  onClick={() => setFramingQuestion(q)}
-                  className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
-                    framingQuestion === q
-                      ? 'border-brand/40 bg-brand/10 text-brand'
-                      : 'border-border text-text-muted hover:border-brand/20 hover:text-text-secondary'
-                  }`}
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Advanced: additional context */}
-          <div>
-            <button
-              type="button"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center gap-1.5 text-xs text-text-muted hover:text-text-secondary transition-colors"
-            >
-              <ChevronDown size={12} className={`transition-transform ${showAdvanced ? '' : '-rotate-90'}`} />
-              Additional context for this assessment
-            </button>
-            {showAdvanced && (
-              <textarea
-                value={additionalContext}
-                onChange={(e) => setAdditionalContext(e.target.value)}
-                placeholder="Any run-specific context, constraints, or focus areas beyond the company profile..."
-                rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-brand/40 transition-all text-sm resize-none mt-2"
+          {/* Step content */}
+          <div className="min-h-[300px]">
+            {step === 'market' && (
+              <StepMarket value={marketSpace} onChange={setMarketSpace} companyName={activeCompany.name} onNext={goNext} />
+            )}
+            {step === 'framing' && (
+              <StepFraming value={framingQuestion} onChange={setFramingQuestion} />
+            )}
+            {step === 'documents' && (
+              <StepDocuments documents={documents} selectedIds={selectedDocIds} loading={loadingDocs} onToggle={toggleDoc} onToggleAll={toggleAllDocs} />
+            )}
+            {step === 'context' && (
+              <StepContext value={additionalContext} onChange={setAdditionalContext} />
+            )}
+            {step === 'review' && (
+              <StepReview
+                companyName={activeCompany.name}
+                marketSpace={marketSpace}
+                framingQuestion={framingQuestion}
+                additionalContext={additionalContext}
+                documentCount={selectedDocIds.size}
+                totalDocuments={documents.length}
+                onEdit={setStep}
               />
             )}
           </div>
 
-          {/* Error */}
           {error && (
-            <div className="bg-nogo-light border border-nogo/20 rounded-xl px-4 py-3 text-sm text-nogo">
-              {error}
-            </div>
+            <p className="text-center text-sm text-red-400 mt-4">{error}</p>
           )}
 
-          {/* Submit */}
+          {/* Navigation */}
+          <div className="flex items-center justify-between mt-10">
+            <button
+              type="button"
+              onClick={goBack}
+              className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                effectiveIndex > 0
+                  ? 'text-white/50 hover:text-white hover:bg-white/10'
+                  : 'invisible'
+              }`}
+            >
+              <ArrowLeft size={14} />
+              Back
+            </button>
+
+            {step === 'review' ? (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={submitting || !marketSpace.trim()}
+                className={`flex items-center gap-2 px-7 py-3 rounded-2xl text-sm font-semibold transition-all ${
+                  !submitting && marketSpace.trim()
+                    ? 'bg-white text-gray-900 hover:bg-white/90 shadow-lg shadow-white/10'
+                    : 'bg-white/10 text-white/30 cursor-not-allowed'
+                }`}
+              >
+                {submitting ? (
+                  <><Loader2 size={15} className="animate-spin" /> Starting...</>
+                ) : (
+                  <><Search size={15} /> Run Assessment <ArrowRight size={14} /></>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={goNext}
+                disabled={!canAdvance}
+                className={`flex items-center gap-1.5 px-6 py-3 rounded-2xl text-sm font-semibold transition-all ${
+                  canAdvance
+                    ? 'bg-white text-gray-900 hover:bg-white/90'
+                    : 'bg-white/10 text-white/30 cursor-not-allowed'
+                }`}
+              >
+                {step === 'market' ? 'Continue' : 'Next'}
+                <ArrowRight size={14} />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+// ── Step 1: Market ──
+
+function StepMarket({ value, onChange, companyName, onNext }: {
+  value: string; onChange: (v: string) => void; companyName: string; onNext: () => void;
+}) {
+  return (
+    <div className="text-center">
+      <h1 className="text-3xl font-bold text-white mb-3 leading-tight">
+        What market should {companyName} explore?
+      </h1>
+      <p className="text-sm text-white/45 mb-10">Enter a market, vertical, or adjacency to evaluate</p>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="e.g. AI-Powered Expense Management, Cloud Security"
+        className={glassInput}
+        autoFocus
+        onKeyDown={(e) => { if (e.key === 'Enter' && value.trim()) { e.preventDefault(); onNext(); } }}
+      />
+      <p className="text-[11px] text-white/25 mt-3">Press Enter to continue</p>
+    </div>
+  );
+}
+
+
+// ── Step 2: Framing Question ──
+
+function StepFraming({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="text-center">
+      <h1 className="text-3xl font-bold text-white mb-3 leading-tight">
+        What question are you trying to answer?
+      </h1>
+      <p className="text-sm text-white/45 mb-10">This focuses the research on what matters most to you</p>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="e.g. Should we pursue this? What gives us a right to win?"
+        className={glassInput}
+        autoFocus
+      />
+      <div className="flex flex-wrap justify-center gap-2 mt-5">
+        {FRAMING_SUGGESTIONS.map((q) => (
           <button
-            type="submit"
-            disabled={!canSubmit}
-            className={`w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all ${
-              canSubmit
-                ? 'bg-brand text-white hover:bg-brand-dark shadow-sm hover:shadow-md cursor-pointer'
-                : 'bg-gray-100 text-text-muted cursor-not-allowed'
+            key={q}
+            type="button"
+            onClick={() => onChange(q)}
+            className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+              value === q
+                ? 'border-white/40 bg-white/20 text-white'
+                : 'border-white/15 text-white/40 hover:border-white/30 hover:text-white/60'
             }`}
           >
-            {submitting ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                Starting Assessment...
-              </>
-            ) : (
-              <>
-                <Search size={16} />
-                Run Opportunity Assessment
-                <ArrowRight size={16} />
-              </>
-            )}
+            {q}
           </button>
-
-          {/* Info */}
-          <div className="bg-gray-50 border border-border rounded-xl p-4">
-            <p className="text-xs text-text-secondary leading-relaxed">
-              <strong className="text-text-primary">How it works:</strong> AI research agents investigate
-              three areas — <strong className="text-text-primary">incumbents</strong>,{' '}
-              <strong className="text-text-primary">emerging competitors</strong>, and{' '}
-              <strong className="text-text-primary">market sizing</strong> — then synthesize a
-              strategic recommendation with conditions for pursuit, key risks, and questions
-              requiring leadership judgment. Your company profile is applied to evaluate strategic fit.
-            </p>
-          </div>
-        </form>
+        ))}
       </div>
+      <p className="text-[11px] text-white/25 mt-5">Optional — skip for a broad assessment</p>
+    </div>
+  );
+}
+
+
+// ── Step 3: Document Selection ──
+
+function StepDocuments({ documents, selectedIds, loading, onToggle, onToggleAll }: {
+  documents: DocumentResponse[]; selectedIds: Set<string>; loading: boolean;
+  onToggle: (id: string) => void; onToggleAll: () => void;
+}) {
+  return (
+    <div className="text-center">
+      <h1 className="text-3xl font-bold text-white mb-3 leading-tight">
+        Which documents should inform this?
+      </h1>
+      <p className="text-sm text-white/45 mb-8">Select company documents to include as context</p>
+
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <Loader2 size={20} className="text-white/40 animate-spin" />
+        </div>
+      ) : (
+        <div className="text-left">
+          <button
+            type="button"
+            onClick={onToggleAll}
+            className="flex items-center gap-2 text-xs font-medium text-white/40 hover:text-white transition-colors mb-3 px-1"
+          >
+            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+              selectedIds.size === documents.length ? 'bg-white/80 border-white/80' : 'border-white/25'
+            }`}>
+              {selectedIds.size === documents.length && <Check size={10} className="text-black" />}
+            </div>
+            {selectedIds.size === documents.length ? 'Deselect all' : 'Select all'}
+          </button>
+          <div className="space-y-2">
+            {documents.map((doc) => {
+              const selected = selectedIds.has(doc.id);
+              return (
+                <button
+                  key={doc.id}
+                  type="button"
+                  onClick={() => onToggle(doc.id)}
+                  className={`w-full flex items-start gap-3 p-3.5 rounded-xl border text-left transition-all ${
+                    selected ? 'border-white/30 bg-white/15' : 'border-white/10 bg-white/5 hover:border-white/20'
+                  }`}
+                >
+                  <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 mt-0.5 ${
+                    selected ? 'bg-white/80 border-white/80' : 'border-white/25'
+                  }`}>
+                    {selected && <Check size={10} className="text-black" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">{doc.filename}</p>
+                    <p className="text-[10px] text-white/35 mt-0.5">{doc.chunkCount} chunks</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-[11px] text-white/25 mt-4 text-center">
+            {selectedIds.size} of {documents.length} selected
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+// ── Step 4: Additional Context ──
+
+function StepContext({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="text-center">
+      <h1 className="text-3xl font-bold text-white mb-3 leading-tight">
+        Any additional context?
+      </h1>
+      <p className="text-sm text-white/45 mb-8">Constraints, focus areas, or details specific to this run</p>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="e.g. North American market only. Sales team has flagged this as a growth area..."
+        rows={4}
+        className={glassTextarea}
+        autoFocus
+      />
+      <p className="text-[11px] text-white/25 mt-3">Optional — your company profile is already applied</p>
+    </div>
+  );
+}
+
+
+// ── Step 5: Review ──
+
+function StepReview({ companyName, marketSpace, framingQuestion, additionalContext, documentCount, totalDocuments, onEdit }: {
+  companyName: string; marketSpace: string; framingQuestion: string;
+  additionalContext: string; documentCount: number; totalDocuments: number;
+  onEdit: (step: Step) => void;
+}) {
+  return (
+    <div>
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-white mb-2">Ready to run</h1>
+        <p className="text-sm text-white/45">Review your assessment parameters</p>
+      </div>
+      <div className="space-y-2">
+        <GlassRow label="Company" value={companyName} />
+        <GlassRow label="Market" value={marketSpace} onEdit={() => onEdit('market')} />
+        <GlassRow label="Framing Question" value={framingQuestion || '—'} muted={!framingQuestion} onEdit={() => onEdit('framing')} />
+        {totalDocuments > 0 && (
+          <GlassRow label="Documents" value={`${documentCount} of ${totalDocuments} included`} muted={documentCount === 0} onEdit={() => onEdit('documents')} />
+        )}
+        <GlassRow label="Additional Context" value={additionalContext || '—'} muted={!additionalContext} onEdit={() => onEdit('context')} />
+      </div>
+    </div>
+  );
+}
+
+
+function GlassRow({ label, value, muted, onEdit }: {
+  label: string; value: string; muted?: boolean; onEdit?: () => void;
+}) {
+  return (
+    <div className="flex items-start justify-between px-4 py-3 rounded-xl border border-white/10 bg-white/[0.08] backdrop-blur-sm group">
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-semibold text-white/35 uppercase tracking-wide mb-0.5">{label}</p>
+        <p className={`text-sm leading-relaxed ${muted ? 'text-white/25 italic' : 'text-white/80'}`}>{value}</p>
+      </div>
+      {onEdit && (
+        <button
+          type="button"
+          onClick={onEdit}
+          className="text-xs text-white/30 hover:text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-3 mt-1"
+        >
+          Edit
+        </button>
+      )}
     </div>
   );
 }
