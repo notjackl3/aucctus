@@ -18,7 +18,6 @@ import {
   TrendingUp,
   AlertTriangle,
   Compass,
-  Layers,
   Trash2,
 } from 'lucide-react';
 import {
@@ -46,7 +45,7 @@ export default function SettingsPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Company form
-  const [companyName, setCompanyName] = useState('');
+  const [, setCompanyName] = useState('');
   const [companyContext, setCompanyContext] = useState('');
   const [contextSaveStatus, setContextSaveStatus] = useState<SaveStatus>('idle');
   const [showNewCompanyForm, setShowNewCompanyForm] = useState(false);

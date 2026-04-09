@@ -24,7 +24,10 @@ import {
   Crosshair,
   Eye,
   RefreshCw,
+  Download,
 } from 'lucide-react';
+import { pdf } from '@react-pdf/renderer';
+import WorkspacePDF from '../components/WorkspacePDF';
 import { getAnalysis, getDecisionQuestions, answerDecisionQuestion, replaceDecisionQuestion, generateDecisionQuestion, applyAnswers, getOperation } from '../api/client';
 import type {
   AnalysisResult,
@@ -63,6 +66,26 @@ export default function WorkspacePage() {
     blockCategory: string;
     blockLabel: string;
   } | null>(null);
+
+  const [generatingPdf, setGeneratingPdf] = useState(false);
+
+  const handleDownloadPdf = useCallback(async () => {
+    if (!data || generatingPdf) return;
+    setGeneratingPdf(true);
+    try {
+      const blob = await pdf(<WorkspacePDF data={data} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const company = data.request.companyName.replace(/\s+/g, '-');
+      const market = data.request.marketSpace.replace(/\s+/g, '-').slice(0, 40);
+      a.href = url;
+      a.download = `${company}-${market}-assessment.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setGeneratingPdf(false);
+    }
+  }, [data, generatingPdf]);
 
   // Decision questions state
   const [questions, setQuestions] = useState<DecisionQuestion[]>([]);
@@ -268,13 +291,28 @@ export default function WorkspacePage() {
               <p className="text-sm text-text-secondary">{data.request.marketSpace}</p>
             </div>
           </div>
-          {data.completedAt && (
-            <span className="text-xs text-text-muted">
-              {new Date(data.completedAt).toLocaleDateString('en-US', {
-                month: 'short', day: 'numeric', year: 'numeric',
-              })}
-            </span>
-          )}
+          <div className="flex items-center gap-3">
+            {data.completedAt && (
+              <span className="text-xs text-text-muted">
+                {new Date(data.completedAt).toLocaleDateString('en-US', {
+                  month: 'short', day: 'numeric', year: 'numeric',
+                })}
+              </span>
+            )}
+            <button
+              onClick={handleDownloadPdf}
+              disabled={generatingPdf}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-surface text-sm font-medium text-text-secondary hover:border-brand/40 hover:text-brand hover:bg-brand/[0.03] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Download PDF report"
+            >
+              {generatingPdf ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Download size={14} />
+              )}
+              {generatingPdf ? 'Generating…' : 'Export PDF'}
+            </button>
+          </div>
         </div>
       </div>
 
