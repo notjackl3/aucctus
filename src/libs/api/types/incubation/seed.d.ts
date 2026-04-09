@@ -56,7 +56,7 @@ export interface IConceptSeed {
    */
   anchorThought?: IAnchorThought | IAnchorThoughtWithQuestions;
 
-  /** UUIDs of tagged living personas (max 4) */
+  /** UUIDs of tagged living personas */
   livingPersonaUuids?: string[];
 }
 

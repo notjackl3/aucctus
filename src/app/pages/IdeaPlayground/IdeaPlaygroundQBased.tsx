@@ -42,7 +42,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   // Track if logo animation intro has completed (for showing title)
   const [showLogoTitle, setShowLogoTitle] = useState(false);
-  // Track selected living personas for tagging (max 4)
+  // Track selected living personas for tagging
   const [selectedPersonas, setSelectedPersonas] = useState<MentionItem[]>([]);
 
   // URL parameter handling
@@ -83,7 +83,6 @@ const IdeaPlaygroundQBased: React.FC = () => {
 
   const handlePersonaSelect = useCallback((item: MentionItem) => {
     setSelectedPersonas((prev) => {
-      if (prev.length >= 4) return prev;
       if (prev.some((p) => p.id === item.id)) return prev;
       return [...prev, item];
     });

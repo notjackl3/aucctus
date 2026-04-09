@@ -139,7 +139,6 @@ const CustomerProfile: FunctionComponent = () => {
   const isLastProfile = profiles.length <= 1;
 
   // --- Living persona add/remove management ---
-  const MAX_PERSONAS = 4;
   const { personas: allPersonas, isLoading: personasLoading } = usePersonas();
   const updateMutation = useConceptUpdate();
   const [addPopoverOpen, setAddPopoverOpen] = useState(false);
@@ -154,18 +153,15 @@ const CustomerProfile: FunctionComponent = () => {
     return allPersonas.filter((p) => !taggedUuids.has(p.uuid));
   }, [allPersonas, taggedUuids]);
 
-  const atPersonaLimit = livingPersonaUuids.length >= MAX_PERSONAS;
-
   const handleAddPersona = useCallback(
     (personaUuid: string) => {
-      if (atPersonaLimit) return;
       const newUuids = [...livingPersonaUuids, personaUuid];
       updateMutation.mutate({
         identifier: concept.identifier,
         livingPersonaUuids: newUuids,
       });
     },
-    [atPersonaLimit, concept.identifier, livingPersonaUuids, updateMutation],
+    [concept.identifier, livingPersonaUuids, updateMutation],
   );
 
   const handleRemovePersona = useCallback(
@@ -800,7 +796,7 @@ const CustomerProfile: FunctionComponent = () => {
                         })}
 
                         {/* Add living persona button */}
-                        {!isReadOnly && !atPersonaLimit && (
+                        {!isReadOnly && (
                           <Popover.Root
                             open={addPopoverOpen}
                             onOpenChange={setAddPopoverOpen}
@@ -852,8 +848,7 @@ const CustomerProfile: FunctionComponent = () => {
                               >
                                 <div className='aucctus-border-secondary border-b px-3 py-2'>
                                   <p className='aucctus-text-xs-medium aucctus-text-secondary'>
-                                    Add Living Persona ({livingPersonas.length}/
-                                    {MAX_PERSONAS})
+                                    Add Living Persona ({livingPersonas.length})
                                   </p>
                                 </div>
                                 <div className='max-h-48 overflow-y-auto p-1'>

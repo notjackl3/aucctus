@@ -121,10 +121,9 @@ const LandingView: React.FC<LandingViewProps> = ({
   }, []);
 
   const togglePersonaMenu = useCallback(() => {
-    if (selectedPersonas.length >= 4) return;
     setShowPersonaMenu((prev) => !prev);
     setPersonaQuery('');
-  }, [selectedPersonas.length]);
+  }, []);
 
   const validateFile = (file: File): boolean => {
     // Check file size
@@ -320,17 +319,15 @@ const LandingView: React.FC<LandingViewProps> = ({
                       onClick={togglePersonaMenu}
                       className={cn(
                         'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors',
-                        selectedPersonas.length >= 4
-                          ? 'cursor-not-allowed border-white/10 text-white/20'
-                          : showPersonaMenu
-                            ? 'border-white/30 bg-white/10 text-white/70'
-                            : 'border-white/15 text-white/40 hover:bg-white/[0.08] hover:text-white/70',
+                        showPersonaMenu
+                          ? 'border-white/30 bg-white/10 text-white/70'
+                          : 'border-white/15 text-white/40 hover:bg-white/[0.08] hover:text-white/70',
                       )}
                     >
                       <Users className='h-3 w-3' />
                       <span>
                         {selectedPersonas.length > 0
-                          ? `Personas (${selectedPersonas.length}/4)`
+                          ? `Personas (${selectedPersonas.length})`
                           : 'Add Personas'}
                       </span>
                     </button>

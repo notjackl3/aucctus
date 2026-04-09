@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Popover from '@radix-ui/react-popover';
 import { Plus, X, Users, Check } from 'lucide-react';
-import { cn } from '@libs/utils/react';
 import { usePersonas } from '@hooks/query/persona.hook';
 import { useConceptUpdate } from '@hooks/query/concepts.hook';
 import type { IConcept } from '@libs/api/types/concept/concepts';
@@ -12,8 +11,6 @@ interface ConceptPersonaTagsProps {
   concept: IConcept;
   isReadOnly?: boolean;
 }
-
-const MAX_PERSONAS = 4;
 
 const ConceptPersonaTags: React.FC<ConceptPersonaTagsProps> = ({
   concept,
@@ -38,18 +35,15 @@ const ConceptPersonaTags: React.FC<ConceptPersonaTagsProps> = ({
     return allPersonas.filter((p) => !taggedUuids.has(p.uuid));
   }, [allPersonas, taggedUuids]);
 
-  const atLimit = taggedPersonas.length >= MAX_PERSONAS;
-
   const handleAdd = useCallback(
     (personaUuid: string) => {
-      if (atLimit) return;
       const newUuids = [...(concept.livingPersonaUuids ?? []), personaUuid];
       updateMutation.mutate({
         identifier: concept.identifier,
         livingPersonaUuids: newUuids,
       });
     },
-    [atLimit, concept.identifier, concept.livingPersonaUuids, updateMutation],
+    [concept.identifier, concept.livingPersonaUuids, updateMutation],
   );
 
   const handleRemove = useCallback(
@@ -121,20 +115,12 @@ const ConceptPersonaTags: React.FC<ConceptPersonaTagsProps> = ({
           <Popover.Trigger asChild>
             <button
               type='button'
-              disabled={atLimit}
-              className={cn(
-                'aucctus-border-secondary inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors',
-                atLimit
-                  ? 'aucctus-text-tertiary cursor-not-allowed opacity-50'
-                  : 'aucctus-text-secondary aucctus-bg-secondary-hover cursor-pointer',
-              )}
+              className='aucctus-border-secondary aucctus-text-secondary aucctus-bg-secondary-hover inline-flex cursor-pointer items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors'
             >
               {taggedPersonas.length > 0 ? (
                 <>
                   <Plus size={12} />
-                  <span>
-                    {taggedPersonas.length}/{MAX_PERSONAS}
-                  </span>
+                  <span>{taggedPersonas.length}</span>
                 </>
               ) : (
                 <>
@@ -154,7 +140,7 @@ const ConceptPersonaTags: React.FC<ConceptPersonaTagsProps> = ({
             >
               <div className='aucctus-border-secondary border-b px-3 py-2'>
                 <p className='aucctus-text-xs-medium aucctus-text-secondary'>
-                  Tag Personas ({taggedPersonas.length}/{MAX_PERSONAS})
+                  Tag Personas ({taggedPersonas.length})
                 </p>
               </div>
               <div className='max-h-48 overflow-y-auto p-1'>
@@ -164,9 +150,7 @@ const ConceptPersonaTags: React.FC<ConceptPersonaTagsProps> = ({
                   </p>
                 ) : availablePersonas.length === 0 ? (
                   <p className='aucctus-text-tertiary px-3 py-2 text-xs'>
-                    {atLimit
-                      ? 'Maximum personas reached'
-                      : 'No more personas available'}
+                    No more personas available
                   </p>
                 ) : (
                   availablePersonas.map((persona) => (
@@ -174,11 +158,7 @@ const ConceptPersonaTags: React.FC<ConceptPersonaTagsProps> = ({
                       key={persona.uuid}
                       type='button'
                       onClick={() => handleAdd(persona.uuid)}
-                      disabled={atLimit}
-                      className={cn(
-                        'aucctus-bg-secondary-hover flex w-full items-center gap-2 rounded-md px-3 py-2 text-left transition-colors',
-                        atLimit && 'cursor-not-allowed opacity-50',
-                      )}
+                      className='aucctus-bg-secondary-hover flex w-full items-center gap-2 rounded-md px-3 py-2 text-left transition-colors'
                     >
                       {persona.avatar ? (
                         <img
