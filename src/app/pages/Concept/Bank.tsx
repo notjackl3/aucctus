@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 
-import { Badge, Header, Input, Modal, Table } from '@components';
+import { Header, Input, Modal, Table } from '@components';
 import { toast } from '@components/Notification/toast';
 import CompactFilterRibbon from '@components/Tables/ConceptBank/CompactFilterRibbon';
 import { useModal } from '@context/ModalContextProvider';
@@ -604,7 +604,6 @@ const ConceptBank: React.FC = () => {
                 })}
               />
               Portfolio
-              <Badge.Beta size='xs' />
             </button>
             <button
               className={cn('btn btn-sm', {
@@ -634,7 +633,6 @@ const ConceptBank: React.FC = () => {
                 })}
               />
               Submissions
-              <Badge.Beta size='xs' />
             </button>
             <button
               className={cn('btn btn-sm', {
