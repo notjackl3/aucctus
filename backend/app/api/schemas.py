@@ -151,6 +151,7 @@ class AnalysisSummaryResponse(CamelModel):
     score: int | None = None
     confidence_level: str | None = None
     confidence_score: int | None = None
+    headline: str | None = None
     created_at: str
     completed_at: str | None = None
 

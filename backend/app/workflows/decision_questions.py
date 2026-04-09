@@ -384,6 +384,14 @@ async def resynthesize_with_answers(
     # Build user input context
     user_input_context = _build_user_input_context(answered)
 
+    # Load past ask-about-selection interactions for richer context
+    interactions = await repo.get_recent_interactions(analysis_id, limit=6)
+    if interactions:
+        interaction_lines = []
+        for i in reversed(interactions):
+            interaction_lines.append(f"- User asked: {i['user_input'][:120]}\n  Answer: {i['ai_response'][:150]}")
+        user_input_context += "\n\nPrior workspace interactions:\n" + "\n".join(interaction_lines)
+
     # Build research summary (reused from existing data)
     research_summary = _build_research_summary(incumbents_data, emerging_data, market_data)
 

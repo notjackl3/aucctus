@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from app.persistence import repositories as repo
 from app.retrieval import retriever
 from app.services import llm
+from app.workflows.user_memory import build_user_memory_context
 
 logger = logging.getLogger(__name__)
 
@@ -112,10 +113,16 @@ async def ask_about_selection(
         analysis_context = _extract_category_context(
             result_data, block_category, analysis.company_name, analysis.market_space)
 
+    # ── Layer 4: User memory (decision answers + past interactions) ──
+    user_memory = await build_user_memory_context(analysis_id)
+
     # ── Assemble prompt ──
     context_sections = [
         f"Company: {analysis.company_name}\nMarket: {analysis.market_space}",
     ]
+
+    if user_memory:
+        context_sections.append(user_memory)
 
     if analysis_context:
         context_sections.append(f"ANALYSIS DATA:\n{analysis_context}")
@@ -136,7 +143,9 @@ async def ask_about_selection(
         "If the evidence is contradictory or insufficient, say so clearly. "
         "Keep your answer under 200 words. "
         "Write in plain text only — no markdown, no asterisks, no bullet symbols. "
-        "Use numbered lists with plain text when listing items."
+        "Use numbered lists with plain text when listing items. "
+        "IMPORTANT: If the user has provided strategic inputs or prior interactions, "
+        "use that context to tailor your answer to their specific perspective and choices."
     )
 
     user_prompt = (
@@ -147,9 +156,20 @@ async def ask_about_selection(
     )
 
     answer = await llm.chat(prompt=user_prompt, system=system_prompt)
+    answer_text = answer.strip()
+
+    # Save interaction for future memory
+    await repo.save_interaction(
+        analysis_id=analysis_id,
+        interaction_type="ask",
+        user_input=f"[About: {selected_text[:80]}] {question}",
+        ai_response=answer_text[:300],
+        block_category=block_category,
+        block_label=block_label,
+    )
 
     return AskSelectionResult(
-        answer=answer.strip(),
+        answer=answer_text,
         source_ids=list(matched_source_ids)[:10],
         confidence="high" if len(matched_claims) >= 3 else "medium" if matched_claims else "low",
     )

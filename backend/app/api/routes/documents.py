@@ -57,6 +57,14 @@ async def upload_document(
     return UploadDocumentResponse(document_id=doc.id, operation_id=operation.id, status="pending")
 
 
+@router.delete("/{document_id}", status_code=204)
+async def delete_document(document_id: str):
+    """Delete a document and all associated chunks, sections, and embeddings."""
+    deleted = await repo.delete_document(document_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+
 @router.get("/by-company/{company_id}", response_model=list[DocumentResponse])
 async def list_documents(company_id: str):
     company = await repo.get_company(company_id)

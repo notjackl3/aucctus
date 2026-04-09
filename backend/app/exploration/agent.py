@@ -17,6 +17,7 @@ from app.retrieval import retriever
 from app.services import llm
 from app.shared.utils import utc_now
 from app.strategy.engine import critique_with_lens
+from app.workflows.user_memory import build_user_memory_context
 
 logger = logging.getLogger(__name__)
 
@@ -114,16 +115,23 @@ async def explore_question(
             priorities = [p.get("priority", "") for p in strategy_lens.get("strategicPriorities", [])[:3]]
             lens_context = f"\nCompany strategy: {', '.join(priorities)}"
 
+        # Load user memory (decision answers + prior interactions)
+        user_memory = await build_user_memory_context(workspace.analysis_id)
+        user_memory_block = f"\n{user_memory}\n" if user_memory else ""
+
         prompt = (
             f"Question about {workspace.market_space} (for {workspace.company_name}):\n"
             f"{question.question_text}\n\n"
             f"Existing research context:\n{context_text}\n\n"
             f"New search results:\n{new_evidence}\n\n"
-            f"{lens_context}\n\n"
+            f"{lens_context}\n"
+            f"{user_memory_block}\n"
             f"Provide a thorough, evidence-based answer. Also generate up to "
             f"{INSIGHTS_PER_EXPLORATION_QUESTION} key insights and up to "
             f"{FOLLOW_UPS_PER_QUESTION} follow-up questions that would deepen understanding.\n"
-            f"Each follow-up should have a clear reason explaining why it's worth exploring."
+            f"Each follow-up should have a clear reason explaining why it's worth exploring.\n"
+            f"IMPORTANT: If user strategic inputs or prior interactions are provided above, "
+            f"tailor your answer and insights to reflect those choices and preferences."
         )
 
         try:

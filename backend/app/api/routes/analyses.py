@@ -36,6 +36,7 @@ async def list_analyses():
         score = None
         confidence_level = None
         confidence_score = None
+        headline = None
         if a.result_json:
             try:
                 data = json.loads(a.result_json)
@@ -43,6 +44,7 @@ async def list_analyses():
                 if oa:
                     recommendation = oa.get("recommendation")
                     score = oa.get("score")
+                    headline = oa.get("headline")
                     conf = oa.get("confidence")
                     if conf:
                         confidence_level = conf.get("level")
@@ -53,6 +55,7 @@ async def list_analyses():
             id=a.id, company_name=a.company_name, market_space=a.market_space,
             status=a.status.value, recommendation=recommendation, score=score,
             confidence_level=confidence_level, confidence_score=confidence_score,
+            headline=headline,
             created_at=a.created_at, completed_at=a.completed_at,
         ))
     return results

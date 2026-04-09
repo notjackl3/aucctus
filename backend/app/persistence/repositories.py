@@ -688,6 +688,23 @@ async def update_document(document_id: str, *, summary: str | None = None, chunk
     await db.commit()
 
 
+async def delete_document(document_id: str) -> bool:
+    """Hard-delete a document and all related data (chunks, sections, embeddings)."""
+    db = await get_db()
+    exists = await db.execute_fetchall("SELECT id FROM documents WHERE id = ?", (document_id,))
+    if not exists:
+        return False
+    # Get chunk ids to delete their embeddings
+    chunk_rows = await db.execute_fetchall("SELECT id FROM document_chunks WHERE document_id = ?", (document_id,))
+    for chunk in chunk_rows:
+        await db.execute("DELETE FROM embeddings WHERE entity_id = ?", (chunk["id"],))
+    await db.execute("DELETE FROM document_chunks WHERE document_id = ?", (document_id,))
+    await db.execute("DELETE FROM document_sections WHERE document_id = ?", (document_id,))
+    await db.execute("DELETE FROM documents WHERE id = ?", (document_id,))
+    await db.commit()
+    return True
+
+
 async def get_documents_for_company(company_id: str) -> list[Document]:
     db = await get_db()
     rows = await db.execute_fetchall("SELECT * FROM documents WHERE company_id = ? ORDER BY created_at DESC", (company_id,))
@@ -969,3 +986,36 @@ def _row_to_decision_question(r) -> DecisionQuestion:
         sort_order=r["sort_order"],
         created_at=r["created_at"],
     )
+
+
+# ══════════════════════════════════════════════
+# Workspace Interactions
+# ══════════════════════════════════════════════
+
+async def save_interaction(
+    analysis_id: str,
+    interaction_type: str,
+    user_input: str,
+    ai_response: str,
+    block_category: str | None = None,
+    block_label: str | None = None,
+) -> str:
+    db = await get_db()
+    interaction_id = generate_id("int")
+    now = utc_now()
+    await db.execute(
+        "INSERT INTO workspace_interactions (id, analysis_id, interaction_type, user_input, ai_response, block_category, block_label, created_at) VALUES (?,?,?,?,?,?,?,?)",
+        (interaction_id, analysis_id, interaction_type, user_input, ai_response, block_category, block_label, now),
+    )
+    await db.commit()
+    return interaction_id
+
+
+async def get_recent_interactions(analysis_id: str, limit: int = 10) -> list[dict]:
+    db = await get_db()
+    rows = await db.execute_fetchall(
+        "SELECT interaction_type, user_input, ai_response, block_category, block_label, created_at "
+        "FROM workspace_interactions WHERE analysis_id = ? ORDER BY created_at DESC LIMIT ?",
+        (analysis_id, limit),
+    )
+    return [dict(r) for r in rows]

@@ -271,6 +271,19 @@ CREATE TABLE IF NOT EXISTS decision_questions (
 );
 CREATE INDEX IF NOT EXISTS idx_decision_q_analysis ON decision_questions(analysis_id);
 
+-- ── Workspace interaction memory ──
+CREATE TABLE IF NOT EXISTS workspace_interactions (
+    id              TEXT PRIMARY KEY,
+    analysis_id     TEXT NOT NULL,
+    interaction_type TEXT NOT NULL DEFAULT 'ask',
+    user_input      TEXT NOT NULL,
+    ai_response     TEXT NOT NULL,
+    block_category  TEXT,
+    block_label     TEXT,
+    created_at      TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_interactions_analysis ON workspace_interactions(analysis_id);
+
 -- ── FTS5 for retrieval ──
 CREATE VIRTUAL TABLE IF NOT EXISTS fts_content USING fts5(
     source_id, source_type, text, tokenize='porter'
