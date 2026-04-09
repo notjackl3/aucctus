@@ -215,12 +215,28 @@ class Document:
 
 
 @dataclass
+class DocumentSection:
+    id: str
+    document_id: str
+    section_index: int
+    title: str | None = None
+    section_type: str = "body"
+    text: str = ""
+    summary: str | None = None
+    char_count: int = 0
+    is_boilerplate: bool = False
+    created_at: str = ""
+
+
+@dataclass
 class DocumentChunk:
     id: str
     document_id: str
     chunk_index: int
     text: str
     embedding: list[float] | None = None
+    section_id: str | None = None
+    chunk_type: str = "text"
     created_at: str = ""
 
 

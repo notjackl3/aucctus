@@ -211,6 +211,60 @@ async def get_sources_for_analysis(analysis_id: str) -> list[Source]:
     return [_row_to_source(r) for r in rows]
 
 
+async def find_prior_analyses(market_space: str, max_age_days: int = 30,
+                              exclude_id: str | None = None) -> list[Analysis]:
+    """Find completed analyses for the same or similar market within a time window."""
+    db = await get_db()
+    rows = await db.execute_fetchall(
+        "SELECT * FROM analyses WHERE status = 'completed' "
+        "AND market_space = ? ORDER BY created_at DESC LIMIT 5",
+        (market_space,))
+    results = []
+    from datetime import datetime, timedelta, timezone
+    cutoff = datetime.now(timezone.utc) - timedelta(days=max_age_days)
+    for r in rows:
+        if exclude_id and r["id"] == exclude_id:
+            continue
+        try:
+            created = datetime.fromisoformat(r["created_at"].replace("Z", "+00:00"))
+            if created >= cutoff:
+                results.append(Analysis(
+                    id=r["id"], company_name=r["company_name"], market_space=r["market_space"],
+                    company_context=r["company_context"], status=AnalysisStatus(r["status"]),
+                    result_json=r["result_json"], created_at=r["created_at"],
+                    completed_at=r["completed_at"],
+                ))
+        except (ValueError, TypeError):
+            continue  # skip rows with unparseable dates
+    return results
+
+
+async def get_sources_for_analyses(analysis_ids: list[str]) -> list[Source]:
+    """Get sources from multiple analyses (for evidence reuse)."""
+    if not analysis_ids:
+        return []
+    db = await get_db()
+    placeholders = ",".join("?" for _ in analysis_ids)
+    rows = await db.execute_fetchall(
+        f"SELECT * FROM sources WHERE analysis_id IN ({placeholders}) ORDER BY relevance_score DESC",
+        analysis_ids)
+    return [_row_to_source(r) for r in rows]
+
+
+async def get_claims_for_analyses(analysis_ids: list[str]) -> list[Claim]:
+    """Get claims from multiple analyses (for evidence reuse)."""
+    if not analysis_ids:
+        return []
+    db = await get_db()
+    placeholders = ",".join("?" for _ in analysis_ids)
+    rows = await db.execute_fetchall(
+        f"SELECT * FROM claims WHERE analysis_id IN ({placeholders})", analysis_ids)
+    return [Claim(id=r["id"], analysis_id=r["analysis_id"], statement=r["statement"],
+                  claim_type=ClaimType(r["claim_type"]), entities=json.loads(r["entities_json"]),
+                  source_ids=json.loads(r["source_ids_json"]), confidence_score=r["confidence_score"],
+                  source_count=r["source_count"], created_at=r["created_at"]) for r in rows]
+
+
 def _row_to_source(r) -> Source:
     return Source(
         id=r["id"], analysis_id=r["analysis_id"], url=r["url"], title=r["title"],
@@ -644,25 +698,76 @@ async def get_documents_for_company(company_id: str) -> list[Document]:
 
 
 async def create_document_chunk(document_id: str, chunk_index: int, text: str,
-                                embedding: list[float] | None = None) -> str:
+                                embedding: list[float] | None = None,
+                                section_id: str | None = None,
+                                chunk_type: str = "text") -> str:
     db = await get_db()
     chunk_id = generate_id("chk")
     embedding_json = json.dumps(embedding) if embedding else None
-    await db.execute("INSERT INTO document_chunks (id, document_id, chunk_index, text, embedding_json, created_at) VALUES (?,?,?,?,?,?)",
-                     (chunk_id, document_id, chunk_index, text, embedding_json, utc_now()))
+    await db.execute(
+        "INSERT INTO document_chunks (id, document_id, chunk_index, text, embedding_json, section_id, chunk_type, created_at) "
+        "VALUES (?,?,?,?,?,?,?,?)",
+        (chunk_id, document_id, chunk_index, text, embedding_json, section_id, chunk_type, utc_now()),
+    )
     await db.commit()
     return chunk_id
+
+
+# ── Document Sections ──
+
+async def create_document_section(
+    document_id: str,
+    section_index: int,
+    title: str | None,
+    section_type: str,
+    text: str,
+    summary: str | None = None,
+    char_count: int = 0,
+    is_boilerplate: bool = False,
+) -> str:
+    """Create a document section record. Returns section ID."""
+    db = await get_db()
+    section_id = generate_id("sec")
+    await db.execute(
+        "INSERT INTO document_sections (id, document_id, section_index, title, section_type, text, summary, char_count, is_boilerplate, created_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?)",
+        (section_id, document_id, section_index, title, section_type, text, summary, char_count, int(is_boilerplate), utc_now()),
+    )
+    await db.commit()
+    return section_id
+
+
+async def get_document_sections(document_id: str) -> list[dict]:
+    """Get all sections for a document, ordered by section_index."""
+    db = await get_db()
+    rows = await db.execute_fetchall(
+        "SELECT * FROM document_sections WHERE document_id = ? ORDER BY section_index",
+        (document_id,),
+    )
+    return [dict(r) for r in rows]
+
+
+async def update_section_summary(section_id: str, summary: str) -> None:
+    db = await get_db()
+    await db.execute("UPDATE document_sections SET summary = ? WHERE id = ?", (summary, section_id))
+    await db.commit()
 
 
 # ═══════════════════════════════════════════════════════════════
 # Embeddings Cache
 # ═══════════════════════════════════════════════════════════════
 
-async def save_embedding(source_type: str, source_id: str, text: str, embedding: list[float]) -> None:
+async def save_embedding(source_type: str, source_id: str, text: str, embedding: list[float],
+                         company_id: str | None = None, analysis_id: str | None = None,
+                         section_id: str | None = None) -> None:
     db = await get_db()
     emb_id = generate_id("emb")
-    await db.execute("INSERT OR REPLACE INTO embeddings (id, source_type, source_id, text, embedding_json, created_at) VALUES (?,?,?,?,?,?)",
-                     (emb_id, source_type, source_id, text, json.dumps(embedding), utc_now()))
+    await db.execute(
+        "INSERT OR REPLACE INTO embeddings "
+        "(id, source_type, source_id, text, embedding_json, company_id, analysis_id, section_id, created_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?)",
+        (emb_id, source_type, source_id, text, json.dumps(embedding),
+         company_id, analysis_id, section_id, utc_now()))
     await db.commit()
 
 
@@ -672,8 +777,49 @@ async def get_all_embeddings(source_type: str | None = None) -> list[dict]:
         rows = await db.execute_fetchall("SELECT * FROM embeddings WHERE source_type = ?", (source_type,))
     else:
         rows = await db.execute_fetchall("SELECT * FROM embeddings")
-    return [{"id": r["id"], "source_type": r["source_type"], "source_id": r["source_id"],
-             "text": r["text"], "embedding": json.loads(r["embedding_json"])} for r in rows]
+    return [_embedding_row_to_dict(r) for r in rows]
+
+
+async def get_embeddings_by_company(company_id: str, source_type: str | None = None) -> list[dict]:
+    """Get embeddings scoped to a specific company."""
+    db = await get_db()
+    if source_type:
+        rows = await db.execute_fetchall(
+            "SELECT * FROM embeddings WHERE company_id = ? AND source_type = ?",
+            (company_id, source_type))
+    else:
+        rows = await db.execute_fetchall(
+            "SELECT * FROM embeddings WHERE company_id = ?", (company_id,))
+    return [_embedding_row_to_dict(r) for r in rows]
+
+
+async def get_embeddings_by_section_ids(section_ids: list[str]) -> list[dict]:
+    """Get embeddings for specific section IDs (hierarchical retrieval)."""
+    if not section_ids:
+        return []
+    db = await get_db()
+    placeholders = ",".join("?" for _ in section_ids)
+    rows = await db.execute_fetchall(
+        f"SELECT * FROM embeddings WHERE section_id IN ({placeholders})", section_ids)
+    return [_embedding_row_to_dict(r) for r in rows]
+
+
+async def get_embeddings_by_source_ids(source_ids: list[str]) -> list[dict]:
+    """Get embeddings for specific source IDs."""
+    if not source_ids:
+        return []
+    db = await get_db()
+    placeholders = ",".join("?" for _ in source_ids)
+    rows = await db.execute_fetchall(
+        f"SELECT * FROM embeddings WHERE source_id IN ({placeholders})", source_ids)
+    return [_embedding_row_to_dict(r) for r in rows]
+
+
+def _embedding_row_to_dict(r) -> dict:
+    return {"id": r["id"], "source_type": r["source_type"], "source_id": r["source_id"],
+            "text": r["text"], "embedding": json.loads(r["embedding_json"]),
+            "company_id": r["company_id"] if "company_id" in r.keys() else None,
+            "section_id": r["section_id"] if "section_id" in r.keys() else None}
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -687,13 +833,53 @@ async def index_for_fts(source_id: str, source_type: str, text: str) -> None:
     await db.commit()
 
 
-async def search_fts(query: str, limit: int = 20) -> list[dict]:
+async def search_fts(query: str, limit: int = 20, source_type: str | None = None) -> list[dict]:
+    """Full-text search, optionally filtered by source_type."""
     db = await get_db()
-    rows = await db.execute_fetchall(
-        "SELECT source_id, source_type, text, rank FROM fts_content WHERE fts_content MATCH ? ORDER BY rank LIMIT ?",
-        (query, limit))
+    if source_type:
+        rows = await db.execute_fetchall(
+            "SELECT source_id, source_type, text, rank FROM fts_content "
+            "WHERE fts_content MATCH ? AND source_type = ? ORDER BY rank LIMIT ?",
+            (query, source_type, limit))
+    else:
+        rows = await db.execute_fetchall(
+            "SELECT source_id, source_type, text, rank FROM fts_content "
+            "WHERE fts_content MATCH ? ORDER BY rank LIMIT ?",
+            (query, limit))
     return [{"source_id": r["source_id"], "source_type": r["source_type"],
              "text": r["text"], "rank": r["rank"]} for r in rows]
+
+
+async def get_document_ids_for_company(company_id: str) -> list[str]:
+    """Get all document IDs belonging to a company."""
+    db = await get_db()
+    rows = await db.execute_fetchall(
+        "SELECT id FROM documents WHERE company_id = ?", (company_id,))
+    return [r["id"] for r in rows]
+
+
+async def get_sections_for_documents(document_ids: list[str], boilerplate: bool = False) -> list[dict]:
+    """Get sections for specific documents, optionally excluding boilerplate."""
+    if not document_ids:
+        return []
+    db = await get_db()
+    placeholders = ",".join("?" for _ in document_ids)
+    bp_filter = "" if boilerplate else " AND is_boilerplate = 0"
+    rows = await db.execute_fetchall(
+        f"SELECT * FROM document_sections WHERE document_id IN ({placeholders}){bp_filter}",
+        document_ids)
+    return [dict(r) for r in rows]
+
+
+async def get_chunks_for_sections(section_ids: list[str]) -> list[dict]:
+    """Get chunks belonging to specific sections."""
+    if not section_ids:
+        return []
+    db = await get_db()
+    placeholders = ",".join("?" for _ in section_ids)
+    rows = await db.execute_fetchall(
+        f"SELECT * FROM document_chunks WHERE section_id IN ({placeholders})", section_ids)
+    return [dict(r) for r in rows]
 
 
 # ══════════════════════════════════════════════

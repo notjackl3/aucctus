@@ -23,10 +23,12 @@ import {
   CheckCircle2,
   Crosshair,
   Eye,
+  RefreshCw,
 } from 'lucide-react';
-import { getAnalysis } from '../api/client';
+import { getAnalysis, getDecisionQuestions, answerDecisionQuestion, applyAnswers, getOperation } from '../api/client';
 import type {
   AnalysisResult,
+  DecisionQuestion,
   IncumbentsResult,
   EmergingCompetitorsResult,
   MarketSizingResult,
@@ -62,12 +64,54 @@ export default function WorkspacePage() {
     blockLabel: string;
   } | null>(null);
 
+  // Decision questions state
+  const [questions, setQuestions] = useState<DecisionQuestion[]>([]);
+  const [savingQ, setSavingQ] = useState<Record<string, boolean>>({});
+  const [applyingAnswers, setApplyingAnswers] = useState(false);
+  const [applyError, setApplyError] = useState<string | null>(null);
+  const [applySuccess, setApplySuccess] = useState(false);
+
   useEffect(() => {
     if (!id) { setError('No analysis ID'); setLoading(false); return; }
-    getAnalysis(id)
-      .then(setData)
+    Promise.all([getAnalysis(id), getDecisionQuestions(id).catch(() => [] as DecisionQuestion[])])
+      .then(([analysis, qs]) => { setData(analysis); setQuestions(qs); })
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load'))
       .finally(() => setLoading(false));
+  }, [id]);
+
+  const handleAnswerQuestion = useCallback(async (questionId: string, value: string) => {
+    if (!id) return;
+    setSavingQ((prev) => ({ ...prev, [questionId]: true }));
+    try {
+      const updated = await answerDecisionQuestion(id, questionId, value);
+      setQuestions((prev) => prev.map((q) => (q.id === questionId ? { ...q, answerValue: updated.answerValue } : q)));
+      setApplySuccess(false);
+    } catch { /* user can retry */ }
+    finally { setSavingQ((prev) => ({ ...prev, [questionId]: false })); }
+  }, [id]);
+
+  const handleApplyAnswers = useCallback(async () => {
+    if (!id) return;
+    setApplyingAnswers(true);
+    setApplyError(null);
+    setApplySuccess(false);
+    try {
+      const result = await applyAnswers(id);
+      for (let i = 0; i < 60; i++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        const op = await getOperation(result.operationId);
+        if (op.status === 'completed') {
+          const analysis = await getAnalysis(id);
+          setData(analysis);
+          setApplySuccess(true);
+          return;
+        }
+        if (op.status === 'error') { setApplyError(op.errorMessage || 'Re-synthesis failed'); return; }
+      }
+      setApplyError('Timed out waiting for update');
+    } catch (err) {
+      setApplyError(err instanceof Error ? err.message : 'Failed to apply answers');
+    } finally { setApplyingAnswers(false); }
   }, [id]);
 
   const pinFinding = useCallback((finding: Omit<PinnedFinding, 'id'>) => {
@@ -205,7 +249,6 @@ export default function WorkspacePage() {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold text-text-primary">{data.request.companyName}</h1>
-                {assessment && <RecommendationBadge recommendation={assessment.recommendation} />}
               </div>
               <p className="text-sm text-text-secondary">{data.request.marketSpace}</p>
             </div>
@@ -224,15 +267,21 @@ export default function WorkspacePage() {
         <div className="flex gap-6">
           {/* Left column: recommendation + research + analysis */}
           <div className="w-80 shrink-0 space-y-1">
-            {/* Strategic Recommendation hero */}
+            {/* Strategic Score hero — click to return to overview */}
             {assessment && (
-              <div className="p-5 rounded-xl bg-white border border-border mb-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-semibold text-text-muted uppercase tracking-wide">Strategic Recommendation</span>
-                  <ScoreGauge score={assessment.score} size="sm" />
+              <button
+                onClick={() => setActiveCategory(null)}
+                className={`w-full text-left p-5 rounded-xl border mb-4 transition-all group ${
+                  activeCategory === null
+                    ? 'bg-white border-brand/40 shadow-md shadow-brand/5'
+                    : 'bg-white border-border hover:border-brand/30 hover:shadow-sm cursor-pointer'
+                }`}
+              >
+                <span className="text-xs font-semibold text-text-muted uppercase tracking-wide">Strategic Score</span>
+                <div className="flex justify-center mt-3 mb-2">
+                  <ScoreGauge score={assessment.score} size="lg" />
                 </div>
-                <RecommendationBadge recommendation={assessment.recommendation} size="lg" />
-                <p className="text-sm text-text-secondary leading-relaxed mt-3">
+                <p className="text-sm text-text-secondary leading-relaxed mt-3 group-hover:text-text-primary transition-colors">
                   {assessment.headline}
                 </p>
                 {/* Key signals at a glance */}
@@ -254,10 +303,7 @@ export default function WorkspacePage() {
                     </div>
                   )}
                 </div>
-                <div className="mt-3">
-                  <ConfidenceBadge confidence={assessment.confidence} />
-                </div>
-              </div>
+              </button>
             )}
 
             {/* Research Foundation */}
@@ -302,27 +348,6 @@ export default function WorkspacePage() {
               </>
             )}
 
-            {/* Decision Questions link */}
-            {id && (
-              <button
-                onClick={() => navigate(`/workspace/${id}/decisions`)}
-                className="w-full mt-2 flex items-center gap-2.5 p-3.5 rounded-xl border border-dashed border-brand/30 bg-brand/[0.02] hover:bg-brand/5 hover:border-brand/50 transition-colors group"
-              >
-                <div className="w-7 h-7 rounded-lg bg-brand/10 flex items-center justify-center shrink-0">
-                  <HelpCircle size={14} className="text-brand" />
-                </div>
-                <div className="text-left flex-1">
-                  <p className="text-sm font-medium text-text-primary group-hover:text-brand transition-colors">
-                    Decision Questions
-                  </p>
-                  <p className="text-[10px] text-text-muted">
-                    Refine the recommendation with your strategic judgment
-                  </p>
-                </div>
-                <ChevronRight size={14} className="text-text-muted group-hover:text-brand transition-colors" />
-              </button>
-            )}
-
             {/* Footer */}
             <div className="pt-4">
               <button onClick={() => navigate('/')}
@@ -339,6 +364,13 @@ export default function WorkspacePage() {
                 assessment={assessment}
                 weakestArea={weakestArea}
                 onSelectCategory={setActiveCategory}
+                questions={questions}
+                savingQ={savingQ}
+                onAnswerQuestion={handleAnswerQuestion}
+                applyingAnswers={applyingAnswers}
+                applyError={applyError}
+                applySuccess={applySuccess}
+                onApplyAnswers={handleApplyAnswers}
               />
             ) : activeCategory === 'incumbents' && incumbents ? (
               <IncumbentsDetail data={incumbents} />
@@ -355,6 +387,13 @@ export default function WorkspacePage() {
                 assessment={assessment}
                 weakestArea={weakestArea}
                 onSelectCategory={setActiveCategory}
+                questions={questions}
+                savingQ={savingQ}
+                onAnswerQuestion={handleAnswerQuestion}
+                applyingAnswers={applyingAnswers}
+                applyError={applyError}
+                applySuccess={applySuccess}
+                onApplyAnswers={handleApplyAnswers}
               />
             )}
           </div>
@@ -405,10 +444,17 @@ export default function WorkspacePage() {
 
 // ── Overview state (replaces empty detail) ──
 
-function OverviewState({ assessment, weakestArea, onSelectCategory }: {
+function OverviewState({ assessment, weakestArea, onSelectCategory, questions, savingQ, onAnswerQuestion, applyingAnswers, applyError, applySuccess, onApplyAnswers }: {
   assessment?: OpportunityAssessment;
   weakestArea?: { key: CategoryKey; title: string; confidence: ConfidenceIndicator | null };
   onSelectCategory: (key: CategoryKey) => void;
+  questions: DecisionQuestion[];
+  savingQ: Record<string, boolean>;
+  onAnswerQuestion: (questionId: string, value: string) => void;
+  applyingAnswers: boolean;
+  applyError: string | null;
+  applySuccess: boolean;
+  onApplyAnswers: () => void;
 }) {
   if (!assessment) {
     return (
@@ -505,54 +551,72 @@ function OverviewState({ assessment, weakestArea, onSelectCategory }: {
         </div>
       </div>
 
-      {/* What to inspect next — guidance */}
-      <div className="bg-gray-50 rounded-xl border border-border p-4">
-        <h3 className="text-xs font-semibold text-text-primary mb-2 flex items-center gap-2">
-          <Eye size={12} className="text-brand" />
-          Where to Look Next
-        </h3>
-        <div className="space-y-2">
-          {weakestArea && weakestArea.confidence && (
-            <button
-              onClick={() => onSelectCategory(weakestArea.key as CategoryKey)}
-              className="w-full text-left flex items-center gap-3 p-2.5 rounded-lg hover:bg-white transition-colors group"
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-maybe shrink-0" />
-              <div className="flex-1">
-                <span className="text-xs font-medium text-text-primary group-hover:text-brand transition-colors">
-                  Review {weakestArea.title}
-                </span>
-                <span className="text-xs text-text-muted ml-1.5">
-                  — lowest confidence ({weakestArea.confidence.score}%)
-                </span>
+      {/* Decision Questions — inline */}
+      {questions.length > 0 && (
+        <div className="bg-white rounded-2xl border border-border p-5">
+          <div className="flex items-center justify-between mb-1">
+            <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+              <HelpCircle size={14} className="text-brand" />
+              Decision Questions
+            </h3>
+            <span className="text-[10px] text-text-muted">
+              {questions.filter((q) => q.answerValue !== null).length}/{questions.length} answered
+            </span>
+          </div>
+          <p className="text-xs text-text-muted mb-4">
+            Answer these to refine the recommendation with your strategic judgment.
+          </p>
+          <div className="space-y-3">
+            {questions.map((q) => (
+              <InlineQuestionCard
+                key={q.id}
+                question={q}
+                saving={savingQ[q.id] || false}
+                onAnswer={(v) => onAnswerQuestion(q.id, v)}
+              />
+            ))}
+          </div>
+
+          {/* Apply footer */}
+          {questions.some((q) => q.answerValue !== null) && (
+            <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-text-primary">
+                  {applySuccess ? 'Assessment updated.' : 'Ready to update assessment'}
+                </p>
+                <p className="text-[10px] text-text-muted mt-0.5">
+                  {applySuccess ? 'Score reflects your inputs.' : 'Re-runs synthesis only — no new research.'}
+                </p>
               </div>
-              <ChevronRight size={12} className="text-text-muted group-hover:text-brand" />
-            </button>
+              <button
+                onClick={onApplyAnswers}
+                disabled={applyingAnswers || applySuccess}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                  applySuccess
+                    ? 'bg-go-light text-go cursor-default'
+                    : applyingAnswers
+                      ? 'bg-brand/10 text-brand cursor-wait'
+                      : 'bg-brand text-white hover:bg-brand-dark'
+                }`}
+              >
+                {applyingAnswers ? (
+                  <><Loader2 size={12} className="animate-spin" /> Updating...</>
+                ) : applySuccess ? (
+                  <><CheckCircle2 size={12} /> Applied</>
+                ) : (
+                  <><RefreshCw size={12} /> Update Assessment</>
+                )}
+              </button>
+            </div>
           )}
-          {assessment.needsLeadershipInput && assessment.needsLeadershipInput.length > 0 && (
-            <button
-              onClick={() => onSelectCategory('risks')}
-              className="w-full text-left flex items-center gap-3 p-2.5 rounded-lg hover:bg-white transition-colors group"
-            >
-              <div className="w-1.5 h-1.5 rounded-full bg-nogo shrink-0" />
-              <div className="flex-1">
-                <span className="text-xs font-medium text-text-primary group-hover:text-brand transition-colors">
-                  {assessment.needsLeadershipInput.length} question{assessment.needsLeadershipInput.length > 1 ? 's' : ''} requiring leadership judgment
-                </span>
-              </div>
-              <ChevronRight size={12} className="text-text-muted group-hover:text-brand" />
-            </button>
-          )}
-          {assessment.whiteSpaceOpportunities.length > 0 && (
-            <div className="flex items-start gap-3 p-2.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-brand mt-1 shrink-0" />
-              <span className="text-xs text-text-secondary">
-                {assessment.whiteSpaceOpportunities.length} white space opportunit{assessment.whiteSpaceOpportunities.length > 1 ? 'ies' : 'y'} identified — review in research detail
-              </span>
+          {applyError && (
+            <div className="mt-2 flex items-center gap-1.5 text-xs text-nogo">
+              <AlertTriangle size={12} />
+              {applyError}
             </div>
           )}
         </div>
-      </div>
+      )}
     </div>
     </SelectableBlock>
   );
@@ -567,6 +631,153 @@ function ListItem({ text, dotColor }: { text: string; dotColor: string }) {
       <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${dotColor}`} />
       <span className="text-sm text-text-secondary leading-relaxed">{text}</span>
     </li>
+  );
+}
+
+
+// ── Inline Decision Question Card ──
+
+const IMPORTANCE_COLORS: Record<string, { bg: string; text: string }> = {
+  high: { bg: 'bg-nogo-light', text: 'text-nogo' },
+  medium: { bg: 'bg-maybe-light', text: 'text-maybe' },
+  low: { bg: 'bg-gray-100', text: 'text-text-muted' },
+};
+
+function InlineQuestionCard({ question: q, saving, onAnswer }: {
+  question: DecisionQuestion;
+  saving: boolean;
+  onAnswer: (value: string) => void;
+}) {
+  const [draft, setDraft] = useState(q.answerValue || '');
+  const imp = IMPORTANCE_COLORS[q.importance] || IMPORTANCE_COLORS.medium;
+  const isAnswered = q.answerValue !== null;
+
+  return (
+    <div className={`rounded-lg border p-3.5 transition-colors ${
+      isAnswered ? 'border-go/30 bg-go/[0.02]' : 'border-border'
+    }`}>
+      <div className="flex items-start justify-between gap-2 mb-1.5">
+        <p className="text-xs font-medium text-text-primary leading-snug">{q.questionText}</p>
+        <div className="flex items-center gap-1 shrink-0">
+          <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${imp.bg} ${imp.text}`}>
+            {q.importance}
+          </span>
+          {isAnswered && <CheckCircle2 size={12} className="text-go" />}
+        </div>
+      </div>
+      <p className="text-[10px] text-text-muted mb-2.5">{q.decisionImpact}</p>
+
+      {q.answerType === 'scale_1_5' && (
+        <InlineScaleInput value={q.answerValue} saving={saving} onSelect={onAnswer} />
+      )}
+      {q.answerType === 'yes_no' && (
+        <InlineYesNoInput value={q.answerValue} saving={saving} onSelect={onAnswer} />
+      )}
+      {q.answerType === 'multiple_choice' && q.choices && (
+        <InlineMultipleChoiceInput choices={q.choices} value={q.answerValue} saving={saving} onSelect={onAnswer} />
+      )}
+      {q.answerType === 'short_text' && (
+        <div className="flex gap-1.5">
+          <input
+            type="text"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="Type your answer..."
+            className="flex-1 text-xs px-2.5 py-2 rounded-lg border border-border bg-white text-text-primary placeholder-text-muted focus:outline-none focus:border-brand/40 focus:ring-1 focus:ring-brand/20"
+          />
+          <button
+            onClick={() => draft.trim() && onAnswer(draft.trim())}
+            disabled={!draft.trim() || saving}
+            className="px-3 py-2 rounded-lg text-xs font-medium bg-brand text-white hover:bg-brand-dark disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {saving ? <Loader2 size={12} className="animate-spin" /> : 'Save'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InlineScaleInput({ value, saving, onSelect }: {
+  value: string | null; saving: boolean; onSelect: (v: string) => void;
+}) {
+  const labels = ['Very Low', 'Low', 'Moderate', 'High', 'Very High'];
+  return (
+    <div className="flex gap-1.5">
+      {[1, 2, 3, 4, 5].map((n) => {
+        const selected = value === String(n);
+        return (
+          <button
+            key={n}
+            onClick={() => onSelect(String(n))}
+            disabled={saving}
+            className={`flex-1 py-2 rounded-lg text-xs font-medium border transition-all ${
+              selected
+                ? 'bg-brand text-white border-brand shadow-sm'
+                : 'bg-white text-text-secondary border-border hover:border-brand/30 hover:bg-brand/5'
+            } disabled:opacity-50`}
+            title={labels[n - 1]}
+          >
+            {n}
+            <span className="block text-[9px] opacity-70 mt-0.5">{labels[n - 1]}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function InlineYesNoInput({ value, saving, onSelect }: {
+  value: string | null; saving: boolean; onSelect: (v: string) => void;
+}) {
+  return (
+    <div className="flex gap-1.5">
+      {['Yes', 'No'].map((opt) => {
+        const selected = value === opt;
+        return (
+          <button
+            key={opt}
+            onClick={() => onSelect(opt)}
+            disabled={saving}
+            className={`flex-1 py-2 rounded-lg text-xs font-medium border transition-all ${
+              selected
+                ? opt === 'Yes'
+                  ? 'bg-go text-white border-go shadow-sm'
+                  : 'bg-nogo text-white border-nogo shadow-sm'
+                : 'bg-white text-text-secondary border-border hover:border-brand/30 hover:bg-brand/5'
+            } disabled:opacity-50`}
+          >
+            {opt}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function InlineMultipleChoiceInput({ choices, value, saving, onSelect }: {
+  choices: string[]; value: string | null; saving: boolean; onSelect: (v: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {choices.map((choice) => {
+        const selected = value === choice;
+        return (
+          <button
+            key={choice}
+            onClick={() => onSelect(choice)}
+            disabled={saving}
+            className={`px-3 py-2 rounded-lg text-xs font-medium border transition-all ${
+              selected
+                ? 'bg-brand text-white border-brand shadow-sm'
+                : 'bg-white text-text-secondary border-border hover:border-brand/30 hover:bg-brand/5'
+            } disabled:opacity-50`}
+          >
+            {choice}
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -620,9 +831,7 @@ function IncumbentsDetail({ data }: { data: IncumbentsResult }) {
                 </div>
                 <div className="flex items-center gap-4 shrink-0">
                   {player.estimatedRevenue && (
-                    <span className="flex items-center gap-1 text-xs text-text-muted">
-                      <DollarSign size={12} />{player.estimatedRevenue}
-                    </span>
+                    <span className="text-xs text-text-muted">{player.estimatedRevenue}</span>
                   )}
                   {player.founded && (
                     <span className="flex items-center gap-1 text-xs text-text-muted">
@@ -672,6 +881,16 @@ function IncumbentsDetail({ data }: { data: IncumbentsResult }) {
 // ── Emerging Competitors Detail ──
 
 function EmergingDetail({ data }: { data: EmergingCompetitorsResult }) {
+  const [expandedComps, setExpandedComps] = useState<Set<string>>(new Set());
+
+  const toggleComp = (name: string) => {
+    setExpandedComps((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name); else next.add(name);
+      return next;
+    });
+  };
+
   return (
     <SelectableBlock blockId="emerging" category="emerging_competitors" label="Emerging Competitors">
       <div className="space-y-4">
@@ -683,58 +902,63 @@ function EmergingDetail({ data }: { data: EmergingCompetitorsResult }) {
             </h2>
             <ConfidenceBadge confidence={data.confidence} />
           </div>
-          <p className="text-xs text-text-secondary leading-relaxed mb-4">{data.summary}</p>
-
-          <div className="flex gap-3">
-            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-gray-50 border border-border">
-              <DollarSign size={14} className="text-brand" />
-              <div>
-                <p className="text-sm font-bold text-text-primary">{data.totalFundingInSpace}</p>
-                <p className="text-[10px] text-text-muted">Total Funding</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-gray-50 border border-border">
-              <TrendingUp size={14} className="text-brand" />
-              <div>
-                <p className="text-sm font-bold text-text-primary capitalize">{data.fundingTrend}</p>
-                <p className="text-[10px] text-text-muted">Trend</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-gray-50 border border-border">
-              <Users size={14} className="text-brand" />
-              <div>
-                <p className="text-sm font-bold text-text-primary">{data.competitors.length}</p>
-                <p className="text-[10px] text-text-muted">Startups</p>
-              </div>
-            </div>
-          </div>
+          <p className="text-xs text-text-secondary leading-relaxed mb-2">{data.summary}</p>
+          <p className="text-[10px] text-text-muted">{data.competitors.length} startups · {data.totalFundingInSpace} total funding · <span className="capitalize">{data.fundingTrend}</span> trend</p>
         </div>
 
-        {data.competitors.map((comp) => (
-          <div key={comp.name} className="bg-white rounded-xl border border-border p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm font-semibold text-text-primary">{comp.name}</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">
-                {comp.fundingStage}
-              </span>
-              {comp.fundingAmount && (
-                <span className="text-xs text-text-muted">{comp.fundingAmount}</span>
+        {data.competitors.map((comp) => {
+          const isExpanded = expandedComps.has(comp.name);
+          return (
+            <div key={comp.name} className="bg-white rounded-xl border border-border overflow-hidden">
+              <button onClick={() => toggleComp(comp.name)}
+                className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors">
+                {isExpanded
+                  ? <ChevronDown size={16} className="text-text-muted shrink-0" />
+                  : <ChevronRight size={16} className="text-text-muted shrink-0" />
+                }
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-text-primary">{comp.name}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">
+                      {comp.fundingStage}
+                    </span>
+                  </div>
+                  <p className="text-xs text-text-muted mt-0.5 truncate">{comp.description}</p>
+                </div>
+                <div className="flex items-center gap-4 shrink-0">
+                  {comp.fundingAmount && (
+                    <span className="text-xs text-text-muted">{comp.fundingAmount}</span>
+                  )}
+                  {comp.fundingDate && (
+                    <span className="flex items-center gap-1 text-xs text-text-muted">
+                      <Calendar size={12} />{comp.fundingDate}
+                    </span>
+                  )}
+                </div>
+              </button>
+              {isExpanded && (
+                <div className="px-5 pb-5 border-t border-border-light">
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <h4 className="text-xs font-semibold text-brand mb-1.5 uppercase tracking-wide">Differentiator</h4>
+                      <p className="text-xs text-text-secondary leading-relaxed">{comp.differentiator}</p>
+                    </div>
+                    {comp.investors && comp.investors.length > 0 && (
+                      <div>
+                        <h4 className="text-xs font-semibold text-text-muted mb-1.5 uppercase tracking-wide">Investors</h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {comp.investors.map((inv) => (
+                            <span key={inv} className="text-xs px-2 py-0.5 rounded bg-gray-100 text-text-secondary">{inv}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
-            <p className="text-xs text-text-muted mb-2">{comp.description}</p>
-            <div className="bg-gray-50 rounded-lg p-2.5 text-xs text-text-secondary mb-2">
-              <strong className="text-text-primary">Differentiator:</strong> {comp.differentiator}
-            </div>
-            {comp.investors && comp.investors.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-text-muted">Investors:</span>
-                {comp.investors.map((inv) => (
-                  <span key={inv} className="text-xs px-2 py-0.5 rounded bg-gray-100 text-text-secondary">{inv}</span>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
 
         <SourcesBlock sources={data.sources} />
       </div>

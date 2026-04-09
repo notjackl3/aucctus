@@ -54,16 +54,41 @@ async def chat_structured(
     temperature: float = 0.2,
     max_tokens: int = 4096,
 ) -> T:
-    """Chat completion with structured JSON output parsed into a Pydantic model."""
+    """Chat completion with structured JSON output parsed into a Pydantic model.
+
+    Uses OpenAI's native structured output (json_schema response_format) for
+    reliable schema adherence. Falls back to manual JSON mode if the model
+    doesn't support structured outputs.
+    """
     client = _get_client()
     model = model or LLM_MODEL_FAST
 
+    # Try native structured output first (supported by gpt-4o, gpt-4o-mini)
+    try:
+        response = await client.beta.chat.completions.parse(
+            model=model,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=temperature,
+            max_tokens=max_tokens,
+            response_format=response_model,
+        )
+        parsed = response.choices[0].message.parsed
+        if parsed is not None:
+            return parsed
+    except Exception as e:
+        logger.debug(f"Native structured output failed, falling back to JSON mode: {e}")
+
+    # Fallback: manual JSON schema injection
     schema = response_model.model_json_schema()
     schema_str = json.dumps(schema, indent=2)
 
     full_prompt = (
         f"{prompt}\n\n"
-        f"Respond with valid JSON matching this schema:\n```json\n{schema_str}\n```"
+        f"Respond ONLY with a JSON object (not the schema). "
+        f"The JSON must match this schema:\n```json\n{schema_str}\n```"
     )
 
     response = await client.chat.completions.create(

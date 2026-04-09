@@ -69,14 +69,21 @@ async def explore_question(
         await repo.update_operation(operation_id, status=OperationStatus.RUNNING,
                                     current_step="Planning research approach...")
 
-        # 1. Retrieve relevant context from local evidence
+        # 1. Retrieve relevant context from local evidence (hierarchical if company-scoped)
         await repo.update_operation(operation_id, current_step="Retrieving relevant evidence...", steps_completed=1)
-        context_results = await retriever.hybrid_search(question.question_text, workspace_id, limit=15)
-        context_text = "\n\n".join(r.get("text", "")[:500] for r in context_results[:10])
+
+        if workspace.company_id:
+            assembled = await retriever.hierarchical_retrieve(
+                question.question_text, company_id=workspace.company_id, token_budget=3000)
+            context_text = assembled.text
+            local_relevant_count = len(assembled.chunks)
+        else:
+            context_results = await retriever.hybrid_search(question.question_text, workspace_id, limit=15)
+            context_text = "\n\n".join(r.get("text", "")[:500] for r in context_results[:10])
+            local_relevant_count = len(context_results)
 
         # 2. Conditionally search Tavily — only if local evidence is insufficient
         new_evidence = ""
-        local_relevant_count = len(context_results)
 
         if local_relevant_count < _LOCAL_SUFFICIENCY_THRESHOLD:
             from app.services import search as search_svc

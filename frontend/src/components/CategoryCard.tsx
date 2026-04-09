@@ -45,25 +45,29 @@ export default function CategoryCard({
   return (
     <button
       onClick={onClick}
-      className={`group text-left w-full p-4 rounded-xl border transition-all ${
+      className={`group text-left w-full p-4 rounded-xl border transition-all duration-150 ${
         active
-          ? 'bg-surface border-brand/40 shadow-lg shadow-brand/5'
-          : 'bg-surface border-border hover:border-brand/20 hover:shadow-sm'
+          ? 'bg-brand/[0.03] border-brand/40 shadow-md shadow-brand/5'
+          : 'bg-surface border-border hover:border-brand/30 hover:bg-brand/[0.02] hover:shadow-sm'
       }`}
     >
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-brand/10 flex items-center justify-center shrink-0">
+          <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+            active ? 'bg-brand/20' : 'bg-brand/10 group-hover:bg-brand/15'
+          }`}>
             <Icon size={14} className="text-brand" />
           </div>
-          <h3 className="text-sm font-semibold text-text-primary group-hover:text-brand transition-colors">
+          <h3 className={`text-sm font-semibold transition-colors ${
+            active ? 'text-brand' : 'text-text-primary group-hover:text-brand'
+          }`}>
             {title}
           </h3>
         </div>
         <ChevronRight
           size={14}
-          className={`shrink-0 mt-1 transition-colors ${
-            active ? 'text-brand' : 'text-text-muted group-hover:text-brand'
+          className={`shrink-0 mt-1 transition-all duration-150 ${
+            active ? 'text-brand translate-x-0.5' : 'text-text-muted group-hover:text-brand group-hover:translate-x-0.5'
           }`}
         />
       </div>

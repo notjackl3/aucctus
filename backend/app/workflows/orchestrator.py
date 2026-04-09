@@ -2,6 +2,10 @@
 
 Coordinates research agents, updates step/operation status, stores results.
 Supports both real API mode and mock fallback.
+
+Architecture (v4): The orchestrator calls the centralized retrieval service
+first, then passes pre-fetched evidence to each agent. Agents no longer
+call providers directly — they only do LLM extraction + insight building.
 """
 
 import asyncio
@@ -11,14 +15,13 @@ import traceback
 
 from app.agents.base import AgentContext, AgentResult
 from app.agents import incumbents, emerging, market_sizing, synthesis
-from app.config import ANALYSIS_STEPS, DEFAULT_EVALUATION_POSTURE, MAX_REFINEMENT_ATTEMPTS, use_real_apis
+from app.config import ANALYSIS_STEPS, DEFAULT_EVALUATION_POSTURE, use_real_apis
 from app.services.search import get_tavily_stats, reset_tavily_stats
 from app.domain.enums import AnalysisStatus, OperationStatus
-from app.evidence.claims import find_contradictions, merge_duplicate_claims
 from app.mock.data import build_mock_result
 from app.persistence import repositories as repo
-from app.retrieval.coverage import evaluate_coverage
-from app.retrieval.query_planner import build_query_plan, generate_refinement_queries
+from app.retrieval.query_planner import build_query_plan
+from app.retrieval.retrieval_service import retrieve_evidence
 from app.shared.utils import utc_now
 from app.workflows.decision_questions import generate_decision_questions
 
@@ -58,7 +61,12 @@ async def run_analysis(
             evaluation_posture=posture,
         )
 
-        ctx = AgentContext(
+        # ── Centralized retrieval phase ──
+        await repo.update_operation(operation_id, current_step="Retrieving evidence from providers...")
+        evidence = await retrieve_evidence(query_plan, analysis_id)
+
+        # ── Build per-agent contexts with pre-fetched evidence ──
+        base_ctx = dict(
             analysis_id=analysis_id,
             company_name=company_name,
             market_space=market_space,
@@ -68,35 +76,40 @@ async def run_analysis(
             query_plan=query_plan,
         )
 
+        inc_ctx = AgentContext(
+            **base_ctx,
+            prefetched_sources=evidence.incumbents.sources,
+            prefetched_claims=evidence.incumbents.claims,
+            prefetched_confidence=evidence.incumbents.confidence,
+        )
+        emg_ctx = AgentContext(
+            **base_ctx,
+            prefetched_sources=evidence.emerging.sources,
+            prefetched_claims=evidence.emerging.claims,
+            prefetched_confidence=evidence.emerging.confidence,
+        )
+        mkt_ctx = AgentContext(
+            **base_ctx,
+            prefetched_sources=evidence.market_sizing.sources,
+            prefetched_claims=evidence.market_sizing.claims,
+            prefetched_confidence=evidence.market_sizing.confidence,
+        )
+
         steps = await repo.get_analysis_steps(analysis_id)
         step_map = {s.step: s for s in steps}
 
-        # ── Run 3 research agents in parallel ──
-        await repo.update_operation(operation_id, current_step="Researching incumbents, emerging competitors, and market sizing...")
+        # ── Run 3 research agents in parallel (LLM extraction only) ──
+        await repo.update_operation(operation_id, current_step="Analyzing incumbents, emerging competitors, and market sizing...")
 
         for step_key in ["incumbents", "emerging_competitors", "market_sizing"]:
             if step_key in step_map:
                 await repo.update_step_status(step_map[step_key].id, AnalysisStatus.RUNNING, started_at=utc_now())
 
-        inc_task = asyncio.create_task(_run_agent_safe(incumbents.run, ctx, "incumbents"))
-        emg_task = asyncio.create_task(_run_agent_safe(emerging.run, ctx, "emerging_competitors"))
-        mkt_task = asyncio.create_task(_run_agent_safe(market_sizing.run, ctx, "market_sizing"))
+        inc_task = asyncio.create_task(_run_agent_safe(incumbents.run, inc_ctx, "incumbents"))
+        emg_task = asyncio.create_task(_run_agent_safe(emerging.run, emg_ctx, "emerging_competitors"))
+        mkt_task = asyncio.create_task(_run_agent_safe(market_sizing.run, mkt_ctx, "market_sizing"))
 
         inc_result, emg_result, mkt_result = await asyncio.gather(inc_task, emg_task, mkt_task)
-
-        # ── Coverage evaluation + bounded refinement ──
-        coverage = evaluate_coverage({
-            "incumbents": inc_result.sources,
-            "emerging": emg_result.sources,
-            "market_sizing": mkt_result.sources,
-        })
-
-        if coverage.should_refine:
-            logger.info(f"Coverage weak ({coverage.overall_score:.2f}), running refinement for: {coverage.weak_dimensions}")
-            await repo.update_operation(operation_id, current_step="Refining weak coverage areas...")
-            inc_result, emg_result, mkt_result = await _run_refinement(
-                ctx, query_plan, coverage, inc_result, emg_result, mkt_result
-            )
 
         # Mark research steps completed
         completed_count = 0
@@ -109,34 +122,28 @@ async def run_analysis(
 
         await repo.update_operation(operation_id, steps_completed=completed_count, current_step="Running synthesis...")
 
-        # Synthesis step
+        # ── Synthesis (consumes agent results, not evidence directly) ──
+        syn_ctx = AgentContext(**base_ctx)
         if "synthesis" in step_map:
             await repo.update_step_status(step_map["synthesis"].id, AnalysisStatus.RUNNING, started_at=utc_now())
 
         syn_result = await _run_agent_safe(
             lambda c: synthesis.run(c, inc_result.data, emg_result.data, mkt_result.data),
-            ctx, "synthesis"
+            syn_ctx, "synthesis"
         )
 
         if "synthesis" in step_map:
             status = AnalysisStatus.COMPLETED if not syn_result.error else AnalysisStatus.ERROR
             await repo.update_step_status(step_map["synthesis"].id, status, completed_at=utc_now())
 
-        # Persist sources and claims
-        all_sources = inc_result.sources + emg_result.sources + mkt_result.sources
-        all_claims = inc_result.claims + emg_result.claims + mkt_result.claims
-
-        for source in all_sources:
+        # ── Persist evidence (sources, claims, contradictions from retrieval service) ──
+        for source in evidence.all_sources:
             await repo.create_source(source)
 
-        # Dedup and persist claims
-        merged_claims = merge_duplicate_claims(all_claims)
-        for claim in merged_claims:
+        for claim in evidence.all_claims:
             await repo.create_claim(claim)
 
-        # Find contradictions
-        contradictions = find_contradictions(merged_claims, analysis_id)
-        for ctg in contradictions:
+        for ctg in evidence.contradictions:
             await repo.create_contradiction(ctg)
 
         # Build and store result JSON
@@ -203,54 +210,6 @@ async def _run_agent_safe(agent_fn, ctx: AgentContext, step_name: str) -> AgentR
     except Exception as e:
         logger.error(f"Agent {step_name} failed: {e}")
         return AgentResult(step=step_name, data={}, error=str(e))
-
-
-async def _run_refinement(
-    ctx: AgentContext,
-    query_plan,
-    coverage,
-    inc_result: AgentResult,
-    emg_result: AgentResult,
-    mkt_result: AgentResult,
-) -> tuple[AgentResult, AgentResult, AgentResult]:
-    """Run one bounded refinement pass for weak coverage dimensions.
-
-    Generates additional queries from the query plan and runs targeted
-    supplemental searches. Merges new sources into existing results.
-    """
-    from app.evidence.processor import process_search_results
-    from app.services import search as search_svc
-
-    refinement_queries = generate_refinement_queries(query_plan, coverage.weak_dimensions)
-
-    for dim, pq in refinement_queries.items():
-        try:
-            new_sources = []
-            # Run refinement Tavily queries
-            for query in pq.tavily[:1]:  # At most 1 extra Tavily query per weak dim
-                results = await search_svc.search(query, max_results=5)
-                if results:
-                    if dim == "incumbents":
-                        existing_urls = {s.url for s in inc_result.sources}
-                    elif dim == "emerging":
-                        existing_urls = {s.url for s in emg_result.sources}
-                    else:
-                        existing_urls = {s.url for s in mkt_result.sources}
-                    sources = process_search_results(results, ctx.analysis_id, existing_urls)
-                    new_sources.extend(sources)
-
-            if new_sources:
-                if dim == "incumbents":
-                    inc_result.sources.extend(new_sources)
-                elif dim == "emerging":
-                    emg_result.sources.extend(new_sources)
-                elif dim == "market_sizing":
-                    mkt_result.sources.extend(new_sources)
-                logger.info(f"Refinement added {len(new_sources)} sources for {dim}")
-        except Exception as e:
-            logger.warning(f"Refinement for {dim} failed: {e}")
-
-    return inc_result, emg_result, mkt_result
 
 
 async def _run_mock_pipeline(

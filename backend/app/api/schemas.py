@@ -65,7 +65,6 @@ class IncumbentsResultResponse(CamelModel):
     summary: str
     players: list[IncumbentResponse]
     market_concentration: str
-    confidence: ConfidenceIndicatorResponse
     sources: list[SourceResponse]
 
 
@@ -84,7 +83,6 @@ class EmergingCompetitorsResultResponse(CamelModel):
     competitors: list[EmergingCompetitorResponse]
     total_funding_in_space: str
     funding_trend: str
-    confidence: ConfidenceIndicatorResponse
     sources: list[SourceResponse]
 
 
@@ -97,7 +95,6 @@ class MarketSizingResultResponse(CamelModel):
     growth_drivers: list[str]
     constraints: list[str]
     timeframe: str
-    confidence: ConfidenceIndicatorResponse
     sources: list[SourceResponse]
 
 
@@ -110,7 +107,6 @@ class OpportunityAssessmentResponse(CamelModel):
     reasons_to_challenge: list[str]
     white_space_opportunities: list[str]
     key_risks: list[str]
-    confidence: ConfidenceIndicatorResponse
 
 
 class AnalysisRequestResponse(CamelModel):
@@ -398,3 +394,5 @@ class AskAboutSelectionRequest(CamelModel):
 
 class AskAboutSelectionResponse(CamelModel):
     answer: str
+    source_ids: list[str] = []
+    confidence: str = "medium"

@@ -417,21 +417,21 @@ class TestAgentCompatibility:
         assert ctx.query_plan is None
 
     def test_incumbents_fallback_queries(self):
-        """When plan is None, agents should use fallback query templates."""
-        from app.agents.incumbents import _FALLBACK_QUERIES
-        queries = [q.format(market_space="cloud security") for q in _FALLBACK_QUERIES]
+        """Retrieval service should have fallback query templates for incumbents."""
+        from app.retrieval.retrieval_service import _FALLBACK_INCUMBENTS
+        queries = [q.format(market_space="cloud security") for q in _FALLBACK_INCUMBENTS]
         assert len(queries) == 3
         assert any("market leaders" in q for q in queries)
 
     def test_emerging_fallback_queries(self):
-        from app.agents.emerging import _FALLBACK_QUERIES
-        queries = [q.format(market_space="cloud security") for q in _FALLBACK_QUERIES]
+        from app.retrieval.retrieval_service import _FALLBACK_EMERGING
+        queries = [q.format(market_space="cloud security") for q in _FALLBACK_EMERGING]
         assert len(queries) == 3
         assert any("startup" in q or "funding" in q for q in queries)
 
     def test_market_sizing_fallback_queries(self):
-        from app.agents.market_sizing import _FALLBACK_QUERIES
-        queries = [q.format(market_space="cloud security") for q in _FALLBACK_QUERIES]
+        from app.retrieval.retrieval_service import _FALLBACK_MARKET_SIZING
+        queries = [q.format(market_space="cloud security") for q in _FALLBACK_MARKET_SIZING]
         assert len(queries) == 3
         assert any("TAM" in q or "market size" in q for q in queries)
 

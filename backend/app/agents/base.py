@@ -22,6 +22,12 @@ class AgentContext:
     evaluation_posture: str = "established_company"  # established_company | adjacency_expansion | new_market_entry | new_venture
     query_plan: QueryPlan | None = None
 
+    # Pre-fetched evidence from centralized retrieval service.
+    # When populated, agents consume these instead of calling providers directly.
+    prefetched_sources: list[Source] = field(default_factory=list)
+    prefetched_claims: list[Claim] = field(default_factory=list)
+    prefetched_confidence: dict[str, Any] | None = None
+
 
 @dataclass
 class AgentResult:

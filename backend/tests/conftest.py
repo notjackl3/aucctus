@@ -35,6 +35,7 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
     await database._db.execute("PRAGMA foreign_keys=ON")
     await database._db.executescript(database.SCHEMA_SQL)
     await database._db.commit()
+    await database._run_migrations(database._db)
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as c:

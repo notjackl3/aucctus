@@ -31,6 +31,7 @@ interface Props {
 }
 
 export default function ConfidenceBadge({ confidence, showReasoning = false }: Props) {
+  if (!confidence) return null;
   const c = config[confidence.level];
   const Icon = c.icon;
 

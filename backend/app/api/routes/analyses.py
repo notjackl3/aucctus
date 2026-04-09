@@ -278,8 +278,8 @@ async def _run_resynthesis(analysis_id: str, operation_id: str):
 
 @router.post("/{analysis_id}/ask", response_model=AskAboutSelectionResponse)
 async def ask_about_selection(analysis_id: str, req: AskAboutSelectionRequest):
-    """Answer a user question about selected text, grounded in the analysis data."""
-    from app.services.llm import chat
+    """Answer a user question about selected text, grounded in evidence + documents."""
+    from app.workflows.ask_selection import ask_about_selection as _ask
 
     analysis = await repo.get_analysis(analysis_id)
     if not analysis:
@@ -287,68 +287,19 @@ async def ask_about_selection(analysis_id: str, req: AskAboutSelectionRequest):
     if not analysis.result_json:
         raise HTTPException(status_code=400, detail="Analysis has no results yet")
 
-    result_data = json.loads(analysis.result_json)
-
-    # Build bounded context from the analysis result
-    context_parts: list[str] = []
-
-    # Company info
-    context_parts.append(
-        f"Company: {analysis.company_name}\n"
-        f"Market: {analysis.market_space}"
-    )
-    if analysis.company_context:
-        ctx = analysis.company_context[:500]
-        context_parts.append(f"Company context: {ctx}")
-
-    # Pull relevant section based on block category
-    category = req.block_category.lower()
-    if "incumbent" in category and "incumbents" in result_data:
-        inc = result_data["incumbents"]
-        context_parts.append(f"Incumbents summary: {inc.get('summary', '')}")
-        for p in (inc.get("players") or [])[:5]:
-            context_parts.append(f"- {p.get('name')}: {p.get('description', '')}")
-    if "emerging" in category and "emerging_competitors" in result_data:
-        ec = result_data["emerging_competitors"]
-        context_parts.append(f"Emerging competitors summary: {ec.get('summary', '')}")
-        for c in (ec.get("competitors") or [])[:5]:
-            context_parts.append(f"- {c.get('name')}: {c.get('differentiator', '')}")
-    if "market" in category and "market_sizing" in result_data:
-        ms = result_data["market_sizing"]
-        context_parts.append(
-            f"Market sizing: TAM={ms.get('tam','N/A')}, SAM={ms.get('sam','N/A')}, "
-            f"CAGR={ms.get('cagr','N/A')}\n{ms.get('summary','')}"
-        )
-
-    # Always include the opportunity assessment for grounding
-    oa = result_data.get("opportunity_assessment")
-    if oa:
-        context_parts.append(
-            f"Recommendation: {oa.get('recommendation')} (score {oa.get('score')})\n"
-            f"Headline: {oa.get('headline')}\n"
-            f"Reasoning: {oa.get('reasoning','')[:300]}"
-        )
-
-    context_block = "\n\n".join(context_parts)
-
-    system_prompt = (
-        "You are a strategic research assistant. Answer the user's question about "
-        "the highlighted text, grounded in the analysis data provided. Be concise, "
-        "specific, and cite the data when possible. Keep your answer under 200 words. "
-        "Write in plain text only — no markdown, no asterisks, no bullet symbols. "
-        "Use numbered lists with plain text when listing items."
+    result = await _ask(
+        analysis_id=analysis_id,
+        selected_text=req.selected_text,
+        question=req.question,
+        block_category=req.block_category,
+        block_label=req.block_label,
     )
 
-    user_prompt = (
-        f"ANALYSIS CONTEXT:\n{context_block}\n\n"
-        f"SELECTED TEXT (from {req.block_label or req.block_category}):\n"
-        f'"{req.selected_text}"\n\n'
-        f"USER QUESTION:\n{req.question}"
+    return AskAboutSelectionResponse(
+        answer=result.answer,
+        source_ids=result.source_ids,
+        confidence=result.confidence,
     )
-
-    answer = await chat(prompt=user_prompt, system=system_prompt)
-
-    return AskAboutSelectionResponse(answer=answer.strip())
 
 
 def _dq_to_response(q) -> DecisionQuestionResponse:

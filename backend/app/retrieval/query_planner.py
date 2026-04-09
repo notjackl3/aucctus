@@ -73,6 +73,10 @@ class QueryPlan:
     local_evidence_count: int = 0
     local_evidence_sufficient: bool = False
 
+    # Prior analysis reuse (Phase 5)
+    prior_analysis_ids: list[str] = field(default_factory=list)
+    prior_evidence_count: int = 0
+
     # Planner confidence
     interpretation_confidence: str = "medium"  # high, medium, low
     notes: str = ""
@@ -162,11 +166,30 @@ async def build_query_plan(
                 existing.add(ent.lower())
         plan.entity_candidates = plan.entity_candidates[:10]
 
-    # Step 3: Local evidence check
+    # Step 3: Local evidence check + prior analysis discovery
     plan.local_evidence_count = await _check_local_evidence(market_space)
     plan.local_evidence_sufficient = (
         plan.local_evidence_count >= LOCAL_EVIDENCE_SUFFICIENCY
     )
+
+    # Check for prior analyses of the same market
+    try:
+        from app.persistence import repositories as _repo
+        prior = await _repo.find_prior_analyses(market_space, max_age_days=30)
+        plan.prior_analysis_ids = [a.id for a in prior]
+        if prior:
+            prior_sources = await _repo.get_sources_for_analyses(plan.prior_analysis_ids)
+            plan.prior_evidence_count = len(prior_sources)
+            plan.local_evidence_count += plan.prior_evidence_count
+            plan.local_evidence_sufficient = (
+                plan.local_evidence_count >= LOCAL_EVIDENCE_SUFFICIENCY
+            )
+            logger.info(
+                f"Found {len(prior)} prior analyses with {plan.prior_evidence_count} "
+                f"reusable sources for '{market_space}'"
+            )
+    except Exception as e:
+        logger.warning(f"Prior analysis lookup failed: {e}")
 
     # Step 4: Generate provider-specific queries
     plan.incumbents_queries = _build_incumbents_queries(plan, company_name)

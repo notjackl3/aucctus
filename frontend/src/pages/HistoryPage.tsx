@@ -289,9 +289,6 @@ function AnalysisCard({
             <h3 className="text-base font-semibold text-text-primary truncate group-hover:text-brand transition-colors">
               {a.companyName}
             </h3>
-            {isCompleted && a.recommendation && (
-              <RecommendationBadge recommendation={a.recommendation} />
-            )}
             {isRunning && (
               <span className="px-2 py-0.5 rounded-full bg-brand/10 text-brand text-xs font-medium">
                 Running
@@ -311,20 +308,6 @@ function AnalysisCard({
               {' at '}
               {formatTime(a.createdAt)}
             </span>
-            {a.confidenceLevel && (
-              <span
-                className={`text-xs font-medium ${
-                  a.confidenceLevel === 'high'
-                    ? 'text-go'
-                    : a.confidenceLevel === 'medium'
-                      ? 'text-maybe'
-                      : 'text-nogo'
-                }`}
-              >
-                {a.confidenceLevel} confidence
-                {a.confidenceScore != null && ` (${a.confidenceScore}%)`}
-              </span>
-            )}
           </div>
         </div>
 

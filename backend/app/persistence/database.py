@@ -211,6 +211,21 @@ CREATE TABLE IF NOT EXISTS documents (
 );
 CREATE INDEX IF NOT EXISTS idx_documents_company ON documents(company_id);
 
+-- ── Document Sections ──
+CREATE TABLE IF NOT EXISTS document_sections (
+    id              TEXT PRIMARY KEY,
+    document_id     TEXT NOT NULL REFERENCES documents(id),
+    section_index   INTEGER NOT NULL,
+    title           TEXT,
+    section_type    TEXT DEFAULT 'body',
+    text            TEXT NOT NULL,
+    summary         TEXT,
+    char_count      INTEGER DEFAULT 0,
+    is_boilerplate  INTEGER DEFAULT 0,
+    created_at      TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_doc_sections_document ON document_sections(document_id);
+
 -- ── Document Chunks ──
 CREATE TABLE IF NOT EXISTS document_chunks (
     id              TEXT PRIMARY KEY,
@@ -218,9 +233,12 @@ CREATE TABLE IF NOT EXISTS document_chunks (
     chunk_index     INTEGER NOT NULL,
     text            TEXT NOT NULL,
     embedding_json  TEXT,
+    section_id      TEXT,
+    chunk_type      TEXT DEFAULT 'text',
     created_at      TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_chunks_document ON document_chunks(document_id);
+-- idx_chunks_section created in _create_post_migration_indexes (section_id may not exist on old DBs)
 
 -- ── Embedding Cache ──
 CREATE TABLE IF NOT EXISTS embeddings (
@@ -229,9 +247,13 @@ CREATE TABLE IF NOT EXISTS embeddings (
     source_id       TEXT NOT NULL,
     text            TEXT NOT NULL,
     embedding_json  TEXT NOT NULL,
+    company_id      TEXT,
+    analysis_id     TEXT,
+    section_id      TEXT,
     created_at      TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_embeddings_source ON embeddings(source_type, source_id);
+-- idx_embeddings_company, idx_embeddings_analysis created in _create_post_migration_indexes
 
 -- ── Decision Questions ──
 CREATE TABLE IF NOT EXISTS decision_questions (
@@ -274,21 +296,82 @@ async def init_db() -> None:
     await db.executescript(SCHEMA_SQL)
     await db.commit()
     await _run_migrations(db)
+    # Create indexes that depend on migration-added columns (safe after migrations)
+    await _create_post_migration_indexes(db)
+
+
+async def _create_post_migration_indexes(db: aiosqlite.Connection) -> None:
+    """Create indexes on columns that may have been added by migrations."""
+    try:
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_chunks_section ON document_chunks(section_id)")
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_embeddings_company ON embeddings(company_id)")
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_embeddings_analysis ON embeddings(analysis_id)")
+        await db.commit()
+    except Exception:
+        pass  # indexes may already exist or columns may not exist in edge cases
 
 
 async def _run_migrations(db: aiosqlite.Connection) -> None:
     """Additive column migrations for existing databases."""
-    # Check which columns exist on sources table
+    # ── Sources: provider + source_category columns ──
     cursor = await db.execute("PRAGMA table_info(sources)")
-    existing_cols = {row[1] for row in await cursor.fetchall()}
+    source_cols = {row[1] for row in await cursor.fetchall()}
 
-    if "provider" not in existing_cols:
+    if "provider" not in source_cols:
         await db.execute("ALTER TABLE sources ADD COLUMN provider TEXT NOT NULL DEFAULT 'tavily'")
-    if "source_category" not in existing_cols:
+    if "source_category" not in source_cols:
         await db.execute("ALTER TABLE sources ADD COLUMN source_category TEXT NOT NULL DEFAULT 'web'")
-
-    # Ensure index exists (safe to re-run)
     await db.execute("CREATE INDEX IF NOT EXISTS idx_sources_provider ON sources(provider)")
+
+    # ── Document chunks: section_id + chunk_type columns ──
+    cursor = await db.execute("PRAGMA table_info(document_chunks)")
+    chunk_cols = {row[1] for row in await cursor.fetchall()}
+
+    if "section_id" not in chunk_cols:
+        await db.execute("ALTER TABLE document_chunks ADD COLUMN section_id TEXT")
+    if "chunk_type" not in chunk_cols:
+        await db.execute("ALTER TABLE document_chunks ADD COLUMN chunk_type TEXT DEFAULT 'text'")
+    await db.execute("CREATE INDEX IF NOT EXISTS idx_chunks_section ON document_chunks(section_id)")
+
+    # ── Documents: section_count + ingestion_version columns ──
+    cursor = await db.execute("PRAGMA table_info(documents)")
+    doc_cols = {row[1] for row in await cursor.fetchall()}
+
+    if "section_count" not in doc_cols:
+        await db.execute("ALTER TABLE documents ADD COLUMN section_count INTEGER DEFAULT 0")
+    if "ingestion_version" not in doc_cols:
+        await db.execute("ALTER TABLE documents ADD COLUMN ingestion_version INTEGER DEFAULT 1")
+
+    # ── Embeddings: company_id, analysis_id, section_id columns ──
+    cursor = await db.execute("PRAGMA table_info(embeddings)")
+    emb_cols = {row[1] for row in await cursor.fetchall()}
+
+    if "company_id" not in emb_cols:
+        await db.execute("ALTER TABLE embeddings ADD COLUMN company_id TEXT")
+    if "analysis_id" not in emb_cols:
+        await db.execute("ALTER TABLE embeddings ADD COLUMN analysis_id TEXT")
+    if "section_id" not in emb_cols:
+        await db.execute("ALTER TABLE embeddings ADD COLUMN section_id TEXT")
+    await db.execute("CREATE INDEX IF NOT EXISTS idx_embeddings_company ON embeddings(company_id)")
+    await db.execute("CREATE INDEX IF NOT EXISTS idx_embeddings_analysis ON embeddings(analysis_id)")
+
+    # ── document_sections table (create if missing for pre-migration DBs) ──
+    await db.execute("""
+        CREATE TABLE IF NOT EXISTS document_sections (
+            id              TEXT PRIMARY KEY,
+            document_id     TEXT NOT NULL REFERENCES documents(id),
+            section_index   INTEGER NOT NULL,
+            title           TEXT,
+            section_type    TEXT DEFAULT 'body',
+            text            TEXT NOT NULL,
+            summary         TEXT,
+            char_count      INTEGER DEFAULT 0,
+            is_boilerplate  INTEGER DEFAULT 0,
+            created_at      TEXT NOT NULL
+        )
+    """)
+    await db.execute("CREATE INDEX IF NOT EXISTS idx_doc_sections_document ON document_sections(document_id)")
+
     await db.commit()
 
 

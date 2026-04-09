@@ -7,9 +7,10 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, UploadFile, File,
 from app.api.schemas import DocumentResponse, UploadDocumentResponse
 from app.config import MAX_DOCUMENTS_PER_COMPANY, MAX_CHUNKS_PER_DOCUMENT, use_real_apis
 from app.domain.enums import OperationStatus
+from app.ingestion.document_processor import process_document, generate_section_summaries
 from app.persistence import repositories as repo
+from app.retrieval import retriever
 from app.services import llm
-from app.services.search import extract_text_from_bytes
 from app.shared.utils import utc_now
 
 logger = logging.getLogger(__name__)
@@ -22,8 +23,8 @@ async def extract_text(file: UploadFile = File(...)):
     """Extract text from an uploaded file (PDF, TXT, etc.) without ingesting it."""
     content = await file.read()
     content_type = file.content_type or "text/plain"
-    text = extract_text_from_bytes(content, content_type)
-    return {"text": text, "filename": file.filename or "unnamed"}
+    result = process_document(content, content_type, file.filename or "unnamed")
+    return {"text": result.raw_text, "filename": file.filename or "unnamed"}
 
 
 @router.post("", response_model=UploadDocumentResponse, status_code=201)
@@ -43,12 +44,15 @@ async def upload_document(
 
     content = await file.read()
     content_type = file.content_type or "text/plain"
-    raw_text = extract_text_from_bytes(content, content_type)
+    filename = file.filename or "unnamed"
 
-    doc = await repo.create_document(company_id, file.filename or "unnamed", content_type, raw_text)
-    operation = await repo.create_operation("document_ingest", parent_id=company_id, steps_total=3)
+    # Section-aware processing
+    processed = process_document(content, content_type, filename)
 
-    background_tasks.add_task(_ingest_document, doc.id, raw_text, operation.id)
+    doc = await repo.create_document(company_id, filename, content_type, processed.raw_text)
+    operation = await repo.create_operation("document_ingest", parent_id=company_id, steps_total=4)
+
+    background_tasks.add_task(_ingest_document, doc.id, processed, operation.id, company_id)
 
     return UploadDocumentResponse(document_id=doc.id, operation_id=operation.id, status="pending")
 
@@ -64,45 +68,98 @@ async def list_documents(company_id: str):
                              chunk_count=d.chunk_count, created_at=d.created_at) for d in docs]
 
 
-async def _ingest_document(document_id: str, raw_text: str, operation_id: str) -> None:
-    """Background task: chunk, summarize, and embed a document."""
+async def _ingest_document(document_id: str, processed, operation_id: str, company_id: str) -> None:
+    """Background task: persist sections, chunk, summarize, and embed a document."""
+    from app.ingestion.document_processor import ProcessedDocument
+    processed: ProcessedDocument
+
     try:
         await repo.update_operation(operation_id, status=OperationStatus.RUNNING,
-                                    current_step="Extracting text...")
+                                    current_step="Storing sections...")
 
-        # 1. Chunk the text
-        chunks = _chunk_text(raw_text, chunk_size=1000, overlap=100)
+        # 1. Persist document sections
+        section_id_map: dict[int, str] = {}  # section_index → section_id
+        for section in processed.sections:
+            section_id = await repo.create_document_section(
+                document_id=document_id,
+                section_index=section.index,
+                title=section.title,
+                section_type=section.section_type,
+                text=section.text,
+                char_count=section.char_count,
+                is_boilerplate=section.is_boilerplate,
+            )
+            section_id_map[section.index] = section_id
+
         await repo.update_operation(operation_id, current_step="Chunking document...", steps_completed=1)
 
-        # 2. Store chunks and embed if APIs available
-        for i, chunk_text in enumerate(chunks[:MAX_CHUNKS_PER_DOCUMENT]):
+        # 2. Store chunks with section references and embed (with scoping metadata)
+        for chunk in processed.chunks[:MAX_CHUNKS_PER_DOCUMENT]:
             embedding = None
             if use_real_apis():
                 try:
-                    embedding = await llm.embed_single(chunk_text)
+                    embedding = await llm.embed_single(chunk.text)
                 except Exception as e:
                     logger.warning(f"Chunk embedding failed: {e}")
-            await repo.create_document_chunk(document_id, i, chunk_text, embedding)
 
-        await repo.update_document(document_id, chunk_count=len(chunks))
-        await repo.update_operation(operation_id, current_step="Generating summary...", steps_completed=2)
+            section_id = section_id_map.get(chunk.section_index)
+            chunk_id = await repo.create_document_chunk(
+                document_id, chunk.chunk_index, chunk.text,
+                embedding=embedding,
+                section_id=section_id,
+                chunk_type=chunk.chunk_type,
+            )
 
-        # 3. Generate summary
-        summary = raw_text[:500] + "..."  # fallback
+            # Index chunk for scoped retrieval
+            if embedding:
+                await repo.save_embedding(
+                    "document_chunk", chunk_id, chunk.text[:500], embedding,
+                    company_id=company_id, section_id=section_id,
+                )
+
+        await repo.update_document(document_id, chunk_count=len(processed.chunks))
+        await repo.update_operation(operation_id, current_step="Generating summaries...", steps_completed=2)
+
+        # 3. Generate section summaries
+        non_boilerplate = [s for s in processed.sections if not s.is_boilerplate]
+        summaries = await generate_section_summaries(non_boilerplate)
+        for section_idx, summary in summaries.items():
+            sid = section_id_map.get(section_idx)
+            if sid:
+                await repo.update_section_summary(sid, summary)
+                # Index section summaries for FTS + embeddings with scoping
+                await retriever.index_text(
+                    sid, "section_summary", summary,
+                    company_id=company_id, section_id=sid,
+                )
+
+        await repo.update_operation(operation_id, current_step="Generating document summary...", steps_completed=3)
+
+        # 4. Generate overall document summary
+        summary = processed.raw_text[:500] + "..."  # fallback
         if use_real_apis():
             try:
                 summary = await llm.chat(
-                    f"Summarize this document in 2-3 sentences:\n\n{raw_text[:5000]}",
+                    f"Summarize this document in 2-3 sentences:\n\n{processed.raw_text[:5000]}",
                     model="gpt-4o-mini",
                 )
             except Exception as e:
                 logger.warning(f"Document summary failed: {e}")
 
+        section_count = len([s for s in processed.sections if not s.is_boilerplate])
         await repo.update_document(document_id, summary=summary)
+        # Update section_count if column exists
+        try:
+            from app.persistence.database import get_db
+            db = await get_db()
+            await db.execute("UPDATE documents SET section_count = ? WHERE id = ?", (section_count, document_id))
+            await db.commit()
+        except Exception:
+            pass  # column may not exist yet
 
         await repo.update_operation(
             operation_id, status=OperationStatus.COMPLETED,
-            steps_completed=3, current_step="Document ingested",
+            steps_completed=4, current_step="Document ingested",
             completed_at=utc_now(),
         )
 
@@ -110,18 +167,3 @@ async def _ingest_document(document_id: str, raw_text: str, operation_id: str) -
         logger.error(f"Document ingestion failed: {e}")
         await repo.update_operation(operation_id, status=OperationStatus.ERROR,
                                     error_message=str(e), completed_at=utc_now())
-
-
-def _chunk_text(text: str, chunk_size: int = 1000, overlap: int = 100) -> list[str]:
-    """Split text into overlapping chunks."""
-    if not text:
-        return []
-    chunks = []
-    start = 0
-    while start < len(text):
-        end = start + chunk_size
-        chunk = text[start:end]
-        if chunk.strip():
-            chunks.append(chunk.strip())
-        start = end - overlap
-    return chunks
