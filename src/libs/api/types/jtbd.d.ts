@@ -35,7 +35,8 @@ export type JTBDWidgetType =
   | 'stat_list'
   | 'social_post'
   | 'survey'
-  | 'sparkline_stat';
+  | 'sparkline_stat'
+  | 'market_sizing';
 
 export type JTBDChartType = 'bar' | 'pie';
 
@@ -146,6 +147,7 @@ export interface IJTBDSocialPostItem {
   sourceUrl: string;
   sourceLabel: string;
   engagementCount: number;
+  engagementLabel: string;
   subredditOrChannel: string;
   displayOrder: number;
   postedAt: string | null;
@@ -171,6 +173,17 @@ export interface IJTBDSparklineStatItem {
   displayOrder: number;
 }
 
+export interface IJTBDMarketSizingItem {
+  uuid: string;
+  metric: 'tam' | 'sam' | 'som';
+  label: string;
+  value: number | null;
+  formattedValue: string;
+  description: string;
+  sources: IJTBDItemSource[];
+  displayOrder: number;
+}
+
 // ============================================
 // Custom Widget Type (flat polymorphic)
 // ============================================
@@ -192,6 +205,7 @@ export interface IJTBDCustomWidget {
   socialPostItems: IJTBDSocialPostItem[];
   surveyItems: IJTBDSurveyItem[];
   sparklineStatItems: IJTBDSparklineStatItem[];
+  marketSizingItems: IJTBDMarketSizingItem[];
 }
 
 // ============================================

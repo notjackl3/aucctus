@@ -8,11 +8,7 @@ import {
   useTriggerJTBDScan,
   type JTBDScanProgress,
 } from '@hooks/query/jtbd.hook';
-import type {
-  IJTBDJob,
-  IJTBDScan,
-  OpportunityTier,
-} from '@libs/api/types/jtbd';
+import type { IJTBDJob, IJTBDScan } from '@libs/api/types/jtbd';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -674,66 +670,6 @@ const ScanInfoLine: React.FC<{
 };
 
 // ============================================
-// Peeking Card (simplified preview for hero)
-// ============================================
-
-const tierColor = (tier: OpportunityTier): string => {
-  switch (tier) {
-    case 'high':
-      return 'text-emerald-400 bg-emerald-500/20 border-emerald-500/30';
-    case 'medium':
-      return 'text-amber-400 bg-amber-500/20 border-amber-500/30';
-    case 'low':
-      return 'text-red-400 bg-red-500/20 border-red-500/30';
-  }
-};
-
-const PeekingCard: React.FC<{ job: IJTBDJob; index: number }> = ({
-  job,
-  index,
-}) => {
-  const paddingTop = [32, 0, 64, 48][index % 4];
-
-  return (
-    <motion.div
-      animate={{ y: [0, -4, 0] }}
-      transition={{
-        y: {
-          duration: 3,
-          repeat: Infinity,
-          repeatType: 'loop',
-          ease: 'easeInOut',
-          times: [0, 0.5, 1],
-          delay: index * 0.3,
-        },
-      }}
-      className='min-w-0 flex-1'
-      style={{ paddingTop }}
-    >
-      <div className='space-y-3 rounded-2xl border border-white/[0.1] bg-white/[0.05] p-5 backdrop-blur-xl'>
-        <div className='flex items-center justify-between'>
-          <span
-            className={cn(
-              'rounded-full border px-2 py-0.5 text-xs font-semibold',
-              tierColor(job.opportunityTier),
-            )}
-          >
-            {job.opportunityScore}
-          </span>
-          <span className='text-xs uppercase tracking-wider text-white/40'>
-            {job.segment}
-          </span>
-        </div>
-        <h3 className='line-clamp-2 text-sm font-semibold leading-snug text-white/90'>
-          {job.persona}
-        </h3>
-        <p className='line-clamp-2 text-xs text-white/50'>{job.desire}</p>
-      </div>
-    </motion.div>
-  );
-};
-
-// ============================================
 // Main JTBDCanvas (embeddable)
 // ============================================
 
@@ -1098,20 +1034,6 @@ const JTBDCanvas: React.FC = () => {
               </button>
             </motion.div>
           </div>
-
-          {/* Peeking cards at bottom of hero */}
-          {filteredJobs.length >= 4 && (
-            <div
-              className='pointer-events-none absolute left-0 right-0 px-8'
-              style={{ top: '100%', transform: 'translateY(-200px)' }}
-            >
-              <div className='grid grid-cols-4 gap-6'>
-                {filteredJobs.slice(0, 4).map((job, i) => (
-                  <PeekingCard key={job.uuid} job={job} index={i} />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Cards section — snaps to top */}

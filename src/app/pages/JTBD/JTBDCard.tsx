@@ -13,13 +13,12 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { create } from 'zustand';
 
 import {
   CollapsibleSection,
-  MarketSizeVisualization,
   ParsedTitle,
   evidenceLabel,
-  formatMarketValue,
   opportunityDollars,
   segmentColors,
   tierColors,
@@ -35,6 +34,7 @@ const COL_SPAN: Record<JTBDWidgetType, string> = {
   metric_chart: 'col-span-2',
   trend_chart: 'col-span-2',
   stat_list: 'col-span-1',
+  market_sizing: 'col-span-2',
 };
 
 // ============================================
@@ -42,12 +42,25 @@ const COL_SPAN: Record<JTBDWidgetType, string> = {
 // Only one video plays at a time across all instances.
 // ============================================
 
-// Module-level ref: the currently playing <video> element (if any).
-let activeVideo: HTMLVideoElement | null = null;
+interface IActiveVideoStore {
+  activeVideo: HTMLVideoElement | null;
+  setActiveVideo: (video: HTMLVideoElement | null) => void;
+  clearIfCurrent: (video: HTMLVideoElement) => void;
+}
+
+const useActiveVideoStore = create<IActiveVideoStore>()((set, get) => ({
+  activeVideo: null,
+  setActiveVideo: (video: HTMLVideoElement | null) =>
+    set({ activeVideo: video }),
+  clearIfCurrent: (video: HTMLVideoElement) => {
+    if (get().activeVideo === video) set({ activeVideo: null });
+  },
+}));
 
 const JTBDVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const { activeVideo, setActiveVideo, clearIfCurrent } = useActiveVideoStore();
 
   // Pause this video when the browser tab loses focus
   useEffect(() => {
@@ -56,12 +69,12 @@ const JTBDVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
       if (video && !video.paused) {
         video.pause();
         setIsPlaying(false);
-        if (activeVideo === video) activeVideo = null;
+        clearIfCurrent(video);
       }
     };
     window.addEventListener('blur', handleBlur);
     return () => window.removeEventListener('blur', handleBlur);
-  }, []);
+  }, [clearIfCurrent]);
 
   // Sync state if the video is paused externally (e.g. another instance took over)
   useEffect(() => {
@@ -80,18 +93,18 @@ const JTBDVideoPlayer: React.FC<{ src: string }> = ({ src }) => {
 
       if (isPlaying) {
         video.pause();
-        if (activeVideo === video) activeVideo = null;
+        clearIfCurrent(video);
       } else {
         // Pause whichever video is currently playing
         if (activeVideo && activeVideo !== video) {
           activeVideo.pause();
         }
         video.play();
-        activeVideo = video;
+        setActiveVideo(video);
       }
       setIsPlaying(!isPlaying);
     },
-    [isPlaying],
+    [isPlaying, activeVideo, setActiveVideo, clearIfCurrent],
   );
 
   return (
@@ -159,6 +172,13 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
     ? [...job.customWidgets].sort((a, b) => a.displayOrder - b.displayOrder)
     : [];
 
+  const marketSizingWidgets = sortedWidgets.filter(
+    (w) => w.widgetType === 'market_sizing',
+  );
+  const evidenceWidgets = sortedWidgets.filter(
+    (w) => w.widgetType !== 'market_sizing',
+  );
+
   // Close on Escape
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -206,76 +226,82 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
               onClick={(e) => e.stopPropagation()}
             >
               {/* ===== FIXED HEADER ===== */}
-              <div className='flex-shrink-0 border-b border-white/[0.08] px-6 pb-4 pr-12 pt-6'>
-                {/* Close button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onClick(job);
-                  }}
-                  className='absolute right-4 top-4 z-10 rounded-lg p-1.5 text-white/30 transition-colors hover:bg-white/[0.08] hover:text-white/60'
-                >
-                  <X className='h-4 w-4' />
-                </button>
+              <div className='flex-shrink-0 border-b border-white/[0.08] px-6 pb-5 pt-4'>
+                {/* Close row */}
+                <div className='mb-3 flex justify-end'>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClick(job);
+                    }}
+                    className='rounded-lg p-1.5 text-white/30 transition-colors hover:bg-white/[0.08] hover:text-white/60'
+                  >
+                    <X className='h-4 w-4' />
+                  </button>
+                </div>
 
-                <div className='flex min-w-0 flex-col gap-4'>
-                  <h3 className='text-2xl font-normal leading-tight text-white/90'>
-                    <ParsedTitle title={job.jtbdTitle} expanded />
-                  </h3>
-                  <p className='text-sm text-white/50'>{job.summary}</p>
+                <div className='flex items-center gap-5'>
+                  {/* Video thumbnail in header */}
+                  {job.videoUrl && (
+                    <div className='w-[240px] flex-shrink-0'>
+                      <JTBDVideoPlayer src={job.videoUrl} />
+                    </div>
+                  )}
 
-                  {/* Badges row */}
-                  <div className='flex flex-wrap items-center gap-2'>
-                    <span
-                      className={cn(
-                        'rounded-full border px-2.5 py-1 text-[11px] font-semibold',
-                        tierColors[job.opportunityTier],
-                      )}
-                    >
-                      {tierLabels[job.opportunityTier]}
-                    </span>
-                    <span
-                      className={cn(
-                        'rounded-full border px-2.5 py-1 text-[11px] font-medium',
-                        segmentColors[job.segment] ?? segmentColors.b2c,
-                      )}
-                    >
-                      {job.segment === 'b2c' ? 'Consumer' : 'Business'}
-                    </span>
-                    {job.marketSizeLabel && (
-                      <span className='rounded-full border border-white/[0.1] bg-white/[0.05] px-2.5 py-1 text-[11px] font-medium text-white/50'>
-                        {job.marketSizeLabel}
-                      </span>
-                    )}
-                    <div className='ml-auto flex items-center gap-1.5'>
-                      <Trophy className='h-3.5 w-3.5 text-white/40' />
+                  {/* Content */}
+                  <div className='flex min-w-0 flex-1 flex-col gap-2.5'>
+                    <h3 className='text-2xl font-normal leading-tight text-white/90'>
+                      <ParsedTitle title={job.jtbdTitle} expanded />
+                    </h3>
+                    <p className='text-sm text-white/50'>{job.summary}</p>
+
+                    {/* Metadata row */}
+                    <div className='flex items-center gap-5 pt-1'>
+                      <div className='flex items-center gap-1.5'>
+                        <Trophy className='h-3.5 w-3.5 text-white/40' />
+                        <span className='text-xs text-white/40'>
+                          Opportunity
+                        </span>
+                        <span
+                          className='text-xs font-bold'
+                          style={{ color: 'hsl(153 79% 40%)' }}
+                        >
+                          {opportunityDollars(job.opportunityScore)}
+                        </span>
+                      </div>
+                      <div className='flex items-center gap-1.5'>
+                        <ShieldCheck className='h-3.5 w-3.5 text-white/40' />
+                        <span className='text-xs text-white/40'>Evidence</span>
+                        <span className='text-xs font-semibold text-white/70'>
+                          {evidenceLabel(job.evidenceStrength)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Tags row */}
+                    <div className='flex flex-wrap items-center gap-2'>
                       <span
-                        className='text-sm font-bold'
-                        style={{ color: 'hsl(153 79% 40%)' }}
+                        className={cn(
+                          'rounded-full border px-2.5 py-1 text-[11px] font-semibold',
+                          tierColors[job.opportunityTier],
+                        )}
                       >
-                        {opportunityDollars(job.opportunityScore)}
+                        {tierLabels[job.opportunityTier]}
                       </span>
-                      <span className='text-xs text-white/40'>
-                        ({job.opportunityScore})
+                      <span
+                        className={cn(
+                          'rounded-full border px-2.5 py-1 text-[11px] font-medium',
+                          segmentColors[job.segment] ?? segmentColors.b2c,
+                        )}
+                      >
+                        {job.segment === 'b2c' ? 'Consumer' : 'Business'}
                       </span>
                     </div>
                   </div>
 
-                  {/* Evidence badge */}
-                  <div className='flex items-center gap-1.5'>
-                    <ShieldCheck className='h-3.5 w-3.5 text-white/40' />
-                    <span className='text-[11px] text-white/40'>
-                      Evidence Strength
-                    </span>
-                    <span className='text-[11px] font-semibold text-white/70'>
-                      {evidenceLabel(job.evidenceStrength)} (
-                      {job.evidenceStrength})
-                    </span>
-                  </div>
-
-                  {/* Ideate Concepts CTA */}
+                  {/* Ideate Solutions CTA */}
                   {onIdeate && (
-                    <div className='pt-1'>
+                    <div className='flex-shrink-0 self-start'>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -283,9 +309,9 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
                         }}
                         disabled={isIdeating}
                         className={cn(
-                          'inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all',
-                          'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30',
-                          'border border-emerald-500/30 hover:border-emerald-500/50',
+                          'inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all',
+                          'bg-white/10 text-white hover:bg-white/20',
+                          'border border-white/20 hover:border-white/40',
                           'disabled:cursor-not-allowed disabled:opacity-50',
                         )}
                       >
@@ -296,7 +322,7 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
                         )}
                         {isIdeating
                           ? 'Starting Ideation...'
-                          : 'Ideate Concepts'}
+                          : 'Ideate Solutions'}
                       </button>
                     </div>
                   )}
@@ -305,21 +331,39 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
 
               {/* ===== SCROLLABLE BODY ===== */}
               <div className='min-h-0 flex-1 overflow-auto px-6 py-4'>
-                {/* Video Hero — max 1/3 width in expanded card */}
-                {job.videoUrl && (
-                  <div className='mb-4 max-w-[33%]'>
-                    <JTBDVideoPlayer src={job.videoUrl} />
-                  </div>
+                {/* Opportunity Size — market_sizing widgets only */}
+                {marketSizingWidgets.length > 0 && (
+                  <CollapsibleSection
+                    title='Opportunity Size'
+                    icon={<BarChart3 className='h-3.5 w-3.5 text-white/40' />}
+                  >
+                    <div className='py-2'>
+                      {marketSizingWidgets.map((widget, i) => (
+                        <motion.div
+                          key={widget.uuid}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.3,
+                            delay: i * 0.05,
+                          }}
+                          className='rounded-lg border border-white/[0.1] bg-white/[0.05] p-3'
+                        >
+                          <WidgetRenderer widget={widget} />
+                        </motion.div>
+                      ))}
+                    </div>
+                  </CollapsibleSection>
                 )}
 
-                {/* Evidence Widgets */}
+                {/* Evidence Widgets — everything except market_sizing */}
                 <CollapsibleSection
                   title='Evidence'
                   icon={<ShieldCheck className='h-3.5 w-3.5 text-white/40' />}
                 >
-                  {sortedWidgets.length > 0 ? (
+                  {evidenceWidgets.length > 0 ? (
                     <div className='grid grid-cols-3 gap-3 py-2'>
-                      {sortedWidgets.map((widget, i) => (
+                      {evidenceWidgets.map((widget, i) => (
                         <motion.div
                           key={widget.uuid}
                           initial={{ opacity: 0, y: 8 }}
@@ -343,75 +387,6 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
                     </p>
                   )}
                 </CollapsibleSection>
-
-                {/* Opportunity Size Section */}
-                {(job.tamValue != null ||
-                  job.samValue != null ||
-                  job.somValue != null) && (
-                  <CollapsibleSection
-                    title='Opportunity Size'
-                    icon={<BarChart3 className='h-3.5 w-3.5 text-white/40' />}
-                  >
-                    <div className='grid grid-cols-3 gap-3 py-2'>
-                      <div className='col-span-2 rounded-lg border border-white/[0.1] bg-white/[0.05] p-3'>
-                        <div className='mb-3 flex items-center gap-2'>
-                          <BarChart3 className='h-3.5 w-3.5 text-white/40' />
-                          <span className='text-[10px] font-medium uppercase tracking-wider text-white/40'>
-                            Market Size
-                          </span>
-                          <span
-                            className={cn(
-                              'ml-auto rounded-full border px-2.5 py-0.5 text-[10px] font-semibold',
-                              job.marketType === 'new'
-                                ? 'border-amber-500/25 bg-amber-500/15 text-amber-300'
-                                : 'border-emerald-500/25 bg-emerald-500/15 text-emerald-300',
-                            )}
-                          >
-                            {job.marketType === 'new'
-                              ? 'New Market'
-                              : 'Existing Market'}
-                          </span>
-                        </div>
-                        <MarketSizeVisualization
-                          marketType={job.marketType}
-                          tamValue={job.tamValue}
-                          samValue={job.samValue}
-                          somValue={job.somValue}
-                        />
-                      </div>
-                      <div className='col-span-1 rounded-lg border border-white/[0.1] bg-white/[0.05] p-3'>
-                        <span className='text-[10px] font-medium uppercase tracking-wider text-white/40'>
-                          Summary
-                        </span>
-                        <div className='mt-2 space-y-1.5'>
-                          {job.tamValue != null && (
-                            <div className='text-xs text-white/60'>
-                              <span className='text-white/30'>TAM </span>
-                              {formatMarketValue(job.tamValue)}
-                            </div>
-                          )}
-                          {job.samValue != null && (
-                            <div className='text-xs text-white/60'>
-                              <span className='text-white/30'>SAM </span>
-                              {formatMarketValue(job.samValue)}
-                            </div>
-                          )}
-                          {job.somValue != null && (
-                            <div className='text-xs text-white/60'>
-                              <span className='text-white/30'>SOM </span>
-                              {formatMarketValue(job.somValue)}
-                            </div>
-                          )}
-                        </div>
-                        {job.marketSizeLabel && (
-                          <p className='mt-2 text-[10px] text-white/30'>
-                            {job.marketSizeLabel}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </CollapsibleSection>
-                )}
               </div>
             </div>
           </motion.div>
@@ -484,7 +459,7 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
             </div>
           </div>
 
-          {/* Segment + market size row */}
+          {/* Segment row */}
           <div className='flex items-center gap-2'>
             <span
               className={cn(
@@ -494,11 +469,6 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
             >
               {job.segment}
             </span>
-            {job.marketSizeLabel && (
-              <span className='text-[10px] font-medium text-white/40'>
-                {job.marketSizeLabel}
-              </span>
-            )}
           </div>
 
           {/* Opportunity tier badge */}

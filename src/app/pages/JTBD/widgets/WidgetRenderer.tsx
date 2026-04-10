@@ -2,6 +2,7 @@ import type { IJTBDCustomWidget } from '@libs/api/types/jtbd';
 import React from 'react';
 
 import { CardListWidget } from './CardListWidget';
+import { MarketSizingWidget } from './MarketSizingWidget';
 import { MetricChartWidget } from './MetricChartWidget';
 import { SocialPostWidget } from './SocialPostWidget';
 import { SparklineStatWidget } from './SparklineStatWidget';
@@ -29,6 +30,8 @@ export const WidgetRenderer: React.FC<WidgetRendererProps> = ({ widget }) => {
       return <SurveyWidget widget={widget} />;
     case 'sparkline_stat':
       return <SparklineStatWidget widget={widget} />;
+    case 'market_sizing':
+      return <MarketSizingWidget widget={widget} />;
     default:
       return null;
   }

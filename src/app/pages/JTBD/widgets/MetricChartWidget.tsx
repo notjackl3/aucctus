@@ -118,9 +118,12 @@ export const MetricChartWidget: React.FC<MetricChartWidgetProps> = ({
         label={widget.title || 'Metrics'}
         description={widget.description}
       />
-      {widget.topScaleLabel && (
-        <div className='mb-1 text-right text-[10px] text-white/40'>
-          {widget.topScaleLabel}
+      {(widget.topScaleLabel || widget.bottomScaleLabel) && (
+        <div className='mb-1 flex justify-between text-[10px] text-white/40'>
+          {widget.bottomScaleLabel && <span>{widget.bottomScaleLabel}</span>}
+          {widget.topScaleLabel && (
+            <span className='ml-auto'>{widget.topScaleLabel}</span>
+          )}
         </div>
       )}
       <ResponsiveContainer
@@ -162,11 +165,6 @@ export const MetricChartWidget: React.FC<MetricChartWidgetProps> = ({
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-      {widget.bottomScaleLabel && (
-        <div className='mt-1 text-[10px] text-white/40'>
-          {widget.bottomScaleLabel}
-        </div>
-      )}
       <ItemSources sources={items.flatMap((item) => item.sources)} />
     </motion.div>
   );

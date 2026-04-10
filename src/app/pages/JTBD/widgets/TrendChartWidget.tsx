@@ -1,6 +1,6 @@
 import type { IJTBDCustomWidget } from '@libs/api/types/jtbd';
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useId } from 'react';
 import {
   Area,
   AreaChart,
@@ -20,6 +20,9 @@ interface TrendChartWidgetProps {
 export const TrendChartWidget: React.FC<TrendChartWidgetProps> = ({
   widget,
 }) => {
+  const reactId = useId();
+  const gradientId = `trendFill-${reactId.replace(/:/g, '')}`;
+
   const items = [...widget.trendChartItems].sort(
     (a, b) => a.displayOrder - b.displayOrder,
   );
@@ -49,7 +52,7 @@ export const TrendChartWidget: React.FC<TrendChartWidgetProps> = ({
           margin={{ top: 4, right: 4, bottom: 0, left: 0 }}
         >
           <defs>
-            <linearGradient id='trendFill' x1='0' y1='0' x2='0' y2='1'>
+            <linearGradient id={gradientId} x1='0' y1='0' x2='0' y2='1'>
               <stop
                 offset='0%'
                 stopColor={TREND_LINE_COLOR}
@@ -85,7 +88,7 @@ export const TrendChartWidget: React.FC<TrendChartWidgetProps> = ({
             dataKey='value'
             stroke={TREND_LINE_COLOR}
             strokeWidth={2}
-            fill='url(#trendFill)'
+            fill={`url(#${gradientId})`}
             animationDuration={800}
             dot={{
               r: 3,

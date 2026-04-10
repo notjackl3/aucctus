@@ -2,7 +2,6 @@ import type { IJTBDCustomWidget } from '@libs/api/types/jtbd';
 import { DynamicIcon } from '@libs/utils/iconMap';
 import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
-import { MessageCircle } from 'lucide-react';
 import React, { useCallback, useRef } from 'react';
 
 import { SourcePill } from './SourcePill';
@@ -109,27 +108,16 @@ export const SocialPostWidget: React.FC<SocialPostWidgetProps> = ({
               </p>
 
               <div className='border-t border-white/[0.06] pt-2'>
-                <div className='flex items-center justify-between text-[10px] text-white/30'>
-                  <div className='flex items-center gap-1.5'>
+                <div className='space-y-1 text-[10px] text-white/30'>
+                  <div className='flex items-center justify-between'>
                     <span className='font-medium text-white/50'>
                       {item.author}
                     </span>
-                    {item.subredditOrChannel && (
-                      <>
-                        <span>&middot;</span>
-                        <span>{item.subredditOrChannel}</span>
-                      </>
-                    )}
-                  </div>
-                  <div className='flex items-center gap-2'>
                     {time && <span>{time}</span>}
-                    {item.engagementCount > 0 && (
-                      <div className='flex items-center gap-1'>
-                        <MessageCircle className='h-3 w-3' />
-                        <span>{item.engagementCount}</span>
-                      </div>
-                    )}
                   </div>
+                  {item.subredditOrChannel && (
+                    <div>{item.subredditOrChannel}</div>
+                  )}
                 </div>
                 {item.sourceUrl && (
                   <div className='mt-1.5'>
