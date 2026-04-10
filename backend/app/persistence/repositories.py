@@ -734,10 +734,14 @@ async def delete_document(document_id: str) -> bool:
     exists = await db.execute_fetchall("SELECT id FROM documents WHERE id = ?", (document_id,))
     if not exists:
         return False
-    # Get chunk ids to delete their embeddings
+    # Delete embeddings for chunks
     chunk_rows = await db.execute_fetchall("SELECT id FROM document_chunks WHERE document_id = ?", (document_id,))
     for chunk in chunk_rows:
         await db.execute("DELETE FROM embeddings WHERE source_id = ?", (chunk["id"],))
+    # Delete embeddings for section summaries
+    section_rows = await db.execute_fetchall("SELECT id FROM document_sections WHERE document_id = ?", (document_id,))
+    for section in section_rows:
+        await db.execute("DELETE FROM embeddings WHERE source_id = ?", (section["id"],))
     await db.execute("DELETE FROM document_chunks WHERE document_id = ?", (document_id,))
     await db.execute("DELETE FROM document_sections WHERE document_id = ?", (document_id,))
     await db.execute("DELETE FROM documents WHERE id = ?", (document_id,))

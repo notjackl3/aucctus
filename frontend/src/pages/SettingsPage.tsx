@@ -251,11 +251,11 @@ export default function SettingsPage() {
   }, [documents, selectedCompanyId]);
 
   const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !selectedCompanyId) return;
+    const files = e.target.files;
+    if (!files || files.length === 0 || !selectedCompanyId) return;
     setUploading(true);
     try {
-      await uploadDocument(selectedCompanyId, file);
+      await Promise.all(Array.from(files).map((file) => uploadDocument(selectedCompanyId, file)));
       const docs = await listDocuments(selectedCompanyId);
       setDocuments(docs);
     } catch {
@@ -581,6 +581,7 @@ export default function SettingsPage() {
                     onChange={handleUploadFile}
                     className="hidden"
                     accept=".txt,.pdf,.md,.csv,.json,.doc,.docx"
+                    multiple
                   />
                   <button
                     onClick={() => fileInputRef.current?.click()}

@@ -100,7 +100,9 @@ async def _ingest_document(document_id: str, processed, operation_id: str, compa
         section_id_map: dict[int, str] = {}  # section_index → section_id
         for section in processed.sections:
             if not await _doc_exists(document_id):
-                return  # document was deleted while we were ingesting
+                await repo.update_operation(operation_id, status=OperationStatus.COMPLETED,
+                                            current_step="Document deleted during ingestion", completed_at=utc_now())
+                return
             section_id = await repo.create_document_section(
                 document_id=document_id,
                 section_index=section.index,
@@ -118,7 +120,9 @@ async def _ingest_document(document_id: str, processed, operation_id: str, compa
         # 2. Store chunks with section references and embed (with scoping metadata)
         for chunk in processed.chunks[:MAX_CHUNKS_PER_DOCUMENT]:
             if not await _doc_exists(document_id):
-                return  # document was deleted while we were ingesting
+                await repo.update_operation(operation_id, status=OperationStatus.COMPLETED,
+                                            current_step="Document deleted during ingestion", completed_at=utc_now())
+                return
             embedding = None
             if use_real_apis():
                 try:

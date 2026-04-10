@@ -3,9 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   Search, ArrowRight, ArrowLeft, Loader2, Check, Sparkles,
 } from 'lucide-react';
-import { createAnalysis, listDocuments, getMarketSuggestions } from '../api/client';
+import { createAnalysis, createCompany, listDocuments, getMarketSuggestions } from '../api/client';
 import type { DocumentResponse } from '../api/client';
-import CompanySetup from '../components/CompanySetup';
 import { useCompany } from '../context/CompanyContext';
 
 const FRAMING_SUGGESTIONS = [
@@ -154,7 +153,7 @@ export default function InputPage() {
   }
 
   if (showSetup || !activeCompany) {
-    return <CompanySetup onComplete={(company) => { addCompany(company); setShowSetup(false); }} />;
+    return <CompanyOnboarding onCreated={(company) => { addCompany(company); navigate('/settings'); }} />;
   }
 
   return (
@@ -602,6 +601,98 @@ function StepReview({ companyName, marketSpace, framingQuestion, additionalConte
           <GlassRow label="Documents" value={`${documentCount} of ${totalDocuments} included`} muted={documentCount === 0} onEdit={() => onEdit('documents')} />
         )}
         <GlassRow label="Additional Context" value={additionalContext || '—'} muted={!additionalContext} onEdit={() => onEdit('context')} />
+      </div>
+    </div>
+  );
+}
+
+
+// ── Company onboarding (no company yet) ─────────────────────────────────────
+
+function CompanyOnboarding({ onCreated }: { onCreated: (company: import('../api/client').CompanyResponse) => void }) {
+  const [name, setName] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = async () => {
+    if (!name.trim() || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const company = await createCompany(name.trim());
+      onCreated(company);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create company');
+      setSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && name.trim()) { e.preventDefault(); submit(); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [name, submitting]);
+
+  return (
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#0a0306]">
+      {/* Same atmospheric background as main input */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 85% 60% at -8% 38%, rgba(170,8,8,0.72) 0%, transparent 62%),' +
+            'radial-gradient(ellipse 70% 55% at 108% -2%, rgba(160,8,90,0.58) 0%, transparent 60%),' +
+            'radial-gradient(ellipse 55% 40% at 50% 18%, rgba(120,5,45,0.28) 0%, transparent 68%),' +
+            'radial-gradient(ellipse 35% 28% at 72% 72%, rgba(140,5,70,0.18) 0%, transparent 55%)',
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
+          backgroundRepeat: 'repeat',
+        }}
+      />
+
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 py-16">
+        <div className="w-full max-w-2xl text-center">
+          <GradientHeading>What company are you evaluating for?</GradientHeading>
+          <p className="text-sm text-white/40 mb-10">
+            Enter your company name to get started
+          </p>
+
+          <div className="relative">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Acme Corp"
+              className="w-full pl-7 pr-16 py-4 rounded-full border border-white/14 bg-white/[0.07] backdrop-blur-md text-white placeholder:text-white/28 focus:outline-none focus:border-white/30 focus:bg-white/[0.10] transition-all text-base text-center"
+              autoFocus
+              disabled={submitting}
+            />
+            <button
+              type="button"
+              onClick={submit}
+              disabled={!name.trim() || submitting}
+              className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                name.trim() && !submitting
+                  ? 'bg-white/15 hover:bg-white/25 text-white cursor-pointer'
+                  : 'bg-white/5 text-white/20 cursor-default'
+              }`}
+            >
+              {submitting ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
+            </button>
+          </div>
+
+          {error && <p className="text-sm text-red-400 mt-4">{error}</p>}
+
+          <p className="text-[11px] text-white/22 mt-4">
+            Press Enter to continue — you'll set up your profile next
+          </p>
+        </div>
       </div>
     </div>
   );
