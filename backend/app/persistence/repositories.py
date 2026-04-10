@@ -369,6 +369,46 @@ async def update_company_context(company_id: str, context: str) -> None:
     await db.commit()
 
 
+async def delete_company(company_id: str) -> None:
+    db = await get_db()
+    # Get document IDs to cascade into chunks/sections/embeddings
+    rows = await db.execute_fetchall("SELECT id FROM documents WHERE company_id = ?", (company_id,))
+    doc_ids = [r[0] for r in rows]
+    for doc_id in doc_ids:
+        await db.execute("DELETE FROM document_chunks WHERE document_id = ?", (doc_id,))
+        await db.execute("DELETE FROM document_sections WHERE document_id = ?", (doc_id,))
+    await db.execute("DELETE FROM embeddings WHERE company_id = ?", (company_id,))
+    await db.execute("DELETE FROM market_suggestions WHERE company_id = ?", (company_id,))
+    await db.execute("DELETE FROM strategy_lenses WHERE company_id = ?", (company_id,))
+    await db.execute("DELETE FROM documents WHERE company_id = ?", (company_id,))
+    await db.execute("DELETE FROM companies WHERE id = ?", (company_id,))
+    await db.commit()
+
+
+async def save_market_suggestions(company_id: str, suggestions: list[str]) -> None:
+    db = await get_db()
+    import json as _json
+    suggestion_id = generate_id("mks")
+    await db.execute("DELETE FROM market_suggestions WHERE company_id = ?", (company_id,))
+    await db.execute(
+        "INSERT INTO market_suggestions (id, company_id, suggestions_json, generated_at) VALUES (?,?,?,?)",
+        (suggestion_id, company_id, _json.dumps(suggestions), utc_now()),
+    )
+    await db.commit()
+
+
+async def get_market_suggestions(company_id: str) -> list[str] | None:
+    db = await get_db()
+    rows = await db.execute_fetchall(
+        "SELECT suggestions_json FROM market_suggestions WHERE company_id = ? ORDER BY generated_at DESC LIMIT 1",
+        (company_id,),
+    )
+    if not rows:
+        return None
+    import json as _json
+    return _json.loads(rows[0]["suggestions_json"])
+
+
 async def list_companies() -> list[Company]:
     db = await get_db()
     rows = await db.execute_fetchall("SELECT * FROM companies ORDER BY created_at DESC")
@@ -697,7 +737,7 @@ async def delete_document(document_id: str) -> bool:
     # Get chunk ids to delete their embeddings
     chunk_rows = await db.execute_fetchall("SELECT id FROM document_chunks WHERE document_id = ?", (document_id,))
     for chunk in chunk_rows:
-        await db.execute("DELETE FROM embeddings WHERE entity_id = ?", (chunk["id"],))
+        await db.execute("DELETE FROM embeddings WHERE source_id = ?", (chunk["id"],))
     await db.execute("DELETE FROM document_chunks WHERE document_id = ?", (document_id,))
     await db.execute("DELETE FROM document_sections WHERE document_id = ?", (document_id,))
     await db.execute("DELETE FROM documents WHERE id = ?", (document_id,))
@@ -717,14 +757,15 @@ async def get_documents_for_company(company_id: str) -> list[Document]:
 async def create_document_chunk(document_id: str, chunk_index: int, text: str,
                                 embedding: list[float] | None = None,
                                 section_id: str | None = None,
-                                chunk_type: str = "text") -> str:
+                                chunk_type: str = "text",
+                                page_number: int = 0) -> str:
     db = await get_db()
     chunk_id = generate_id("chk")
     embedding_json = json.dumps(embedding) if embedding else None
     await db.execute(
-        "INSERT INTO document_chunks (id, document_id, chunk_index, text, embedding_json, section_id, chunk_type, created_at) "
-        "VALUES (?,?,?,?,?,?,?,?)",
-        (chunk_id, document_id, chunk_index, text, embedding_json, section_id, chunk_type, utc_now()),
+        "INSERT INTO document_chunks (id, document_id, chunk_index, text, embedding_json, section_id, chunk_type, page_number, created_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?)",
+        (chunk_id, document_id, chunk_index, text, embedding_json, section_id, chunk_type, page_number, utc_now()),
     )
     await db.commit()
     return chunk_id
@@ -741,15 +782,24 @@ async def create_document_section(
     summary: str | None = None,
     char_count: int = 0,
     is_boilerplate: bool = False,
+    start_page: int = 0,
 ) -> str:
     """Create a document section record. Returns section ID."""
     db = await get_db()
     section_id = generate_id("sec")
-    await db.execute(
-        "INSERT INTO document_sections (id, document_id, section_index, title, section_type, text, summary, char_count, is_boilerplate, created_at) "
-        "VALUES (?,?,?,?,?,?,?,?,?,?)",
-        (section_id, document_id, section_index, title, section_type, text, summary, char_count, int(is_boilerplate), utc_now()),
-    )
+    try:
+        await db.execute(
+            "INSERT INTO document_sections (id, document_id, section_index, title, section_type, text, summary, char_count, is_boilerplate, start_page, created_at) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+            (section_id, document_id, section_index, title, section_type, text, summary, char_count, int(is_boilerplate), start_page, utc_now()),
+        )
+    except Exception:
+        # Fallback for DBs where start_page column may not exist yet
+        await db.execute(
+            "INSERT INTO document_sections (id, document_id, section_index, title, section_type, text, summary, char_count, is_boilerplate, created_at) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?)",
+            (section_id, document_id, section_index, title, section_type, text, summary, char_count, int(is_boilerplate), utc_now()),
+        )
     await db.commit()
     return section_id
 
@@ -865,6 +915,70 @@ async def search_fts(query: str, limit: int = 20, source_type: str | None = None
             (query, limit))
     return [{"source_id": r["source_id"], "source_type": r["source_type"],
              "text": r["text"], "rank": r["rank"]} for r in rows]
+
+
+async def get_sources_by_ids(source_ids: list[str]) -> list[dict]:
+    """Fetch web sources by IDs."""
+    if not source_ids:
+        return []
+    db = await get_db()
+    placeholders = ",".join("?" for _ in source_ids)
+    rows = await db.execute_fetchall(
+        f"SELECT * FROM sources WHERE id IN ({placeholders})", source_ids)
+    return [dict(r) for r in rows]
+
+
+async def search_doc_chunks_by_embedding(
+    query_embedding: list[float],
+    company_id: str,
+    top_k: int = 3,
+) -> list[dict]:
+    """Find top-k document chunks by cosine similarity, returning chunk text, page, and filename."""
+    import numpy as np
+    db = await get_db()
+
+    # Get all document chunk embeddings for this company
+    rows = await db.execute_fetchall(
+        "SELECT e.source_id, e.embedding_json "
+        "FROM embeddings e "
+        "WHERE e.source_type = 'document_chunk' AND e.company_id = ?",
+        (company_id,),
+    )
+    if not rows:
+        return []
+
+    query = np.array(query_embedding, dtype=np.float32)
+    query_norm = query / (np.linalg.norm(query) + 1e-9)
+
+    scored = []
+    for r in rows:
+        try:
+            emb = np.array(json.loads(r["embedding_json"]), dtype=np.float32)
+            emb_norm = emb / (np.linalg.norm(emb) + 1e-9)
+            score = float(np.dot(query_norm, emb_norm))
+            scored.append((score, r["source_id"]))
+        except Exception:
+            continue
+
+    scored.sort(reverse=True)
+    top_ids = [sid for _, sid in scored[:top_k]]
+
+    if not top_ids:
+        return []
+
+    # Fetch chunk text + page + filename in one query
+    placeholders = ",".join("?" for _ in top_ids)
+    chunk_rows = await db.execute_fetchall(
+        f"SELECT dc.id, dc.text, dc.page_number, d.filename, d.id as document_id "
+        f"FROM document_chunks dc "
+        f"JOIN documents d ON dc.document_id = d.id "
+        f"WHERE dc.id IN ({placeholders})",
+        top_ids,
+    )
+    chunk_map = {r["id"]: dict(r) for r in chunk_rows}
+
+    # Return in scored order
+    return [chunk_map[sid] for sid in top_ids if sid in chunk_map]
 
 
 async def get_document_ids_for_company(company_id: str) -> list[str]:

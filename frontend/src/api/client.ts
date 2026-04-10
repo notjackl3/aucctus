@@ -157,6 +157,11 @@ export function createCompany(
   });
 }
 
+export async function deleteCompany(companyId: string): Promise<void> {
+  const res = await fetch(`/api/companies/${companyId}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(res.statusText);
+}
+
 export function updateCompanyContext(
   companyId: string,
   context: string,
@@ -181,6 +186,42 @@ export function buildStrategy(companyId: string): Promise<StrategyLens> {
 
 export function listDocuments(companyId: string): Promise<DocumentResponse[]> {
   return request(`/api/documents/by-company/${companyId}`);
+}
+
+export function getMarketSuggestions(companyId: string): Promise<{ suggestions: string[] }> {
+  return request(`/api/companies/${companyId}/market-suggestions`);
+}
+
+export interface WebSource {
+  title: string;
+  url: string;
+  publisher: string;
+  snippet: string;
+  date?: string | null;
+  matching_quote?: string | null;
+}
+
+export interface DocSource {
+  filename: string;
+  document_id: string;
+  page_number: number;
+  excerpt: string;
+}
+
+export function lookupSources(
+  workspaceId: string,
+  highlightedText: string,
+  insightId?: string,
+  blockCategory?: string,
+): Promise<{ web_sources: WebSource[]; doc_sources: DocSource[] }> {
+  return request(`/api/workspaces/${workspaceId}/source-lookup`, {
+    method: 'POST',
+    body: JSON.stringify({
+      highlighted_text: highlightedText,
+      insight_id: insightId ?? null,
+      block_category: blockCategory ?? null,
+    }),
+  });
 }
 
 export async function extractTextFromFile(
@@ -228,6 +269,16 @@ export function replaceDecisionQuestion(
 
 export function applyAnswers(analysisId: string): Promise<ApplyAnswersResult> {
   return request(`/api/analyses/${analysisId}/apply-answers`, { method: 'POST' });
+}
+
+export function fetchMoreSources(
+  analysisId: string,
+  dimension: 'incumbents' | 'emerging' | 'market_sizing',
+): Promise<{ operationId: string; status: string }> {
+  return request(`/api/analyses/${analysisId}/fetch-more`, {
+    method: 'POST',
+    body: JSON.stringify({ dimension }),
+  });
 }
 
 // ── Ask about selection ──

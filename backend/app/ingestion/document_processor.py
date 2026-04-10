@@ -37,6 +37,7 @@ class DocumentSection:
     text: str
     char_count: int = 0
     is_boilerplate: bool = False
+    start_page: int = 0  # 0-indexed page where this section begins
 
     def __post_init__(self):
         self.char_count = len(self.text)
@@ -49,6 +50,7 @@ class DocumentChunkResult:
     chunk_index: int
     text: str
     chunk_type: str = "text"  # text, header, list
+    page_number: int = 0  # inherited from parent section (0-indexed)
 
 
 @dataclass
@@ -169,6 +171,8 @@ def _extract_pdf_sections(content: bytes) -> list[DocumentSection]:
     current_title = None
     current_type = "body"
     current_lines: list[str] = []
+    current_page = 0
+    section_start_page = 0
     section_idx = 0
 
     for block in blocks:
@@ -189,14 +193,19 @@ def _extract_pdf_sections(content: bytes) -> list[DocumentSection]:
                         title=current_title,
                         section_type=current_type,
                         text=text,
+                        start_page=section_start_page,
                     ))
                     section_idx += 1
 
             current_title = block["text"]
             current_type = "heading_1" if block["font_size"] >= heading_threshold * 1.1 else "heading_2"
             current_lines = []
+            section_start_page = block["page"]
         else:
+            if not current_lines:
+                section_start_page = block["page"]
             current_lines.append(block["text"])
+            current_page = block["page"]
 
     # Flush last section
     if current_lines:
@@ -207,12 +216,13 @@ def _extract_pdf_sections(content: bytes) -> list[DocumentSection]:
                 title=current_title,
                 section_type=current_type,
                 text=text,
+                start_page=section_start_page,
             ))
 
     # If no sections detected (no headings), treat entire document as one section
     if not sections:
         full_text = "\n".join(b["text"] for b in blocks)
-        sections = [DocumentSection(index=0, title=None, section_type="body", text=full_text)]
+        sections = [DocumentSection(index=0, title=None, section_type="body", text=full_text, start_page=0)]
 
     return sections
 
@@ -324,6 +334,8 @@ def _chunk_section(section: DocumentSection, start_chunk_idx: int = 0) -> list[D
     chunk_idx = start_chunk_idx
     current_chunk = ""
 
+    page = section.start_page
+
     for para in paragraphs:
         if len(current_chunk) + len(para) + 2 <= MAX_CHUNK_SIZE:
             current_chunk = (current_chunk + "\n\n" + para).strip() if current_chunk else para
@@ -334,12 +346,13 @@ def _chunk_section(section: DocumentSection, start_chunk_idx: int = 0) -> list[D
                     section_index=section.index,
                     chunk_index=chunk_idx,
                     text=current_chunk,
+                    page_number=page,
                 ))
                 chunk_idx += 1
 
             # If paragraph itself exceeds MAX_CHUNK_SIZE, split by sentences
             if len(para) > MAX_CHUNK_SIZE:
-                sentence_chunks = _split_by_sentences(para, section.index, chunk_idx)
+                sentence_chunks = _split_by_sentences(para, section.index, chunk_idx, page)
                 chunks.extend(sentence_chunks)
                 chunk_idx += len(sentence_chunks)
                 current_chunk = ""
@@ -352,12 +365,13 @@ def _chunk_section(section: DocumentSection, start_chunk_idx: int = 0) -> list[D
             section_index=section.index,
             chunk_index=chunk_idx,
             text=current_chunk,
+            page_number=page,
         ))
 
     return chunks
 
 
-def _split_by_sentences(text: str, section_index: int, start_idx: int) -> list[DocumentChunkResult]:
+def _split_by_sentences(text: str, section_index: int, start_idx: int, page_number: int = 0) -> list[DocumentChunkResult]:
     """Split a large paragraph into sentence-bounded chunks."""
     # Simple sentence boundary detection
     sentences = re.split(r'(?<=[.!?])\s+', text)
@@ -372,7 +386,7 @@ def _split_by_sentences(text: str, section_index: int, start_idx: int) -> list[D
         else:
             if current:
                 chunks.append(DocumentChunkResult(
-                    section_index=section_index, chunk_index=idx, text=current,
+                    section_index=section_index, chunk_index=idx, text=current, page_number=page_number,
                 ))
                 idx += 1
             # If a single sentence exceeds limit, just truncate
@@ -380,7 +394,7 @@ def _split_by_sentences(text: str, section_index: int, start_idx: int) -> list[D
 
     if current:
         chunks.append(DocumentChunkResult(
-            section_index=section_index, chunk_index=idx, text=current,
+            section_index=section_index, chunk_index=idx, text=current, page_number=page_number,
         ))
 
     return chunks

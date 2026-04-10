@@ -10,6 +10,7 @@ interface CompanyContextValue {
   loading: boolean;
   setActiveCompany: (c: CompanyResponse) => void;
   addCompany: (c: CompanyResponse) => void;
+  removeCompany: (id: string) => void;
   reload: () => void;
 }
 
@@ -19,6 +20,7 @@ const CompanyContext = createContext<CompanyContextValue>({
   loading: true,
   setActiveCompany: () => {},
   addCompany: () => {},
+  removeCompany: () => {},
   reload: () => {},
 });
 
@@ -53,8 +55,21 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
     setActiveCompany(c);
   };
 
+  const removeCompany = (id: string) => {
+    setCompanies((prev) => {
+      const next = prev.filter((c) => c.id !== id);
+      if (activeCompany?.id === id) {
+        const nextActive = next[0] || null;
+        setActiveCompanyState(nextActive);
+        if (nextActive) localStorage.setItem(ACTIVE_COMPANY_KEY, nextActive.id);
+        else localStorage.removeItem(ACTIVE_COMPANY_KEY);
+      }
+      return next;
+    });
+  };
+
   return (
-    <CompanyContext.Provider value={{ companies, activeCompany, loading, setActiveCompany, addCompany, reload: load }}>
+    <CompanyContext.Provider value={{ companies, activeCompany, loading, setActiveCompany, addCompany, removeCompany, reload: load }}>
       {children}
     </CompanyContext.Provider>
   );

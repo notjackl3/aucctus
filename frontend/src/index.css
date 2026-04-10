@@ -43,6 +43,24 @@ body {
   border-radius: 3px;
 }
 
+/* Float animation for InputPage market bubbles */
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+/* Shimmer animation for skeleton loading */
+@keyframes shimmer {
+  0% { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f0ebe9 25%, #e8e0dd 50%, #f0ebe9 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
 /* Gradient background — only used on the onboarding/setup page */
 .gradient-bg {
   background: #050505;

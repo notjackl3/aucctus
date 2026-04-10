@@ -284,6 +284,15 @@ CREATE TABLE IF NOT EXISTS workspace_interactions (
 );
 CREATE INDEX IF NOT EXISTS idx_interactions_analysis ON workspace_interactions(analysis_id);
 
+-- ── Market Suggestions ──
+CREATE TABLE IF NOT EXISTS market_suggestions (
+    id              TEXT PRIMARY KEY,
+    company_id      TEXT NOT NULL REFERENCES companies(id),
+    suggestions_json TEXT NOT NULL,
+    generated_at    TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_market_suggestions_company ON market_suggestions(company_id);
+
 -- ── FTS5 for retrieval ──
 CREATE VIRTUAL TABLE IF NOT EXISTS fts_content USING fts5(
     source_id, source_type, text, tokenize='porter'
@@ -384,6 +393,29 @@ async def _run_migrations(db: aiosqlite.Connection) -> None:
         )
     """)
     await db.execute("CREATE INDEX IF NOT EXISTS idx_doc_sections_document ON document_sections(document_id)")
+
+    # ── document_sections: start_page column ──
+    cursor = await db.execute("PRAGMA table_info(document_sections)")
+    section_cols = {row[1] for row in await cursor.fetchall()}
+    if "start_page" not in section_cols:
+        await db.execute("ALTER TABLE document_sections ADD COLUMN start_page INTEGER DEFAULT 0")
+
+    # ── document_chunks: page_number column ──
+    cursor = await db.execute("PRAGMA table_info(document_chunks)")
+    chunk_cols_mig = {row[1] for row in await cursor.fetchall()}
+    if "page_number" not in chunk_cols_mig:
+        await db.execute("ALTER TABLE document_chunks ADD COLUMN page_number INTEGER DEFAULT 0")
+
+    # ── Market suggestions table (create if missing for pre-migration DBs) ──
+    await db.execute("""
+        CREATE TABLE IF NOT EXISTS market_suggestions (
+            id              TEXT PRIMARY KEY,
+            company_id      TEXT NOT NULL REFERENCES companies(id),
+            suggestions_json TEXT NOT NULL,
+            generated_at    TEXT NOT NULL
+        )
+    """)
+    await db.execute("CREATE INDEX IF NOT EXISTS idx_market_suggestions_company ON market_suggestions(company_id)")
 
     await db.commit()
 

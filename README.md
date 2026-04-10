@@ -18,9 +18,9 @@ It is built for established companies evaluating market opportunities, not start
 1. Set up a company profile (name, context, optional internal documents)
 2. Pick a market space and optional framing question
 3. Four AI agents research in parallel — incumbents, emerging competitors, market sizing, synthesis
-4. Interactive workspace: browse findings, pin insights, ask follow-up questions, answer decision questions
+4. Interactive workspace: browse findings, pin insights, ask about selected text, answer decision questions
 5. AI re-synthesizes the recommendation based on your answers
-6. Compile a report
+6. Export a PDF report from the workspace
 
 ---
 
@@ -152,11 +152,10 @@ Exploration searches are conditional — Tavily is only called when local retrie
 After analysis completes, the user lands in a workspace with:
 - **16 seeded insights** (4 per agent), filterable by category
 - **Insight management** — pin, archive, or collapse findings
-- **Exploration questions** — ask follow-up questions with grounded retrieval
 - **Decision questions** — structured inputs that refine the recommendation
-- **Ask-about-selection** — highlight any text and ask a grounded question
+- **Ask-about-selection** — highlight any text and ask a grounded question with source citations
 - **User memory** — prior answers and interactions are injected into future prompts
-- **Report compilation** — generate an executive brief from workspace findings
+- **PDF export** — client-side PDF export of workspace findings
 
 ---
 

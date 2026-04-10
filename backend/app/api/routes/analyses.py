@@ -16,6 +16,7 @@ from app.api.schemas import (
     CreateAnalysisRequest,
     CreateAnalysisResponse,
     DecisionQuestionResponse,
+    FetchMoreRequest,
     ResearchStepStatusResponse,
 )
 from app.config import ANALYSIS_STEPS
@@ -108,6 +109,7 @@ async def create_analysis(req: CreateAnalysisRequest, background_tasks: Backgrou
         market_space=req.market_space,
         company_context=effective_context or None,
         strategy_lens=strategy_lens,
+        company_id=req.company_id or None,
     )
 
     return CreateAnalysisResponse(id=analysis.id, operation_id=operation.id)
@@ -354,6 +356,34 @@ async def _run_resynthesis(analysis_id: str, operation_id: str):
             error_message=str(e),
             completed_at=utc_now(),
         )
+
+
+@router.post("/{analysis_id}/fetch-more")
+async def fetch_more_sources(analysis_id: str, req: FetchMoreRequest, background_tasks: BackgroundTasks):
+    """Fetch additional sources for a research dimension and re-synthesize."""
+    analysis = await repo.get_analysis(analysis_id)
+    if not analysis:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+    if not analysis.result_json:
+        raise HTTPException(status_code=400, detail="Analysis has no results yet")
+
+    workspace = await repo.get_workspace_by_analysis(analysis_id)
+    if not workspace:
+        raise HTTPException(status_code=404, detail="Workspace not found for this analysis")
+
+    if req.dimension not in ("incumbents", "emerging", "market_sizing"):
+        raise HTTPException(status_code=400, detail="dimension must be incumbents, emerging, or market_sizing")
+
+    operation = await repo.create_operation(
+        operation_type="fetch_more",
+        parent_id=analysis_id,
+        steps_total=4,
+    )
+
+    from app.workflows.fetch_more import fetch_more_sources as _fetch_more
+    background_tasks.add_task(_fetch_more, analysis_id, workspace.id, req.dimension, operation.id)
+
+    return {"operationId": operation.id, "status": "pending"}
 
 
 @router.post("/{analysis_id}/ask", response_model=AskAboutSelectionResponse)

@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import analyses, companies, documents, operations, reports, workspace
+from app.api.routes import analyses, companies, documents, internal, operations, reports, workspace
 from app.config import API_PREFIX, CORS_ORIGINS
 from app.persistence.database import close_db, init_db
 
@@ -37,6 +37,7 @@ app.include_router(companies.router, prefix=API_PREFIX)
 app.include_router(workspace.router, prefix=API_PREFIX)
 app.include_router(reports.router, prefix=API_PREFIX)
 app.include_router(documents.router, prefix=API_PREFIX)
+app.include_router(internal.router)  # no API_PREFIX — served at /_internal
 
 
 @app.get("/health")

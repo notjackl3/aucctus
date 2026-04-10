@@ -382,6 +382,10 @@ class ApplyAnswersResponse(CamelModel):
     operation_id: str
 
 
+class FetchMoreRequest(CamelModel):
+    dimension: str  # incumbents | emerging | market_sizing
+
+
 # ══════════════════════════════════════════════
 # Ask about selection schemas
 # ══════════════════════════════════════════════

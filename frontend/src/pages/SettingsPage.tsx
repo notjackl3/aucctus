@@ -24,6 +24,7 @@ import {
   listCompanies,
   createCompany,
   updateCompanyContext,
+  deleteCompany,
   getStrategy,
   buildStrategy,
   listDocuments,
@@ -32,14 +33,18 @@ import {
   extractTextFromFile,
 } from '../api/client';
 import type { CompanyResponse, DocumentResponse, StrategyLens } from '../api/client';
+import { useCompany } from '../context/CompanyContext';
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 const ACTIVE_COMPANY_KEY = 'aucctus_active_company_id';
 
 export default function SettingsPage() {
+  const { removeCompany } = useCompany();
+
   // Company state
   const [companies, setCompanies] = useState<CompanyResponse[]>([]);
+  const [deletingCompany, setDeletingCompany] = useState(false);
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +73,9 @@ export default function SettingsPage() {
   const [docsLoading, setDocsLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const processingPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Load companies on mount
   useEffect(() => {
@@ -145,6 +152,28 @@ export default function SettingsPage() {
     }
   };
 
+  const handleDeleteCompany = async () => {
+    if (!selectedCompanyId || deletingCompany) return;
+    if (!window.confirm('Delete this company profile? This cannot be undone.')) return;
+    setDeletingCompany(true);
+    try {
+      await deleteCompany(selectedCompanyId);
+      removeCompany(selectedCompanyId);
+      setCompanies((prev) => {
+        const next = prev.filter((c) => c.id !== selectedCompanyId);
+        const nextId = next[0]?.id || null;
+        setSelectedCompanyId(nextId);
+        if (nextId) localStorage.setItem(ACTIVE_COMPANY_KEY, nextId);
+        else localStorage.removeItem(ACTIVE_COMPANY_KEY);
+        return next;
+      });
+    } catch {
+      // silently fail
+    } finally {
+      setDeletingCompany(false);
+    }
+  };
+
   const handleBuildLens = async () => {
     if (!selectedCompanyId) return;
     setLensBuilding(true);
@@ -183,15 +212,43 @@ export default function SettingsPage() {
 
   const handleDeleteDocument = async (docId: string) => {
     setDeletingDocId(docId);
+    setDeleteError(null);
     try {
       await deleteDocument(docId);
       setDocuments((prev) => prev.filter((d) => d.id !== docId));
     } catch {
-      // silently fail — item stays in list
+      setDeleteError('Failed to delete — document may still be processing. Try again in a moment.');
+      setTimeout(() => setDeleteError(null), 4000);
     } finally {
       setDeletingDocId(null);
     }
   };
+
+  // Poll every 3s if any document is still processing (chunkCount === 0)
+  useEffect(() => {
+    const hasProcessing = documents.some((d) => d.chunkCount === 0);
+    if (hasProcessing && selectedCompanyId && !processingPollRef.current) {
+      processingPollRef.current = setInterval(async () => {
+        if (!selectedCompanyId) return;
+        const docs = await listDocuments(selectedCompanyId).catch(() => null);
+        if (!docs) return;
+        setDocuments(docs);
+        if (docs.every((d) => d.chunkCount > 0)) {
+          clearInterval(processingPollRef.current!);
+          processingPollRef.current = null;
+        }
+      }, 3000);
+    } else if (!hasProcessing && processingPollRef.current) {
+      clearInterval(processingPollRef.current);
+      processingPollRef.current = null;
+    }
+    return () => {
+      if (processingPollRef.current) {
+        clearInterval(processingPollRef.current);
+        processingPollRef.current = null;
+      }
+    };
+  }, [documents, selectedCompanyId]);
 
   const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -449,6 +506,7 @@ export default function SettingsPage() {
                 </p>
               </div>
             )}
+
           </section>
 
           {/* ═══ Section 2: Strategy Lens ═══ */}
@@ -509,6 +567,7 @@ export default function SettingsPage() {
 
           {/* ═══ Section 3: Supporting Documents ═══ */}
           {selectedCompanyId && (
+            <>
             <section className="bg-surface rounded-2xl border border-border p-6">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2.5">
@@ -541,28 +600,49 @@ export default function SettingsPage() {
                 Upload strategy briefs, pitch decks, or market research. Documents are embedded and used to enrich the strategy lens and analysis context.
               </p>
 
+              {deleteError && (
+                <div className="mb-3 p-3 rounded-xl bg-nogo/10 border border-nogo/20 text-xs text-nogo flex items-center gap-2">
+                  <AlertCircle size={13} />
+                  {deleteError}
+                </div>
+              )}
+
               {docsLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 size={20} className="text-brand animate-spin" />
                 </div>
               ) : documents.length > 0 ? (
                 <div className="space-y-2">
-                  {documents.map((doc) => (
+                  {documents.map((doc) => {
+                    const isProcessing = doc.chunkCount === 0;
+                    return (
                     <div
                       key={doc.id}
-                      className={`flex items-center gap-3 p-3.5 rounded-xl bg-gray-50 border border-border transition-opacity ${
+                      className={`flex items-center gap-3 p-3.5 rounded-xl border transition-opacity ${
                         deletingDocId === doc.id ? 'opacity-50 pointer-events-none' : ''
-                      }`}
+                      } ${isProcessing ? 'bg-brand/[0.03] border-brand/20' : 'bg-gray-50 border-border'}`}
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-text-primary truncate">
-                          {doc.filename}
-                        </p>
-                        {doc.summary && (
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium text-text-primary truncate">
+                            {doc.filename}
+                          </p>
+                          {isProcessing && (
+                            <span className="flex items-center gap-1 text-[10px] font-medium text-brand bg-brand/10 px-1.5 py-0.5 rounded-full shrink-0">
+                              <Loader2 size={9} className="animate-spin" />
+                              Processing
+                            </span>
+                          )}
+                        </div>
+                        {isProcessing ? (
+                          <p className="text-xs text-text-muted mt-1 italic">
+                            Extracting and indexing content — summary will appear when ready
+                          </p>
+                        ) : doc.summary ? (
                           <p className="text-xs text-text-secondary mt-1.5 line-clamp-2">
                             {doc.summary}
                           </p>
-                        )}
+                        ) : null}
                       </div>
                       <button
                         onClick={() => handleDeleteDocument(doc.id)}
@@ -577,7 +657,8 @@ export default function SettingsPage() {
                         )}
                       </button>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-8 border border-dashed border-border rounded-xl">
@@ -589,6 +670,22 @@ export default function SettingsPage() {
                 </div>
               )}
             </section>
+
+            <div className="flex justify-end">
+              <button
+                onClick={handleDeleteCompany}
+                disabled={deletingCompany}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {deletingCompany ? (
+                  <Loader2 size={13} className="animate-spin" />
+                ) : (
+                  <Trash2 size={13} />
+                )}
+                Delete Company
+              </button>
+            </div>
+            </>
           )}
         </div>
       </div>

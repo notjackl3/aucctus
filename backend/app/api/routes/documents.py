@@ -12,6 +12,7 @@ from app.persistence import repositories as repo
 from app.retrieval import retriever
 from app.services import llm
 from app.shared.utils import utc_now
+from app.api.routes.companies import _generate_and_persist_suggestions
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +54,8 @@ async def upload_document(
     operation = await repo.create_operation("document_ingest", parent_id=company_id, steps_total=4)
 
     background_tasks.add_task(_ingest_document, doc.id, processed, operation.id, company_id)
+    if use_real_apis():
+        background_tasks.add_task(_generate_and_persist_suggestions, company_id, company.name, company.context)
 
     return UploadDocumentResponse(document_id=doc.id, operation_id=operation.id, status="pending")
 
@@ -76,6 +79,14 @@ async def list_documents(company_id: str):
                              chunk_count=d.chunk_count, created_at=d.created_at) for d in docs]
 
 
+async def _doc_exists(document_id: str) -> bool:
+    """Return True if the document row still exists (not deleted mid-ingest)."""
+    from app.persistence.database import get_db
+    db = await get_db()
+    rows = await db.execute_fetchall("SELECT id FROM documents WHERE id = ?", (document_id,))
+    return len(rows) > 0
+
+
 async def _ingest_document(document_id: str, processed, operation_id: str, company_id: str) -> None:
     """Background task: persist sections, chunk, summarize, and embed a document."""
     from app.ingestion.document_processor import ProcessedDocument
@@ -88,6 +99,8 @@ async def _ingest_document(document_id: str, processed, operation_id: str, compa
         # 1. Persist document sections
         section_id_map: dict[int, str] = {}  # section_index → section_id
         for section in processed.sections:
+            if not await _doc_exists(document_id):
+                return  # document was deleted while we were ingesting
             section_id = await repo.create_document_section(
                 document_id=document_id,
                 section_index=section.index,
@@ -96,6 +109,7 @@ async def _ingest_document(document_id: str, processed, operation_id: str, compa
                 text=section.text,
                 char_count=section.char_count,
                 is_boilerplate=section.is_boilerplate,
+                start_page=section.start_page,
             )
             section_id_map[section.index] = section_id
 
@@ -103,6 +117,8 @@ async def _ingest_document(document_id: str, processed, operation_id: str, compa
 
         # 2. Store chunks with section references and embed (with scoping metadata)
         for chunk in processed.chunks[:MAX_CHUNKS_PER_DOCUMENT]:
+            if not await _doc_exists(document_id):
+                return  # document was deleted while we were ingesting
             embedding = None
             if use_real_apis():
                 try:
@@ -116,6 +132,7 @@ async def _ingest_document(document_id: str, processed, operation_id: str, compa
                 embedding=embedding,
                 section_id=section_id,
                 chunk_type=chunk.chunk_type,
+                page_number=chunk.page_number,
             )
 
             # Index chunk for scoped retrieval

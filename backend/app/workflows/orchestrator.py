@@ -36,6 +36,7 @@ async def run_analysis(
     company_context: str | None = None,
     strategy_lens: dict | None = None,
     evaluation_posture: str | None = None,
+    company_id: str | None = None,
 ) -> None:
     """Run the full analysis pipeline. Called as a background task."""
     try:
@@ -44,7 +45,7 @@ async def run_analysis(
         await repo.update_analysis_status(analysis_id, AnalysisStatus.RUNNING)
 
         if not use_real_apis():
-            await _run_mock_pipeline(analysis_id, operation_id, company_name, market_space, company_context)
+            await _run_mock_pipeline(analysis_id, operation_id, company_name, market_space, company_context, company_id)
             return
 
         reset_tavily_stats()
@@ -159,7 +160,7 @@ async def run_analysis(
 
         # Create workspace and seed insights
         all_insights = inc_result.insights + emg_result.insights + mkt_result.insights + syn_result.insights
-        workspace = await repo.create_workspace(analysis_id, None, company_name, market_space)
+        workspace = await repo.create_workspace(analysis_id, company_id, company_name, market_space)
         for ins_data in all_insights:
             await repo.create_insight(workspace.id, ins_data)
 
@@ -218,6 +219,7 @@ async def _run_mock_pipeline(
     company_name: str,
     market_space: str,
     company_context: str | None,
+    company_id: str | None = None,
 ) -> None:
     """Fallback mock pipeline when API keys aren't configured."""
     steps = await repo.get_analysis_steps(analysis_id)
@@ -229,7 +231,7 @@ async def _run_mock_pipeline(
     await repo.store_analysis_result(analysis_id, json.dumps(mock_result))
 
     # Create workspace and seed mock insights (mirrors real pipeline behavior)
-    workspace = await repo.create_workspace(analysis_id, None, company_name, market_space)
+    workspace = await repo.create_workspace(analysis_id, company_id, company_name, market_space)
     mock_insights = _build_mock_insights(company_name, market_space)
     for ins_data in mock_insights:
         await repo.create_insight(workspace.id, ins_data)

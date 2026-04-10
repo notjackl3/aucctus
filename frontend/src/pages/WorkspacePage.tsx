@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
 import WorkspacePDF from '../components/WorkspacePDF';
-import { getAnalysis, getDecisionQuestions, answerDecisionQuestion, replaceDecisionQuestion, generateDecisionQuestion, applyAnswers, getOperation } from '../api/client';
+import { getAnalysis, getDecisionQuestions, answerDecisionQuestion, replaceDecisionQuestion, generateDecisionQuestion, applyAnswers, fetchMoreSources, getOperation } from '../api/client';
 import type {
   AnalysisResult,
   DecisionQuestion,
@@ -48,6 +48,7 @@ import FindingsTray, { type PinnedFinding } from '../components/FindingsTray';
 import SelectableBlock from '../components/SelectableBlock';
 import SelectionToolbar from '../components/SelectionToolbar';
 import AskAboutPanel from '../components/AskAboutPanel';
+import SourcePanel from '../components/SourcePanel';
 import { useTextSelection } from '../hooks/useTextSelection';
 
 type CategoryKey = 'incumbents' | 'emerging' | 'market' | 'risks' | 'sources';
@@ -65,6 +66,12 @@ export default function WorkspacePage() {
     text: string;
     blockCategory: string;
     blockLabel: string;
+  } | null>(null);
+  const [sourcePopup, setSourcePopup] = useState<{
+    text: string;
+    insightId?: string;
+    blockCategory?: string;
+    blockLabel?: string;
   } | null>(null);
 
   const [generatingPdf, setGeneratingPdf] = useState(false);
@@ -94,6 +101,7 @@ export default function WorkspacePage() {
   const [applyingAnswers, setApplyingAnswers] = useState(false);
   const [applyError, setApplyError] = useState<string | null>(null);
   const [applySuccess, setApplySuccess] = useState(false);
+  const [fetchingMore, setFetchingMore] = useState<string | null>(null); // dimension being fetched
 
   useEffect(() => {
     if (!id) { setError('No analysis ID'); setLoading(false); return; }
@@ -151,6 +159,25 @@ export default function WorkspacePage() {
       setApplyError(err instanceof Error ? err.message : 'Failed to apply answers');
     } finally { setApplyingAnswers(false); }
   }, [id]);
+
+  const handleFetchMore = useCallback(async (dimension: 'incumbents' | 'emerging' | 'market_sizing') => {
+    if (!id || fetchingMore) return;
+    setFetchingMore(dimension);
+    try {
+      const result = await fetchMoreSources(id, dimension);
+      for (let i = 0; i < 90; i++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        const op = await getOperation(result.operationId);
+        if (op.status === 'completed') {
+          const analysis = await getAnalysis(id);
+          setData(analysis);
+          return;
+        }
+        if (op.status === 'error') return;
+      }
+    } catch { /* silently fail */ }
+    finally { setFetchingMore(null); }
+  }, [id, fetchingMore]);
 
   const pinFinding = useCallback((finding: Omit<PinnedFinding, 'id'>) => {
     setPinned((prev) => {
@@ -428,11 +455,11 @@ export default function WorkspacePage() {
                 onApplyAnswers={handleApplyAnswers}
               />
             ) : activeCategory === 'incumbents' && incumbents ? (
-              <IncumbentsDetail data={incumbents} />
+              <IncumbentsDetail data={incumbents} onFetchMore={() => handleFetchMore('incumbents')} fetchingMore={fetchingMore === 'incumbents'} />
             ) : activeCategory === 'emerging' && emerging ? (
-              <EmergingDetail data={emerging} />
+              <EmergingDetail data={emerging} onFetchMore={() => handleFetchMore('emerging')} fetchingMore={fetchingMore === 'emerging'} />
             ) : activeCategory === 'market' && market ? (
-              <MarketDetail data={market} />
+              <MarketDetail data={market} onFetchMore={() => handleFetchMore('market_sizing')} fetchingMore={fetchingMore === 'market_sizing'} />
             ) : activeCategory === 'risks' && assessment ? (
               <RisksDetail assessment={assessment} />
             ) : activeCategory === 'sources' ? (
@@ -478,11 +505,28 @@ export default function WorkspacePage() {
             clearSelection();
           }}
           onSource={() => {
-            // Navigate to the sources view for the selected block's category
-            setActiveCategory('sources');
+            if (!selection) return;
+            setSourcePopup({
+              text: selection.text,
+              insightId: selection.blockId?.startsWith('ins') ? selection.blockId : undefined,
+              blockCategory: selection.blockCategory || undefined,
+              blockLabel: selection.blockLabel || undefined,
+            });
             clearSelection();
           }}
           onDismiss={clearSelection}
+        />
+      )}
+
+      {/* Source panel */}
+      {sourcePopup && id && (
+        <SourcePanel
+          workspaceId={id}
+          highlightedText={sourcePopup.text}
+          insightId={sourcePopup.insightId}
+          blockCategory={sourcePopup.blockCategory}
+          blockLabel={sourcePopup.blockLabel}
+          onClose={() => setSourcePopup(null)}
         />
       )}
 
@@ -973,7 +1017,7 @@ function InlineMultipleChoiceInput({ choices, value, saving, onSelect }: {
 
 // ── Incumbents Detail ──
 
-function IncumbentsDetail({ data }: { data: IncumbentsResult }) {
+function IncumbentsDetail({ data, onFetchMore, fetchingMore }: { data: IncumbentsResult; onFetchMore: () => void; fetchingMore: boolean }) {
   const [expandedPlayers, setExpandedPlayers] = useState<Set<string>>(new Set());
 
   const togglePlayer = (name: string) => {
@@ -1004,7 +1048,7 @@ function IncumbentsDetail({ data }: { data: IncumbentsResult }) {
           return (
             <div key={player.name} className="bg-white rounded-xl border border-border overflow-hidden">
               <button onClick={() => togglePlayer(player.name)}
-                className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors">
+                className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors select-text">
                 {isExpanded
                   ? <ChevronDown size={16} className="text-text-muted shrink-0" />
                   : <ChevronRight size={16} className="text-text-muted shrink-0" />
@@ -1016,7 +1060,7 @@ function IncumbentsDetail({ data }: { data: IncumbentsResult }) {
                       player.marketPosition === 'Leader' ? 'bg-go-light text-go' : 'bg-gray-100 text-text-secondary'
                     }`}>{player.marketPosition}</span>
                   </div>
-                  <p className="text-xs text-text-muted mt-0.5 truncate">{player.description}</p>
+                  <p className={`text-xs text-text-muted mt-0.5 ${isExpanded ? 'whitespace-normal' : 'truncate'}`}>{player.description}</p>
                 </div>
                 <div className="flex items-center gap-4 shrink-0">
                   {player.estimatedRevenue && (
@@ -1060,7 +1104,7 @@ function IncumbentsDetail({ data }: { data: IncumbentsResult }) {
           );
         })}
 
-        <SourcesBlock sources={data.sources} />
+        <SourcesBlock sources={data.sources} onFetchMore={onFetchMore} fetchingMore={fetchingMore} />
       </div>
     </SelectableBlock>
   );
@@ -1069,7 +1113,7 @@ function IncumbentsDetail({ data }: { data: IncumbentsResult }) {
 
 // ── Emerging Competitors Detail ──
 
-function EmergingDetail({ data }: { data: EmergingCompetitorsResult }) {
+function EmergingDetail({ data, onFetchMore, fetchingMore }: { data: EmergingCompetitorsResult; onFetchMore: () => void; fetchingMore: boolean }) {
   const [expandedComps, setExpandedComps] = useState<Set<string>>(new Set());
 
   const toggleComp = (name: string) => {
@@ -1100,7 +1144,7 @@ function EmergingDetail({ data }: { data: EmergingCompetitorsResult }) {
           return (
             <div key={comp.name} className="bg-white rounded-xl border border-border overflow-hidden">
               <button onClick={() => toggleComp(comp.name)}
-                className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors">
+                className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors select-text">
                 {isExpanded
                   ? <ChevronDown size={16} className="text-text-muted shrink-0" />
                   : <ChevronRight size={16} className="text-text-muted shrink-0" />
@@ -1112,7 +1156,7 @@ function EmergingDetail({ data }: { data: EmergingCompetitorsResult }) {
                       {comp.fundingStage}
                     </span>
                   </div>
-                  <p className="text-xs text-text-muted mt-0.5 truncate">{comp.description}</p>
+                  <p className={`text-xs text-text-muted mt-0.5 ${isExpanded ? 'whitespace-normal' : 'truncate'}`}>{comp.description}</p>
                 </div>
                 <div className="flex items-center gap-4 shrink-0">
                   {comp.fundingAmount && (
@@ -1149,7 +1193,7 @@ function EmergingDetail({ data }: { data: EmergingCompetitorsResult }) {
           );
         })}
 
-        <SourcesBlock sources={data.sources} />
+        <SourcesBlock sources={data.sources} onFetchMore={onFetchMore} fetchingMore={fetchingMore} />
       </div>
     </SelectableBlock>
   );
@@ -1158,7 +1202,7 @@ function EmergingDetail({ data }: { data: EmergingCompetitorsResult }) {
 
 // ── Market Sizing Detail ──
 
-function MarketDetail({ data }: { data: MarketSizingResult }) {
+function MarketDetail({ data, onFetchMore, fetchingMore }: { data: MarketSizingResult; onFetchMore: () => void; fetchingMore: boolean }) {
   return (
     <SelectableBlock blockId="market" category="market_sizing" label="Market Sizing">
       <div className="space-y-4">
@@ -1213,7 +1257,7 @@ function MarketDetail({ data }: { data: MarketSizingResult }) {
           </div>
         </div>
 
-        <SourcesBlock sources={data.sources} />
+        <SourcesBlock sources={data.sources} onFetchMore={onFetchMore} fetchingMore={fetchingMore} />
       </div>
     </SelectableBlock>
   );
@@ -1307,17 +1351,29 @@ function SourcesDetail({ sources }: { sources: Source[] }) {
 
 // ── Sources block (reusable within detail sections) ──
 
-function SourcesBlock({ sources }: { sources: Source[] }) {
+function SourcesBlock({ sources, onFetchMore, fetchingMore }: { sources: Source[]; onFetchMore?: () => void; fetchingMore?: boolean }) {
   const [showAll, setShowAll] = useState(false);
   const visible = showAll ? sources : sources.slice(0, 2);
 
-  if (sources.length === 0) return null;
+  if (sources.length === 0 && !onFetchMore) return null;
 
   return (
     <div className="bg-white rounded-xl border border-border p-5">
-      <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">
-        Sources ({sources.length})
-      </h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wide">
+          Sources ({sources.length})
+        </h3>
+        {onFetchMore && (
+          <button
+            onClick={onFetchMore}
+            disabled={fetchingMore}
+            className="flex items-center gap-1.5 text-[10px] font-medium text-text-secondary hover:text-brand disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {fetchingMore ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+            {fetchingMore ? 'Fetching…' : 'Fetch more'}
+          </button>
+        )}
+      </div>
       <div className="grid grid-cols-2 gap-2">
         {visible.map((src, i) => (
           <SourceCard key={i} source={src} />

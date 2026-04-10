@@ -3,6 +3,7 @@
 import json
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException
+from pydantic import BaseModel
 
 from app.api.schemas import (
     AskQuestionRequest, AskQuestionResponse, InsightConfidenceResponse,
@@ -186,3 +187,169 @@ async def _question_to_response(q) -> QuestionResponse:
         ] if follow_ups else None,
         created_at=q.created_at,
     )
+
+
+
+# ── Source lookup ──────────────────────────────────────────────────────────────
+
+def _best_matching_sentence(content: str, query_words: set[str]) -> str | None:
+    """Return the sentence in content whose word overlap with query_words is highest."""
+    import re
+    if not content or not query_words:
+        return None
+    sentences = re.split(r'(?<=[.!?])\s+', content.strip())
+    best_score = 0.0
+    best_sentence = None
+    for sent in sentences:
+        sent = sent.strip()
+        if len(sent) < 20:
+            continue
+        sent_words = set(w for w in sent.lower().split() if len(w) > 3)
+        if not sent_words:
+            continue
+        overlap = len(query_words & sent_words) / len(query_words | sent_words)
+        if overlap > best_score:
+            best_score = overlap
+            best_sentence = sent
+    # Only return if meaningful overlap
+    return best_sentence if best_score > 0.08 else None
+
+
+class SourceLookupRequest(BaseModel):
+    highlighted_text: str
+    insight_id: str | None = None
+    block_category: str | None = None  # incumbents | emerging_competitors | market | assessment | ...
+
+
+@router.post("/{workspace_id}/source-lookup")
+async def source_lookup(workspace_id: str, req: SourceLookupRequest):
+    """Return web sources (linked to insight) + doc chunk matches for highlighted text.
+    workspace_id may also be an analysis_id — we resolve either way."""
+    from app.config import use_real_apis
+    from app.services import llm as llm_svc
+
+    ws = await repo.get_workspace(workspace_id)
+    if not ws:
+        # Try resolving by analysis_id
+        ws = await repo.get_workspace_by_analysis(workspace_id)
+    if not ws:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+
+    # ── Web sources via claim-based Jaccard matching ──
+    web_sources: list[dict] = []
+
+    query_words = set(w for w in req.highlighted_text.lower().split() if len(w) > 3)
+
+    if req.insight_id:
+        # Direct path: insight has explicit source_ids set at extraction time
+        insight = await repo.get_insight(req.insight_id)
+        if insight and insight.source_ids:
+            rows = await repo.get_sources_by_ids(insight.source_ids)
+            for r in rows:
+                content = r.get("snippet") or r.get("raw_content", "")
+                matching_quote = _best_matching_sentence(content, query_words)
+                web_sources.append({
+                    "title": r.get("title", ""),
+                    "url": r.get("url", ""),
+                    "publisher": r.get("publisher", ""),
+                    "snippet": content[:400],
+                    "date": r.get("published_date"),
+                    "matching_quote": matching_quote,
+                })
+    else:
+        # Claim-matching path: find claims whose statement best overlaps with
+        # the highlighted text (Jaccard similarity), then return their source_ids.
+        # Optionally narrow by block_category so incumbents text maps to
+        # incumbents claims, not synthesis claims.
+        CATEGORY_TO_CLAIM_TYPES = {
+            "incumbents": {"competitive", "revenue", "product", "general"},
+            "emerging_competitors": {"funding", "product", "trend", "general"},
+            "market": {"market_size", "trend", "general"},
+            "market_sizing": {"market_size", "trend", "general"},
+            "assessment": None,  # None = no filter, search all
+        }
+        allowed_types = None
+        if req.block_category:
+            allowed_types = CATEGORY_TO_CLAIM_TYPES.get(req.block_category)
+
+        all_claims = await repo.get_claims_for_analysis(ws.analysis_id)
+
+        scored_claims: list[tuple[float, object]] = []
+        for claim in all_claims:
+            # Skip claims whose type doesn't match the section (if filter set)
+            if allowed_types is not None and claim.claim_type.value not in allowed_types:
+                continue
+            claim_words = set(w for w in claim.statement.lower().split() if len(w) > 3)
+            if not claim_words or not query_words:
+                continue
+            intersection = len(query_words & claim_words)
+            union = len(query_words | claim_words)
+            jaccard = intersection / union if union else 0.0
+            if jaccard > 0.10:  # tighter relevance threshold
+                scored_claims.append((jaccard, claim))
+
+        scored_claims.sort(key=lambda x: x[0], reverse=True)
+
+        # Collect source IDs from top 2 matching claims only (keep results focused)
+        seen_source_ids: set[str] = set()
+        for _, claim in scored_claims[:2]:
+            for sid in claim.source_ids:
+                seen_source_ids.add(sid)
+
+        if seen_source_ids:
+            rows = await repo.get_sources_by_ids(list(seen_source_ids))
+            # Score each source by sentence-level match and keep top 3
+            scored_sources: list[tuple[float, dict]] = []
+            for r in rows:
+                content = r.get("snippet") or r.get("raw_content", "")
+                matching_quote = _best_matching_sentence(content, query_words)
+                # Score source by best sentence overlap
+                if matching_quote:
+                    mq_words = set(w for w in matching_quote.lower().split() if len(w) > 3)
+                    score = len(query_words & mq_words) / len(query_words | mq_words) if (query_words | mq_words) else 0.0
+                else:
+                    score = 0.0
+                scored_sources.append((score, {
+                    "title": r.get("title", ""),
+                    "url": r.get("url", ""),
+                    "publisher": r.get("publisher", ""),
+                    "snippet": content[:400],
+                    "date": r.get("published_date"),
+                    "matching_quote": matching_quote,
+                }))
+            scored_sources.sort(key=lambda x: x[0], reverse=True)
+            web_sources = [s for _, s in scored_sources[:3]]
+
+        # Hard fallback: if no claims matched, return top 2 sources by relevance score
+        if not web_sources:
+            all_sources = await repo.get_sources_for_analysis(ws.analysis_id)
+            for s in all_sources[:2]:
+                content = s.snippet or (s.raw_content or "")
+                matching_quote = _best_matching_sentence(content, query_words)
+                web_sources.append({
+                    "title": s.title or "",
+                    "url": s.url or "",
+                    "publisher": s.publisher or "",
+                    "snippet": content[:400],
+                    "date": s.published_date,
+                    "matching_quote": matching_quote,
+                })
+
+    # ── Document chunk matches (semantic search) ──
+    doc_sources: list[dict] = []
+    company_id = ws.company_id
+    if company_id and use_real_apis() and req.highlighted_text.strip():
+        try:
+            query_emb = await llm_svc.embed_single(req.highlighted_text)
+            chunks = await repo.search_doc_chunks_by_embedding(query_emb, company_id, top_k=3)
+            for c in chunks:
+                doc_sources.append({
+                    "filename": c["filename"],
+                    "document_id": c["document_id"],
+                    "page_number": (c.get("page_number") or 0) + 1,  # convert to 1-indexed
+                    "excerpt": c["text"][:600],
+                })
+        except Exception:
+            pass  # embeddings not available — skip doc sources
+
+    return {"web_sources": web_sources, "doc_sources": doc_sources}
