@@ -1484,6 +1484,56 @@ export class Endpoints {
   static conceptShareRevoke(identifier: string, shareUuid: string) {
     return `/api/v1/concept/${identifier}/shares/${shareUuid}`;
   }
+
+  // ============================================
+  // JTBD Canvas Endpoints
+  // ============================================
+
+  static jtbdConfigs = '/api/v1/jtbd/configs/';
+
+  static jtbdConfig(configUuid: string) {
+    return `/api/v1/jtbd/configs/${configUuid}/`;
+  }
+
+  static jtbdConfigRules(configUuid: string) {
+    return `/api/v1/jtbd/configs/${configUuid}/rules/`;
+  }
+
+  static jtbdRule(ruleUuid: string) {
+    return `/api/v1/jtbd/configs/rules/${ruleUuid}/`;
+  }
+
+  static jtbdConfigDocuments(configUuid: string) {
+    return `/api/v1/jtbd/configs/${configUuid}/documents/`;
+  }
+
+  static jtbdDocument(documentUuid: string) {
+    return `/api/v1/jtbd/configs/documents/${documentUuid}/`;
+  }
+
+  static jtbdTriggerScan(configUuid: string) {
+    return `/api/v1/jtbd/configs/${configUuid}/scan/`;
+  }
+
+  static jtbdScans(configUuid: string) {
+    return `/api/v1/jtbd/configs/${configUuid}/scans/`;
+  }
+
+  static jtbdCurrentScan(configUuid: string) {
+    return `/api/v1/jtbd/configs/${configUuid}/current-scan/`;
+  }
+
+  static jtbdActiveScan(configUuid: string) {
+    return `/api/v1/jtbd/configs/${configUuid}/active-scan/`;
+  }
+
+  static jtbdJob(jobUuid: string) {
+    return `/api/v1/jtbd/jobs/${jobUuid}/`;
+  }
+
+  static jtbdIdeateFromJob(jobUuid: string) {
+    return `/api/v1/jtbd/jobs/${jobUuid}/ideate/`;
+  }
 }
 
 export class SocketEndpoints {

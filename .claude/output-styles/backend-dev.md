@@ -41,7 +41,7 @@ After EVERY code change session (Edit, Write, or batch of changes), you MUST:
 **Database**: PostgreSQL with connection pooling (PgBouncer)
 **AI/LLM**: OpenAI, Anthropic, Google Gemini (via Lumis package)
 **Testing**: pytest with Django test fixtures
-**Type Checking**: Pyright (strict mode)
+**Type Checking**: Pyright (standard mode)
 **Linting**: Ruff (replaces flake8, black, isort, etc.)
 
 ## Key Standards
@@ -69,25 +69,43 @@ After EVERY code change session (Edit, Write, or batch of changes), you MUST:
 - Never expose internal exception details
 
 **Services**:
-- Use `@sync_to_async` for async database operations
+- Use `@sync_to_async` for transactional database operations
 - Use `@transaction.atomic()` for transactions
 - Emit events after commit: `transaction.on_commit()`
 
-### AI Agent Pattern
+### AI Agent Patterns
 
+**Preferred for new agents** - `BaseGeminiAgentBuilder.run()`:
 ```python
-async def create_agent(account_uuid: str, concept_uuid: str):
-    return (
-        ConceptAgentBuilder[ResultType, ConceptAgentContext](
-            account_uuid=account_uuid,
-            concept_uuid=concept_uuid,
-        )
-        .with_concept_context(disabled=True)
-        .with_name("Agent Name")
-        .with_model("o4-mini")
-        .with_output_format(ResultType)
-        .build(instructions=system_prompt)
+from core.ai.agents.base_gemini import BaseGeminiAgentBuilder
+
+result = await (
+    BaseGeminiAgentBuilder(account_uuid=account_uuid)
+    .with_name("MyAgent")
+    .with_model("gemini-3-flash-preview")
+    .run(
+        system_instruction=system_prompt,
+        user_prompt="Analyze this data.",
+        output_type=MyOutputType,
     )
+)
+```
+
+**Legacy** - `ConceptAgentBuilder.build()` (still used in older agents):
+```python
+from core.ai.agents.concept import ConceptAgentBuilder
+
+agent = (
+    ConceptAgentBuilder[ResultType, ConceptAgentContext](
+        account_uuid=account_uuid,
+        concept_uuid=concept_uuid,
+    )
+    .with_concept_context(disabled=True)
+    .with_name("Agent Name")
+    .with_model("o4-mini")
+    .with_output_format(ResultType)
+    .build(instructions=system_prompt)
+)
 ```
 
 ## Quality Checklist
@@ -98,7 +116,7 @@ Before completing any backend task, verify:
 - [ ] Models have UUID primary keys
 - [ ] All fields have `help_text`
 - [ ] Routes use `HTTPStatus` enum
-- [ ] Services use `@sync_to_async` and `@transaction.atomic()`
+- [ ] Transactional writes use `@sync_to_async @transaction.atomic()`
 - [ ] Tests written for new functionality
 
 ## Testing Commands

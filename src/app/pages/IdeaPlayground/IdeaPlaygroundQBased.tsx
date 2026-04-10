@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  Suspense,
+} from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AppPath } from '@routes/routes';
@@ -12,6 +18,7 @@ import {
   PlaygroundLoadingTransition,
   IdeationModeSwitcher,
   DebugContextButton,
+  PlaygroundModeTabs,
 } from '@components/IdeaPlayground';
 import type { IAnchorThought } from '@components/IdeaPlayground/types';
 import { animationStyles } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
@@ -27,7 +34,29 @@ import {
   useGenerateConcepts,
 } from '@hooks/query/ideaPlayground.hook';
 import { usePersonas } from '@hooks/query/persona.hook';
+import { isAucctusAdmin } from '@libs/utils/account';
 import type { MentionItem } from '@stores/overseer/types';
+
+const LazyJTBDCanvas = React.lazy(() => import('@pages/JTBD/JTBDCanvas'));
+
+const JTBDLoadingSkeleton: React.FC = () => (
+  <div className='grid grid-cols-1 gap-6 px-8 pt-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
+    {Array.from({ length: 8 }).map((_, i) => (
+      <div
+        key={i}
+        className='space-y-3 rounded-2xl border border-white/[0.1] bg-white/[0.05] p-5 backdrop-blur-xl'
+      >
+        <div className='flex items-center justify-between'>
+          <div className='h-5 w-12 animate-pulse rounded-full bg-white/[0.08]' />
+          <div className='h-4 w-8 animate-pulse rounded bg-white/[0.08]' />
+        </div>
+        <div className='h-5 w-full animate-pulse rounded bg-white/[0.08]' />
+        <div className='h-4 w-3/4 animate-pulse rounded bg-white/[0.08]' />
+        <div className='h-4 w-1/2 animate-pulse rounded bg-white/[0.08]' />
+      </div>
+    ))}
+  </div>
+);
 
 const IdeaPlaygroundQBased: React.FC = () => {
   // Track page time for analytics
@@ -49,6 +78,29 @@ const IdeaPlaygroundQBased: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const seedUuidFromUrl = searchParams.get('seed') || undefined;
+
+  // Mode switching
+  const { user } = useStore((state) => state.auth);
+  const isAdmin = useMemo(() => isAucctusAdmin(user), [user]);
+  const currentMode =
+    searchParams.get('mode') === 'jtbd' ? 'jtbd' : 'playground';
+
+  const handleModeChange = useCallback(
+    (mode: 'playground' | 'jtbd') => {
+      if (mode === 'jtbd') {
+        setSearchParams({ mode: 'jtbd' });
+      } else {
+        // Preserve seed if present, remove mode
+        const seed = searchParams.get('seed');
+        if (seed) {
+          setSearchParams({ seed });
+        } else {
+          setSearchParams({});
+        }
+      }
+    },
+    [searchParams, setSearchParams],
+  );
 
   // Manage seedUuid in local state (synchronized with URL params)
   const [currentSeedUuid, setCurrentSeedUuid] = useState<string | null>(null);
@@ -410,12 +462,14 @@ const IdeaPlaygroundQBased: React.FC = () => {
       <style>{animationStyles}</style>
 
       {/* Debug Context Button - Top Left (only in debug mode) */}
-      <DebugContextButton
-        seedUuid={currentSeedUuid}
-        className='absolute left-4 top-4 z-50'
-      />
+      {currentMode === 'playground' && (
+        <DebugContextButton
+          seedUuid={currentSeedUuid}
+          className='absolute left-4 top-4 z-50'
+        />
+      )}
 
-      {/* Background Image with Blur */}
+      {/* Background Image with Blur — ALWAYS visible in both modes */}
       <div
         className='absolute -inset-4 bg-cover bg-center bg-no-repeat'
         style={{
@@ -428,141 +482,167 @@ const IdeaPlaygroundQBased: React.FC = () => {
 
       {/* Inlay */}
       <div className='absolute inset-0 bg-black/45'>
-        {/* Floating Inspiration Cards - Only show if not awaiting restoration */}
-        {!isLoadingThoughts && !isAwaitingSessionRestoration && (
-          <FloatingAnchorThought
-            thoughts={anchorThoughts}
-            onCardClick={handleInspirationClick}
-            isVisible={!hasStartedTyping}
-          />
-        )}
-      </div>
-
-      {/* Loading Indicator for session restoration */}
-      {isAwaitingSessionRestoration && (
-        <PlaygroundLoadingIndicator
-          show={true}
-          message='Restoring your session...'
-        />
-      )}
-
-      {/* Loading Indicator for anchor thoughts - Only show if not awaiting restoration */}
-      {!isAwaitingSessionRestoration && (
-        <PlaygroundLoadingIndicator
-          show={isLoadingThoughts && !hasStartedTyping}
-          message='Loading innovation ideas...'
-        />
-      )}
-
-      {/* Entry State - Clean centered layout - Only show if not awaiting restoration */}
-      {!isAwaitingSessionRestoration && (
-        <AnimatePresence>
-          {!hasStartedTyping && (
-            <LandingView
-              inputValue={inputValue}
-              onInputChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              onSubmit={handleSubmit}
-              onFilesChange={setSelectedFiles}
-              selectedFiles={selectedFiles}
-              style={{ opacity: 1 }}
-              personaItems={personaItems}
-              selectedPersonas={selectedPersonas}
-              onPersonaSelect={handlePersonaSelect}
-              onPersonaRemove={handlePersonaRemove}
+        {/* Floating Inspiration Cards - Only show in playground mode and if not awaiting restoration */}
+        {currentMode === 'playground' &&
+          !isLoadingThoughts &&
+          !isAwaitingSessionRestoration && (
+            <FloatingAnchorThought
+              thoughts={anchorThoughts}
+              onCardClick={handleInspirationClick}
+              isVisible={!hasStartedTyping}
             />
           )}
-        </AnimatePresence>
+      </div>
+
+      {/* Mode Tabs — top-left, admin only */}
+      {isAdmin && (
+        <PlaygroundModeTabs
+          activeMode={currentMode}
+          onModeChange={handleModeChange}
+          showJTBD={isAdmin}
+          className='absolute left-6 top-6 z-40'
+        />
       )}
 
-      {/* Interface State - After Starting - Only show if not awaiting restoration */}
-      {!isAwaitingSessionRestoration && (
-        <AnimatePresence>
-          {hasStartedTyping && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className='relative z-10 flex min-h-screen'
-            >
-              {/* Loading Transition - Show until data is ready */}
-              {!isDataReady && (
-                <div className='flex flex-1 flex-col'>
-                  <div className='px-8 pb-4 pt-8'>
-                    <ExplorationModeSelector
-                      currentTopic={currentTopic}
-                      onRestart={handleRestart}
-                      onClose={handleClose}
-                      showTitle={showLogoTitle}
-                      personas={selectedPersonas}
-                    />
-                  </div>
-                  <div className='relative flex-1 pt-24'>
-                    <PlaygroundLoadingTransition
-                      seedUuid={currentSeedUuid}
-                      onReady={() => setIsDataReady(true)}
-                    />
-                  </div>
-                </div>
-              )}
+      {/* JTBD Mode */}
+      {currentMode === 'jtbd' && (
+        <Suspense fallback={<JTBDLoadingSkeleton />}>
+          <div className='relative z-10 h-full pt-20'>
+            <LazyJTBDCanvas />
+          </div>
+        </Suspense>
+      )}
 
-              {/* Question Carousel - Show when data is ready */}
-              {isDataReady && (
-                <div className='flex flex-1 flex-col'>
-                  <div className='px-8 pb-4 pt-8'>
-                    <ExplorationModeSelector
-                      currentTopic={currentTopic}
-                      onRestart={handleRestart}
-                      onClose={handleClose}
-                      showTitle={true}
-                      personas={selectedPersonas}
-                    />
-                  </div>
-
-                  {/* Main Map Area - Question Carousel */}
-                  <div className='relative flex-1 pt-24'>
-                    <QuestionCarousel
-                      topic={currentTopic || 'Cheese on chicken in QSR'}
-                      seedUuid={currentSeedUuid}
-                      onGenerateIdeas={handleGenerateIdeas}
-                      onViewConcepts={() => setShowOpportunityMap(true)}
-                      hasGeneratedConcepts={hasGeneratedConcepts}
-                    />
-                  </div>
-                </div>
-              )}
-            </motion.div>
+      {/* Playground Mode — existing content unchanged */}
+      {currentMode === 'playground' && (
+        <>
+          {/* Loading Indicator for session restoration */}
+          {isAwaitingSessionRestoration && (
+            <PlaygroundLoadingIndicator
+              show={true}
+              message='Restoring your session...'
+            />
           )}
-        </AnimatePresence>
-      )}
 
-      {/* Opportunity Map Overlay */}
-      {showOpportunityMap && (
-        <OpportunityMap
-          seedUuid={currentSeedUuid}
-          onClose={handleCloseOpportunityMap}
-          livingPersonaUuids={
-            selectedPersonas.length > 0
-              ? selectedPersonas.map((p) => p.id)
-              : undefined
-          }
-          personaInfos={selectedPersonas.map((p) => ({
-            uuid: p.id,
-            name: p.name,
-            segment: p.segment || '',
-            themeColor: p.themeColor,
-            avatar: p.avatar,
-          }))}
-        />
-      )}
+          {/* Loading Indicator for anchor thoughts - Only show if not awaiting restoration */}
+          {!isAwaitingSessionRestoration && (
+            <PlaygroundLoadingIndicator
+              show={isLoadingThoughts && !hasStartedTyping}
+              message='Loading innovation ideas...'
+            />
+          )}
 
-      {/* Mode Switcher - Bottom Left (only on intro/landing page) */}
-      {!hasStartedTyping && (
-        <IdeationModeSwitcher
-          currentMode='playground'
-          className='absolute bottom-6 left-6'
-        />
+          {/* Entry State - Clean centered layout - Only show if not awaiting restoration */}
+          {!isAwaitingSessionRestoration && (
+            <AnimatePresence>
+              {!hasStartedTyping && (
+                <LandingView
+                  inputValue={inputValue}
+                  onInputChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  onSubmit={handleSubmit}
+                  onFilesChange={setSelectedFiles}
+                  selectedFiles={selectedFiles}
+                  style={{ opacity: 1 }}
+                  personaItems={personaItems}
+                  selectedPersonas={selectedPersonas}
+                  onPersonaSelect={handlePersonaSelect}
+                  onPersonaRemove={handlePersonaRemove}
+                />
+              )}
+            </AnimatePresence>
+          )}
+
+          {/* Interface State - After Starting - Only show if not awaiting restoration */}
+          {!isAwaitingSessionRestoration && (
+            <AnimatePresence>
+              {hasStartedTyping && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className='relative z-10 flex min-h-screen'
+                >
+                  {/* Loading Transition - Show until data is ready */}
+                  {!isDataReady && (
+                    <div className='flex flex-1 flex-col'>
+                      <div className='px-8 pb-4 pt-8'>
+                        <ExplorationModeSelector
+                          currentTopic={currentTopic}
+                          onRestart={handleRestart}
+                          onClose={handleClose}
+                          showTitle={showLogoTitle}
+                          personas={selectedPersonas}
+                        />
+                      </div>
+                      <div className='relative flex-1 pt-24'>
+                        <PlaygroundLoadingTransition
+                          seedUuid={currentSeedUuid}
+                          onReady={() => setIsDataReady(true)}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Question Carousel - Show when data is ready */}
+                  {isDataReady && (
+                    <div className='flex flex-1 flex-col'>
+                      <div className='px-8 pb-4 pt-8'>
+                        <ExplorationModeSelector
+                          currentTopic={currentTopic}
+                          onRestart={handleRestart}
+                          onClose={handleClose}
+                          showTitle={true}
+                          personas={selectedPersonas}
+                        />
+                      </div>
+
+                      {/* Main Map Area - Question Carousel */}
+                      <div className='relative flex-1 pt-24'>
+                        <QuestionCarousel
+                          topic={currentTopic || 'Cheese on chicken in QSR'}
+                          seedUuid={currentSeedUuid}
+                          onGenerateIdeas={handleGenerateIdeas}
+                          onViewConcepts={() => setShowOpportunityMap(true)}
+                          hasGeneratedConcepts={hasGeneratedConcepts}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
+
+          {/* Opportunity Map Overlay */}
+          {showOpportunityMap && (
+            <OpportunityMap
+              seedUuid={currentSeedUuid}
+              onClose={handleCloseOpportunityMap}
+              livingPersonaUuids={
+                selectedPersonas.length > 0
+                  ? selectedPersonas.map((p) => p.id)
+                  : undefined
+              }
+              personaInfos={selectedPersonas.map((p) => ({
+                uuid: p.id,
+                name: p.name,
+                segment: p.segment || '',
+                themeColor: p.themeColor,
+                avatar: p.avatar,
+              }))}
+            />
+          )}
+
+          {/* Mode Switcher - Bottom Left (only on intro/landing page, only in playground mode) */}
+          {!hasStartedTyping && (
+            <IdeationModeSwitcher
+              currentMode='playground'
+              className='absolute bottom-6 left-6'
+            />
+          )}
+        </>
       )}
     </div>
   );

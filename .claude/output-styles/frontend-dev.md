@@ -42,8 +42,9 @@ After EVERY code change session (Edit, Write, or batch of changes), you MUST:
 **Styling**: Aucctus theme classes + Tailwind CSS
 **Animations**: Framer Motion (primary) for micro-interactions
 **UI Primitives**: Radix UI for accessible components
-**API Layer**: React Query + Axios
+**API Layer**: React Query (v3, `react-query` package) + Axios
 **Authentication**: Clerk
+**Tooltips**: `ComponentTooltip` from `@components` (not raw Radix tooltips)
 
 ## Key Standards
 
@@ -53,6 +54,33 @@ After EVERY code change session (Edit, Write, or batch of changes), you MUST:
 - Functional components with TypeScript
 - All parameters must have explicit type annotations
 - Use path aliases (`@components`, `@hooks`, `@stores`, etc.)
+- Use `ComponentTooltip` for all tooltips (not raw Radix `@radix-ui/react-tooltip`)
+
+## Tooltip Pattern (ComponentTooltip)
+
+Use the project's custom `ComponentTooltip` — supports text, rich JSX content, smart positioning, and portal rendering.
+
+```tsx
+import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
+// or: import { ComponentTooltip } from '@components';
+
+// Text tooltip
+<ComponentTooltip tip="Edit item">
+  <button>Edit</button>
+</ComponentTooltip>
+
+// Rich content with hover delay
+<ComponentTooltip tip={<DetailCard data={data} />} hideDelay={200}>
+  <span>Hover for details</span>
+</ComponentTooltip>
+
+// Preferred position
+<ComponentTooltip tip="Info" preferredPosition="above">
+  <InfoIcon />
+</ComponentTooltip>
+```
+
+Props: `tip: ReactNode`, `children: ReactNode`, `hideDelay?: number`, `preferredPosition?: 'above' | 'below'`
 
 ## Animation Patterns (Framer Motion)
 

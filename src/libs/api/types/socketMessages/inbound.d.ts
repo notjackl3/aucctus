@@ -1196,6 +1196,45 @@ export interface ICompetitorAssessmentScanErrorMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// JTBD Canvas Scan Messages
+// ==========================================
+
+export interface IJTBDScanProgressMessage extends BaseSocketEvent {
+  type: 'jtbd.scan.progress.account';
+  accountUuid: string;
+  configUuid: string;
+  stage: string;
+  progress: number;
+  message: string;
+  currentJob?: string;
+}
+
+export interface IJTBDScanCompletedMessage extends BaseSocketEvent {
+  type: 'jtbd.scan.completed.account';
+  accountUuid: string;
+  jobsDiscovered: number;
+  configUuid: string;
+  message: string;
+}
+
+export interface IJTBDScanErrorMessage extends BaseSocketEvent {
+  type: 'jtbd.scan.error.account';
+  accountUuid: string;
+  error: string;
+  message: string;
+  details?: string;
+  configUuid?: string;
+}
+
+export interface IJTBDVideoReadyMessage extends BaseSocketEvent {
+  type: 'jtbd.video.ready.account';
+  accountUuid: string;
+  configUuid: string;
+  jobUuid: string;
+  message: string;
+}
+
+// ==========================================
 // Portfolio Executive Summary Messages
 // ==========================================
 
@@ -1455,6 +1494,10 @@ export type InboundSocketEvent<C = {}> =
   | IPersonaChatTypingMessage
   | IPersonaChatErrorMessage
   | IPersonaChatToolActivityMessage
+  | IJTBDScanProgressMessage
+  | IJTBDScanCompletedMessage
+  | IJTBDScanErrorMessage
+  | IJTBDVideoReadyMessage
   | IConceptDocumentProcessingProgressMessage
   | IConceptDocumentProcessingCompletedMessage
   | IConceptDocumentProcessingErrorMessage

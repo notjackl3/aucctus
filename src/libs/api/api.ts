@@ -14,6 +14,7 @@ import { DynamicComponentApi } from './dynamicComponent';
 import { SocketEndpoints } from './endpoints';
 import { FinancialProjectionApi } from './financialProjection';
 import { IdeaPlaygroundApi } from './ideaPlayground';
+import { JtbdApi } from './jtbd';
 import { IdeaSubmissionsApi } from './ideaSubmissions';
 import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
@@ -73,6 +74,7 @@ export class Api {
   portfolioInsights!: PortfolioInsightsApi;
   accountBranding!: AccountBrandingApi;
   sharedReport!: SharedReportApi;
+  jtbd!: JtbdApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -113,6 +115,7 @@ export class Api {
       { key: 'portfolioInsights', class: PortfolioInsightsApi },
       { key: 'accountBranding', class: AccountBrandingApi },
       { key: 'sharedReport', class: SharedReportApi },
+      { key: 'jtbd', class: JtbdApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {

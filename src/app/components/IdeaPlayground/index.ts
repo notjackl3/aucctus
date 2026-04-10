@@ -23,6 +23,7 @@ export { ConceptGenerationLoading } from './ConceptGenerationLoading';
 
 // Mode Switcher
 export { IdeationModeSwitcher } from './IdeationModeSwitcher';
+export { PlaygroundModeTabs } from './PlaygroundModeTabs';
 
 // Debug components
 export { default as DebugContextButton } from './DebugContextButton';
