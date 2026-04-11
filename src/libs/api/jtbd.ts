@@ -11,6 +11,7 @@ import type {
   IJTBDMessageResponse,
   IJTBDRefreshResponse,
   IJTBDRule,
+  IJTBDRuleGenerationResponse,
   IJTBDScan,
   IJTBDScanDetail,
   ICreateJTBDConfigPayload,
@@ -28,6 +29,27 @@ export class JtbdApi extends ApiService {
   constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
     super(apiInstance, apiConfig);
     this._setupMiddleware();
+  }
+
+  // ============================================
+  // Rule Generation
+  // ============================================
+
+  /**
+   * Generate monitoring rules from a description using AI.
+   * Returns a task ID; results arrive via WebSocket.
+   */
+  generateRules(description: string, files?: File[]) {
+    const formData = new FormData();
+    formData.append('description', description);
+    if (files) {
+      files.forEach((file) => formData.append('files', file));
+    }
+    return this.post<IJTBDRuleGenerationResponse>(
+      endpoints.jtbdConfigGenerateRules,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    );
   }
 
   // ============================================

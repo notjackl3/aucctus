@@ -8,6 +8,8 @@
 import { toast } from '@components';
 import api from '@libs/api';
 import type {
+  IJTBDRuleGenerationCompletedMessage,
+  IJTBDRuleGenerationErrorMessage,
   IJTBDScanCompletedMessage,
   IJTBDScanErrorMessage,
   IJTBDScanProgressMessage,
@@ -15,7 +17,7 @@ import type {
 } from '@libs/api/types/socketMessages/inbound';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import { useSocketEvent } from '../sockets/aucctus';
@@ -25,6 +27,7 @@ import type {
   ICreateJTBDConfigPayload,
   IJTBDConfigDetail,
   IJTBDConfigList,
+  IJTBDGeneratedRule,
   IJTBDJob,
   IJTBDScan,
   IJTBDScanDetail,
@@ -47,6 +50,83 @@ export const jtbdKeys = {
   job: (uuid: string) => [...jtbdKeys.all, 'job', uuid] as const,
   activeScan: (configUuid: string) =>
     [...jtbdKeys.all, 'activeScan', configUuid] as const,
+};
+
+// ============================================
+// Rule Generation Hook
+// ============================================
+
+/**
+ * Generates JTBD monitoring rules from a description using AI.
+ * Dispatches to Celery via POST, receives results via WebSocket.
+ */
+export const useGenerateJTBDRules = () => {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedRules, setGeneratedRules] = useState<{
+    name: string;
+    rules: IJTBDGeneratedRule[];
+  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const taskIdRef = useRef<string | null>(null);
+
+  const generateRules = useCallback(
+    async ({ description, files }: { description: string; files?: File[] }) => {
+      setIsGenerating(true);
+      setGeneratedRules(null);
+      setError(null);
+
+      try {
+        const data = await api.jtbd.generateRules(description, files);
+        taskIdRef.current = data.taskId;
+      } catch (e) {
+        setIsGenerating(false);
+        const message = utils.osiris.parseFormError(e as AxiosError);
+        const errorMsg =
+          message || 'Unable to generate rules. Please try again.';
+        setError(errorMsg);
+        toast.error('Rule Generation Failed', errorMsg);
+      }
+    },
+    [],
+  );
+
+  useSocketEvent<'jtbd.rule_generation.completed.account'>(
+    'jtbd.rule_generation.completed.account',
+    useCallback((data: IJTBDRuleGenerationCompletedMessage) => {
+      if (taskIdRef.current && data.taskId === taskIdRef.current) {
+        setGeneratedRules({ name: data.name, rules: data.rules });
+        setIsGenerating(false);
+        taskIdRef.current = null;
+      }
+    }, []),
+  );
+
+  useSocketEvent<'jtbd.rule_generation.error.account'>(
+    'jtbd.rule_generation.error.account',
+    useCallback((data: IJTBDRuleGenerationErrorMessage) => {
+      if (taskIdRef.current && data.taskId === taskIdRef.current) {
+        setIsGenerating(false);
+        setError(data.message);
+        taskIdRef.current = null;
+        toast.error('Rule Generation Failed', data.message);
+      }
+    }, []),
+  );
+
+  const reset = useCallback(() => {
+    setIsGenerating(false);
+    setGeneratedRules(null);
+    setError(null);
+    taskIdRef.current = null;
+  }, []);
+
+  return {
+    generateRules,
+    generatedRules,
+    isGenerating,
+    error,
+    reset,
+  };
 };
 
 // ============================================

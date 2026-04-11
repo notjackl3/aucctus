@@ -1235,6 +1235,28 @@ export interface IJTBDVideoReadyMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// JTBD Rule Generation Messages
+// ==========================================
+
+export interface IJTBDRuleGenerationCompletedMessage extends BaseSocketEvent {
+  type: 'jtbd.rule_generation.completed.account';
+  accountUuid: string;
+  taskId: string;
+  name: string;
+  rules: import('../jtbd').IJTBDGeneratedRule[];
+  message: string;
+}
+
+export interface IJTBDRuleGenerationErrorMessage extends BaseSocketEvent {
+  type: 'jtbd.rule_generation.error.account';
+  accountUuid: string;
+  taskId: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
+// ==========================================
 // Portfolio Executive Summary Messages
 // ==========================================
 
@@ -1498,6 +1520,8 @@ export type InboundSocketEvent<C = {}> =
   | IJTBDScanCompletedMessage
   | IJTBDScanErrorMessage
   | IJTBDVideoReadyMessage
+  | IJTBDRuleGenerationCompletedMessage
+  | IJTBDRuleGenerationErrorMessage
   | IConceptDocumentProcessingProgressMessage
   | IConceptDocumentProcessingCompletedMessage
   | IConceptDocumentProcessingErrorMessage

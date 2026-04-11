@@ -292,7 +292,6 @@ export interface IJTBDActiveScan {
 export interface IJTBDRule {
   uuid: string;
   ruleText: string;
-  isActive: boolean;
 }
 
 export interface IJTBDConfigDocument {
@@ -353,7 +352,6 @@ export interface IAddJTBDRulePayload {
 
 export interface IUpdateJTBDRulePayload {
   ruleText?: string;
-  isActive?: boolean;
 }
 
 // ============================================
@@ -371,5 +369,19 @@ export interface IJTBDMessageResponse {
 
 export interface IJTBDIdeateResponse {
   seedUuid: string;
+  message: string;
+}
+
+// ============================================
+// Rule Generation Types
+// ============================================
+
+export interface IJTBDGeneratedRule {
+  ruleText: string;
+  suggestedPersonaUuid: string | null;
+}
+
+export interface IJTBDRuleGenerationResponse {
+  taskId: string;
   message: string;
 }

@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import * as Popover from '@radix-ui/react-popover';
-import { Check, Plus, Users, X } from 'lucide-react';
-import { cn } from '@libs/utils/react';
 import { usePersonas } from '@hooks/query/persona.hook';
+import { cn } from '@libs/utils/react';
+import * as Popover from '@radix-ui/react-popover';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Check, Plus, Users, X } from 'lucide-react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 interface JTBDPersonaTaggerProps {
   selectedUuids: string[];
@@ -50,13 +50,6 @@ const JTBDPersonaTagger: React.FC<JTBDPersonaTaggerProps> = ({
 
   return (
     <div>
-      <label className='mb-1.5 block text-sm text-white/60'>
-        Living Personas
-      </label>
-      <p className='mb-2 text-xs text-white/40'>
-        Tag personas to include as context in scans
-      </p>
-
       <div className='flex flex-wrap items-center gap-2'>
         {/* Selected persona chips */}
         <AnimatePresence mode='popLayout'>

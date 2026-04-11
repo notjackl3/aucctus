@@ -1,5 +1,5 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 
 import { useRimOrbStyles } from '@hooks/useRimOrbStyles';
@@ -65,6 +65,10 @@ interface LiquidGlassModalProps {
    * and a slowly rotating conic gradient.
    */
   animatedRim?: boolean;
+  /**
+   * Additional CSS classes for the title section
+   */
+  titleClassName?: string;
 }
 
 /**
@@ -89,7 +93,7 @@ const variantStyles: Record<
   }
 > = {
   default: {
-    headerBorder: 'border-b border-gray-light-200 dark:border-gray-dark-700',
+    headerBorder: 'border-b border-gray-light-200 dark:border-white/[0.08]',
     titleColor: 'aucctus-text-primary',
     closeButtonHover: 'hover:bg-gray-light-100 dark:hover:bg-gray-dark-800',
   },
@@ -155,6 +159,7 @@ const LiquidGlassModal: React.FC<LiquidGlassModalProps> = ({
   headerClassName,
   titleIcon,
   animatedRim = true,
+  titleClassName,
 }) => {
   const styles = variantStyles[variant];
   const distortionId = React.useId().replace(/:/g, '');
@@ -268,6 +273,7 @@ const LiquidGlassModal: React.FC<LiquidGlassModalProps> = ({
                                       className={cn(
                                         'aucctus-text-lg-semibold',
                                         styles.titleColor,
+                                        titleClassName,
                                       )}
                                     >
                                       {title}
@@ -373,8 +379,8 @@ const LiquidGlassModalFooter: React.FC<LiquidGlassModalFooterProps> = ({
 export default LiquidGlassModal;
 export { LiquidGlassModalFooter };
 export type {
-  LiquidGlassModalProps,
   LiquidGlassModalFooterProps,
+  LiquidGlassModalProps,
   ModalSize,
   ModalVariant,
 };

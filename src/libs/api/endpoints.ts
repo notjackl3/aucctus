@@ -1491,6 +1491,8 @@ export class Endpoints {
 
   static jtbdConfigs = '/api/v1/jtbd/configs/';
 
+  static jtbdConfigGenerateRules = '/api/v1/jtbd/configs/generate-rules/';
+
   static jtbdConfig(configUuid: string) {
     return `/api/v1/jtbd/configs/${configUuid}/`;
   }

@@ -1,3 +1,4 @@
+import { OpportunityMap } from '@components/IdeaPlayground';
 import {
   useIdeateFromJob,
   useJTBDActiveScan,
@@ -13,7 +14,6 @@ import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertTriangle,
-  ArrowRight,
   Calendar,
   ChevronDown,
   Crosshair,
@@ -21,7 +21,6 @@ import {
   Radar,
   RefreshCw,
   Search,
-  Settings,
   Sparkles,
   Target,
   X,
@@ -35,17 +34,18 @@ import React, {
   useState,
 } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { OpportunityMap } from '@components/IdeaPlayground';
 
-import { JTBDConfigPage } from './JTBDConfigPage';
+import CreateJTBDConfigModal from './CreateJTBDConfigModal';
+import EditJTBDConfigModal from './EditJTBDConfigModal';
+import JTBDConfigDropdown from './JTBDConfigDropdown';
 import {
-  type JTBDFilters,
-  JTBDFilterBar,
   matchesAudience,
   matchesEvidenceStrength,
   matchesOpportunitySize,
+  type JTBDFilters,
 } from './JTBDFilterBar';
 import { JTBDMasonryColumns } from './JTBDMasonryColumns';
+import { JTBDViewProvider, useJTBDView } from './JTBDViewContext';
 
 // ============================================
 // Skeleton Loading Cards
@@ -82,34 +82,32 @@ const ScanProgressBanner: React.FC<{
   progress: number;
   message: string;
   currentJob?: string;
-}> = ({ stage, progress, message, currentJob }) => (
+}> = ({ progress, message, currentJob }) => (
   <motion.div
-    initial={{ opacity: 0, y: -10 }}
+    initial={{ opacity: 0, y: 8 }}
     animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -10 }}
-    className='mx-8 mt-6 rounded-2xl border border-white/[0.1] bg-white/[0.05] p-5 backdrop-blur-xl'
+    exit={{ opacity: 0, y: 8 }}
+    className='mx-auto flex w-full max-w-md items-center gap-3 rounded-full border border-white/[0.08] bg-black/60 px-4 py-2 backdrop-blur-xl'
   >
-    <div className='mb-3 flex items-center gap-3'>
-      <Radar className='h-5 w-5 animate-pulse text-emerald-400' />
-      <span className='text-sm font-semibold text-white/90'>
-        Scanning for Jobs to Be Done
-      </span>
-      <span className='text-xs capitalize text-white/40'>{stage}</span>
+    <Radar className='h-4 w-4 shrink-0 animate-pulse text-emerald-400' />
+    <div className='min-w-0 flex-1'>
+      <div className='flex items-center gap-2'>
+        <span className='truncate text-xs font-medium text-white/80'>
+          {currentJob ? `Analyzing: ${currentJob}` : message}
+        </span>
+        <span className='shrink-0 text-[10px] tabular-nums text-white/40'>
+          {Math.round(progress)}%
+        </span>
+      </div>
+      <div className='mt-1 h-1 w-full rounded-full bg-white/[0.08]'>
+        <motion.div
+          className='h-1 rounded-full bg-emerald-400'
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.5 }}
+        />
+      </div>
     </div>
-    <div className='mb-2 h-1.5 w-full rounded-full bg-white/[0.1]'>
-      <motion.div
-        className='h-1.5 rounded-full bg-emerald-400'
-        initial={{ width: 0 }}
-        animate={{ width: `${progress}%` }}
-        transition={{ duration: 0.5 }}
-      />
-    </div>
-    <p className='text-xs text-white/50'>{message}</p>
-    {currentJob && (
-      <p className='mt-1 text-xs italic text-white/40'>
-        Analyzing: {currentJob}
-      </p>
-    )}
   </motion.div>
 );
 
@@ -124,39 +122,30 @@ const ScanFailureBanner: React.FC<{
   onDismiss: () => void;
 }> = ({ errorMessage, onRetry, isRetrying, onDismiss }) => (
   <motion.div
-    initial={{ opacity: 0, y: -10 }}
+    initial={{ opacity: 0, y: 8 }}
     animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -10 }}
-    className='mx-8 mt-6 rounded-2xl border border-red-500/20 bg-red-500/[0.08] p-5 backdrop-blur-xl'
+    exit={{ opacity: 0, y: 8 }}
+    className='mx-auto flex w-full max-w-md items-center gap-3 rounded-full border border-red-500/15 bg-black/60 px-4 py-2 backdrop-blur-xl'
   >
-    <div className='flex items-start justify-between'>
-      <div className='flex items-start gap-3'>
-        <AlertTriangle className='mt-0.5 h-5 w-5 shrink-0 text-red-400' />
-        <div>
-          <p className='text-sm font-semibold text-red-300'>Last scan failed</p>
-          {errorMessage && (
-            <p className='mt-1 text-xs text-red-300/60'>{errorMessage}</p>
-          )}
-        </div>
-      </div>
-      <div className='flex items-center gap-2'>
-        <button
-          onClick={onRetry}
-          disabled={isRetrying}
-          className='flex items-center gap-1.5 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-300 transition-all hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50'
-        >
-          <RefreshCw
-            className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')}
-          />
-          {isRetrying ? 'Starting...' : 'Retry Scan'}
-        </button>
-        <button
-          onClick={onDismiss}
-          className='rounded-md p-1 text-red-300/40 transition-colors hover:bg-red-500/10 hover:text-red-300/60'
-        >
-          <X className='h-4 w-4' />
-        </button>
-      </div>
+    <AlertTriangle className='h-4 w-4 shrink-0 text-red-400' />
+    <span className='min-w-0 truncate text-xs font-medium text-red-300'>
+      {errorMessage || 'Last scan failed'}
+    </span>
+    <div className='ml-auto flex shrink-0 items-center gap-1.5'>
+      <button
+        onClick={onRetry}
+        disabled={isRetrying}
+        className='flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-1 text-[11px] font-semibold text-red-300 transition-all hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50'
+      >
+        <RefreshCw className={cn('h-3 w-3', isRetrying && 'animate-spin')} />
+        {isRetrying ? '...' : 'Retry'}
+      </button>
+      <button
+        onClick={onDismiss}
+        className='rounded-full p-1 text-red-300/40 transition-colors hover:text-red-300/60'
+      >
+        <X className='h-3.5 w-3.5' />
+      </button>
     </div>
   </motion.div>
 );
@@ -486,140 +475,6 @@ const EmptyState: React.FC<{
 );
 
 // ============================================
-// Config Selector Dropdown
-// ============================================
-
-const ConfigSelector: React.FC<{
-  configs: { uuid: string; name: string; rulesCount: number }[];
-  activeUuid: string;
-  onSelect: (uuid: string) => void;
-  onEdit: (uuid: string) => void;
-}> = ({ configs, activeUuid, onSelect, onEdit }) => {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
-
-  const active = configs.find((c) => c.uuid === activeUuid);
-  if (configs.length <= 1) {
-    // Single config — show as label with edit button
-    return (
-      <div className='flex items-center gap-2'>
-        <Puzzle className='h-5 w-5 text-white/70' />
-        <h1 className='text-xl font-bold text-white'>
-          {active?.name ?? 'Jobs to Be Done'}
-        </h1>
-        {active && (
-          <button
-            onClick={() => onEdit(active.uuid)}
-            className='rounded-md p-1 text-white/30 transition-colors hover:bg-white/[0.08] hover:text-white/50'
-            title='Edit config'
-          >
-            <Settings className='h-3.5 w-3.5' />
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div ref={ref} className='relative'>
-      <button
-        onClick={() => setOpen(!open)}
-        className='flex items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-white/[0.08]'
-      >
-        <Puzzle className='h-5 w-5 text-white/70' />
-        <h1 className='text-xl font-bold text-white'>
-          {active?.name ?? 'Jobs to Be Done'}
-        </h1>
-        <ChevronDown
-          className={cn(
-            'h-4 w-4 text-white/40 transition-transform',
-            open && 'rotate-180',
-          )}
-        />
-      </button>
-
-      {open && (
-        <motion.div
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className='absolute left-0 top-full z-30 mt-1 min-w-[260px] overflow-hidden rounded-xl border border-white/15 bg-black/80 py-1 shadow-xl backdrop-blur-xl'
-        >
-          {configs.map((config) => {
-            const isActive = config.uuid === activeUuid;
-            return (
-              <div
-                key={config.uuid}
-                className={cn(
-                  'group/row flex w-full items-center gap-3 px-4 py-2.5 transition-colors',
-                  isActive ? 'bg-white/10' : 'hover:bg-white/5',
-                )}
-              >
-                <button
-                  onClick={() => {
-                    onSelect(config.uuid);
-                    setOpen(false);
-                  }}
-                  className='flex flex-1 items-center gap-3 text-left'
-                >
-                  <div
-                    className={cn(
-                      'h-2 w-2 shrink-0 rounded-full',
-                      isActive ? 'bg-emerald-400' : 'bg-white/20',
-                    )}
-                  />
-                  <div className='flex-1'>
-                    <div className='text-sm font-medium text-white/90'>
-                      {config.name}
-                    </div>
-                  </div>
-                  <span className='rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-white/40'>
-                    {config.rulesCount} rules
-                  </span>
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setOpen(false);
-                    onEdit(config.uuid);
-                  }}
-                  className='shrink-0 rounded-md p-1 text-white/20 opacity-0 transition-all hover:bg-white/10 hover:text-white/50 group-hover/row:opacity-100'
-                  title='Edit config'
-                >
-                  <Settings className='h-3.5 w-3.5' />
-                </button>
-              </div>
-            );
-          })}
-          {/* New config button */}
-          <div className='border-t border-white/[0.08] px-4 pt-1'>
-            <button
-              onClick={() => {
-                setOpen(false);
-                onEdit('');
-              }}
-              className='flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs font-medium text-white/40 transition-colors hover:bg-white/5 hover:text-white/60'
-            >
-              <span className='text-sm'>+</span>
-              New Config
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </div>
-  );
-};
-
-// ============================================
 // Scan Info Line
 // ============================================
 
@@ -670,38 +525,44 @@ const ScanInfoLine: React.FC<{
 };
 
 // ============================================
-// Main JTBDCanvas (embeddable)
+// Inner Canvas (uses view context)
 // ============================================
 
-const JTBDCanvas: React.FC = () => {
+const JTBDCanvasInner: React.FC = () => {
+  // View context
+  const {
+    activeConfigUuid,
+    setActiveConfigUuid,
+    showCreateModal,
+    setShowCreateModal,
+    editConfigUuid,
+    setEditConfigUuid,
+  } = useJTBDView();
+
   // Data hooks
   const { configs, isLoading: isLoadingConfigs } = useJTBDConfigs();
 
-  // Config selection — default to first config
-  const [selectedConfigUuid, setSelectedConfigUuid] = useState<string | null>(
-    null,
-  );
-  const configUuid = selectedConfigUuid ?? configs[0]?.uuid ?? '';
-  const activeConfig = configs.find((c) => c.uuid === configUuid) ?? null;
-
   // Auto-select first config when configs load
   useEffect(() => {
-    if (!selectedConfigUuid && configs.length > 0) {
-      setSelectedConfigUuid(configs[0].uuid);
+    if (!activeConfigUuid && configs.length > 0) {
+      setActiveConfigUuid(configs[0].uuid);
     }
-  }, [configs, selectedConfigUuid]);
+  }, [configs, activeConfigUuid, setActiveConfigUuid]);
+
+  const configUuid = activeConfigUuid ?? configs[0]?.uuid ?? '';
+  const activeConfig = configs.find((c) => c.uuid === configUuid) ?? null;
 
   const { jobs, isLoading: isLoadingScan } = useJTBDCurrentScan(configUuid);
   const { scans } = useJTBDScans(configUuid);
   const { scanProgress, startScanning } = useJTBDScanSocketEvents(configUuid);
 
-  // Recover scan progress on page refresh — fetch active scan when config says scanning
+  // Recover scan progress on page refresh
   const { activeScan } = useJTBDActiveScan(
     configUuid,
     !!activeConfig?.isScanning && !scanProgress.isScanning,
   );
 
-  // Derive effective progress: prefer WS (real-time) > REST active scan > config.isScanning fallback
+  // Derive effective progress
   const effectiveProgress: JTBDScanProgress = scanProgress.isScanning
     ? scanProgress
     : activeScan
@@ -747,11 +608,8 @@ const JTBDCanvas: React.FC = () => {
     setSearchParams({ mode: 'jtbd' });
   }, [setSearchParams]);
 
-  // UI state — editConfigUuid: null = canvas, string = config page with that config pre-selected
-  const [editConfigUuid, setEditConfigUuid] = useState<string | null>(null);
-  const showConfig = editConfigUuid !== null;
+  // UI state
   const [searchValue, setSearchValue] = useState('');
-  const [committedQuery, setCommittedQuery] = useState('');
   const [hasScrolled, setHasScrolled] = useState(false);
   const [selectedJobUuid, setSelectedJobUuid] = useState<string | null>(null);
   const [filters, setFilters] = useState<JTBDFilters>({
@@ -761,28 +619,32 @@ const JTBDCanvas: React.FC = () => {
   });
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const heroSearchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [failureDismissed, setFailureDismissed] = useState(false);
+  const [pendingDescription, setPendingDescription] = useState('');
 
   const isLoading = isLoadingConfigs || (!!configUuid && isLoadingScan);
 
-  // Scroll detection — re-run when the scroll container mounts
-  // (it doesn't exist during loading/empty early-return paths)
+  // Show sticky bar when hero search bar is nearly scrolled out of view.
+  // The search bar sits ~60% down the hero section (which is 100vh - 5rem).
+  // Trigger when the search bar is close to the top — roughly when we've
+  // scrolled past 50% of the visible height.
   const hasJobs = jobs.length > 0;
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
     const handleScroll = (): void => {
-      setHasScrolled(container.scrollTop > 10);
+      const threshold = container.clientHeight * 0.5;
+      setHasScrolled(container.scrollTop > threshold);
     };
     container.addEventListener('scroll', handleScroll, { passive: true });
     return () => container.removeEventListener('scroll', handleScroll);
   }, [hasJobs, effectiveProgress.isScanning]);
 
-  // Reset search/filters when switching configs
-  const handleConfigSelect = useCallback((uuid: string) => {
-    setSelectedConfigUuid(uuid);
+  // Reset filters when switching configs
+  useEffect(() => {
     setSearchValue('');
-    setCommittedQuery('');
     setSelectedJobUuid(null);
     setFailureDismissed(false);
     setFilters({
@@ -790,61 +652,37 @@ const JTBDCanvas: React.FC = () => {
       evidenceStrength: 'ALL',
       audience: 'ALL',
     });
-  }, []);
+  }, [activeConfigUuid]);
 
   const showFailureBanner =
     !failureDismissed &&
     !effectiveProgress.isScanning &&
     activeConfig?.lastScanStatus === 'failed';
 
-  // Search handlers
-  const handleSearchSubmit = useCallback(() => {
-    if (searchValue.trim()) {
-      setCommittedQuery(searchValue.trim());
-      cardsRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [searchValue]);
-
+  // Search bar handler: Enter key opens create modal with search text
   const handleSearchKeyDown = useCallback(
     (e: React.KeyboardEvent): void => {
-      if (e.key === 'Enter') handleSearchSubmit();
+      if (e.key === 'Enter' && searchValue.trim()) {
+        setPendingDescription(searchValue.trim());
+        setShowCreateModal(true);
+        setSearchValue('');
+      }
     },
-    [handleSearchSubmit],
+    [searchValue, setShowCreateModal],
   );
 
-  const handleClearSearch = useCallback(() => {
-    setSearchValue('');
-    setCommittedQuery('');
-  }, []);
-
-  // Filter and sort jobs
+  // Filter jobs (no text search — only filter bar)
   const filteredJobs = useMemo(() => {
     let items = [...jobs];
-
-    // Text search
-    if (committedQuery) {
-      const q = committedQuery.toLowerCase();
-      items = items.filter(
-        (j) =>
-          j.jtbdTitle.toLowerCase().includes(q) ||
-          j.persona.toLowerCase().includes(q) ||
-          j.desire.toLowerCase().includes(q) ||
-          j.summary.toLowerCase().includes(q),
-      );
-    }
-
-    // Filter bar filters
     items = items.filter(
       (j) =>
         matchesOpportunitySize(j.opportunityScore, filters.opportunitySize) &&
         matchesEvidenceStrength(j.evidenceStrength, filters.evidenceStrength) &&
         matchesAudience(j.segment, filters.audience),
     );
-
-    // Sort by opportunity score descending
     items.sort((a, b) => b.opportunityScore - a.opportunityScore);
     return items;
-  }, [jobs, committedQuery, filters]);
+  }, [jobs, filters]);
 
   const handleCardClick = useCallback((job: IJTBDJob) => {
     setSelectedJobUuid((prev) => (prev === job.uuid ? null : job.uuid));
@@ -856,340 +694,309 @@ const JTBDCanvas: React.FC = () => {
     }
   }, [configUuid, triggerScan]);
 
-  // Config view
-  if (showConfig) {
-    return (
-      <div className='relative h-full w-full'>
-        <JTBDConfigPage
-          onBack={() => setEditConfigUuid(null)}
-          initialConfigUuid={editConfigUuid || undefined}
-        />
-      </div>
-    );
-  }
+  const handleNewArea = useCallback(() => {
+    scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => searchInputRef.current?.focus(), 300);
+  }, []);
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className='relative h-full w-full overflow-auto'>
-        <SkeletonCards />
-      </div>
-    );
-  }
+  const handleConfigCreated = useCallback(
+    (uuid: string) => {
+      setActiveConfigUuid(uuid);
+    },
+    [setActiveConfigUuid],
+  );
 
-  // Empty states
-  if (
+  const isEmptyState =
     !activeConfig ||
     (jobs.length === 0 &&
       !effectiveProgress.isScanning &&
-      !activeConfig?.isScanning)
-  ) {
-    return (
-      <div className='relative h-full w-full overflow-auto'>
-        <EmptyState
-          hasConfig={!!activeConfig}
-          onConfigure={() => setEditConfigUuid('')}
-          onTriggerScan={handleTriggerScan}
-          isTriggering={isTriggering}
-        />
-        <AnimatePresence>
-          {effectiveProgress.isScanning && (
-            <ScanProgressBanner
-              stage={effectiveProgress.stage}
-              progress={effectiveProgress.progress}
-              message={effectiveProgress.message}
-              currentJob={effectiveProgress.currentJob}
-            />
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {showFailureBanner && (
-            <ScanFailureBanner
-              errorMessage={activeConfig?.lastScanError}
-              onRetry={handleTriggerScan}
-              isRetrying={isTriggering}
-              onDismiss={() => setFailureDismissed(true)}
-            />
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  }
+      !activeConfig?.isScanning);
 
-  // Show OpportunityMap when a seed is in the URL (from JTBD concept ideation)
-  if (ideationSeedUuid) {
-    return (
-      <div className='relative h-full w-full'>
-        <OpportunityMap
-          seedUuid={ideationSeedUuid}
-          onClose={handleCloseOpportunityMap}
-        />
-      </div>
-    );
-  }
+  // Determine which content to render
+  const renderContent = (): React.ReactNode => {
+    // Loading state
+    if (isLoading) {
+      return (
+        <div className='relative h-full w-full overflow-auto'>
+          <SkeletonCards />
+        </div>
+      );
+    }
 
-  return (
-    <div className='relative h-full w-full overflow-hidden'>
-      {/* Scrollable content with snap */}
-      <div
-        ref={scrollContainerRef}
-        className='h-full overflow-auto'
-        style={{ scrollSnapType: 'y proximity' }}
-      >
-        {/* Landing hero section — full viewport snap point */}
+    // Empty states
+    if (isEmptyState) {
+      return (
+        <div className='relative h-full w-full overflow-auto'>
+          <EmptyState
+            hasConfig={!!activeConfig}
+            onConfigure={handleNewArea}
+            onTriggerScan={handleTriggerScan}
+            isTriggering={isTriggering}
+          />
+          <AnimatePresence>
+            {effectiveProgress.isScanning && (
+              <div className='pointer-events-none absolute bottom-6 left-0 right-0 z-30 flex justify-center'>
+                <div className='pointer-events-auto w-full max-w-md px-4'>
+                  <ScanProgressBanner
+                    stage={effectiveProgress.stage}
+                    progress={effectiveProgress.progress}
+                    message={effectiveProgress.message}
+                    currentJob={effectiveProgress.currentJob}
+                  />
+                </div>
+              </div>
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {showFailureBanner && (
+              <div className='pointer-events-none absolute bottom-6 left-0 right-0 z-30 flex justify-center'>
+                <div className='pointer-events-auto w-full max-w-md px-4'>
+                  <ScanFailureBanner
+                    errorMessage={activeConfig?.lastScanError}
+                    onRetry={handleTriggerScan}
+                    isRetrying={isTriggering}
+                    onDismiss={() => setFailureDismissed(true)}
+                  />
+                </div>
+              </div>
+            )}
+          </AnimatePresence>
+        </div>
+      );
+    }
+
+    // Show OpportunityMap when a seed is in the URL
+    if (ideationSeedUuid) {
+      return (
+        <div className='relative h-full w-full'>
+          <OpportunityMap
+            seedUuid={ideationSeedUuid}
+            onClose={handleCloseOpportunityMap}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className='relative h-full w-full overflow-hidden'>
+        {/* Scrollable content with snap */}
         <div
-          className='relative h-[calc(100vh-5rem)] overflow-hidden'
-          style={{ scrollSnapAlign: 'start' }}
+          ref={scrollContainerRef}
+          className='h-full overflow-auto'
+          style={{ scrollSnapType: 'y proximity' }}
         >
-          {/* Centered hero content */}
-          <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-32'>
-            <motion.div
-              style={{ pointerEvents: 'auto' }}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.7 }}
-              className='space-y-3 text-center'
-            >
-              <div className='mb-2 flex items-center justify-center gap-3'>
-                <Puzzle className='h-12 w-12 text-white/70' />
-              </div>
-              <h1 className='text-5xl font-bold text-white'>Jobs to Be Done</h1>
-              <p className='mx-auto max-w-lg text-xl text-white/60'>
-                {filteredJobs.length} unmet need
-                {filteredJobs.length !== 1 ? 's' : ''} discovered
-              </p>
-              {/* Config selector + rescan */}
-              <div className='flex items-center justify-center gap-3 pt-2'>
-                {configs.length > 1 && (
-                  <ConfigSelector
-                    configs={configs}
-                    activeUuid={configUuid}
-                    onSelect={handleConfigSelect}
-                    onEdit={(uuid) => setEditConfigUuid(uuid)}
-                  />
-                )}
-                <button
-                  onClick={handleTriggerScan}
-                  disabled={isTriggering || effectiveProgress.isScanning}
-                  className='flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50'
-                >
-                  <Radar className='h-3.5 w-3.5' />
-                  {isTriggering
-                    ? 'Starting...'
-                    : effectiveProgress.isScanning
-                      ? 'Scanning...'
-                      : 'Rescan'}
-                </button>
-              </div>
-              {/* Scan info */}
-              <div className='flex justify-center pt-1'>
-                <ScanInfoLine scans={scans} jobCount={filteredJobs.length} />
-              </div>
-            </motion.div>
+          {/* Landing hero section */}
+          <div
+            className='relative h-[calc(100vh-5rem)] overflow-hidden'
+            style={{ scrollSnapAlign: 'start' }}
+          >
+            <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-32'>
+              <motion.div
+                style={{ pointerEvents: 'auto' }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.7 }}
+                className='space-y-3 text-center'
+              >
+                <div className='mb-2 flex items-center justify-center gap-3'>
+                  <Puzzle className='h-12 w-12 text-white/70' />
+                </div>
+                <h1 className='text-5xl font-bold text-white'>
+                  Jobs to Be Done
+                </h1>
+                <p className='mx-auto max-w-lg text-xl text-white/60'>
+                  {filteredJobs.length} unmet need
+                  {filteredJobs.length !== 1 ? 's' : ''} discovered
+                </p>
+                {/* Config dropdown + rescan */}
+                <div className='flex items-center justify-center gap-3 pt-2'>
+                  <JTBDConfigDropdown isAdmin onNewArea={handleNewArea} />
+                  <button
+                    onClick={handleTriggerScan}
+                    disabled={isTriggering || effectiveProgress.isScanning}
+                    className='flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50'
+                  >
+                    <Radar className='h-3.5 w-3.5' />
+                    {isTriggering
+                      ? 'Starting...'
+                      : effectiveProgress.isScanning
+                        ? 'Scanning...'
+                        : 'Rescan'}
+                  </button>
+                </div>
+                {/* Scan info */}
+                <div className='flex justify-center pt-1'>
+                  <ScanInfoLine scans={scans} jobCount={filteredJobs.length} />
+                </div>
+              </motion.div>
 
-            {/* Landing search bar */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className='mt-8 w-full max-w-lg px-6'
-              style={{ pointerEvents: 'auto' }}
-            >
-              <div className='rounded-2xl border border-white/[0.1] bg-white/[0.05] backdrop-blur-xl'>
-                <div className='flex items-center gap-2 px-4 py-3'>
-                  <Search className='h-5 w-5 shrink-0 text-white/40' />
-                  <input
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    onKeyDown={handleSearchKeyDown}
-                    placeholder='Search for jobs, pain, or customers'
-                    className='h-9 flex-1 border-0 bg-transparent text-base text-white placeholder:text-white/30 focus:outline-none'
-                  />
-                  {searchValue && (
-                    <>
+              {/* Landing search bar — opens create modal on Enter */}
+              <motion.div
+                ref={heroSearchRef}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+                className='mt-8 w-full max-w-lg px-6'
+                style={{ pointerEvents: 'auto' }}
+              >
+                <div className='rounded-2xl border border-white/[0.1] bg-white/[0.05] backdrop-blur-xl'>
+                  <div className='flex items-center gap-2 px-4 py-3'>
+                    <Search className='h-5 w-5 shrink-0 text-white/40' />
+                    <input
+                      ref={searchInputRef}
+                      value={searchValue}
+                      onChange={(e) => setSearchValue(e.target.value)}
+                      onKeyDown={handleSearchKeyDown}
+                      placeholder='Describe a market to explore...'
+                      className='h-9 flex-1 border-0 bg-transparent text-base text-white placeholder:text-white/30 focus:outline-none'
+                    />
+                    {searchValue && (
                       <button
-                        onClick={handleClearSearch}
+                        onClick={() => setSearchValue('')}
                         className='rounded-md p-1 transition-colors hover:bg-white/10'
                       >
                         <X className='h-4 w-4 text-white/40' />
                       </button>
-                      <button
-                        onClick={handleSearchSubmit}
-                        className='flex shrink-0 items-center gap-1 rounded-lg bg-white/15 px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-white/25'
-                      >
-                        Search <ArrowRight className='h-3 w-3' />
-                      </button>
-                    </>
-                  )}
+                    )}
+                  </div>
                 </div>
+                <button
+                  onClick={() =>
+                    cardsRef.current?.scrollIntoView({ behavior: 'smooth' })
+                  }
+                  className='mx-auto mt-4 flex cursor-pointer items-center justify-center gap-1.5 text-white/30 transition-colors hover:text-white/50'
+                >
+                  <ChevronDown className='h-3.5 w-3.5 animate-bounce' />
+                  <span className='text-xs'>Scroll to See JTBD</span>
+                </button>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Cards section */}
+          <div
+            ref={cardsRef}
+            className='min-h-screen px-8 pb-24 pt-8'
+            style={{ scrollSnapAlign: 'start' }}
+          >
+            <JTBDMasonryColumns
+              jobs={filteredJobs}
+              selectedJobUuid={selectedJobUuid}
+              onCardClick={handleCardClick}
+              onIdeate={handleIdeate}
+              ideatingJobUuid={ideatingJobUuid}
+            />
+
+            {filteredJobs.length === 0 && (
+              <div className='py-20 text-center text-lg text-white/40'>
+                No jobs match your current filters
               </div>
-              <button
-                onClick={() =>
-                  cardsRef.current?.scrollIntoView({ behavior: 'smooth' })
-                }
-                className='mx-auto mt-4 flex cursor-pointer items-center justify-center gap-1.5 text-white/30 transition-colors hover:text-white/50'
-              >
-                <ChevronDown className='h-3.5 w-3.5 animate-bounce' />
-                <span className='text-xs'>Scroll to See JTBD</span>
-              </button>
-            </motion.div>
+            )}
           </div>
         </div>
 
-        {/* Cards section — snaps to top */}
-        <div
-          ref={cardsRef}
-          className='min-h-screen px-8 pb-24 pt-8'
-          style={{ scrollSnapAlign: 'start' }}
-        >
-          {/* Masonry grid of job cards */}
-          <JTBDMasonryColumns
-            jobs={filteredJobs}
-            selectedJobUuid={selectedJobUuid}
-            onCardClick={handleCardClick}
-            onIdeate={handleIdeate}
-            ideatingJobUuid={ideatingJobUuid}
-          />
+        {/* Sticky header — compact search bar + config dropdown */}
+        <AnimatePresence>
+          {hasScrolled && (
+            <motion.div
+              initial={{ opacity: 0, y: -40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -40 }}
+              transition={{ duration: 0.2 }}
+              className='absolute right-4 top-3 z-40 flex w-full max-w-md items-center gap-2 rounded-full border border-white/[0.1] bg-black/60 px-3 py-1.5 backdrop-blur-xl'
+            >
+              <JTBDConfigDropdown isAdmin onNewArea={handleNewArea} />
+              <div className='mx-1 h-4 w-px bg-white/10' />
+              <Search className='h-3.5 w-3.5 shrink-0 text-white/40' />
+              <input
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
+                placeholder='Explore...'
+                className='h-7 flex-1 border-0 bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none'
+              />
+              {searchValue && (
+                <button
+                  onClick={() => setSearchValue('')}
+                  className='rounded-md p-0.5 transition-colors hover:bg-white/10'
+                >
+                  <X className='h-3.5 w-3.5 text-white/40' />
+                </button>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          {filteredJobs.length === 0 && (
-            <div className='py-20 text-center text-lg text-white/40'>
-              No jobs match your current search
+        {/* Scan progress banner */}
+        <AnimatePresence>
+          {effectiveProgress.isScanning && (
+            <div className='pointer-events-none absolute bottom-6 left-0 right-0 z-30 flex justify-center'>
+              <div className='pointer-events-auto w-full max-w-md px-4'>
+                <ScanProgressBanner
+                  stage={effectiveProgress.stage}
+                  progress={effectiveProgress.progress}
+                  message={effectiveProgress.message}
+                  currentJob={effectiveProgress.currentJob}
+                />
+              </div>
             </div>
           )}
-        </div>
-      </div>
+        </AnimatePresence>
 
-      {/* Sticky header — slides down when scrolled, absolute over content */}
-      <AnimatePresence>
-        {hasScrolled && (
-          <motion.div
-            initial={{ opacity: 0, y: -60 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -60 }}
-            transition={{ duration: 0.25 }}
-            className='absolute left-4 right-4 top-3 z-40 rounded-xl bg-black/60 px-6 py-4 backdrop-blur-xl'
-          >
-            <div className='mb-1 flex items-center gap-4'>
-              <ConfigSelector
-                configs={configs}
-                activeUuid={configUuid}
-                onSelect={handleConfigSelect}
-                onEdit={(uuid) => setEditConfigUuid(uuid)}
-              />
-              <div className='flex-1' />
-              <ScanInfoLine scans={scans} jobCount={filteredJobs.length} />
-              <button
-                onClick={() => setEditConfigUuid(configUuid)}
-                className='rounded-lg p-2 text-white/40 transition-colors hover:bg-white/[0.08] hover:text-white/60'
-              >
-                <Settings className='h-4 w-4' />
-              </button>
-              <button
-                onClick={handleTriggerScan}
-                disabled={isTriggering || effectiveProgress.isScanning}
-                className='flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50'
-              >
-                <Radar className='h-3.5 w-3.5' />
-                {isTriggering ? 'Starting...' : 'Scan'}
-              </button>
-            </div>
-            <JTBDFilterBar
-              filters={filters}
-              onFiltersChange={setFilters}
-              totalCount={jobs.length}
-              filteredCount={filteredJobs.length}
-              instanceId='sticky'
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Scan progress banner — absolute overlay */}
-      <AnimatePresence>
-        {effectiveProgress.isScanning && (
-          <div
-            className={cn(
-              'absolute left-0 right-0 z-30',
-              hasScrolled ? 'top-24' : 'top-4',
-            )}
-          >
-            <ScanProgressBanner
-              stage={effectiveProgress.stage}
-              progress={effectiveProgress.progress}
-              message={effectiveProgress.message}
-              currentJob={effectiveProgress.currentJob}
-            />
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Scan failure banner — absolute overlay */}
-      <AnimatePresence>
-        {showFailureBanner && (
-          <div
-            className={cn(
-              'absolute left-0 right-0 z-30',
-              hasScrolled ? 'top-24' : 'top-4',
-            )}
-          >
-            <ScanFailureBanner
-              errorMessage={activeConfig?.lastScanError}
-              onRetry={handleTriggerScan}
-              isRetrying={isTriggering}
-              onDismiss={() => setFailureDismissed(true)}
-            />
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Floating search bar — visible in scrolled state */}
-      <AnimatePresence>
-        {hasScrolled && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.25 }}
-            className='pointer-events-none absolute bottom-6 left-0 right-0 z-50 flex justify-center'
-          >
-            <div className='pointer-events-auto'>
-              <div className='rounded-2xl border border-white/[0.1] bg-black/60 backdrop-blur-xl'>
-                <div className='flex items-center gap-2 px-4 py-2'>
-                  <Search className='h-4 w-4 shrink-0 text-white/40' />
-                  <input
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    onKeyDown={handleSearchKeyDown}
-                    placeholder='Search for jobs, pain, or customers'
-                    className='h-7 w-[280px] border-0 bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none'
-                  />
-                  {searchValue && (
-                    <>
-                      <button
-                        onClick={handleClearSearch}
-                        className='rounded-md p-1 transition-colors hover:bg-white/10'
-                      >
-                        <X className='h-3.5 w-3.5 text-white/40' />
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (searchValue.trim())
-                            setCommittedQuery(searchValue.trim());
-                        }}
-                        className='flex shrink-0 items-center gap-1 rounded-lg bg-white/15 px-2.5 py-1 text-xs font-semibold text-white transition-all hover:bg-white/25'
-                      >
-                        Search <ArrowRight className='h-3 w-3' />
-                      </button>
-                    </>
-                  )}
-                </div>
+        {/* Scan failure banner */}
+        <AnimatePresence>
+          {showFailureBanner && (
+            <div className='pointer-events-none absolute bottom-6 left-0 right-0 z-30 flex justify-center'>
+              <div className='pointer-events-auto w-full max-w-md px-4'>
+                <ScanFailureBanner
+                  errorMessage={activeConfig?.lastScanError}
+                  onRetry={handleTriggerScan}
+                  isRetrying={isTriggering}
+                  onDismiss={() => setFailureDismissed(true)}
+                />
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {renderContent()}
+
+      {/* Modals — always rendered to preserve WebSocket listener lifecycle */}
+      <CreateJTBDConfigModal
+        open={showCreateModal}
+        onOpenChange={(v) => {
+          setShowCreateModal(v);
+          if (!v) setPendingDescription('');
+        }}
+        onCreated={handleConfigCreated}
+        initialDescription={pendingDescription}
+      />
+      {editConfigUuid && (
+        <EditJTBDConfigModal
+          configUuid={editConfigUuid}
+          open={!!editConfigUuid}
+          onOpenChange={(open) => {
+            if (!open) setEditConfigUuid(undefined);
+          }}
+        />
+      )}
+    </>
   );
 };
+
+// ============================================
+// Main JTBDCanvas (wraps with provider)
+// ============================================
+
+const JTBDCanvas: React.FC = () => (
+  <JTBDViewProvider>
+    <JTBDCanvasInner />
+  </JTBDViewProvider>
+);
 
 export default JTBDCanvas;
