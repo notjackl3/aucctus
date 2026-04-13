@@ -1,4 +1,4 @@
-import type { IJTBDCustomWidget } from '@libs/api/types/jtbd';
+import type { IJTBDCustomWidget, IJTBDItemSource } from '@libs/api/types/jtbd';
 import { motion } from 'framer-motion';
 import React, { useId } from 'react';
 import {
@@ -12,6 +12,34 @@ import {
 
 import { TREND_DOT_FILL, TREND_LINE_COLOR } from '../chartColors';
 import { ItemSources } from './ItemSources';
+
+interface TrendDataItem {
+  period: string;
+  value: number;
+  label: string;
+  sources: IJTBDItemSource[];
+}
+
+const TrendChartTooltip = ({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload: TrendDataItem }>;
+}) => {
+  if (!active || !payload?.length) return null;
+  const data = payload[0].payload;
+  return (
+    <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-3 shadow-lg'>
+      <p className='aucctus-text-primary aucctus-text-sm-semibold'>
+        {data.label}
+      </p>
+      <p className='aucctus-text-secondary aucctus-text-xs mt-1'>
+        {data.period}: {data.value}
+      </p>
+    </div>
+  );
+};
 
 interface TrendChartWidgetProps {
   widget: IJTBDCustomWidget;
@@ -29,10 +57,11 @@ export const TrendChartWidget: React.FC<TrendChartWidgetProps> = ({
 
   if (items.length === 0) return null;
 
-  const data = items.map((item) => ({
+  const data: TrendDataItem[] = items.map((item) => ({
     period: item.period,
     value: item.value,
     label: item.label,
+    sources: item.sources,
   }));
 
   return (
@@ -73,15 +102,8 @@ export const TrendChartWidget: React.FC<TrendChartWidgetProps> = ({
           />
           <YAxis hide />
           <Tooltip
-            contentStyle={{
-              background: 'rgba(0,0,0,0.9)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 12,
-              color: 'white',
-              fontSize: 12,
-            }}
-            formatter={(value: number) => [value, 'Value']}
-            labelFormatter={(label: string) => label}
+            content={<TrendChartTooltip />}
+            cursor={{ stroke: 'rgba(255,255,255,0.1)' }}
           />
           <Area
             type='monotone'

@@ -1,4 +1,4 @@
-import type { IJTBDCustomWidget } from '@libs/api/types/jtbd';
+import type { IJTBDCustomWidget, IJTBDItemSource } from '@libs/api/types/jtbd';
 import { DynamicIcon } from '@libs/utils/iconMap';
 import { motion } from 'framer-motion';
 import React from 'react';
@@ -19,6 +19,61 @@ import { BAR_COLORS, PIE_COLORS } from '../chartColors';
 import { ItemSources } from './ItemSources';
 import { WidgetHeader } from './WidgetHeader';
 
+interface MetricDataItem {
+  name: string;
+  value: number;
+  unit: string;
+  valueLabel: string;
+  sources: IJTBDItemSource[];
+}
+
+const BarChartTooltip = ({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload: MetricDataItem }>;
+}) => {
+  if (!active || !payload?.length) return null;
+  const data = payload[0].payload;
+  return (
+    <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-3 shadow-lg'>
+      <p className='aucctus-text-primary aucctus-text-sm-semibold'>
+        {data.name}
+      </p>
+      <p className='aucctus-text-secondary aucctus-text-xs mt-1'>
+        {data.value}
+        {data.unit}
+      </p>
+    </div>
+  );
+};
+
+const PieChartTooltip = ({
+  active,
+  payload,
+  total,
+}: {
+  active?: boolean;
+  payload?: Array<{ payload: MetricDataItem }>;
+  total: number;
+}) => {
+  if (!active || !payload?.length) return null;
+  const data = payload[0].payload;
+  const percentage = total > 0 ? ((data.value / total) * 100).toFixed(1) : '0';
+  return (
+    <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-3 shadow-lg'>
+      <p className='aucctus-text-primary aucctus-text-sm-semibold'>
+        {data.name}
+      </p>
+      <p className='aucctus-text-secondary aucctus-text-xs mt-1'>
+        {data.value}
+        {data.unit} ({percentage}%)
+      </p>
+    </div>
+  );
+};
+
 interface MetricChartWidgetProps {
   widget: IJTBDCustomWidget;
 }
@@ -32,12 +87,15 @@ export const MetricChartWidget: React.FC<MetricChartWidgetProps> = ({
 
   if (items.length === 0) return null;
 
-  const data = items.map((item) => ({
+  const data: MetricDataItem[] = items.map((item) => ({
     name: item.label,
     value: item.magnitude,
     unit: item.unit,
     valueLabel: `${item.magnitude}${item.unit}`,
+    sources: item.sources,
   }));
+
+  const total = data.reduce((sum, d) => sum + d.value, 0);
 
   if (widget.chartType === 'pie') {
     return (
@@ -68,19 +126,7 @@ export const MetricChartWidget: React.FC<MetricChartWidgetProps> = ({
                 />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{
-                background: 'rgba(0,0,0,0.9)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 12,
-                color: 'white',
-                fontSize: 12,
-              }}
-              formatter={(value: number, name: string) => [
-                `${value} ${data.find((d) => d.name === name)?.unit ?? ''}`,
-                name,
-              ]}
-            />
+            <Tooltip content={<PieChartTooltip total={total} />} />
           </PieChart>
         </ResponsiveContainer>
         <div className='flex flex-wrap justify-center gap-3'>
@@ -90,7 +136,7 @@ export const MetricChartWidget: React.FC<MetricChartWidgetProps> = ({
                 className='h-2.5 w-2.5 rounded-full'
                 style={{ background: PIE_COLORS[i % PIE_COLORS.length] }}
               />
-              <span className='text-[11px] text-white/60'>
+              <span className='line-clamp-1 text-[11px] text-white/60'>
                 {item.name} ({item.valueLabel})
               </span>
             </div>
@@ -136,22 +182,31 @@ export const MetricChartWidget: React.FC<MetricChartWidgetProps> = ({
             type='category'
             dataKey='name'
             width={100}
-            tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11 }}
+            tick={({
+              x,
+              y,
+              payload,
+            }: {
+              x: number;
+              y: number;
+              payload: { value: string };
+            }) => (
+              <foreignObject x={x - 100} y={y - 10} width={96} height={20}>
+                <div
+                  className='line-clamp-1 text-right text-[11px] leading-[20px]'
+                  style={{ color: 'rgba(255,255,255,0.5)' }}
+                  title={payload.value}
+                >
+                  {payload.value}
+                </div>
+              </foreignObject>
+            )}
             axisLine={false}
             tickLine={false}
           />
           <Tooltip
-            contentStyle={{
-              background: 'rgba(0,0,0,0.9)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 12,
-              color: 'white',
-              fontSize: 12,
-            }}
-            formatter={(value: number, name: string) => [
-              `${value}${data.find((d) => d.name === name)?.unit ?? ''}`,
-              name,
-            ]}
+            content={<BarChartTooltip />}
+            cursor={{ fill: 'rgba(255,255,255,0.05)' }}
           />
           <Bar dataKey='value' radius={[0, 4, 4, 0]} animationDuration={800}>
             {data.map((_, i) => (
