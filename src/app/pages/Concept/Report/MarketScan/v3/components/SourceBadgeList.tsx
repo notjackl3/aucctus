@@ -34,7 +34,10 @@ const SourceBadgeList: React.FC<SourceBadgeListProps> = ({
             badgeSize='small'
             badgeClassName='aucctus-text-primary whitespace-nowrap'
             source={source}
-            onClick={() => window.open(source.url, '_blank')}
+            onClick={() =>
+              source.url &&
+              window.open(source.url, '_blank', 'noopener,noreferrer')
+            }
             showPublishedDate={false}
             sourceDescription={createSourceDescription(source)}
             hideDelay={0}
@@ -49,7 +52,10 @@ const SourceBadgeList: React.FC<SourceBadgeListProps> = ({
               badgeSize='small'
               badgeClassName='aucctus-text-primary whitespace-nowrap'
               source={source}
-              onClick={() => window.open(source.url, '_blank')}
+              onClick={() =>
+                source.url &&
+                window.open(source.url, '_blank', 'noopener,noreferrer')
+              }
               showPublishedDate={false}
               sourceDescription={createSourceDescription(source)}
               hideDelay={0}
@@ -74,7 +80,10 @@ const SourceBadgeList: React.FC<SourceBadgeListProps> = ({
                       index < sources.slice(visibleCount).length - 1 &&
                         'aucctus-border-secondary border-b',
                     )}
-                    onClick={() => window.open(source.url, '_blank')}
+                    onClick={() =>
+                      source.url &&
+                      window.open(source.url, '_blank', 'noopener,noreferrer')
+                    }
                   >
                     <div className='pointer-events-none'>
                       <Badge.SourceInfo

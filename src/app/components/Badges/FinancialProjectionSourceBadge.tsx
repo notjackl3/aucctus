@@ -1,4 +1,5 @@
 import images from '@assets/img';
+import AucctusLogo from '@assets/aucctus_logo.png';
 import { ComponentTooltip } from '@components';
 import {
   useCompanyInfo,
@@ -39,19 +40,24 @@ const FinancialProjectionSourceBadge: React.FC<
   const [publishedDate, setPublishedDate] = useState<string | undefined>(
     undefined,
   );
-  const isAIReasoning = source.title === 'AI Reasoning' || !source.url;
+  const isNucleusSource = source.sourceType === 'nucleus';
+  const isAIReasoning =
+    source.sourceType === 'ai_reasoning' ||
+    (!isNucleusSource && (source.title === 'AI Reasoning' || !source.url));
   const hasValidUrl = source.url && source.url.trim() !== '';
 
-  const companyInfoQuery = useCompanyInfo(source.url || '');
+  const companyInfoQuery = useCompanyInfo(
+    isNucleusSource ? '' : source.url || '',
+  );
   const publishedDatesQuery = usePublishedDatesQuery(
-    hasValidUrl
+    hasValidUrl && !isNucleusSource
       ? {
           uuid: source.uuid,
           title: source.title,
           url: source.url!,
         }
       : { uuid: '', title: '', url: '' },
-    showPublishedDate && !!hasValidUrl,
+    showPublishedDate && !!hasValidUrl && !isNucleusSource,
   );
 
   useEffect(() => {
@@ -75,7 +81,9 @@ const FinancialProjectionSourceBadge: React.FC<
   }, [publishedDatesQuery.data, showPublishedDate, hasValidUrl]);
 
   useEffect(() => {
-    if (isAIReasoning) {
+    if (isNucleusSource) {
+      setSourceTitle(source.title);
+    } else if (isAIReasoning) {
       setSourceTitle('AI Reasoning');
     } else if (
       companyInfoQuery.data &&
@@ -93,6 +101,7 @@ const FinancialProjectionSourceBadge: React.FC<
     source.title,
     source.url,
     isAIReasoning,
+    isNucleusSource,
     hasValidUrl,
   ]);
 
@@ -101,12 +110,29 @@ const FinancialProjectionSourceBadge: React.FC<
     badgeSize === 'small' ? 'text-xs font-normal' : 'text-sm font-medium';
 
   const handleClick = () => {
-    if (hasValidUrl && !isAIReasoning) {
-      window.open(source.url, '_blank');
+    if (hasValidUrl && !isAIReasoning && !isNucleusSource) {
+      window.open(source.url, '_blank', 'noopener,noreferrer');
     }
   };
 
   const renderSourceLogo = () => {
+    if (isNucleusSource) {
+      return (
+        <div
+          className={cn(
+            'flex items-center justify-center overflow-hidden rounded-full bg-white',
+            logoSizeClass,
+          )}
+        >
+          <img
+            src={AucctusLogo}
+            alt='Nucleus'
+            className='h-full w-full object-contain p-0.5'
+          />
+        </div>
+      );
+    }
+
     if (isAIReasoning) {
       return (
         <div
@@ -176,7 +202,9 @@ const FinancialProjectionSourceBadge: React.FC<
             'aucctus-border-primary flex items-center gap-2 rounded-full border p-1',
             'aucctus-bg-primary-hover transition-all !duration-200',
             badgeClassName,
-            hasValidUrl && !isAIReasoning ? 'cursor-pointer' : 'cursor-default',
+            hasValidUrl && !isAIReasoning && !isNucleusSource
+              ? 'cursor-pointer'
+              : 'cursor-default',
           )}
         >
           {renderSourceLogo()}

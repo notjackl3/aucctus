@@ -98,8 +98,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
     );
   };
 
-  const isNucleusInsight =
-    card.source?.toLowerCase().includes('nucleus report') || false;
+  const isNucleusInsight = card.sourceType === 'nucleus';
   const isFileInsight = card.sourceType === 'file';
   const isPersonaInsight = card.sourceType === 'persona';
 
@@ -108,8 +107,9 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
       clearTimeout(clickTimerRef.current);
       clickTimerRef.current = null;
     }
-    // Don't open modal for Nucleus, File, or Persona insights
-    if (isNucleusInsight || isFileInsight || isPersonaInsight) return;
+    // Don't open modal for Persona insights; for Nucleus/File, allow if citation exists
+    if (isPersonaInsight) return;
+    if ((isNucleusInsight || isFileInsight) && !card.citation) return;
     onDoubleClick();
   };
 
@@ -120,8 +120,13 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
       clearTimeout(clickTimerRef.current);
       clickTimerRef.current = null;
     }
-    // File and Persona insights have no URL to open
-    if (isFileInsight || isPersonaInsight) return;
+    // Persona insights have no URL to open
+    if (isPersonaInsight) return;
+    // For nucleus/file with citation, open side panel
+    if ((isNucleusInsight || isFileInsight) && card.citation) {
+      onDoubleClick();
+      return;
+    }
     if (card.url) {
       window.open(card.url, '_blank', 'noopener,noreferrer');
     }
@@ -157,9 +162,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
       );
     }
 
-    const isNucleus = card.source?.toLowerCase().includes('nucleus') || false;
-
-    if (isNucleus) {
+    if (isNucleusInsight) {
       return (
         <div
           className={cn(
@@ -199,7 +202,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
         )}
       </div>
     );
-  }, [card.url, card.source, isFileInsight, isPersonaInsight]);
+  }, [card.url, isFileInsight, isNucleusInsight, isPersonaInsight]);
 
   const displayTitle = useMemo(() => {
     let title = card.source;
@@ -255,9 +258,8 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
         <div
           className={cn(
             'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-white/30 bg-white/10 px-1.5 py-0.5 transition-colors',
-            isFileInsight ||
-              isPersonaInsight ||
-              card.source?.includes('Nucleus')
+            isPersonaInsight ||
+              ((isFileInsight || isNucleusInsight) && !card.citation)
               ? 'cursor-default'
               : 'cursor-pointer hover:bg-white/15',
           )}

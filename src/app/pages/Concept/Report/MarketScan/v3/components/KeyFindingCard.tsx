@@ -56,6 +56,7 @@ const KeyFindingCard: React.FC<KeyFindingCardProps> = ({ finding }) => {
       description: source.summary,
       url: source.url,
       classification: source.classification,
+      sourceType: source.sourceType === 'nucleus' ? 'nucleus' : undefined,
     })) || [];
 
   return (

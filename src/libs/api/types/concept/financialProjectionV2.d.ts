@@ -9,6 +9,7 @@ export interface IBaseFinancialProjectionSourceV2 {
   title: string;
   url?: string;
   reasoning: string;
+  sourceType?: 'web' | 'nucleus' | 'ai_reasoning';
 }
 
 // =============================================================================

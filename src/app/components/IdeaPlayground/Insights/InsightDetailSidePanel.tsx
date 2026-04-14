@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Loading } from '@components';
 import { InsightCard } from '../types';
 import { getSourceInitial, getSourceColor } from './utils';
-import { Target, X } from 'lucide-react';
+import { FileText, Quote, Target, X } from 'lucide-react';
+import AucctusLogo from '@assets/aucctus_logo.png';
 
 interface InsightDetailSidePanelProps {
   selectedInsight: InsightCard | null;
@@ -84,8 +85,73 @@ const InsightDetailSidePanel: React.FC<InsightDetailSidePanelProps> = ({
             </button>
           </div>
 
-          {/* Error State - Show only error message */}
-          {selectedInsight.citationValidationStatus === 'error' ? (
+          {/* Citation-only view for Nucleus and File insights */}
+          {selectedInsight.sourceType === 'nucleus' ||
+          selectedInsight.sourceType === 'file' ? (
+            <div className='mb-8 mt-2'>
+              <div className='aucctus-border-secondary aucctus-bg-secondary shadow-glass mb-6 rounded-lg border p-4 backdrop-blur-sm'>
+                <h4 className='aucctus-text-xl-semibold aucctus-text-primary mb-3 capitalize'>
+                  {selectedInsight.insight}
+                </h4>
+                <div className='flex items-center gap-3'>
+                  {/* Source type badge with logo */}
+                  <div className='aucctus-bg-tertiary aucctus-border-tertiary inline-flex items-center gap-1.5 rounded-full border px-2 py-1'>
+                    {selectedInsight.sourceType === 'nucleus' ? (
+                      <div className='flex h-4 w-4 items-center justify-center overflow-hidden rounded-full bg-white'>
+                        <img
+                          src={AucctusLogo}
+                          alt='Nucleus'
+                          className='h-full w-full object-contain p-0.5'
+                        />
+                      </div>
+                    ) : (
+                      <FileText
+                        size={12}
+                        className='aucctus-stroke-secondary'
+                      />
+                    )}
+                    <span className='aucctus-text-xs-medium aucctus-text-secondary'>
+                      {selectedInsight.sourceType === 'nucleus'
+                        ? 'Nucleus'
+                        : 'Uploaded Document'}
+                    </span>
+                  </div>
+                  {/* Category/filename badge */}
+                  <div className='aucctus-bg-tertiary aucctus-border-tertiary inline-flex items-center gap-1 rounded-full border px-2 py-1'>
+                    <span className='aucctus-text-xs-medium aucctus-text-secondary max-w-[200px] truncate'>
+                      {selectedInsight.source}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {selectedInsight.citation && (
+                <div>
+                  <div className='mb-3 flex items-center gap-2'>
+                    <Quote size={16} className='aucctus-stroke-secondary' />
+                    <span className='aucctus-text-xs-medium aucctus-text-placeholder uppercase tracking-wider'>
+                      {selectedInsight.sourceType === 'nucleus'
+                        ? 'Supporting Context'
+                        : 'Source Citation'}
+                    </span>
+                  </div>
+                  {selectedInsight.sourceType === 'nucleus' ? (
+                    <div className='aucctus-border-secondary border-l-2 pl-4'>
+                      <p className='aucctus-text-secondary aucctus-text-sm leading-relaxed'>
+                        {selectedInsight.citation}
+                      </p>
+                    </div>
+                  ) : (
+                    <blockquote className='aucctus-border-secondary border-l-2 pl-4'>
+                      <p className='aucctus-text-secondary aucctus-text-sm italic leading-relaxed'>
+                        &ldquo;{selectedInsight.citation}&rdquo;
+                      </p>
+                    </blockquote>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : /* Error State - Show only error message */
+          selectedInsight.citationValidationStatus === 'error' ? (
             <div className='mt-8 flex items-center justify-center'>
               <div className='aucctus-bg-secondary aucctus-border-secondary flex flex-col items-center justify-center rounded-lg border p-8 text-center'>
                 <div className='mb-4 text-5xl'>😅</div>

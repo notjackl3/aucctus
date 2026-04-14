@@ -166,6 +166,7 @@ export interface IKeyFindingSourceV3 {
   credibility: number;
   timestamp: string;
   metadata: Record<string, any>;
+  sourceType?: 'web' | 'nucleus';
 }
 
 export interface IKeyFindingV3 {

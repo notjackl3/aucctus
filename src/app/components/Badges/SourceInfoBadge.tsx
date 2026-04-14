@@ -1,4 +1,5 @@
 import images from '@assets/img';
+import AucctusLogo from '@assets/aucctus_logo.png';
 import { ComponentTooltip } from '@components';
 import {
   useCompanyInfo,
@@ -30,8 +31,13 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
   sourceDescription,
   hideDelay = 0,
 }) => {
-  const publishedDatesQuery = usePublishedDatesQuery(source, showPublishedDate);
-  const companyInfoQuery = useCompanyInfo(source.url);
+  const isNucleusSource = source.sourceType === 'nucleus';
+
+  const publishedDatesQuery = usePublishedDatesQuery(
+    isNucleusSource ? { uuid: '', title: '', url: '' } : source,
+    showPublishedDate && !isNucleusSource,
+  );
+  const companyInfoQuery = useCompanyInfo(isNucleusSource ? '' : source.url);
 
   // Check if this is an AI-generated source (AI Reasoning or AI Synthesis)
   const isAIGenerated =
@@ -47,8 +53,10 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
         badgeSize === 'small' ? 'text-xs font-normal' : 'text-sm font-medium';
 
       let sourceTitle = 'loading...';
-      // Handle AI-generated sources first
-      if (isAIGenerated) {
+      // Handle nucleus sources first
+      if (isNucleusSource) {
+        sourceTitle = source.nucleusFileSource?.title || source.title;
+      } else if (isAIGenerated) {
         // Determine if it's AI Reasoning or AI Synthesis based on title
         if (source.title?.toLowerCase().includes('ai synthesis')) {
           sourceTitle = 'AI Synthesis';
@@ -79,9 +87,28 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
       source.nucleusFileSource,
       source.title,
       isAIGenerated,
+      isNucleusSource,
     ]);
 
   const renderSourceLogo = () => {
+    // Show Aucctus logo for nucleus sources
+    if (isNucleusSource) {
+      return (
+        <div
+          className={cn(
+            'flex items-center justify-center overflow-hidden rounded-full bg-white',
+            logoSizeClass,
+          )}
+        >
+          <img
+            src={AucctusLogo}
+            alt='Nucleus'
+            className='h-full w-full object-contain p-0.5'
+          />
+        </div>
+      );
+    }
+
     // Show lightbulb icon for AI-generated sources
     if (isAIGenerated) {
       return (
@@ -171,12 +198,13 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
     <ComponentTooltip tip={renderTooltipContent()} hideDelay={hideDelay}>
       <div className='flex flex-row items-center gap-2'>
         <div
-          onClick={!isAIGenerated ? onClick : undefined}
+          onClick={!isAIGenerated && !isNucleusSource ? onClick : undefined}
           className={cn(
             'aucctus-border-primary flex items-center gap-2 rounded-full border p-1',
             badgeClassName,
             onClick &&
               !isAIGenerated &&
+              !isNucleusSource &&
               'aucctus-bg-primary-hover cursor-pointer transition-all !duration-200',
           )}
         >

@@ -62,6 +62,7 @@ export interface ISavedFileInsight {
   insight: string;
   sourceTitle: string;
   sourceCredibility: number;
+  citation?: string | null;
 }
 
 /**
@@ -216,6 +217,7 @@ export interface IResearchInsight {
   citationValidationStatus?: CitationValidationStatus;
   createdAt?: string;
   sentiment: 'headwind' | 'tailwind' | 'neutral';
+  citation?: string | null;
 }
 
 /**
@@ -234,6 +236,7 @@ export interface INucleusInsight {
   citationValidationStatus?: CitationValidationStatus;
   createdAt?: string;
   sentiment: 'headwind' | 'tailwind' | 'neutral';
+  citation?: string | null;
 }
 
 /**
@@ -370,6 +373,7 @@ export interface IBulkInsight {
   more_details?: string | null;
   why_it_matters?: IWhyItMatters | null;
   citation_validation_status?: CitationValidationStatus;
+  citation?: string | null;
 }
 
 export interface IBulkUserAnswer {

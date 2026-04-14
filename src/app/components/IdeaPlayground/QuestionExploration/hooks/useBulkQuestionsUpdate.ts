@@ -82,6 +82,7 @@ export const useBulkQuestionsUpdate = ({
                 more_details: ri.moreDetails,
                 why_it_matters: ri.whyItMatters,
                 citation_validation_status: ri.citationValidationStatus,
+                citation: ri.citation,
               };
             }) || [],
           user_answers: q.userAnswers.map((ua) => ({

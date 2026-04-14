@@ -19,6 +19,7 @@ interface ExtendedPriorityInsight extends IPriorityInsightV3 {
     summary?: string;
     classification?: string;
     citations?: string[];
+    sourceType?: 'web' | 'nucleus';
   }>;
 }
 
@@ -77,6 +78,7 @@ const PriorityInsightCard: React.FC<PriorityInsightCardProps> = ({
       description: source.summary || '',
       url: source.url || '',
       classification: source.classification || '',
+      sourceType: source.sourceType === 'nucleus' ? 'nucleus' : undefined,
     })) || [];
 
   return (

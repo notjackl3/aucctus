@@ -54,6 +54,7 @@ export interface InsightCard {
     badNews: string;
   } | null;
   citationValidationStatus?: CitationValidationStatus;
+  citation?: string | null;
 }
 
 export interface SavedItem {

@@ -255,7 +255,7 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     source:
       insight.sourceType === 'file'
         ? insight.sourceTitle || 'Uploaded File'
-        : insight?.sourceTitle || insight?.sourceUrl || 'nucleus',
+        : insight?.sourceTitle || insight?.sourceUrl || 'Nucleus Report',
     url: insight.sourceType === 'file' ? '' : insight?.sourceUrl || '',
     type: 'opportunity' as any,
     sentiment: insight.sentiment,
@@ -263,6 +263,7 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     moreDetails: insight.moreDetails,
     whyItMatters: insight.whyItMatters,
     citationValidationStatus: insight.citationValidationStatus,
+    citation: insight.citation,
   });
 
   // Get current question's insights

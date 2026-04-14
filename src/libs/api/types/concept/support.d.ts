@@ -8,6 +8,7 @@ export interface ISource {
   nucleusFileSource?: {
     title: string;
   };
+  sourceType?: 'url' | 'file' | 'nucleus' | 'user_conversation' | 'seed';
 }
 
 export interface IInsight {
