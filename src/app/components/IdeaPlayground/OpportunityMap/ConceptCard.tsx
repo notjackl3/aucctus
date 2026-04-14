@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { IGeneratedIdeaPlaygroundConcept } from '../types';
 import type { PersonaDisplayInfo } from './OpportunityMap';
-import { Check, Loader2, X } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Loader2, X } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ConceptCardProps {
   concept: IGeneratedIdeaPlaygroundConcept;
@@ -45,6 +46,16 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
     if (personaInfo) return [personaInfo];
     return [];
   }, [personaInfos, personaInfo]);
+
+  // State for description expansion
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  // Toggle description expansion
+  const handleDescriptionClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDescriptionExpanded((prev) => !prev);
+  };
+
   // Determine category badge styling
   const getBadgeStyle = () => {
     switch (concept.conceptType) {
@@ -137,9 +148,60 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
           </h3>
         </div>
 
-        <p className='aucctus-text-xs aucctus-text-white mb-4 line-clamp-3 flex-1 leading-relaxed opacity-70'>
-          {concept.description}
-        </p>
+        <div className='mb-4 flex-1'>
+          <motion.div
+            initial={false}
+            animate={{ height: 'auto' }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className='relative'
+          >
+            <p
+              onClick={handleDescriptionClick}
+              className={`aucctus-text-xs aucctus-text-white cursor-pointer leading-relaxed opacity-70 transition-opacity hover:opacity-90 ${
+                isDescriptionExpanded ? '' : 'line-clamp-3'
+              }`}
+            >
+              {concept.description}
+            </p>
+            {/* Chevron indicator */}
+            <motion.div
+              onClick={handleDescriptionClick}
+              className='absolute -bottom-1 right-0 cursor-pointer'
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <AnimatePresence mode='wait'>
+                {isDescriptionExpanded ? (
+                  <motion.div
+                    key='chevron-up'
+                    initial={{ opacity: 0, rotate: -90 }}
+                    animate={{ opacity: 0.7, rotate: 0 }}
+                    exit={{ opacity: 0, rotate: 90 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <ChevronUp
+                      size={14}
+                      className='aucctus-stroke-white opacity-70 hover:opacity-100'
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key='chevron-down'
+                    initial={{ opacity: 0, rotate: 90 }}
+                    animate={{ opacity: 0.7, rotate: 0 }}
+                    exit={{ opacity: 0, rotate: -90 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <ChevronDown
+                      size={14}
+                      className='aucctus-stroke-white opacity-70 hover:opacity-100'
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </motion.div>
+        </div>
 
         {/* Idea Score + Persona Badge */}
         <div className='flex-start flex items-center gap-2 border-t border-white/20 pt-3'>
