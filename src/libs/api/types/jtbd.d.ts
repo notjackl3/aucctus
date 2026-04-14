@@ -209,21 +209,6 @@ export interface IJTBDCustomWidget {
 }
 
 // ============================================
-// Job Source Types
-// ============================================
-
-export interface IJTBDJobSource {
-  uuid: string;
-  title: string;
-  url: string;
-  sourceType: JTBDSourceType;
-  citation: string;
-  relevanceNote: string;
-  publishedAt: string | null;
-  createdAt: string;
-}
-
-// ============================================
 // Job Types
 // ============================================
 
@@ -244,9 +229,6 @@ export interface IJTBDJob {
   evidenceStrength: number;
 
   // Market sizing
-  tamValue: number | null;
-  samValue: number | null;
-  somValue: number | null;
   marketSizeLabel: string | null;
 
   displayOrder: number;
@@ -276,6 +258,12 @@ export interface IJTBDScanDetail extends IJTBDScan {
   jobs: IJTBDJob[];
 }
 
+export interface IJTBDSubAgentActivity {
+  agentName: string;
+  status: 'dispatched' | 'completed' | 'failed';
+  message: string;
+}
+
 export interface IJTBDActiveScan {
   uuid: string;
   status: string;
@@ -283,6 +271,7 @@ export interface IJTBDActiveScan {
   progress?: number;
   message?: string;
   scannedAt: string;
+  subAgents?: IJTBDSubAgentActivity[];
 }
 
 // ============================================

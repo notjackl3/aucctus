@@ -507,7 +507,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
       {/* JTBD Mode — admin only, prevent rendering via URL params */}
       {currentMode === 'jtbd' && isAdmin && (
         <Suspense fallback={<JTBDLoadingSkeleton />}>
-          <div className='relative z-10 h-full pt-20'>
+          <div className='relative h-full pt-20'>
             <LazyJTBDCanvas />
           </div>
         </Suspense>

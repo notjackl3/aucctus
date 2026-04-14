@@ -13,6 +13,7 @@ import type {
   IJTBDScanCompletedMessage,
   IJTBDScanErrorMessage,
   IJTBDScanProgressMessage,
+  IJTBDSubAgentActivityMessage,
   IJTBDVideoReadyMessage,
 } from '@libs/api/types/socketMessages/inbound';
 import utils from '@libs/utils';
@@ -208,6 +209,7 @@ export const useJTBDCurrentScan = (configUuid: string) => {
       return await api.jtbd.getCurrentScan(configUuid);
     },
     enabled: !!configUuid,
+    keepPreviousData: true,
     staleTime: 1000 * 60 * 2,
     cacheTime: 1000 * 60 * 5,
     onError: (e: AxiosError) => {
@@ -225,6 +227,7 @@ export const useJTBDCurrentScan = (configUuid: string) => {
     scan: query.data ?? null,
     jobs: query.data?.jobs ?? [],
     isLoading: query.isLoading,
+    isFetching: query.isFetching,
     isError: query.isError,
     error: query.error,
     refetch: query.refetch,
@@ -730,6 +733,38 @@ export const useJTBDScanSocketEvents = (configUuid?: string) => {
     }, []),
   );
 
+  // Listen for sub-agent activity events (updates message + asymptotic progress)
+  const subAgentCountRef = useRef<Record<string, number>>({});
+  useSocketEvent<'jtbd.scan.subagent.account'>(
+    'jtbd.scan.subagent.account',
+    useCallback((data: IJTBDSubAgentActivityMessage) => {
+      const key = data.configUuid;
+      if (!key) return;
+      subAgentCountRef.current[key] = (subAgentCountRef.current[key] ?? 0) + 1;
+      const eventCount = subAgentCountRef.current[key];
+      // Asymptotic: each event pushes 5% closer to 50%
+      const progress = Math.round(
+        20 + 30 * (1 - Math.pow(1 - 5 / 30, eventCount)),
+      );
+      setProgressMap((prev) => {
+        const existing = prev[key] ?? {
+          isScanning: true,
+          stage: 'discovery',
+          progress: 20,
+          message: data.message,
+        };
+        return {
+          ...prev,
+          [key]: {
+            ...existing,
+            progress,
+            message: data.message,
+          },
+        };
+      });
+    }, []),
+  );
+
   // Listen for scan completed events
   useSocketEvent<'jtbd.scan.completed.account'>(
     'jtbd.scan.completed.account',
@@ -843,6 +878,7 @@ export const useJTBDScanSocketEvents = (configUuid?: string) => {
   }, []);
 
   const startScanning = useCallback((uuid: string) => {
+    subAgentCountRef.current[uuid] = 0;
     setProgressMap((prev) => ({
       ...prev,
       [uuid]: {

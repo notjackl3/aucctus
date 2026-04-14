@@ -1226,6 +1226,15 @@ export interface IJTBDScanErrorMessage extends BaseSocketEvent {
   configUuid?: string;
 }
 
+export interface IJTBDSubAgentActivityMessage extends BaseSocketEvent {
+  type: 'jtbd.scan.subagent.account';
+  accountUuid: string;
+  configUuid: string;
+  agentName: string;
+  status: 'dispatched' | 'completed' | 'failed';
+  message: string;
+}
+
 export interface IJTBDVideoReadyMessage extends BaseSocketEvent {
   type: 'jtbd.video.ready.account';
   accountUuid: string;
@@ -1519,6 +1528,7 @@ export type InboundSocketEvent<C = {}> =
   | IJTBDScanProgressMessage
   | IJTBDScanCompletedMessage
   | IJTBDScanErrorMessage
+  | IJTBDSubAgentActivityMessage
   | IJTBDVideoReadyMessage
   | IJTBDRuleGenerationCompletedMessage
   | IJTBDRuleGenerationErrorMessage

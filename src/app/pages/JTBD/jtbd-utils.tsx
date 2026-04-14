@@ -1,8 +1,4 @@
-import type {
-  IJTBDJob,
-  JTBDMarketType,
-  OpportunityTier,
-} from '@libs/api/types/jtbd';
+import type { IJTBDJob, OpportunityTier } from '@libs/api/types/jtbd';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
@@ -44,14 +40,6 @@ export function evidenceLabel(strength: number): string {
   if (strength >= 75) return 'Overwhelming';
   if (strength >= 40) return 'Strong';
   return 'Emerging';
-}
-
-export function formatMarketValue(value: number | null): string {
-  if (value == null) return '\u2014';
-  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(0)}M`;
-  if (value >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
-  return `$${value.toFixed(0)}`;
 }
 
 // ============================================
@@ -107,108 +95,6 @@ export const ParsedTitle: React.FC<{ title: string; expanded?: boolean }> = ({
 };
 
 // ============================================
-// MarketSizeVisualization component
-// ============================================
-
-export const MarketSizeVisualization: React.FC<{
-  marketType: JTBDMarketType;
-  tamValue: number | null;
-  samValue: number | null;
-  somValue: number | null;
-  height?: string;
-}> = ({ marketType, tamValue, samValue, somValue, height = '120px' }) => {
-  if (tamValue == null && samValue == null && somValue == null) {
-    return null;
-  }
-
-  if (marketType === 'new') {
-    const bars = [
-      {
-        label: 'TAM',
-        value: formatMarketValue(tamValue),
-        width: '100%',
-        color: 'bg-amber-500/25 border-amber-500/30 text-amber-300',
-      },
-      {
-        label: 'SAM',
-        value: formatMarketValue(samValue),
-        width: '65%',
-        color: 'bg-amber-500/20 border-amber-500/25 text-amber-300/80',
-      },
-      {
-        label: 'SOM',
-        value: formatMarketValue(somValue),
-        width: '35%',
-        color: 'bg-amber-500/15 border-amber-500/20 text-amber-300/60',
-      },
-    ];
-
-    return (
-      <div className='flex flex-col gap-2'>
-        {bars.map((bar) => (
-          <div key={bar.label} className='flex flex-col gap-0.5'>
-            <span className='text-[9px] uppercase tracking-wider text-white/30'>
-              {bar.label}
-            </span>
-            <div
-              className={cn(
-                'rounded-md border px-2 py-1.5 text-[11px] font-semibold',
-                bar.color,
-              )}
-              style={{ width: bar.width }}
-            >
-              {bar.value}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  // Nested rectangles for existing markets
-  return (
-    <div className='relative w-full' style={{ height }}>
-      <div className='absolute inset-0 rounded-lg border border-blue-500/20 bg-blue-500/10'>
-        <div className='absolute left-2 right-2 top-1.5 flex items-start justify-between'>
-          <span className='text-[9px] font-semibold uppercase tracking-wider text-blue-300/70'>
-            TAM
-          </span>
-          <div className='text-sm font-bold text-blue-300'>
-            {formatMarketValue(tamValue)}
-          </div>
-        </div>
-      </div>
-      <div className='absolute bottom-0 left-0 h-[75%] w-[55%] rounded-lg border border-indigo-500/25 bg-indigo-500/15'>
-        <div className='absolute left-2 right-2 top-1.5 flex items-start justify-between'>
-          <span className='text-[9px] font-semibold uppercase tracking-wider text-indigo-300/70'>
-            SAM
-          </span>
-          <div className='text-xs font-bold text-indigo-300'>
-            {formatMarketValue(samValue)}
-          </div>
-        </div>
-      </div>
-      <div
-        className='absolute bottom-0 left-0 h-[45%] w-[30%] rounded-lg border border-purple-500/30'
-        style={{
-          background:
-            'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(139,92,246,0.1))',
-        }}
-      >
-        <div className='absolute left-1.5 top-1'>
-          <span className='text-[8px] font-semibold uppercase tracking-wider text-purple-300/70'>
-            SOM
-          </span>
-          <div className='text-[11px] font-bold text-purple-300'>
-            {formatMarketValue(somValue)}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ============================================
 // CollapsibleSection component
 // ============================================
 
@@ -261,4 +147,4 @@ export const CollapsibleSection: React.FC<{
 // Re-export types for convenience
 // ============================================
 
-export type { IJTBDJob, JTBDMarketType, OpportunityTier };
+export type { IJTBDJob, OpportunityTier };
