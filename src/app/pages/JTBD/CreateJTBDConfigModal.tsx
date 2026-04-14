@@ -46,7 +46,7 @@ const LOADING_STEPS = [
   'Matching personas...',
 ];
 
-const GENERATION_TIMEOUT_MS = 60_000;
+const GENERATION_TIMEOUT_MS = 180_000;
 
 const CreateJTBDConfigModal: React.FC<CreateJTBDConfigModalProps> = ({
   open,
