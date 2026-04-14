@@ -101,7 +101,7 @@ const SubmissionsTab: FunctionComponent = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setIsCreateModalOpen(true)}
-              className='btn btn-primary btn-md flex items-center gap-2'
+              className='btn btn-primary btn-md inline-flex items-center gap-2'
             >
               <Plus className='h-4 w-4' />
               <span>Create Submission Link</span>
