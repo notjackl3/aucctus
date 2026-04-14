@@ -141,7 +141,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             </p>
           </div>
 
-          {/* Inline answer input for non-custom questions */}
+          {/* Inline answer input for non-custom, non-persona questions */}
           {!isCustomQuestion && showInput && (
             <div className='mt-4 border-t border-white/10 pt-4'>
               <input

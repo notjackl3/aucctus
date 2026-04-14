@@ -51,7 +51,8 @@ export const useBulkQuestionsUpdate = ({
               // - File: No URL and sourceTitle is a filename (not "Nucleus Report")
               // - Nucleus: sourceCredibility === 1 or sourceUrl is null with "Nucleus Report" title
               // - Research: Has actual sourceUrl and sourceTitle values
-              let sourceType: 'research' | 'nucleus' | 'file' = 'research';
+              let sourceType: 'research' | 'nucleus' | 'file' | 'persona' =
+                'research';
               if (ri.sourceType) {
                 sourceType = ri.sourceType;
               } else if (
@@ -77,6 +78,7 @@ export const useBulkQuestionsUpdate = ({
                 source_title: ri.sourceTitle,
                 source_credibility: ri.sourceCredibility,
                 sentiment: ri.sentiment,
+                persona_uuid: ri.personaUuid,
                 more_details: ri.moreDetails,
                 why_it_matters: ri.whyItMatters,
                 citation_validation_status: ri.citationValidationStatus,

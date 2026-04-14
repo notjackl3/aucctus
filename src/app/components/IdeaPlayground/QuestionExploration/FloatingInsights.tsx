@@ -58,8 +58,8 @@ const FloatingInsights: React.FC<FloatingInsightsProps> = ({
     prevCardIdsRef.current.clear();
   }, [currentQuestion?.id]);
 
-  // Build limited insights array: nucleus first (if exists), then non-nucleus up to 3 more
-  const limitedInsights = currentInsights.slice(0, 5);
+  // Build limited insights array: up to 6 selected + up to 3 persona insights = 9 max
+  const limitedInsights = currentInsights.slice(0, 9);
   const allCards: any[] = [...limitedInsights];
 
   // Add possible answer cards if available (now supports multiple)

@@ -9,7 +9,7 @@ import {
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { useDebouncedInvalidation } from '@hooks/query/useDebouncedInvalidation';
 import AucctusLogo from '@assets/aucctus_logo.png';
-import { Check, FileText, Link, Loader2 } from 'lucide-react';
+import { Check, FileText, Link, Loader2, User } from 'lucide-react';
 interface ResearchInsightCardProps {
   card: InsightCardType;
   isSelected: boolean;
@@ -101,14 +101,15 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
   const isNucleusInsight =
     card.source?.toLowerCase().includes('nucleus report') || false;
   const isFileInsight = card.sourceType === 'file';
+  const isPersonaInsight = card.sourceType === 'persona';
 
   const handleDoubleClick = () => {
     if (clickTimerRef.current) {
       clearTimeout(clickTimerRef.current);
       clickTimerRef.current = null;
     }
-    // Don't open modal for Nucleus or File insights
-    if (isNucleusInsight || isFileInsight) return;
+    // Don't open modal for Nucleus, File, or Persona insights
+    if (isNucleusInsight || isFileInsight || isPersonaInsight) return;
     onDoubleClick();
   };
 
@@ -119,8 +120,8 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
       clearTimeout(clickTimerRef.current);
       clickTimerRef.current = null;
     }
-    // File insights have no URL to open
-    if (isFileInsight) return;
+    // File and Persona insights have no URL to open
+    if (isFileInsight || isPersonaInsight) return;
     if (card.url) {
       window.open(card.url, '_blank', 'noopener,noreferrer');
     }
@@ -128,6 +129,20 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
 
   // Render source logo similar to SourceInfoBadge
   const renderSourceLogo = useMemo(() => {
+    // Persona insights: show user icon
+    if (isPersonaInsight) {
+      return (
+        <div
+          className={cn(
+            'flex items-center justify-center overflow-hidden rounded-full border border-transparent',
+            'h-4 w-4',
+          )}
+        >
+          <User size={12} className='aucctus-stroke-white' />
+        </div>
+      );
+    }
+
     // File insights: show document icon
     if (isFileInsight) {
       return (
@@ -184,7 +199,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
         )}
       </div>
     );
-  }, [card.url, card.source, isFileInsight]);
+  }, [card.url, card.source, isFileInsight, isPersonaInsight]);
 
   const displayTitle = useMemo(() => {
     let title = card.source;
@@ -240,7 +255,9 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
         <div
           className={cn(
             'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-white/30 bg-white/10 px-1.5 py-0.5 transition-colors',
-            isFileInsight || card.source?.includes('Nucleus')
+            isFileInsight ||
+              isPersonaInsight ||
+              card.source?.includes('Nucleus')
               ? 'cursor-default'
               : 'cursor-pointer hover:bg-white/15',
           )}

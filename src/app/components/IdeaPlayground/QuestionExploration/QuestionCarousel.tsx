@@ -48,6 +48,7 @@ interface QuestionCarouselProps {
   onGenerateIdeas?: () => void;
   onViewConcepts?: () => void;
   hasGeneratedConcepts?: boolean;
+  onPersonaInsightToggled?: (personaUuid: string, included: boolean) => void;
 }
 
 // Type for loading operations
@@ -58,6 +59,7 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
   onGenerateIdeas,
   onViewConcepts,
   hasGeneratedConcepts = false,
+  onPersonaInsightToggled,
 }) => {
   // Zustand store for UI state
   const {
@@ -526,6 +528,15 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
 
       return { ...prev, [questionId]: updatedSelections };
     });
+
+    // If this is a persona insight, notify parent so it can update selectedPersonas
+    if (onPersonaInsightToggled) {
+      const question = apiQuestions.find((q) => q.uuid === questionId);
+      const insight = question?.insights?.find((i) => i.uuid === cardId);
+      if (insight?.sourceType === 'persona' && insight.personaUuid) {
+        onPersonaInsightToggled(insight.personaUuid, isSelected);
+      }
+    }
   };
 
   const handleInsightDoubleClick = (insight: InsightCardType) => {
@@ -730,7 +741,7 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
       return { isLoading: false, message: '' };
 
     // Find the API question to check for existing data
-    const apiQuestion = apiQuestions.find((q) => q.uuid === currentQuestion.id);
+    const apiQuestion = currentApiQuestion;
 
     // Check if data already exists - if so, don't show loading even if operation is in Set
     const hasInsightsData =
@@ -755,7 +766,7 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     }
 
     return { isLoading: false, message: '' };
-  }, [currentQuestion?.id, loadingOperations, apiQuestions]);
+  }, [currentQuestion?.id, loadingOperations, currentApiQuestion]);
 
   const userAnswerCount = useMemo(() => {
     if (!currentQuestion?.id) return 0;

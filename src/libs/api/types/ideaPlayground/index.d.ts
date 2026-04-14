@@ -209,7 +209,8 @@ export interface IResearchInsight {
   sourceUrl: string;
   sourceTitle: string;
   sourceCredibility: number;
-  sourceType?: 'research' | 'nucleus' | 'file';
+  sourceType?: 'research' | 'nucleus' | 'file' | 'persona';
+  personaUuid?: string;
   moreDetails?: string | null;
   whyItMatters?: IWhyItMatters | null;
   citationValidationStatus?: CitationValidationStatus;
@@ -227,7 +228,7 @@ export interface INucleusInsight {
   sourceUrl: string;
   sourceTitle: string;
   sourceCredibility: number;
-  sourceType?: 'research' | 'nucleus' | 'file';
+  sourceType?: 'research' | 'nucleus' | 'file' | 'persona';
   moreDetails?: string | null;
   whyItMatters?: IWhyItMatters | null;
   citationValidationStatus?: CitationValidationStatus;
@@ -360,11 +361,12 @@ export interface IBulkPossibleAnswer {
 export interface IBulkInsight {
   uuid: string;
   insight: string;
-  source_type: 'research' | 'nucleus' | 'file';
+  source_type: 'research' | 'nucleus' | 'file' | 'persona';
   source_url?: string;
   source_title?: string;
   source_credibility?: number;
   sentiment?: 'headwind' | 'tailwind' | 'neutral';
+  persona_uuid?: string;
   more_details?: string | null;
   why_it_matters?: IWhyItMatters | null;
   citation_validation_status?: CitationValidationStatus;

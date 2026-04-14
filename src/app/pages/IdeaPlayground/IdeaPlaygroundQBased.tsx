@@ -144,6 +144,21 @@ const IdeaPlaygroundQBased: React.FC = () => {
     setSelectedPersonas((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
+  // Handle persona insight bubble toggled in QuestionCarousel
+  const handlePersonaInsightToggled = useCallback(
+    (personaUuid: string, included: boolean) => {
+      if (included) {
+        const persona = personaItems.find((p) => p.id === personaUuid);
+        if (persona) {
+          handlePersonaSelect(persona);
+        }
+      } else {
+        handlePersonaRemove(personaUuid);
+      }
+    },
+    [personaItems, handlePersonaSelect, handlePersonaRemove],
+  );
+
   // Fetch anchor thought for seed restoration (only when seedUuidFromUrl exists)
   const {
     anchorThought: seedAnchorThought,
@@ -227,6 +242,28 @@ const IdeaPlaygroundQBased: React.FC = () => {
         // Let the loading transition check backend flags to determine readiness
         // (isDataReady will be set by PlaygroundLoadingTransition.onReady)
 
+        // Restore implicitly tagged personas from included persona insights
+        const restoredPersonaUuids = new Set<string>();
+        existingQuestions.forEach((q) => {
+          q.insights?.forEach((insight) => {
+            if (
+              insight.sourceType === 'persona' &&
+              insight.personaUuid &&
+              q.includedAnswers?.includes(insight.uuid)
+            ) {
+              restoredPersonaUuids.add(insight.personaUuid);
+            }
+          });
+        });
+        if (restoredPersonaUuids.size > 0) {
+          restoredPersonaUuids.forEach((uuid) => {
+            const persona = personaItems.find((p) => p.id === uuid);
+            if (persona) {
+              handlePersonaSelect(persona);
+            }
+          });
+        }
+
         telemetry.log('ideaPlayground.session.restored', {
           seedUuid: seedUuidFromUrl,
           questionCount: existingQuestions.length,
@@ -254,6 +291,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
     seedAnchorThought,
     navigate,
     ideaPlaygroundStore,
+    personaItems,
+    handlePersonaSelect,
   ]);
 
   // Auto-show OpportunityMap if concepts exist or are being generated
@@ -606,6 +645,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
                           onGenerateIdeas={handleGenerateIdeas}
                           onViewConcepts={() => setShowOpportunityMap(true)}
                           hasGeneratedConcepts={hasGeneratedConcepts}
+                          onPersonaInsightToggled={handlePersonaInsightToggled}
                         />
                       </div>
                     </div>
