@@ -1021,6 +1021,16 @@ export class ConceptApi extends ApiService {
   }
 
   /**
+   * Cancel a running concept comparison task.
+   * @param taskId - The Celery task ID returned from compareConcepts
+   */
+  cancelConceptComparison(taskId: string) {
+    return this.delete<{ detail: string }>(
+      endpoints.conceptCompareCancel(taskId),
+    );
+  }
+
+  /**
    * Export a concept report with selected sections as xlsx or csv.
    * @param conceptUuid - The concept UUID to export
    * @param sections - Array of section group keys to include

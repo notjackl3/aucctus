@@ -1,4 +1,10 @@
-import { FunctionComponent, useState, useEffect, useCallback } from 'react';
+import {
+  FunctionComponent,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Loader2,
@@ -12,7 +18,10 @@ import {
   X,
 } from 'lucide-react';
 import LiquidGlassModal from '@components/ui/LiquidGlassModal';
-import { useCompareConcepts } from '@hooks/query/concepts.hook';
+import {
+  useCompareConcepts,
+  useCancelConceptComparison,
+} from '@hooks/query/concepts.hook';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import { toast } from '@components';
 import {
@@ -90,8 +99,10 @@ const ConceptComparisonModal: FunctionComponent<
   const [isWaiting, setIsWaiting] = useState(false);
   const [hasError, setHasError] = useState(false);
 
+  const taskIdRef = useRef<string | null>(null);
   const navigate = useNavigate();
   const compareMutation = useCompareConcepts();
+  const cancelMutation = useCancelConceptComparison();
 
   // Listen for comparison results via WebSocket
   useSocketEvent<'concept.comparison.completed.user'>(
@@ -127,19 +138,29 @@ const ConceptComparisonModal: FunctionComponent<
     if (open && conceptUuids.length >= 2) {
       setIsWaiting(true);
       setHasError(false);
-      compareMutation.mutate(conceptUuids);
+      taskIdRef.current = null;
+      compareMutation.mutate(conceptUuids, {
+        onSuccess: (data) => {
+          taskIdRef.current = data.taskId;
+        },
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  // Reset state when modal closes
+  // Reset state when modal closes, cancel running task if needed
   useEffect(() => {
     if (!open) {
+      if (isWaiting && taskIdRef.current) {
+        cancelMutation.mutate(taskIdRef.current);
+      }
+      taskIdRef.current = null;
       setComparisonResult(null);
       setSelectedConceptUuid(null);
       setIsWaiting(false);
       setHasError(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const selectedConcept: IConceptAnalysis | undefined =
@@ -222,7 +243,12 @@ const ConceptComparisonModal: FunctionComponent<
               onClick={() => {
                 setHasError(false);
                 setIsWaiting(true);
-                compareMutation.mutate(conceptUuids);
+                taskIdRef.current = null;
+                compareMutation.mutate(conceptUuids, {
+                  onSuccess: (data) => {
+                    taskIdRef.current = data.taskId;
+                  },
+                });
               }}
               className='btn btn-secondary btn-md'
             >

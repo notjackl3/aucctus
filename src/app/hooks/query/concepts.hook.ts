@@ -3083,6 +3083,20 @@ export const useCompareConcepts = () => {
   });
 };
 
+export const useCancelConceptComparison = () => {
+  return useMutation({
+    mutationFn: async (taskId: string) =>
+      await api.concept.cancelConceptComparison(taskId),
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Cancel Failed',
+        message || 'Unable to cancel concept comparison.',
+      );
+    },
+  });
+};
+
 export const useExportConceptReport = () => {
   return useMutation({
     mutationFn: async (params: {

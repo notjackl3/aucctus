@@ -322,6 +322,10 @@ export class Endpoints {
 
   static conceptCompare = '/api/v1/concept/compare';
 
+  static conceptCompareCancel(taskId: string) {
+    return `/api/v1/concept/compare/${taskId}`;
+  }
+
   static conceptReportExport(conceptUuid: string) {
     return `/api/v1/concept/${conceptUuid}/export/report`;
   }
