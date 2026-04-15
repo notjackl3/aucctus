@@ -73,12 +73,20 @@ const EditableCertaintyMeter: React.FC<EditableCertaintyMeterProps> = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
+      const target = event.target as HTMLElement;
+
+      // Check if click is inside the dropdown button ref
+      if (dropdownRef.current && dropdownRef.current.contains(target)) {
+        return;
       }
+
+      // Check if click is inside the portal dropdown (using the data attribute)
+      if (target.closest('[data-aucctus-portal-target="true"]')) {
+        return;
+      }
+
+      // Click is outside both the button and portal dropdown, so close
+      setIsOpen(false);
     };
 
     if (isOpen) {

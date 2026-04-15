@@ -69,13 +69,19 @@ const EditableStatusBadge: React.FC<EditableStatusBadgeProps> = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(target) &&
-        !target.closest('[data-aucctus-portal-target]')
-      ) {
-        setIsOpen(false);
+
+      // Check if click is inside the dropdown button ref
+      if (dropdownRef.current && dropdownRef.current.contains(target)) {
+        return;
       }
+
+      // Check if click is inside the portal dropdown (using the data attribute)
+      if (target.closest('[data-aucctus-portal-target="true"]')) {
+        return;
+      }
+
+      // Click is outside both the button and portal dropdown, so close
+      setIsOpen(false);
     };
 
     if (isOpen) {
