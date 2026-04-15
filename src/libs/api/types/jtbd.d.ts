@@ -26,7 +26,12 @@ export type JTBDSourceType =
   | 'complaint'
   | 'survey'
   | 'market_report'
-  | 'news';
+  | 'news'
+  | 'patent'
+  | 'research_paper'
+  | 'conference_proceeding'
+  | 'clinical_report'
+  | 'trade_publication';
 
 export type JTBDWidgetType =
   | 'metric_chart'
@@ -209,6 +214,16 @@ export interface IJTBDCustomWidget {
 }
 
 // ============================================
+// Constraint Source Types
+// ============================================
+
+export interface IJTBDConstraintSource {
+  sourceLabel: string;
+  sourceUrl: string;
+  field: string;
+}
+
+// ============================================
 // Job Types
 // ============================================
 
@@ -231,11 +246,23 @@ export interface IJTBDJob {
   // Market sizing
   marketSizeLabel: string | null;
 
+  // Constraint & landscape analysis
+  rootConstraint: string;
+  solutionLandscape: string;
+  capabilityFit: string;
+
+  // Source corroboration
+  sourceTypeCount: number;
+  corroborationLabel: string;
+
   displayOrder: number;
   createdAt: string;
 
   // Video
   videoUrl: string | null;
+
+  // Constraint sources
+  constraintSources: IJTBDConstraintSource[];
 
   // Nested relations
   customWidgets: IJTBDCustomWidget[];

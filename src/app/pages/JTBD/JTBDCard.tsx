@@ -3,11 +3,14 @@ import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   BarChart3,
+  Crosshair,
   Lightbulb,
   Loader2,
+  Map,
   Pause,
   Play,
   ShieldCheck,
+  Sparkles,
   Trophy,
   X,
 } from 'lucide-react';
@@ -24,7 +27,7 @@ import {
   tierColors,
   tierLabels,
 } from './jtbd-utils';
-import { WidgetRenderer } from './widgets';
+import { SourcePill, WidgetRenderer } from './widgets';
 
 const COL_SPAN: Record<JTBDWidgetType, string> = {
   sparkline_stat: 'col-span-1',
@@ -331,6 +334,150 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
 
               {/* ===== SCROLLABLE BODY ===== */}
               <div className='min-h-0 flex-1 overflow-auto px-6 py-4'>
+                {/* Constraint Analysis — rootConstraint, solutionLandscape, capabilityFit */}
+                {(job.rootConstraint ||
+                  job.solutionLandscape ||
+                  job.capabilityFit) && (
+                  <CollapsibleSection
+                    title='Constraint Analysis'
+                    icon={<Crosshair className='h-3.5 w-3.5 text-white/40' />}
+                  >
+                    <div className='grid grid-cols-3 gap-3 py-2'>
+                      {job.rootConstraint && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0 }}
+                          className='col-span-1 rounded-lg border border-white/[0.1] bg-white/[0.05] p-4'
+                        >
+                          <div className='mb-2 flex items-center gap-2'>
+                            <Crosshair className='h-3.5 w-3.5 text-rose-400/70' />
+                            <span className='text-[11px] font-semibold uppercase tracking-wider text-white/50'>
+                              Root Constraint
+                            </span>
+                          </div>
+                          <p className='text-[13px] leading-relaxed text-white/70'>
+                            {job.rootConstraint}
+                          </p>
+                          {(() => {
+                            const sources =
+                              job.constraintSources?.filter(
+                                (s) => s.field === 'root_constraint',
+                              ) ?? [];
+                            if (sources.length === 0) return null;
+                            return (
+                              <div className='mt-2 flex flex-wrap gap-1.5'>
+                                {sources.map((src, i) => (
+                                  <SourcePill
+                                    key={i}
+                                    source={src.sourceLabel}
+                                    url={src.sourceUrl || undefined}
+                                  />
+                                ))}
+                              </div>
+                            );
+                          })()}
+                        </motion.div>
+                      )}
+
+                      {job.solutionLandscape && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0.05 }}
+                          className='col-span-1 rounded-lg border border-white/[0.1] bg-white/[0.05] p-4'
+                        >
+                          <div className='mb-2 flex items-center gap-2'>
+                            <Map className='h-3.5 w-3.5 text-sky-400/70' />
+                            <span className='text-[11px] font-semibold uppercase tracking-wider text-white/50'>
+                              Solution Landscape
+                            </span>
+                          </div>
+                          <p className='text-[13px] leading-relaxed text-white/70'>
+                            {job.solutionLandscape}
+                          </p>
+                          {(() => {
+                            const sources =
+                              job.constraintSources?.filter(
+                                (s) => s.field === 'solution_landscape',
+                              ) ?? [];
+                            if (sources.length === 0) return null;
+                            return (
+                              <div className='mt-2 flex flex-wrap gap-1.5'>
+                                {sources.map((src, i) => (
+                                  <SourcePill
+                                    key={i}
+                                    source={src.sourceLabel}
+                                    url={src.sourceUrl || undefined}
+                                  />
+                                ))}
+                              </div>
+                            );
+                          })()}
+                        </motion.div>
+                      )}
+
+                      {job.capabilityFit && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0.1 }}
+                          className='col-span-1 rounded-lg border border-white/[0.1] bg-white/[0.05] p-4'
+                        >
+                          <div className='mb-2 flex items-center gap-2'>
+                            <Sparkles className='h-3.5 w-3.5 text-emerald-400/70' />
+                            <span className='text-[11px] font-semibold uppercase tracking-wider text-white/50'>
+                              Capability Fit
+                            </span>
+                          </div>
+                          <p className='text-[13px] leading-relaxed text-white/70'>
+                            {job.capabilityFit}
+                          </p>
+                          {(() => {
+                            const sources =
+                              job.constraintSources?.filter(
+                                (s) => s.field === 'capability_fit',
+                              ) ?? [];
+                            if (sources.length === 0) return null;
+                            return (
+                              <div className='mt-2 flex flex-wrap gap-1.5'>
+                                {sources.map((src, i) => (
+                                  <SourcePill
+                                    key={i}
+                                    source={src.sourceLabel}
+                                    url={src.sourceUrl || undefined}
+                                  />
+                                ))}
+                              </div>
+                            );
+                          })()}
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {/* Corroboration indicator */}
+                    {job.corroborationLabel && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3, delay: 0.15 }}
+                        className='flex items-center gap-2 pb-1 pt-2'
+                      >
+                        <ShieldCheck className='h-3 w-3 text-white/30' />
+                        <span className='text-[11px] text-white/40'>
+                          {job.corroborationLabel}
+                        </span>
+                        {job.sourceTypeCount > 0 && (
+                          <span className='text-[11px] text-white/30'>
+                            ({job.sourceTypeCount} source{' '}
+                            {job.sourceTypeCount === 1 ? 'type' : 'types'})
+                          </span>
+                        )}
+                      </motion.div>
+                    )}
+                  </CollapsibleSection>
+                )}
+
                 {/* Opportunity Size — market_sizing widgets only */}
                 {marketSizingWidgets.length > 0 && (
                   <CollapsibleSection
