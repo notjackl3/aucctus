@@ -242,6 +242,7 @@ export interface IJTBDJob {
   opportunityScore: number;
   opportunityTier: OpportunityTier;
   evidenceStrength: number;
+  differentiationScore: number | null;
 
   // Market sizing
   marketSizeLabel: string | null;

@@ -1501,6 +1501,10 @@ export class Endpoints {
     return `/api/v1/jtbd/configs/${configUuid}/`;
   }
 
+  static jtbdConfigClone(configUuid: string) {
+    return `/api/v1/jtbd/configs/${configUuid}/clone/`;
+  }
+
   static jtbdConfigRules(configUuid: string) {
     return `/api/v1/jtbd/configs/${configUuid}/rules/`;
   }

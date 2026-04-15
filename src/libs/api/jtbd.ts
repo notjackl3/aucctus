@@ -97,6 +97,13 @@ export class JtbdApi extends ApiService {
     return this.delete<IJTBDMessageResponse>(endpoints.jtbdConfig(configUuid));
   }
 
+  /**
+   * Clone a JTBD config (creates a duplicate with all rules and documents).
+   */
+  cloneConfig(configUuid: string) {
+    return this.post<IJTBDConfigDetail>(endpoints.jtbdConfigClone(configUuid));
+  }
+
   // ============================================
   // Rule Management
   // ============================================

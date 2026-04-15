@@ -5,6 +5,7 @@ import {
   useDeleteJTBDDocument,
   useDeleteJTBDRule,
   useJTBDConfig,
+  useJTBDConfigs,
   useUpdateJTBDConfig,
   useUploadJTBDDocument,
 } from '@hooks/query/jtbd.hook';
@@ -46,6 +47,7 @@ const EditJTBDConfigModal: React.FC<EditJTBDConfigModalProps> = ({
   onOpenChange,
 }) => {
   const { config, isLoading } = useJTBDConfig(configUuid);
+  const { configs } = useJTBDConfigs();
   const { updateConfig } = useUpdateJTBDConfig();
   const { addRule, isAdding } = useAddJTBDRule();
   const { deleteRule } = useDeleteJTBDRule();
@@ -61,6 +63,14 @@ const EditJTBDConfigModal: React.FC<EditJTBDConfigModalProps> = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Name duplicate validation — exclude the current config's own name
+  const isNameDuplicate =
+    editingField === 'name' &&
+    editValue.trim() !== '' &&
+    configs
+      .filter((c) => c.uuid !== configUuid)
+      .some((c) => c.name.toLowerCase() === editValue.trim().toLowerCase());
+
   const handleStartEdit = useCallback(
     (field: 'name' | 'description', currentValue: string) => {
       setEditingField(field);
@@ -74,13 +84,22 @@ const EditJTBDConfigModal: React.FC<EditJTBDConfigModalProps> = ({
       if (!config) return;
       const trimmed = editValue.trim();
       if (field === 'name' && !trimmed) return;
+      // Prevent saving duplicate name
+      if (
+        field === 'name' &&
+        configs
+          .filter((c) => c.uuid !== configUuid)
+          .some((c) => c.name.toLowerCase() === trimmed.toLowerCase())
+      ) {
+        return;
+      }
       updateConfig({
         configUuid: config.uuid,
         data: { [field]: trimmed },
       });
       setEditingField(null);
     },
-    [config, editValue, updateConfig],
+    [config, configUuid, configs, editValue, updateConfig],
   );
 
   const handleCancelEdit = useCallback(() => {
@@ -219,30 +238,43 @@ const EditJTBDConfigModal: React.FC<EditJTBDConfigModalProps> = ({
                 Name
               </label>
               {editingField === 'name' ? (
-                <div className='flex gap-2'>
-                  <input
-                    type='text'
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSaveEdit('name');
-                      if (e.key === 'Escape') handleCancelEdit();
-                    }}
-                    autoFocus
-                    className='flex-1 rounded-lg border border-emerald-500/50 bg-white/[0.07] px-3 py-1.5 text-sm font-medium text-white outline-none'
-                  />
-                  <button
-                    onClick={() => handleSaveEdit('name')}
-                    className='rounded-lg bg-emerald-500/20 p-1.5 text-emerald-400 transition-colors hover:bg-emerald-500/30'
-                  >
-                    <Check className='h-3.5 w-3.5' />
-                  </button>
-                  <button
-                    onClick={handleCancelEdit}
-                    className='rounded-lg bg-white/[0.08] p-1.5 text-white/40 transition-colors hover:text-white/60'
-                  >
-                    <X className='h-3.5 w-3.5' />
-                  </button>
+                <div>
+                  <div className='flex gap-2'>
+                    <input
+                      type='text'
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSaveEdit('name');
+                        if (e.key === 'Escape') handleCancelEdit();
+                      }}
+                      autoFocus
+                      className={cn(
+                        'flex-1 rounded-lg bg-white/[0.07] px-3 py-1.5 text-sm font-medium text-white outline-none',
+                        isNameDuplicate
+                          ? 'border border-red-400/50'
+                          : 'border border-emerald-500/50',
+                      )}
+                    />
+                    <button
+                      onClick={() => handleSaveEdit('name')}
+                      disabled={isNameDuplicate || !editValue.trim()}
+                      className='rounded-lg bg-emerald-500/20 p-1.5 text-emerald-400 transition-colors hover:bg-emerald-500/30 disabled:cursor-not-allowed disabled:opacity-30'
+                    >
+                      <Check className='h-3.5 w-3.5' />
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className='rounded-lg bg-white/[0.08] p-1.5 text-white/40 transition-colors hover:text-white/60'
+                    >
+                      <X className='h-3.5 w-3.5' />
+                    </button>
+                  </div>
+                  {isNameDuplicate && (
+                    <p className='mt-1 text-xs text-red-400'>
+                      A discovery area with this name already exists
+                    </p>
+                  )}
                 </div>
               ) : (
                 <p

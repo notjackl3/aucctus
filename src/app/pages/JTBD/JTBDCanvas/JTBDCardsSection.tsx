@@ -7,6 +7,7 @@ import { JTBDMasonryColumns } from '../JTBDMasonryColumns';
 const JTBDCardsSection: React.FC<{
   jobs: IJTBDJob[];
   isLoading: boolean;
+  hasScans: boolean;
   selectedJobUuid: string | null;
   onCardClick: (job: IJTBDJob) => void;
   onIdeate: (job: IJTBDJob) => Promise<void>;
@@ -14,16 +15,14 @@ const JTBDCardsSection: React.FC<{
 }> = ({
   jobs,
   isLoading,
+  hasScans,
   selectedJobUuid,
   onCardClick,
   onIdeate,
   ideatingJobUuid,
 }) => {
   return (
-    <div
-      className='min-h-screen px-8 pb-24 pt-8'
-      style={{ scrollSnapAlign: 'start' }}
-    >
+    <div className='px-8 pb-24 pt-8' style={{ scrollSnapAlign: 'start' }}>
       <AnimatePresence mode='wait'>
         {isLoading ? (
           <motion.div
@@ -51,7 +50,9 @@ const JTBDCardsSection: React.FC<{
             />
             {jobs.length === 0 && (
               <div className='py-20 text-center text-lg text-white/40'>
-                No jobs match your current filters
+                {hasScans
+                  ? 'No jobs were found in scan'
+                  : 'Run your first scan to find jobs'}
               </div>
             )}
           </motion.div>

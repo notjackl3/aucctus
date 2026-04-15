@@ -5,6 +5,7 @@ import {
   Puzzle,
   Radar,
   Search,
+  Send,
   Sparkles,
   Target,
   X,
@@ -47,6 +48,12 @@ const EmptyState: React.FC<{
       onSearch(localSearch.trim());
       setLocalSearch('');
     }
+  };
+
+  const handleSubmit = (): void => {
+    if (!localSearch.trim()) return;
+    onSearch(localSearch.trim());
+    setLocalSearch('');
   };
 
   return (
@@ -205,6 +212,19 @@ const EmptyState: React.FC<{
                       <X className='h-4 w-4 text-white/40' />
                     </button>
                   )}
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!localSearch.trim()}
+                    className={cn(
+                      'rounded-lg p-2 transition-all',
+                      localSearch.trim()
+                        ? 'text-white/50 hover:bg-white/[0.08] hover:text-white/80'
+                        : 'text-white/20',
+                    )}
+                    aria-label='Submit'
+                  >
+                    <Send className='h-4 w-4' />
+                  </button>
                 </div>
               </div>
             </div>

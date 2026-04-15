@@ -1,4 +1,8 @@
-import { useDeleteJTBDConfig, useJTBDConfigs } from '@hooks/query/jtbd.hook';
+import {
+  useCloneJTBDConfig,
+  useDeleteJTBDConfig,
+  useJTBDConfigs,
+} from '@hooks/query/jtbd.hook';
 import { cn } from '@libs/utils/react';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
@@ -6,6 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   Check,
   ChevronDown,
+  Copy,
   Plus,
   Puzzle,
   Settings,
@@ -30,6 +35,7 @@ const JTBDConfigDropdown: React.FC<JTBDConfigDropdownProps> = ({
     useJTBDView();
   const { configs } = useJTBDConfigs();
   const { deleteConfigAsync } = useDeleteJTBDConfig();
+  const { cloneConfigAsync, isCloning } = useCloneJTBDConfig();
 
   const [deleteTarget, setDeleteTarget] = useState<{
     uuid: string;
@@ -77,6 +83,21 @@ const JTBDConfigDropdown: React.FC<JTBDConfigDropdownProps> = ({
     configs,
     setActiveConfigUuid,
   ]);
+
+  const handleCloneClick = useCallback(
+    async (e: React.MouseEvent, uuid: string) => {
+      e.stopPropagation();
+      e.preventDefault();
+      setDropdownOpen(false);
+      try {
+        const cloned = await cloneConfigAsync(uuid);
+        setActiveConfigUuid(cloned.uuid);
+      } catch {
+        // Error toast handled by hook
+      }
+    },
+    [cloneConfigAsync, setActiveConfigUuid],
+  );
 
   const handleEditClick = useCallback(
     (e: React.MouseEvent, uuid: string) => {
@@ -171,7 +192,7 @@ const JTBDConfigDropdown: React.FC<JTBDConfigDropdownProps> = ({
                         onSelect={(e) => {
                           if (
                             (e.target as HTMLElement).closest(
-                              '[data-delete-button],[data-edit-button]',
+                              '[data-delete-button],[data-edit-button],[data-clone-button]',
                             )
                           ) {
                             e.preventDefault();
@@ -199,6 +220,14 @@ const JTBDConfigDropdown: React.FC<JTBDConfigDropdownProps> = ({
                           {activeConfigUuid === config.uuid && (
                             <Check size={12} className='text-white/60' />
                           )}
+                          <button
+                            data-clone-button
+                            onClick={(e) => handleCloneClick(e, config.uuid)}
+                            disabled={isCloning}
+                            className='rounded p-0.5 text-white/30 opacity-0 transition-colors hover:text-white/60 disabled:opacity-30 group-hover:opacity-100'
+                          >
+                            <Copy size={12} />
+                          </button>
                           <button
                             data-edit-button
                             onClick={(e) => handleEditClick(e, config.uuid)}

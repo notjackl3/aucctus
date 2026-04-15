@@ -10,8 +10,9 @@ import {
   type JTBDScanProgress,
 } from '@hooks/query/jtbd.hook';
 import type { IJTBDJob } from '@libs/api/types/jtbd';
+import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, Puzzle, Radar, Search, X } from 'lucide-react';
+import { ChevronDown, Puzzle, Radar, Search, Send, X } from 'lucide-react';
 import React, {
   useCallback,
   useEffect,
@@ -60,12 +61,8 @@ const JTBDCanvasInner: React.FC = () => {
   const configUuid = activeConfigUuid ?? configs[0]?.uuid ?? '';
   const activeConfig = configs.find((c) => c.uuid === configUuid) ?? null;
 
-  const {
-    jobs,
-    isLoading: isLoadingScan,
-    isFetching: isFetchingScan,
-  } = useJTBDCurrentScan(configUuid);
-  const { scans } = useJTBDScans(configUuid);
+  const { jobs, isLoading: isLoadingScan } = useJTBDCurrentScan(configUuid);
+  const { scans, isLoading: isLoadingScans } = useJTBDScans(configUuid);
   const { scanProgress, startScanning } = useJTBDScanSocketEvents(configUuid);
 
   // Recover scan progress on page refresh
@@ -188,6 +185,13 @@ const JTBDCanvasInner: React.FC = () => {
     [searchValue, setShowCreateModal],
   );
 
+  const handleSearchSubmit = useCallback((): void => {
+    if (!searchValue.trim()) return;
+    setPendingDescription(searchValue.trim());
+    setShowCreateModal(true);
+    setSearchValue('');
+  }, [searchValue, setShowCreateModal]);
+
   const handleNewArea = useCallback(() => {
     scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => searchInputRef.current?.focus(), 300);
@@ -200,14 +204,7 @@ const JTBDCanvasInner: React.FC = () => {
     [setActiveConfigUuid],
   );
 
-  const isEmptyState =
-    !isLoadingConfigs &&
-    (!activeConfig ||
-      (jobs.length === 0 &&
-        !isLoadingScan &&
-        !isFetchingScan &&
-        !effectiveProgress.isScanning &&
-        !activeConfig?.isScanning));
+  const isEmptyState = !isLoadingConfigs && !activeConfig;
 
   // Determine which content to render
   const renderContent = (): React.ReactNode => {
@@ -216,12 +213,12 @@ const JTBDCanvasInner: React.FC = () => {
       return <div className='relative h-full w-full' />;
     }
 
-    // Empty states
+    // Empty state — no config exists yet
     if (isEmptyState) {
       return (
         <div className='relative h-full w-full overflow-auto'>
           <EmptyState
-            hasConfig={!!activeConfig}
+            hasConfig={false}
             onConfigure={handleNewArea}
             onTriggerScan={handleTriggerScan}
             isTriggering={isTriggering}
@@ -230,34 +227,6 @@ const JTBDCanvasInner: React.FC = () => {
               setShowCreateModal(true);
             }}
           />
-          <AnimatePresence>
-            {effectiveProgress.isScanning && (
-              <div className='pointer-events-none absolute bottom-6 left-0 right-0 z-30 flex justify-center'>
-                <div className='pointer-events-auto w-full max-w-md px-4'>
-                  <ScanProgressBanner
-                    stage={effectiveProgress.stage}
-                    progress={effectiveProgress.progress}
-                    message={effectiveProgress.message}
-                    currentJob={effectiveProgress.currentJob}
-                  />
-                </div>
-              </div>
-            )}
-          </AnimatePresence>
-          <AnimatePresence>
-            {showFailureBanner && (
-              <div className='pointer-events-none absolute bottom-6 left-0 right-0 z-30 flex justify-center'>
-                <div className='pointer-events-auto w-full max-w-md px-4'>
-                  <ScanFailureBanner
-                    errorMessage={activeConfig?.lastScanError}
-                    onRetry={handleTriggerScan}
-                    isRetrying={isTriggering}
-                    onDismiss={() => setFailureDismissed(true)}
-                  />
-                </div>
-              </div>
-            )}
-          </AnimatePresence>
         </div>
       );
     }
@@ -284,10 +253,10 @@ const JTBDCanvasInner: React.FC = () => {
         >
           {/* Landing hero section */}
           <div
-            className='relative h-[calc(100vh-5rem)] overflow-hidden'
+            className='relative h-[calc(90vh-5rem)] overflow-hidden'
             style={{ scrollSnapAlign: 'start' }}
           >
-            <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-32'>
+            <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-8'>
               <motion.div
                 style={{ pointerEvents: 'auto' }}
                 initial={{ opacity: 0, y: 30 }}
@@ -301,25 +270,36 @@ const JTBDCanvasInner: React.FC = () => {
                 <h1 className='text-5xl font-bold text-white'>
                   Jobs to Be Done
                 </h1>
-                <p className='mx-auto max-w-lg text-xl text-white/60'>
-                  {filteredJobs.length} unmet need
-                  {filteredJobs.length !== 1 ? 's' : ''} discovered
-                </p>
+                {scans.length > 0 && (
+                  <p className='mx-auto max-w-lg text-xl text-white/60'>
+                    {filteredJobs.length} unmet need
+                    {filteredJobs.length !== 1 ? 's' : ''} discovered
+                  </p>
+                )}
                 {/* Config dropdown + rescan */}
                 <div className='flex items-center justify-center gap-3 pt-2'>
                   <JTBDConfigDropdown isAdmin onNewArea={handleNewArea} />
-                  <button
-                    onClick={handleTriggerScan}
-                    disabled={isTriggering || effectiveProgress.isScanning}
-                    className='flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50'
-                  >
-                    <Radar className='h-3.5 w-3.5' />
-                    {isTriggering
-                      ? 'Starting...'
-                      : effectiveProgress.isScanning
-                        ? 'Scanning...'
-                        : 'Rescan'}
-                  </button>
+                  <AnimatePresence>
+                    {!isLoadingScans && (
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3 }}
+                        onClick={handleTriggerScan}
+                        disabled={isTriggering || effectiveProgress.isScanning}
+                        className='flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50'
+                      >
+                        <Radar className='h-3.5 w-3.5' />
+                        {isTriggering
+                          ? 'Starting...'
+                          : effectiveProgress.isScanning
+                            ? 'Scanning...'
+                            : scans.length === 0
+                              ? 'Run First Scan'
+                              : 'Rescan'}
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
                 </div>
                 {/* Scan info */}
                 <div className='flex justify-center pt-1'>
@@ -356,6 +336,19 @@ const JTBDCanvasInner: React.FC = () => {
                           <X className='h-4 w-4 text-white/40' />
                         </button>
                       )}
+                      <button
+                        onClick={handleSearchSubmit}
+                        disabled={!searchValue.trim()}
+                        className={cn(
+                          'rounded-lg p-2 transition-all',
+                          searchValue.trim()
+                            ? 'text-white/50 hover:bg-white/[0.08] hover:text-white/80'
+                            : 'text-white/20',
+                        )}
+                        aria-label='Submit'
+                      >
+                        <Send className='h-4 w-4' />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -372,6 +365,7 @@ const JTBDCanvasInner: React.FC = () => {
             <JTBDCardsSection
               jobs={filteredJobs}
               isLoading={isLoadingScan && filteredJobs.length === 0}
+              hasScans={scans.length > 0}
               selectedJobUuid={selectedJobUuid}
               onCardClick={handleCardClick}
               onIdeate={handleIdeate}

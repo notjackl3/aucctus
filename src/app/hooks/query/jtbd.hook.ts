@@ -388,6 +388,36 @@ export const useUpdateJTBDConfig = () => {
 };
 
 /**
+ * Clones a JTBD config (creates a duplicate with all rules and documents).
+ */
+export const useCloneJTBDConfig = () => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (configUuid: string) => {
+      return await api.jtbd.cloneConfig(configUuid);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: jtbdKeys.configs() });
+      toast.success('Config Cloned', 'Discovery area cloned successfully');
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Clone Failed',
+        message || 'Unable to clone JTBD config. Please try again',
+      );
+    },
+  });
+
+  return {
+    cloneConfig: mutation.mutate,
+    cloneConfigAsync: mutation.mutateAsync,
+    isCloning: mutation.isLoading,
+  };
+};
+
+/**
  * Deletes a JTBD config (cascades to rules, documents, scans, jobs).
  */
 export const useDeleteJTBDConfig = () => {

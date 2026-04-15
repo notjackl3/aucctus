@@ -76,7 +76,7 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
   return (
     <div
       onClick={onCardClick}
-      className={`group relative flex h-[220px] cursor-pointer flex-col rounded-lg border p-4 transition-all duration-200 ${
+      className={`group relative flex min-h-[220px] cursor-pointer flex-col rounded-lg border p-4 transition-all duration-200 ${
         isActive
           ? 'border-white/60 bg-white/20 shadow-lg'
           : 'border-white/30 bg-white/10 hover:border-white/40 hover:bg-white/15'
