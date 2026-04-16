@@ -263,6 +263,8 @@ export interface IJTBDJob {
 
   displayOrder: number;
   createdAt: string;
+  agentLastUpdated: string | null;
+  mergedFromScanUuid: string | null;
 
   // Video
   videoUrl: string | null;

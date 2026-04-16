@@ -25,6 +25,7 @@ import { animationStyles } from '@components/Card/ConceptGeneration/UserExplorat
 import useStore from '@stores/store';
 import telemetry from '@libs/telemetry';
 import { toast } from '@components';
+import Loading from '@components/Loading/Loading';
 import {
   useAnchorThoughts,
   useCreateSeed,
@@ -37,25 +38,6 @@ import { usePersonas } from '@hooks/query/persona.hook';
 import type { MentionItem } from '@stores/overseer/types';
 
 const LazyJTBDCanvas = React.lazy(() => import('@pages/JTBD/JTBDCanvas'));
-
-const JTBDLoadingSkeleton: React.FC = () => (
-  <div className='grid grid-cols-1 gap-6 px-8 pt-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
-    {Array.from({ length: 8 }).map((_, i) => (
-      <div
-        key={i}
-        className='space-y-3 rounded-2xl border border-white/[0.1] bg-white/[0.05] p-5 backdrop-blur-xl'
-      >
-        <div className='flex items-center justify-between'>
-          <div className='h-5 w-12 animate-pulse rounded-full bg-white/[0.08]' />
-          <div className='h-4 w-8 animate-pulse rounded bg-white/[0.08]' />
-        </div>
-        <div className='h-5 w-full animate-pulse rounded bg-white/[0.08]' />
-        <div className='h-4 w-3/4 animate-pulse rounded bg-white/[0.08]' />
-        <div className='h-4 w-1/2 animate-pulse rounded bg-white/[0.08]' />
-      </div>
-    ))}
-  </div>
-);
 
 const IdeaPlaygroundQBased: React.FC = () => {
   // Track page time for analytics
@@ -79,11 +61,6 @@ const IdeaPlaygroundQBased: React.FC = () => {
   const seedUuidFromUrl = searchParams.get('seed') || undefined;
 
   // Mode switching
-  const { user } = useStore((state) => state.auth);
-  const isAccountAdmin = useMemo(
-    () => user?.role?.toLowerCase() === 'admin',
-    [user],
-  );
   const currentMode =
     searchParams.get('mode') === 'jtbd' ? 'jtbd' : 'playground';
 
@@ -545,9 +522,9 @@ const IdeaPlaygroundQBased: React.FC = () => {
 
       {/* JTBD Mode — visible to all, admin prop controls mutative actions */}
       {currentMode === 'jtbd' && (
-        <Suspense fallback={<JTBDLoadingSkeleton />}>
+        <Suspense fallback={<Loading />}>
           <div className='relative h-full pt-20'>
-            <LazyJTBDCanvas isAdmin={isAccountAdmin} />
+            <LazyJTBDCanvas isAdmin />
           </div>
         </Suspense>
       )}
