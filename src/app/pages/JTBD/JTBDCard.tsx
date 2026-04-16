@@ -1,4 +1,8 @@
-import type { IJTBDJob, JTBDWidgetType } from '@libs/api/types/jtbd';
+import type {
+  IJTBDCustomWidget,
+  IJTBDJob,
+  JTBDWidgetType,
+} from '@libs/api/types/jtbd';
 import { cn } from '@libs/utils/react';
 import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -40,6 +44,25 @@ const COL_SPAN: Record<JTBDWidgetType, string> = {
   trend_chart: 'col-span-2',
   stat_list: 'col-span-1',
   market_sizing: 'col-span-2',
+};
+
+/** Map each widget type to the items array that drives its content. */
+const WIDGET_ITEMS_KEY: Record<JTBDWidgetType, keyof IJTBDCustomWidget> = {
+  metric_chart: 'metricChartItems',
+  trend_chart: 'trendChartItems',
+  card_list: 'cardListItems',
+  stat_list: 'statListItems',
+  social_post: 'socialPostItems',
+  survey: 'surveyItems',
+  sparkline_stat: 'sparklineStatItems',
+  market_sizing: 'marketSizingItems',
+};
+
+/** Returns true when the widget's primary items array is non-empty. */
+const hasItems = (w: IJTBDCustomWidget): boolean => {
+  const key = WIDGET_ITEMS_KEY[w.widgetType];
+  const items = key ? w[key] : undefined;
+  return Array.isArray(items) && items.length > 0;
 };
 
 // ============================================
@@ -178,10 +201,10 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
     : [];
 
   const marketSizingWidgets = sortedWidgets.filter(
-    (w) => w.widgetType === 'market_sizing',
+    (w) => w.widgetType === 'market_sizing' && hasItems(w),
   );
   const evidenceWidgets = sortedWidgets.filter(
-    (w) => w.widgetType !== 'market_sizing',
+    (w) => w.widgetType !== 'market_sizing' && hasItems(w),
   );
 
   // Close on Escape

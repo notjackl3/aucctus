@@ -34,7 +34,6 @@ import {
   useGenerateConcepts,
 } from '@hooks/query/ideaPlayground.hook';
 import { usePersonas } from '@hooks/query/persona.hook';
-import { isAucctusAdmin } from '@libs/utils/account';
 import type { MentionItem } from '@stores/overseer/types';
 
 const LazyJTBDCanvas = React.lazy(() => import('@pages/JTBD/JTBDCanvas'));
@@ -81,7 +80,10 @@ const IdeaPlaygroundQBased: React.FC = () => {
 
   // Mode switching
   const { user } = useStore((state) => state.auth);
-  const isAdmin = useMemo(() => isAucctusAdmin(user), [user]);
+  const isAccountAdmin = useMemo(
+    () => user?.role?.toLowerCase() === 'admin',
+    [user],
+  );
   const currentMode =
     searchParams.get('mode') === 'jtbd' ? 'jtbd' : 'playground';
 
@@ -533,21 +535,19 @@ const IdeaPlaygroundQBased: React.FC = () => {
           )}
       </div>
 
-      {/* Mode Tabs — top-left, admin only */}
-      {isAdmin && (
-        <PlaygroundModeTabs
-          activeMode={currentMode}
-          onModeChange={handleModeChange}
-          showJTBD={isAdmin}
-          className='absolute left-6 top-6 z-40'
-        />
-      )}
+      {/* Mode Tabs — top-left, visible to all users */}
+      <PlaygroundModeTabs
+        activeMode={currentMode}
+        onModeChange={handleModeChange}
+        showJTBD={true}
+        className='absolute left-6 top-6 z-40'
+      />
 
-      {/* JTBD Mode — admin only, prevent rendering via URL params */}
-      {currentMode === 'jtbd' && isAdmin && (
+      {/* JTBD Mode — visible to all, admin prop controls mutative actions */}
+      {currentMode === 'jtbd' && (
         <Suspense fallback={<JTBDLoadingSkeleton />}>
           <div className='relative h-full pt-20'>
-            <LazyJTBDCanvas />
+            <LazyJTBDCanvas isAdmin={isAccountAdmin} />
           </div>
         </Suspense>
       )}

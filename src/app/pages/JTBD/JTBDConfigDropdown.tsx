@@ -109,8 +109,16 @@ const JTBDConfigDropdown: React.FC<JTBDConfigDropdownProps> = ({
     [setEditConfigUuid],
   );
 
-  // When no configs exist, show a prompt
+  // When no configs exist, show a prompt (admin) or a label (non-admin)
   if (configs.length === 0) {
+    if (!isAdmin) {
+      return (
+        <div className='inline-flex select-none items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-medium backdrop-blur-md'>
+          <Puzzle size={12} className='text-white/50' />
+          <span className='text-white/50'>No Discovery Areas</span>
+        </div>
+      );
+    }
     return (
       <motion.button
         whileHover={{ scale: 1.02 }}
@@ -217,21 +225,25 @@ const JTBDConfigDropdown: React.FC<JTBDConfigDropdownProps> = ({
                           {activeConfigUuid === config.uuid && (
                             <Check size={12} className='text-white/60' />
                           )}
-                          <button
-                            data-clone-button
-                            onClick={(e) => handleCloneClick(e, config.uuid)}
-                            disabled={isCloning}
-                            className='rounded p-0.5 text-white/30 opacity-0 transition-colors hover:text-white/60 disabled:opacity-30 group-hover:opacity-100'
-                          >
-                            <Copy size={12} />
-                          </button>
-                          <button
-                            data-edit-button
-                            onClick={(e) => handleEditClick(e, config.uuid)}
-                            className='rounded p-0.5 text-white/30 opacity-0 transition-colors hover:text-white/60 group-hover:opacity-100'
-                          >
-                            <Settings size={12} />
-                          </button>
+                          {isAdmin && (
+                            <button
+                              data-clone-button
+                              onClick={(e) => handleCloneClick(e, config.uuid)}
+                              disabled={isCloning}
+                              className='rounded p-0.5 text-white/30 opacity-0 transition-colors hover:text-white/60 disabled:opacity-30 group-hover:opacity-100'
+                            >
+                              <Copy size={12} />
+                            </button>
+                          )}
+                          {isAdmin && (
+                            <button
+                              data-edit-button
+                              onClick={(e) => handleEditClick(e, config.uuid)}
+                              className='rounded p-0.5 text-white/30 opacity-0 transition-colors hover:text-white/60 group-hover:opacity-100'
+                            >
+                              <Settings size={12} />
+                            </button>
+                          )}
                           {isAdmin && configs.length > 1 && (
                             <button
                               data-delete-button

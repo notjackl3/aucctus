@@ -799,7 +799,9 @@ export const useJTBDScanSocketEvents = (configUuid?: string) => {
           queryClient.invalidateQueries({
             queryKey: jtbdKeys.scans(uuid),
           });
-          queryClient.invalidateQueries({
+          // Remove (don't invalidate) activeScan — the scan is COMPLETED so a
+          // refetch would 404 and the global QueryCache.onError toast would fire.
+          queryClient.removeQueries({
             queryKey: jtbdKeys.activeScan(uuid),
           });
         }
@@ -829,7 +831,7 @@ export const useJTBDScanSocketEvents = (configUuid?: string) => {
           queryClient.invalidateQueries({
             queryKey: jtbdKeys.scans(uuid),
           });
-          queryClient.invalidateQueries({
+          queryClient.removeQueries({
             queryKey: jtbdKeys.activeScan(uuid),
           });
         }

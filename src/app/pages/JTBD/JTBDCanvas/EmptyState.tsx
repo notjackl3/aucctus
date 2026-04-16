@@ -35,23 +35,30 @@ const JTBD_FEATURES = [
 
 const EmptyState: React.FC<{
   hasConfig: boolean;
+  isAdmin?: boolean;
   onConfigure: () => void;
   onTriggerScan: () => void;
   isTriggering: boolean;
   onSearch: (description: string) => void;
-}> = ({ hasConfig, onTriggerScan, isTriggering, onSearch }) => {
+}> = ({
+  hasConfig,
+  isAdmin = false,
+  onTriggerScan,
+  isTriggering,
+  onSearch,
+}) => {
   const [localSearch, setLocalSearch] = React.useState('');
   const localInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent): void => {
-    if (e.key === 'Enter' && localSearch.trim()) {
+    if (e.key === 'Enter' && localSearch.trim() && isAdmin) {
       onSearch(localSearch.trim());
       setLocalSearch('');
     }
   };
 
   const handleSubmit = (): void => {
-    if (!localSearch.trim()) return;
+    if (!localSearch.trim() || !isAdmin) return;
     onSearch(localSearch.trim());
     setLocalSearch('');
   };
@@ -146,8 +153,19 @@ const EmptyState: React.FC<{
           })}
         </motion.div>
 
-        {/* CTA — search bar or scan button */}
-        {hasConfig ? (
+        {/* CTA — search bar (admin), scan button (admin+config), or info message (non-admin) */}
+        {hasConfig && !isAdmin ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2, duration: 0.6 }}
+            className='rounded-xl border border-white/10 bg-white/5 px-6 py-4 text-center backdrop-blur-sm'
+          >
+            <p className='text-sm text-white/60'>
+              Only admins can run scans. Ask an admin to start the first scan.
+            </p>
+          </motion.div>
+        ) : hasConfig && isAdmin ? (
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -184,52 +202,65 @@ const EmptyState: React.FC<{
               }}
             />
           </motion.button>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.6 }}
-            className='w-full max-w-lg'
-          >
-            <div className='liquid-glass-search-shell'>
-              <div aria-hidden='true' className='liquid-glass-search-rim' />
-              <div className='liquid-glass-search-surface'>
-                <div className='flex items-center gap-2 px-4 py-3'>
-                  <Search className='h-5 w-5 shrink-0 text-white/40' />
-                  <input
-                    ref={localInputRef}
-                    value={localSearch}
-                    onChange={(e) => setLocalSearch(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder='Search for jobs, pain, or customers'
-                    className='no-focus-ring h-9 flex-1 border-0 bg-transparent text-base text-white placeholder:text-white/30'
-                  />
-                  {localSearch && (
-                    <button
-                      onClick={() => setLocalSearch('')}
-                      className='rounded-md p-1 transition-colors hover:bg-white/10'
-                    >
-                      <X className='h-4 w-4 text-white/40' />
-                    </button>
-                  )}
-                  <button
-                    onClick={handleSubmit}
-                    disabled={!localSearch.trim()}
-                    className={cn(
-                      'rounded-lg p-2 transition-all',
-                      localSearch.trim()
-                        ? 'text-white/50 hover:bg-white/[0.08] hover:text-white/80'
-                        : 'text-white/20',
+        ) : !hasConfig ? (
+          isAdmin ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2, duration: 0.6 }}
+              className='w-full max-w-lg'
+            >
+              <div className='liquid-glass-search-shell'>
+                <div aria-hidden='true' className='liquid-glass-search-rim' />
+                <div className='liquid-glass-search-surface'>
+                  <div className='flex items-center gap-2 px-4 py-3'>
+                    <Search className='h-5 w-5 shrink-0 text-white/40' />
+                    <input
+                      ref={localInputRef}
+                      value={localSearch}
+                      onChange={(e) => setLocalSearch(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder='Search for jobs, pain, or customers'
+                      className='no-focus-ring h-9 flex-1 border-0 bg-transparent text-base text-white placeholder:text-white/30'
+                    />
+                    {localSearch && (
+                      <button
+                        onClick={() => setLocalSearch('')}
+                        className='rounded-md p-1 transition-colors hover:bg-white/10'
+                      >
+                        <X className='h-4 w-4 text-white/40' />
+                      </button>
                     )}
-                    aria-label='Submit'
-                  >
-                    <Send className='h-4 w-4' />
-                  </button>
+                    <button
+                      onClick={handleSubmit}
+                      disabled={!localSearch.trim()}
+                      className={cn(
+                        'rounded-lg p-2 transition-all',
+                        localSearch.trim()
+                          ? 'text-white/50 hover:bg-white/[0.08] hover:text-white/80'
+                          : 'text-white/20',
+                      )}
+                      aria-label='Submit'
+                    >
+                      <Send className='h-4 w-4' />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        )}
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2, duration: 0.6 }}
+              className='rounded-xl border border-white/10 bg-white/5 px-6 py-4 text-center backdrop-blur-sm'
+            >
+              <p className='text-sm text-white/60'>
+                Only admins can set up new JTBD discovery areas.
+              </p>
+            </motion.div>
+          )
+        ) : null}
 
         {/* Help text */}
         <motion.p
@@ -238,9 +269,11 @@ const EmptyState: React.FC<{
           transition={{ delay: 1.4, duration: 0.6 }}
           className='mt-6 max-w-md text-center text-xs text-white/30'
         >
-          {hasConfig
+          {hasConfig && isAdmin
             ? 'Scanning will analyze market signals and discover unmet customer needs. This can take a few minutes.'
-            : 'Describe a market or customer segment and press Enter to get started.'}
+            : !hasConfig && isAdmin
+              ? 'Describe a market or customer segment and press Enter to get started.'
+              : 'Only admins can create discovery areas and run scans.'}
         </motion.p>
       </div>
 

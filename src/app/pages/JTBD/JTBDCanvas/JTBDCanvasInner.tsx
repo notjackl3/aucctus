@@ -37,7 +37,14 @@ import JTBDCardsSection from './JTBDCardsSection';
 import { ScanFailureBanner } from './ScanBanners';
 import ScanInfoLine from './ScanInfoLine';
 
-const JTBDCanvasInner: React.FC = () => {
+interface JTBDCanvasInnerProps {
+  /** Whether the current user is an account admin (controls mutative actions). */
+  isAdmin?: boolean;
+}
+
+const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
+  isAdmin = false,
+}) => {
   // View context
   const {
     activeConfigUuid,
@@ -155,29 +162,29 @@ const JTBDCanvasInner: React.FC = () => {
   }, []);
 
   const handleTriggerScan = useCallback(() => {
-    if (configUuid) {
+    if (configUuid && isAdmin) {
       triggerScan(configUuid);
     }
-  }, [configUuid, triggerScan]);
+  }, [configUuid, triggerScan, isAdmin]);
 
-  // Search bar handler: Enter key opens create modal with search text
+  // Search bar handler: Enter key opens create modal with search text (admin only)
   const handleSearchKeyDown = useCallback(
     (e: React.KeyboardEvent): void => {
-      if (e.key === 'Enter' && searchValue.trim()) {
+      if (e.key === 'Enter' && searchValue.trim() && isAdmin) {
         setPendingDescription(searchValue.trim());
         setShowCreateModal(true);
         setSearchValue('');
       }
     },
-    [searchValue, setShowCreateModal],
+    [searchValue, setShowCreateModal, isAdmin],
   );
 
   const handleSearchSubmit = useCallback((): void => {
-    if (!searchValue.trim()) return;
+    if (!searchValue.trim() || !isAdmin) return;
     setPendingDescription(searchValue.trim());
     setShowCreateModal(true);
     setSearchValue('');
-  }, [searchValue, setShowCreateModal]);
+  }, [searchValue, setShowCreateModal, isAdmin]);
 
   const handleNewArea = useCallback(() => {
     scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -206,6 +213,7 @@ const JTBDCanvasInner: React.FC = () => {
         <div className='relative h-full w-full overflow-auto'>
           <EmptyState
             hasConfig={false}
+            isAdmin={isAdmin}
             onConfigure={handleNewArea}
             onTriggerScan={handleTriggerScan}
             isTriggering={isTriggering}
@@ -265,9 +273,12 @@ const JTBDCanvasInner: React.FC = () => {
                 )}
                 {/* Config dropdown + rescan */}
                 <div className='flex items-center justify-center gap-3 pt-2'>
-                  <JTBDConfigDropdown isAdmin onNewArea={handleNewArea} />
+                  <JTBDConfigDropdown
+                    isAdmin={isAdmin}
+                    onNewArea={handleNewArea}
+                  />
                   <AnimatePresence>
-                    {!isLoadingScans && (
+                    {!isLoadingScans && isAdmin && (
                       <motion.button
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -336,8 +347,13 @@ const JTBDCanvasInner: React.FC = () => {
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
                         onKeyDown={handleSearchKeyDown}
-                        placeholder='Search for jobs, pain, or customers'
-                        className='no-focus-ring h-9 flex-1 border-0 bg-transparent text-base text-white placeholder:text-white/30'
+                        disabled={!isAdmin}
+                        placeholder={
+                          isAdmin
+                            ? 'Search for jobs, pain, or customers'
+                            : 'Only admins can create new discovery areas'
+                        }
+                        className='no-focus-ring h-9 flex-1 border-0 bg-transparent text-base text-white placeholder:text-white/30 disabled:cursor-not-allowed'
                       />
                       {searchValue && (
                         <button
@@ -347,19 +363,21 @@ const JTBDCanvasInner: React.FC = () => {
                           <X className='h-4 w-4 text-white/40' />
                         </button>
                       )}
-                      <button
-                        onClick={handleSearchSubmit}
-                        disabled={!searchValue.trim()}
-                        className={cn(
-                          'rounded-lg p-2 transition-all',
-                          searchValue.trim()
-                            ? 'text-white/50 hover:bg-white/[0.08] hover:text-white/80'
-                            : 'text-white/20',
-                        )}
-                        aria-label='Submit'
-                      >
-                        <Send className='h-4 w-4' />
-                      </button>
+                      {isAdmin && (
+                        <button
+                          onClick={handleSearchSubmit}
+                          disabled={!searchValue.trim()}
+                          className={cn(
+                            'rounded-lg p-2 transition-all',
+                            searchValue.trim()
+                              ? 'text-white/50 hover:bg-white/[0.08] hover:text-white/80'
+                              : 'text-white/20',
+                          )}
+                          aria-label='Submit'
+                        >
+                          <Send className='h-4 w-4' />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -421,17 +439,19 @@ const JTBDCanvasInner: React.FC = () => {
     <>
       {renderContent()}
 
-      {/* Modals — always rendered to preserve WebSocket listener lifecycle */}
-      <CreateJTBDConfigModal
-        open={showCreateModal}
-        onOpenChange={(v) => {
-          setShowCreateModal(v);
-          if (!v) setPendingDescription('');
-        }}
-        onCreated={handleConfigCreated}
-        initialDescription={pendingDescription}
-      />
-      {editConfigUuid && (
+      {/* Modals — only rendered for admins to preserve WebSocket listener lifecycle */}
+      {isAdmin && (
+        <CreateJTBDConfigModal
+          open={showCreateModal}
+          onOpenChange={(v) => {
+            setShowCreateModal(v);
+            if (!v) setPendingDescription('');
+          }}
+          onCreated={handleConfigCreated}
+          initialDescription={pendingDescription}
+        />
+      )}
+      {isAdmin && editConfigUuid && (
         <EditJTBDConfigModal
           configUuid={editConfigUuid}
           open={!!editConfigUuid}
