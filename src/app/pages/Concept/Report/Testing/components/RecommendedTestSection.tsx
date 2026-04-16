@@ -817,7 +817,9 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                 onClose={() => setIsDropdownOpen(false)}
                 availableAssumptions={conceptAssumptions}
                 onSelectAssumption={handleSelectAssumption}
-                existingAssumptionUuids={new Set(existingAssumptionUuids)}
+                existingAssumptionUuids={
+                  new Set([...existingAssumptionUuids, ...pendingAdditions])
+                }
                 existingAssumptionStatements={existingAssumptionStatements}
               />
             </div>
