@@ -26,7 +26,6 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useRef, useState } from 'react';
 
-import JTBDPersonaTagger from './JTBDPersonaTagger';
 import { useJTBDView } from './JTBDViewContext';
 
 interface EditJTBDConfigModalProps {
@@ -106,17 +105,6 @@ const EditJTBDConfigModal: React.FC<EditJTBDConfigModalProps> = ({
     setEditingField(null);
     setEditValue('');
   }, []);
-
-  const handlePersonasChange = useCallback(
-    (uuids: string[]) => {
-      if (!config) return;
-      updateConfig({
-        configUuid: config.uuid,
-        data: { personaUuids: uuids },
-      });
-    },
-    [config, updateConfig],
-  );
 
   const handleAddRule = useCallback(() => {
     const text = ruleInput.trim();
@@ -400,13 +388,13 @@ const EditJTBDConfigModal: React.FC<EditJTBDConfigModalProps> = ({
             )}
           </div>
 
-          {/* Personas Section */}
-          <div className='rounded-xl border border-white/[0.08] bg-white/[0.03] p-4'>
+          {/* TODO: Re-enable persona tagger once persona integration is implemented */}
+          {/* <div className='rounded-xl border border-white/[0.08] bg-white/[0.03] p-4'>
             <JTBDPersonaTagger
               selectedUuids={config.personaUuids}
               onChange={handlePersonasChange}
             />
-          </div>
+          </div> */}
 
           {/* Documents Section */}
           <div className='rounded-xl border border-white/[0.08] bg-white/[0.03] p-4'>
@@ -426,7 +414,10 @@ const EditJTBDConfigModal: React.FC<EditJTBDConfigModalProps> = ({
               type='file'
               multiple
               accept='.pdf,.txt,.doc,.docx,.csv,.xlsx'
-              onChange={(e) => handleFileUpload(e.target.files)}
+              onChange={(e) => {
+                handleFileUpload(e.target.files);
+                e.target.value = '';
+              }}
               className='hidden'
             />
             <div

@@ -1544,6 +1544,10 @@ export class Endpoints {
   static jtbdIdeateFromJob(jobUuid: string) {
     return `/api/v1/jtbd/jobs/${jobUuid}/ideate/`;
   }
+
+  static jtbdEmailWhenReady(configUuid: string) {
+    return `/api/v1/jtbd/configs/${configUuid}/email-when-ready/`;
+  }
 }
 
 export class SocketEndpoints {

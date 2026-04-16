@@ -5,22 +5,23 @@ import {
   useGenerateJTBDRules,
   useJTBDConfigs,
   useTriggerJTBDScan,
+  useUploadJTBDDocument,
 } from '@hooks/query/jtbd.hook';
-import { usePersonas } from '@hooks/query/persona.hook';
 import type { IJTBDGeneratedRule } from '@libs/api/types/jtbd';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, Loader2, Plus, Trash2, X } from 'lucide-react';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import {
+  Check,
+  FileText,
+  Loader2,
+  Plus,
+  Trash2,
+  Upload,
+  X,
+} from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import JTBDPersonaTagger from './JTBDPersonaTagger';
 import { useJTBDView } from './JTBDViewContext';
 
 type Step = 'loading' | 'review' | 'success';
@@ -37,6 +38,14 @@ interface SuggestedRule {
   ruleText: string;
   suggestedPersonaUuid: string | null;
 }
+
+const ACCEPTED_FILE_TYPES = '.pdf,.txt,.doc,.docx,.csv,.xlsx';
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
 
 const LOADING_STEPS = [
   'Analyzing market description...',
@@ -66,6 +75,7 @@ const CreateJTBDConfigModal: React.FC<CreateJTBDConfigModalProps> = ({
   const [selectedPersonaUuids, setSelectedPersonaUuids] = useState<string[]>(
     [],
   );
+  const [stagedFiles, setStagedFiles] = useState<File[]>([]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const firedRef = useRef(false);
@@ -77,14 +87,15 @@ const CreateJTBDConfigModal: React.FC<CreateJTBDConfigModalProps> = ({
     reset: resetGeneration,
   } = useGenerateJTBDRules();
   const { createConfigAsync, isCreating } = useCreateJTBDConfig();
+  const { uploadDocumentAsync } = useUploadJTBDDocument();
   const { triggerScan } = useTriggerJTBDScan();
   const { configs } = useJTBDConfigs();
   const { setActiveConfigUuid } = useJTBDView();
-  const { personas: allPersonas } = usePersonas();
   const orbStyles = useRimOrbStyles();
 
   const existingNames = configs.map((c) => c.name.toLowerCase());
   const isNameDuplicate =
+    step === 'review' &&
     viewName.trim() !== '' &&
     existingNames.includes(viewName.trim().toLowerCase());
 
@@ -96,6 +107,7 @@ const CreateJTBDConfigModal: React.FC<CreateJTBDConfigModalProps> = ({
     setSuggestedRules([]);
     setPendingResult(null);
     setSelectedPersonaUuids([]);
+    setStagedFiles([]);
     firedRef.current = false;
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -247,6 +259,14 @@ const CreateJTBDConfigModal: React.FC<CreateJTBDConfigModalProps> = ({
     ]);
   }, []);
 
+  const handleStageFiles = useCallback((files: FileList) => {
+    setStagedFiles((prev) => [...prev, ...Array.from(files)]);
+  }, []);
+
+  const handleRemoveStagedFile = useCallback((index: number) => {
+    setStagedFiles((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
   const handleApprove = useCallback(async () => {
     try {
       const result = await createConfigAsync({
@@ -257,9 +277,25 @@ const CreateJTBDConfigModal: React.FC<CreateJTBDConfigModalProps> = ({
         rules: suggestedRules.map((r) => r.ruleText),
       });
 
-      setStep('success');
-
       const newUuid = (result as { uuid: string }).uuid;
+
+      // Upload staged files — failures show a toast but don't block the scan
+      if (stagedFiles.length > 0) {
+        const results = await Promise.allSettled(
+          stagedFiles.map((file) =>
+            uploadDocumentAsync({ configUuid: newUuid, file }),
+          ),
+        );
+        const failCount = results.filter((r) => r.status === 'rejected').length;
+        if (failCount > 0) {
+          toast.error(
+            'Upload Warning',
+            `${failCount} of ${stagedFiles.length} document(s) failed to upload.`,
+          );
+        }
+      }
+
+      setStep('success');
       triggerScan(newUuid);
       setActiveConfigUuid(newUuid);
 
@@ -280,22 +316,15 @@ const CreateJTBDConfigModal: React.FC<CreateJTBDConfigModalProps> = ({
     description,
     selectedPersonaUuids,
     suggestedRules,
+    stagedFiles,
     createConfigAsync,
+    uploadDocumentAsync,
     triggerScan,
     setActiveConfigUuid,
     onCreated,
     onOpenChange,
     reset,
   ]);
-
-  // Build a map of persona UUID -> name for suggestion chips
-  const personaNameMap = useMemo(() => {
-    const map = new Map<string, string>();
-    if (allPersonas) {
-      allPersonas.forEach((p) => map.set(p.uuid, p.name));
-    }
-    return map;
-  }, [allPersonas]);
 
   return createPortal(
     <AnimatePresence>
@@ -422,6 +451,9 @@ const CreateJTBDConfigModal: React.FC<CreateJTBDConfigModalProps> = ({
                           onRemoveRule={handleRemoveRule}
                           onEditRule={handleEditRule}
                           onAddRule={handleAddRule}
+                          stagedFiles={stagedFiles}
+                          onStageFiles={handleStageFiles}
+                          onRemoveStagedFile={handleRemoveStagedFile}
                           onApprove={handleApprove}
                           isApproveDisabled={
                             suggestedRules.length === 0 ||
@@ -430,9 +462,6 @@ const CreateJTBDConfigModal: React.FC<CreateJTBDConfigModalProps> = ({
                             isNameDuplicate
                           }
                           isNameDuplicate={isNameDuplicate}
-                          selectedPersonaUuids={selectedPersonaUuids}
-                          onPersonaUuidsChange={setSelectedPersonaUuids}
-                          personaNameMap={personaNameMap}
                         />
                       )}
 
@@ -527,12 +556,12 @@ interface ReviewStepProps {
   onRemoveRule: (id: string) => void;
   onEditRule: (id: string, newText: string) => void;
   onAddRule: (text: string) => void;
+  stagedFiles: File[];
+  onStageFiles: (files: FileList) => void;
+  onRemoveStagedFile: (index: number) => void;
   onApprove: () => void;
   isApproveDisabled: boolean;
   isNameDuplicate?: boolean;
-  selectedPersonaUuids: string[];
-  onPersonaUuidsChange: (uuids: string[]) => void;
-  personaNameMap: Map<string, string>;
 }
 
 const ReviewStep: React.FC<ReviewStepProps> = ({
@@ -542,16 +571,18 @@ const ReviewStep: React.FC<ReviewStepProps> = ({
   onRemoveRule,
   onEditRule,
   onAddRule,
+  stagedFiles,
+  onStageFiles,
+  onRemoveStagedFile,
   onApprove,
   isApproveDisabled,
   isNameDuplicate,
-  selectedPersonaUuids,
-  onPersonaUuidsChange,
-  personaNameMap,
 }) => {
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
   const [editingRuleText, setEditingRuleText] = useState('');
   const [newRuleText, setNewRuleText] = useState('');
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleStartEditRule = useCallback((rule: SuggestedRule) => {
     setEditingRuleId(rule.id);
@@ -651,12 +682,12 @@ const ReviewStep: React.FC<ReviewStepProps> = ({
                   {rule.ruleText}
                 </span>
               )}
-              {/* Persona suggestion chip */}
-              {rule.suggestedPersonaUuid && (
+              {/* TODO: Re-enable persona suggestion chips once persona integration is implemented */}
+              {/* {rule.suggestedPersonaUuid && (
                 <span className='shrink-0 rounded-full bg-white/[0.08] px-2 py-0.5 text-[10px] text-white/50'>
                   {personaNameMap.get(rule.suggestedPersonaUuid) ?? 'Persona'}
                 </span>
-              )}
+              )} */}
               <button
                 onClick={() => onRemoveRule(rule.id)}
                 className='rounded p-1 text-white/30 opacity-0 transition-colors hover:text-red-400 group-hover:opacity-100'
@@ -686,12 +717,103 @@ const ReviewStep: React.FC<ReviewStepProps> = ({
         </div>
       </div>
 
-      {/* Persona tagger */}
-      <div className='mb-4 border-t border-white/[0.08] pt-4'>
+      {/* TODO: Re-enable persona tagger once persona integration is implemented */}
+      {/* <div className='mb-4 border-t border-white/[0.08] pt-4'>
         <JTBDPersonaTagger
           selectedUuids={selectedPersonaUuids}
           onChange={onPersonaUuidsChange}
         />
+      </div> */}
+
+      {/* Context Documents */}
+      <div className='mb-4'>
+        <label className='mb-2 block text-xs font-medium text-white/40'>
+          Context Documents
+          {stagedFiles.length > 0 && (
+            <span className='ml-1.5 rounded-full bg-white/[0.08] px-1.5 py-0.5 text-[10px] text-white/40'>
+              {stagedFiles.length}
+            </span>
+          )}
+        </label>
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type='file'
+          multiple
+          accept={ACCEPTED_FILE_TYPES}
+          onChange={(e) => {
+            if (e.target.files && e.target.files.length > 0) {
+              onStageFiles(e.target.files);
+            }
+            e.target.value = '';
+          }}
+          className='hidden'
+        />
+
+        {/* Drop zone */}
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragOver(true);
+          }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            setIsDragOver(false);
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDragOver(false);
+            if (e.dataTransfer.files.length > 0) {
+              onStageFiles(e.dataTransfer.files);
+            }
+          }}
+          className={cn(
+            'flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-4 py-3 transition-all',
+            isDragOver
+              ? 'border-emerald-500/50 bg-emerald-500/[0.08]'
+              : 'border-white/[0.1] bg-white/[0.02] hover:border-white/[0.2]',
+          )}
+        >
+          <Upload className='mb-1 h-4 w-4 text-white/30' />
+          <p className='text-xs text-white/50'>Drop files here or click</p>
+          <p className='mt-0.5 text-[10px] text-white/25'>
+            PDF, TXT, DOC, DOCX, CSV, XLSX
+          </p>
+        </div>
+
+        {/* Staged file list */}
+        {stagedFiles.length > 0 && (
+          <div className='mt-2 space-y-1.5'>
+            {stagedFiles.map((file, index) => (
+              <motion.div
+                key={`${file.name}-${index}`}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.03 }}
+                className='group flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 transition-colors hover:bg-white/[0.05]'
+              >
+                <FileText className='h-3.5 w-3.5 shrink-0 text-white/30' />
+                <span className='flex-1 truncate text-xs text-white/70'>
+                  {file.name}
+                </span>
+                <span className='shrink-0 text-[10px] text-white/30'>
+                  {formatFileSize(file.size)}
+                </span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemoveStagedFile(index);
+                  }}
+                  className='text-white/30 opacity-0 transition-all hover:text-red-400 group-hover:opacity-100'
+                >
+                  <Trash2 className='h-3 w-3' />
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className='mt-1 flex justify-end'>

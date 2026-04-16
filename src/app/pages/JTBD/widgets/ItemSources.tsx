@@ -33,10 +33,19 @@ export const ItemSources: React.FC<ItemSourcesProps> = ({ sources }) => {
     <div className='mt-2 flex flex-wrap gap-1.5'>
       {unique.map((src, i) =>
         src.metricsContributed ? (
-          <ComponentTooltip key={i} tip={src.metricsContributed}>
+          <ComponentTooltip
+            key={i}
+            preferredPosition='above'
+            tip={
+              <div className='max-w-[400px] rounded-xl border border-white/[0.08] bg-black/80 px-4 py-3 text-sm text-white/90 shadow-2xl'>
+                {src.metricsContributed}
+              </div>
+            }
+          >
             <SourcePill
               source={src.sourceLabel}
               url={src.sourceUrl || undefined}
+              sourceType={src.sourceType}
             />
           </ComponentTooltip>
         ) : (
@@ -44,6 +53,7 @@ export const ItemSources: React.FC<ItemSourcesProps> = ({ sources }) => {
             key={i}
             source={src.sourceLabel}
             url={src.sourceUrl || undefined}
+            sourceType={src.sourceType}
           />
         ),
       )}

@@ -1,4 +1,5 @@
 import { OpportunityMap } from '@components/IdeaPlayground';
+import AgentProgressBar from '@components/Progress/AgentProgressBar';
 import {
   useIdeateFromJob,
   useJTBDActiveScan,
@@ -7,7 +8,6 @@ import {
   useJTBDScans,
   useJTBDScanSocketEvents,
   useTriggerJTBDScan,
-  type JTBDScanProgress,
 } from '@hooks/query/jtbd.hook';
 import type { IJTBDJob } from '@libs/api/types/jtbd';
 import { cn } from '@libs/utils/react';
@@ -34,7 +34,7 @@ import {
 import { useJTBDView } from '../JTBDViewContext';
 import EmptyState from './EmptyState';
 import JTBDCardsSection from './JTBDCardsSection';
-import { ScanFailureBanner, ScanProgressBanner } from './ScanBanners';
+import { ScanFailureBanner } from './ScanBanners';
 import ScanInfoLine from './ScanInfoLine';
 
 const JTBDCanvasInner: React.FC = () => {
@@ -63,34 +63,21 @@ const JTBDCanvasInner: React.FC = () => {
 
   const { jobs, isLoading: isLoadingScan } = useJTBDCurrentScan(configUuid);
   const { scans, isLoading: isLoadingScans } = useJTBDScans(configUuid);
-  const { scanProgress, startScanning } = useJTBDScanSocketEvents(configUuid);
+  useJTBDScanSocketEvents(configUuid);
 
-  // Recover scan progress on page refresh
-  const { activeScan } = useJTBDActiveScan(
-    configUuid,
-    !!activeConfig?.isScanning && !scanProgress.isScanning,
-  );
+  // Fetch active scan for start time (page-refresh resilience)
+  const isScanning = !!activeConfig?.isScanning;
+  const { activeScan } = useJTBDActiveScan(configUuid, isScanning);
 
-  // Derive effective progress — WS > REST active scan > config flag
-  const effectiveProgress: JTBDScanProgress = scanProgress.isScanning
-    ? scanProgress
-    : activeScan
-      ? {
-          isScanning: true,
-          stage: activeScan.stage ?? 'started',
-          progress: activeScan.progress ?? 0,
-          message: activeScan.message ?? 'Scan in progress...',
-        }
-      : activeConfig?.isScanning
-        ? {
-            isScanning: true,
-            stage: 'started',
-            progress: 0,
-            message: 'Scan in progress...',
-          }
-        : scanProgress;
+  // Derive scan start time as Unix timestamp for AgentProgressBar
+  const scanStartTime = useMemo(() => {
+    if (activeScan?.scannedAt) {
+      return new Date(activeScan.scannedAt).getTime();
+    }
+    return undefined;
+  }, [activeScan?.scannedAt]);
 
-  const { triggerScan, isTriggering } = useTriggerJTBDScan(startScanning);
+  const { triggerScan, isTriggering } = useTriggerJTBDScan();
 
   const { ideateFromJobAsync } = useIdeateFromJob();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -147,7 +134,7 @@ const JTBDCanvasInner: React.FC = () => {
 
   const showFailureBanner =
     !failureDismissed &&
-    !effectiveProgress.isScanning &&
+    !isScanning &&
     activeConfig?.lastScanStatus === 'failed';
 
   // Filter jobs (no text search — only filter bar)
@@ -253,10 +240,10 @@ const JTBDCanvasInner: React.FC = () => {
         >
           {/* Landing hero section */}
           <div
-            className='relative h-[calc(90vh-5rem)] overflow-hidden'
+            className='relative h-[calc(75vh-5rem)] overflow-hidden'
             style={{ scrollSnapAlign: 'start' }}
           >
-            <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-8'>
+            <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center'>
               <motion.div
                 style={{ pointerEvents: 'auto' }}
                 initial={{ opacity: 0, y: 30 }}
@@ -286,13 +273,13 @@ const JTBDCanvasInner: React.FC = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.3 }}
                         onClick={handleTriggerScan}
-                        disabled={isTriggering || effectiveProgress.isScanning}
+                        disabled={isTriggering || isScanning}
                         className='flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50'
                       >
                         <Radar className='h-3.5 w-3.5' />
                         {isTriggering
                           ? 'Starting...'
-                          : effectiveProgress.isScanning
+                          : isScanning
                             ? 'Scanning...'
                             : scans.length === 0
                               ? 'Run First Scan'
@@ -305,6 +292,30 @@ const JTBDCanvasInner: React.FC = () => {
                 <div className='flex justify-center pt-1'>
                   <ScanInfoLine scans={scans} jobCount={filteredJobs.length} />
                 </div>
+
+                {/* Inline scan progress bar */}
+                <AnimatePresence>
+                  {isScanning && (
+                    <motion.div
+                      key='scan-progress-inline'
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className='w-full max-w-md pt-3'
+                    >
+                      <AgentProgressBar
+                        agentName='JTBDScan'
+                        fallbackEstimatedSeconds={600}
+                        startTime={scanStartTime}
+                        showPercentage
+                        showTimeRemaining
+                        theme='success'
+                        size='sm'
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
 
               {/* Landing search bar — opens create modal on Enter */}
@@ -360,6 +371,19 @@ const JTBDCanvasInner: React.FC = () => {
             </div>
           </div>
 
+          {/* Agent status message */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+            className='flex items-center justify-center gap-2 py-4 text-white/40'
+          >
+            <Radar className='h-4 w-4 animate-pulse' />
+            <span className='text-sm'>
+              Agents are continuously searching for new jobs
+            </span>
+          </motion.div>
+
           {/* Cards section */}
           <div ref={cardsRef}>
             <JTBDCardsSection
@@ -373,22 +397,6 @@ const JTBDCanvasInner: React.FC = () => {
             />
           </div>
         </div>
-
-        {/* Scan progress banner */}
-        <AnimatePresence>
-          {effectiveProgress.isScanning && (
-            <div className='pointer-events-none absolute bottom-6 left-0 right-0 z-30 flex justify-center'>
-              <div className='pointer-events-auto w-full max-w-md px-4'>
-                <ScanProgressBanner
-                  stage={effectiveProgress.stage}
-                  progress={effectiveProgress.progress}
-                  message={effectiveProgress.message}
-                  currentJob={effectiveProgress.currentJob}
-                />
-              </div>
-            </div>
-          )}
-        </AnimatePresence>
 
         {/* Scan failure banner */}
         <AnimatePresence>

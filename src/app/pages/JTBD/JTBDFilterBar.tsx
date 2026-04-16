@@ -99,8 +99,8 @@ const EVIDENCE_OPTIONS: {
 
 const AUDIENCE_OPTIONS: { value: AudienceFilter; label: string }[] = [
   { value: 'ALL', label: 'All' },
-  { value: 'b2c', label: 'Consumers' },
-  { value: 'b2b', label: 'Businesses' },
+  { value: 'b2c', label: 'B2C' },
+  { value: 'b2b', label: 'B2B' },
 ];
 
 // ============================================

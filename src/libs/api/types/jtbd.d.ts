@@ -31,7 +31,8 @@ export type JTBDSourceType =
   | 'research_paper'
   | 'conference_proceeding'
   | 'clinical_report'
-  | 'trade_publication';
+  | 'trade_publication'
+  | 'document';
 
 export type JTBDWidgetType =
   | 'metric_chart'
@@ -104,6 +105,7 @@ export type LucideIconName =
 export interface IJTBDItemSource {
   sourceLabel: string;
   sourceUrl: string;
+  sourceType?: string;
   metricsContributed: string;
 }
 
@@ -220,6 +222,7 @@ export interface IJTBDCustomWidget {
 export interface IJTBDConstraintSource {
   sourceLabel: string;
   sourceUrl: string;
+  sourceType?: string;
   field: string;
 }
 
@@ -240,8 +243,10 @@ export interface IJTBDJob {
 
   // Aggregate scores
   opportunityScore: number;
+  opportunityReasoning: string;
   opportunityTier: OpportunityTier;
   evidenceStrength: number;
+  evidenceStrengthReasoning: string;
   differentiationScore: number | null;
 
   // Market sizing
@@ -286,20 +291,10 @@ export interface IJTBDScanDetail extends IJTBDScan {
   jobs: IJTBDJob[];
 }
 
-export interface IJTBDSubAgentActivity {
-  agentName: string;
-  status: 'dispatched' | 'completed' | 'failed';
-  message: string;
-}
-
 export interface IJTBDActiveScan {
   uuid: string;
   status: string;
-  stage?: string;
-  progress?: number;
-  message?: string;
   scannedAt: string;
-  subAgents?: IJTBDSubAgentActivity[];
 }
 
 // ============================================

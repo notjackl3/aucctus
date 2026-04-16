@@ -1,9 +1,11 @@
 import type { IJTBDJob, JTBDWidgetType } from '@libs/api/types/jtbd';
 import { cn } from '@libs/utils/react';
+import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   BarChart3,
   Crosshair,
+  HelpCircle,
   Lightbulb,
   Loader2,
   Map,
@@ -271,6 +273,18 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
                         >
                           {opportunityDollars(job.opportunityScore)}
                         </span>
+                        {job.opportunityReasoning && (
+                          <ComponentTooltip
+                            preferredPosition='above'
+                            tip={
+                              <div className='max-w-[400px] rounded-xl border border-white/[0.08] bg-black/80 px-4 py-3 text-sm text-white/90 shadow-2xl'>
+                                {job.opportunityReasoning}
+                              </div>
+                            }
+                          >
+                            <HelpCircle className='h-3.5 w-3.5 cursor-help text-white/30 transition-colors hover:text-white/50' />
+                          </ComponentTooltip>
+                        )}
                       </div>
                       <div className='flex items-center gap-1.5'>
                         <ShieldCheck className='h-3.5 w-3.5 text-white/40' />
@@ -278,6 +292,18 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
                         <span className='text-xs font-semibold text-white/70'>
                           {evidenceLabel(job.evidenceStrength)}
                         </span>
+                        {job.evidenceStrengthReasoning && (
+                          <ComponentTooltip
+                            preferredPosition='above'
+                            tip={
+                              <div className='max-w-[400px] rounded-xl border border-white/[0.08] bg-black/80 px-4 py-3 text-sm text-white/90 shadow-2xl'>
+                                {job.evidenceStrengthReasoning}
+                              </div>
+                            }
+                          >
+                            <HelpCircle className='h-3.5 w-3.5 cursor-help text-white/30 transition-colors hover:text-white/50' />
+                          </ComponentTooltip>
+                        )}
                       </div>
                     </div>
 
@@ -297,7 +323,7 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
                           segmentColors[job.segment] ?? segmentColors.b2c,
                         )}
                       >
-                        {job.segment === 'b2c' ? 'Consumer' : 'Business'}
+                        {job.segment === 'b2c' ? 'B2C' : 'B2B'}
                       </span>
                     </div>
                   </div>
@@ -372,6 +398,7 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
                                     key={i}
                                     source={src.sourceLabel}
                                     url={src.sourceUrl || undefined}
+                                    sourceType={src.sourceType}
                                   />
                                 ))}
                               </div>
@@ -409,6 +436,7 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
                                     key={i}
                                     source={src.sourceLabel}
                                     url={src.sourceUrl || undefined}
+                                    sourceType={src.sourceType}
                                   />
                                 ))}
                               </div>
@@ -446,6 +474,7 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
                                     key={i}
                                     source={src.sourceLabel}
                                     url={src.sourceUrl || undefined}
+                                    sourceType={src.sourceType}
                                   />
                                 ))}
                               </div>
@@ -594,6 +623,18 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
               >
                 {opportunityDollars(job.opportunityScore)}
               </span>
+              {job.opportunityReasoning && (
+                <ComponentTooltip
+                  preferredPosition='above'
+                  tip={
+                    <div className='max-w-[400px] rounded-xl border border-white/[0.08] bg-black/80 px-4 py-3 text-sm text-white/90 shadow-2xl'>
+                      {job.opportunityReasoning}
+                    </div>
+                  }
+                >
+                  <HelpCircle className='h-3 w-3 cursor-help text-white/30 transition-colors hover:text-white/50' />
+                </ComponentTooltip>
+              )}
             </div>
             <div className='flex items-center gap-1.5'>
               <ShieldCheck className='h-3.5 w-3.5 shrink-0 text-white/40' />
@@ -603,6 +644,18 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
               <span className='text-[11px] font-semibold leading-none text-white/70'>
                 {evidenceLabel(job.evidenceStrength)}
               </span>
+              {job.evidenceStrengthReasoning && (
+                <ComponentTooltip
+                  preferredPosition='above'
+                  tip={
+                    <div className='max-w-[400px] rounded-xl border border-white/[0.08] bg-black/80 px-4 py-3 text-sm text-white/90 shadow-2xl'>
+                      {job.evidenceStrengthReasoning}
+                    </div>
+                  }
+                >
+                  <HelpCircle className='h-3 w-3 cursor-help text-white/30 transition-colors hover:text-white/50' />
+                </ComponentTooltip>
+              )}
             </div>
           </div>
 
@@ -614,7 +667,7 @@ export const JTBDCard: React.FC<JTBDCardProps> = ({
                 segmentColors[job.segment] ?? segmentColors.b2c,
               )}
             >
-              {job.segment}
+              {job.segment === 'b2c' ? 'B2C' : 'B2B'}
             </span>
           </div>
 

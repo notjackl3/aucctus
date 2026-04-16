@@ -1199,16 +1199,6 @@ export interface ICompetitorAssessmentScanErrorMessage extends BaseSocketEvent {
 // JTBD Canvas Scan Messages
 // ==========================================
 
-export interface IJTBDScanProgressMessage extends BaseSocketEvent {
-  type: 'jtbd.scan.progress.account';
-  accountUuid: string;
-  configUuid: string;
-  stage: string;
-  progress: number;
-  message: string;
-  currentJob?: string;
-}
-
 export interface IJTBDScanCompletedMessage extends BaseSocketEvent {
   type: 'jtbd.scan.completed.account';
   accountUuid: string;
@@ -1224,15 +1214,6 @@ export interface IJTBDScanErrorMessage extends BaseSocketEvent {
   message: string;
   details?: string;
   configUuid?: string;
-}
-
-export interface IJTBDSubAgentActivityMessage extends BaseSocketEvent {
-  type: 'jtbd.scan.subagent.account';
-  accountUuid: string;
-  configUuid: string;
-  agentName: string;
-  status: 'dispatched' | 'completed' | 'failed';
-  message: string;
 }
 
 export interface IJTBDVideoReadyMessage extends BaseSocketEvent {
@@ -1525,10 +1506,8 @@ export type InboundSocketEvent<C = {}> =
   | IPersonaChatTypingMessage
   | IPersonaChatErrorMessage
   | IPersonaChatToolActivityMessage
-  | IJTBDScanProgressMessage
   | IJTBDScanCompletedMessage
   | IJTBDScanErrorMessage
-  | IJTBDSubAgentActivityMessage
   | IJTBDVideoReadyMessage
   | IJTBDRuleGenerationCompletedMessage
   | IJTBDRuleGenerationErrorMessage

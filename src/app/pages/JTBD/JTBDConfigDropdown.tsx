@@ -174,7 +174,7 @@ const JTBDConfigDropdown: React.FC<JTBDConfigDropdownProps> = ({
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: -4 }}
                   transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className='z-50 w-64 rounded-lg border border-white/15 bg-black/95 p-1 shadow-2xl backdrop-blur-xl'
+                  className='z-50 w-72 rounded-lg border border-white/15 bg-black/95 p-1 shadow-2xl backdrop-blur-xl'
                 >
                   {/* Config items */}
                   {configs.map((config, index) => (
@@ -205,15 +205,12 @@ const JTBDConfigDropdown: React.FC<JTBDConfigDropdownProps> = ({
                         <div className='flex min-w-0 items-center gap-2'>
                           <span
                             className={cn(
-                              'max-w-[130px] truncate text-xs',
+                              'truncate text-xs',
                               activeConfigUuid === config.uuid &&
                                 'font-semibold',
                             )}
                           >
                             {config.name}
-                          </span>
-                          <span className='shrink-0 rounded-full border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-white/40'>
-                            {config.rulesCount}
                           </span>
                         </div>
                         <div className='flex items-center gap-1'>

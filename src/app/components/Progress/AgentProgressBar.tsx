@@ -185,6 +185,13 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
   const maxProgressReached = useRef<number>(0);
   const estimateSourceRef = useRef<string | null>(null);
 
+  // Update startTimeRef when initialStartTime arrives asynchronously (e.g., after API fetch)
+  useEffect(() => {
+    if (initialStartTime) {
+      startTimeRef.current = initialStartTime;
+    }
+  }, [initialStartTime]);
+
   // Fetch timing estimate from backend (skip if override provided)
   const shouldFetchTiming = overrideEstimatedSeconds === undefined;
 

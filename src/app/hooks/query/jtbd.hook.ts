@@ -12,8 +12,6 @@ import type {
   IJTBDRuleGenerationErrorMessage,
   IJTBDScanCompletedMessage,
   IJTBDScanErrorMessage,
-  IJTBDScanProgressMessage,
-  IJTBDSubAgentActivityMessage,
   IJTBDVideoReadyMessage,
 } from '@libs/api/types/socketMessages/inbound';
 import utils from '@libs/utils';
@@ -309,6 +307,13 @@ export const useJTBDActiveScan = (configUuid: string, enabled: boolean) => {
     queryFn: () => api.jtbd.getActiveScan(configUuid),
     enabled: !!configUuid && enabled,
     staleTime: 10_000,
+    // The scan row is created inside the Celery worker, so it may not exist yet
+    // when isScanning is optimistically set. Retry with backoff until the row appears.
+    retry: 3,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10_000),
+    onError: () => {
+      // Suppress toast — 404 is expected during the optimistic window
+    },
   });
 
   return { activeScan: data ?? null };
@@ -643,22 +648,70 @@ export const useDeleteJTBDDocument = () => {
 };
 
 // ============================================
+// Email When Ready Hook
+// ============================================
+
+/**
+ * Requests an email notification when the active scan completes.
+ */
+export const useJTBDEmailWhenReady = () => {
+  const mutation = useMutation({
+    mutationFn: async (configUuid: string) => {
+      return await api.jtbd.emailWhenReady(configUuid);
+    },
+    onSuccess: (data) => {
+      const alreadyScheduled = data?.detail?.includes('already');
+      toast.success(
+        alreadyScheduled ? 'Already Scheduled' : 'Email Scheduled',
+        alreadyScheduled
+          ? 'An email notification was already scheduled for this scan.'
+          : "You'll be emailed when your scan completes.",
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Email Request Failed',
+        message || 'Unable to schedule email notification. Please try again.',
+      );
+    },
+  });
+
+  return {
+    emailWhenReady: mutation.mutate,
+    isRequesting: mutation.isLoading,
+    isSuccess: mutation.isSuccess,
+  };
+};
+
+// ============================================
 // Scan Trigger Hook
 // ============================================
 
 /**
  * Triggers a JTBD scan for a config.
- * Returns immediately; progress comes via WebSocket.
+ * Returns immediately; progress is displayed by AgentProgressBar.
  */
-export const useTriggerJTBDScan = (
-  startScanning?: (configUuid: string) => void,
-) => {
+export const useTriggerJTBDScan = () => {
+  const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (configUuid: string) => {
       return await api.jtbd.triggerScan(configUuid);
     },
     onSuccess: (_data, configUuid) => {
-      startScanning?.(configUuid);
+      // Optimistically set isScanning so the progress bar renders immediately,
+      // before the Celery worker creates the scan row in the database.
+      queryClient.setQueryData<IJTBDConfigList[]>(jtbdKeys.configs(), (old) =>
+        old
+          ? old.map((c) =>
+              c.uuid === configUuid ? { ...c, isScanning: true } : c,
+            )
+          : old!,
+      );
+      queryClient.setQueryData<IJTBDConfigDetail>(
+        jtbdKeys.config(configUuid),
+        (old) => (old ? { ...old, isScanning: true } : old!),
+      );
       toast.success(
         'Scan Started',
         'JTBD scan started. Progress will update in real-time.',
@@ -718,97 +771,19 @@ export const useIdeateFromJob = () => {
 // WebSocket Events Hook
 // ============================================
 
-export interface JTBDScanProgress {
-  isScanning: boolean;
-  stage: string;
-  progress: number;
-  message: string;
-  currentJob?: string;
-}
-
-const DEFAULT_SCAN_PROGRESS: JTBDScanProgress = {
-  isScanning: false,
-  stage: '',
-  progress: 0,
-  message: '',
-  currentJob: undefined,
-};
-
 /**
  * Hook to listen for JTBD scan WebSocket events.
- * Maintains per-config keyed state so progress is scoped correctly.
+ * Handles completion/error toasts and query invalidation.
+ * Progress display is delegated to AgentProgressBar.
  */
 export const useJTBDScanSocketEvents = (configUuid?: string) => {
   const queryClient = useQueryClient();
-  const [progressMap, setProgressMap] = useState<
-    Record<string, JTBDScanProgress>
-  >({});
-
-  // Listen for scan progress events
-  useSocketEvent<'jtbd.scan.progress.account'>(
-    'jtbd.scan.progress.account',
-    useCallback((data: IJTBDScanProgressMessage) => {
-      const key = data.configUuid;
-      if (!key) return;
-      setProgressMap((prev) => ({
-        ...prev,
-        [key]: {
-          isScanning: data.stage !== 'completed',
-          stage: data.stage,
-          progress: data.progress,
-          message: data.message,
-          currentJob: data.currentJob,
-        },
-      }));
-    }, []),
-  );
-
-  // Listen for sub-agent activity events (updates message + asymptotic progress)
-  const subAgentCountRef = useRef<Record<string, number>>({});
-  useSocketEvent<'jtbd.scan.subagent.account'>(
-    'jtbd.scan.subagent.account',
-    useCallback((data: IJTBDSubAgentActivityMessage) => {
-      const key = data.configUuid;
-      if (!key) return;
-      subAgentCountRef.current[key] = (subAgentCountRef.current[key] ?? 0) + 1;
-      const eventCount = subAgentCountRef.current[key];
-      // Asymptotic: each event pushes 5% closer to 50%
-      const progress = Math.round(
-        20 + 30 * (1 - Math.pow(1 - 5 / 30, eventCount)),
-      );
-      setProgressMap((prev) => {
-        const existing = prev[key] ?? {
-          isScanning: true,
-          stage: 'discovery',
-          progress: 20,
-          message: data.message,
-        };
-        return {
-          ...prev,
-          [key]: {
-            ...existing,
-            progress,
-            message: data.message,
-          },
-        };
-      });
-    }, []),
-  );
 
   // Listen for scan completed events
   useSocketEvent<'jtbd.scan.completed.account'>(
     'jtbd.scan.completed.account',
     useCallback(
       (data: IJTBDScanCompletedMessage) => {
-        // Remove this config's progress entry
-        if (data.configUuid) {
-          setProgressMap((prev) => {
-            const next = { ...prev };
-            delete next[data.configUuid];
-            return next;
-          });
-        }
-
         // Invalidate configs list (to update isScanning/lastScanAt)
         queryClient.invalidateQueries({ queryKey: jtbdKeys.configs() });
 
@@ -843,20 +818,10 @@ export const useJTBDScanSocketEvents = (configUuid?: string) => {
     'jtbd.scan.error.account',
     useCallback(
       (data: IJTBDScanErrorMessage) => {
-        // Remove this config's progress entry
-        const errorConfigUuid = data.configUuid;
-        if (errorConfigUuid) {
-          setProgressMap((prev) => {
-            const next = { ...prev };
-            delete next[errorConfigUuid];
-            return next;
-          });
-        }
-
         // Invalidate caches so isScanning resets from REST
         queryClient.invalidateQueries({ queryKey: jtbdKeys.configs() });
 
-        const uuid = errorConfigUuid || configUuid;
+        const uuid = data.configUuid || configUuid;
         if (uuid) {
           queryClient.invalidateQueries({
             queryKey: jtbdKeys.config(uuid),
@@ -890,40 +855,4 @@ export const useJTBDScanSocketEvents = (configUuid?: string) => {
       [queryClient, configUuid],
     ),
   );
-
-  const scanProgress = configUuid
-    ? (progressMap[configUuid] ?? DEFAULT_SCAN_PROGRESS)
-    : DEFAULT_SCAN_PROGRESS;
-
-  const resetProgress = useCallback((uuid?: string) => {
-    if (uuid) {
-      setProgressMap((prev) => {
-        const next = { ...prev };
-        delete next[uuid];
-        return next;
-      });
-    } else {
-      setProgressMap({});
-    }
-  }, []);
-
-  const startScanning = useCallback((uuid: string) => {
-    subAgentCountRef.current[uuid] = 0;
-    setProgressMap((prev) => ({
-      ...prev,
-      [uuid]: {
-        isScanning: true,
-        stage: 'started',
-        progress: 0,
-        message: 'Starting JTBD scan...',
-        currentJob: undefined,
-      },
-    }));
-  }, []);
-
-  return {
-    scanProgress,
-    resetProgress,
-    startScanning,
-  };
 };

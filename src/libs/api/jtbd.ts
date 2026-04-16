@@ -223,4 +223,14 @@ export class JtbdApi extends ApiService {
   ideateFromJob(jobUuid: string) {
     return this.post<IJTBDIdeateResponse>(endpoints.jtbdIdeateFromJob(jobUuid));
   }
+
+  /**
+   * Request an email notification when the active scan completes.
+   * Returns 409 if no scan is currently running.
+   */
+  emailWhenReady(configUuid: string) {
+    return this.post<IJTBDMessageResponse>(
+      endpoints.jtbdEmailWhenReady(configUuid),
+    );
+  }
 }

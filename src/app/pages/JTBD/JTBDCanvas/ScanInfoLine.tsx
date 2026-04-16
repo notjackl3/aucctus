@@ -22,10 +22,6 @@ const ScanInfoLine: React.FC<{
   const currentScan = scans.find((s) => s.isCurrent);
   if (!currentScan) return null;
 
-  const pastScansCount = scans.filter(
-    (s) => s.status === 'completed' && !s.isCurrent,
-  ).length;
-
   return (
     <div className='flex items-center gap-3 text-[11px] text-white/40'>
       <div className='flex items-center gap-1.5'>
@@ -36,14 +32,6 @@ const ScanInfoLine: React.FC<{
       <span>
         {jobCount} job{jobCount !== 1 ? 's' : ''} discovered
       </span>
-      {pastScansCount > 0 && (
-        <>
-          <span className='text-white/20'>·</span>
-          <span>
-            {pastScansCount} prior scan{pastScansCount !== 1 ? 's' : ''}
-          </span>
-        </>
-      )}
     </div>
   );
 };
