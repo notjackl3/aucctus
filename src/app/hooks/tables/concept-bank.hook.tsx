@@ -1,4 +1,4 @@
-import { Button, ComponentTooltip, Table, Text } from '@components';
+import { Button, ComponentTooltip, Table } from '@components';
 import { toast } from '@components/Notification/toast';
 import PriorityCell from '@components/Tables/ConceptBank/PriorityCell';
 import { UnseenChangesTooltip } from '@components/ToolTip/UnseenChangesTooltip';
@@ -50,7 +50,8 @@ import {
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import React, { useMemo } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { ArrowDown } from 'lucide-react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
@@ -72,6 +73,69 @@ export interface IConceptFilterOptions {
   sortConfigs?: ISortConfig[]; // Parsed sort configurations for UI state
   propertyFilters?: IPropertyFilter[];
 }
+
+interface ConceptTitleCellProps {
+  title: string;
+  description: string;
+}
+
+const ConceptTitleCell: React.FC<ConceptTitleCellProps> = ({
+  title,
+  description,
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const descRef = useRef<HTMLSpanElement>(null);
+
+  useLayoutEffect(() => {
+    const el = descRef.current;
+    if (!el) return;
+    setIsTruncated(el.scrollHeight > el.clientHeight);
+  }, [description]);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isTruncated) return;
+    e.stopPropagation();
+    setIsExpanded((prev) => !prev);
+  };
+
+  return (
+    <div
+      className='flex flex-col gap-1'
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
+    >
+      <span className='aucctus-text-primary aucctus-text-sm'>{title}</span>
+      <span className='relative'>
+        <span
+          ref={descRef}
+          className={cn(
+            'aucctus-text-tertiary aucctus-text-sm hyphens-auto break-words',
+            {
+              'line-clamp-1': !isExpanded,
+              'cursor-pointer': isTruncated,
+            },
+          )}
+        >
+          {description}
+        </span>
+        {!isExpanded && isTruncated && isHovered && (
+          <span className='absolute -bottom-1 right-0 flex'>
+            <button
+              type='button'
+              onClick={handleClick}
+              className='btn btn-light btn-xs'
+            >
+              See More <ArrowDown />
+            </button>
+          </span>
+        )}
+      </span>
+    </div>
+  );
+};
 
 const columnHelper = createColumnHelper<IConcept>();
 
@@ -962,7 +1026,7 @@ export const useConceptBank = (
           const { hasSeenConceptChange, updatedAt } = concept;
 
           return (
-            <div className='flex max-w-[700px] flex-col py-2'>
+            <div className='flex max-w-[700px] flex-col py-1'>
               <div className='flex items-start gap-2'>
                 {/* Recent activity indicator dot - always reserves space */}
                 <div
@@ -997,9 +1061,8 @@ export const useConceptBank = (
                       : undefined
                   }
                 >
-                  <Text.Collapsible
+                  <ConceptTitleCell
                     title={info.getValue()}
-                    maxDescriptionHeight={35}
                     description={concept.summary}
                   />
                 </div>

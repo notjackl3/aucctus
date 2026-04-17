@@ -176,6 +176,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
             />
           }
           hideDelay={0}
+          preferredPosition='left'
         >
           <motion.button
             className={cn(style, { 'btn-border-trace': isUpdating })}
