@@ -94,8 +94,10 @@ const ConceptTitleCell: React.FC<ConceptTitleCellProps> = ({
     setIsTruncated(el.scrollHeight > el.clientHeight);
   }, [description]);
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (!isTruncated) return;
+  // Expand only via the "See More" button. The cell itself never swallows
+  // clicks — the parent owns row/debug navigation and stopping propagation
+  // here would block it (regression: concepts unopenable in debug mode).
+  const handleSeeMoreClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsExpanded((prev) => !prev);
   };
@@ -105,7 +107,6 @@ const ConceptTitleCell: React.FC<ConceptTitleCellProps> = ({
       className='flex flex-col gap-1'
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={handleClick}
     >
       <span className='aucctus-text-primary aucctus-text-sm'>{title}</span>
       <span className='relative'>
@@ -113,10 +114,7 @@ const ConceptTitleCell: React.FC<ConceptTitleCellProps> = ({
           ref={descRef}
           className={cn(
             'aucctus-text-tertiary aucctus-text-sm hyphens-auto break-words',
-            {
-              'line-clamp-1': !isExpanded,
-              'cursor-pointer': isTruncated,
-            },
+            { 'line-clamp-1': !isExpanded },
           )}
         >
           {description}
@@ -125,7 +123,7 @@ const ConceptTitleCell: React.FC<ConceptTitleCellProps> = ({
           <span className='absolute -bottom-1 right-0 flex'>
             <button
               type='button'
-              onClick={handleClick}
+              onClick={handleSeeMoreClick}
               className='btn btn-light btn-xs'
             >
               See More <ArrowDown />

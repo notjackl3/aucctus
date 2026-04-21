@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from '@components';
+import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 import { cn } from '@libs/utils/react';
 import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
 import { File, Send, Upload, Users, X } from 'lucide-react';
@@ -39,6 +40,23 @@ const SUPPORTED_EXTENSIONS = [
   'mov',
 ];
 
+/**
+ * Conditionally wraps children in a ComponentTooltip. Keeps JSX flat where
+ * the tooltip is only needed in a disabled-ish state.
+ */
+const TooltipWhen: React.FC<{
+  when: boolean;
+  tip: string;
+  children: React.ReactNode;
+}> = ({ when, tip, children }) =>
+  when ? (
+    <ComponentTooltip tip={tip} preferredPosition='above' hideDelay={0}>
+      {children}
+    </ComponentTooltip>
+  ) : (
+    <>{children}</>
+  );
+
 interface LandingViewProps {
   inputValue: string;
   onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -51,6 +69,8 @@ interface LandingViewProps {
   selectedPersonas?: MentionItem[];
   onPersonaSelect?: (item: MentionItem) => void;
   onPersonaRemove?: (id: string) => void;
+  considerAllPersonas?: boolean;
+  onConsiderAllPersonasChange?: (next: boolean) => void;
 }
 
 const LandingView: React.FC<LandingViewProps> = ({
@@ -65,6 +85,8 @@ const LandingView: React.FC<LandingViewProps> = ({
   selectedPersonas = [],
   onPersonaSelect,
   onPersonaRemove,
+  considerAllPersonas = false,
+  onConsiderAllPersonasChange,
 }) => {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -313,24 +335,64 @@ const LandingView: React.FC<LandingViewProps> = ({
                 <div className='-mt-1 flex items-center gap-1.5 px-5 pb-3'>
                   {/* Add Personas button */}
                   {personaItems.length > 0 && (
-                    <button
-                      ref={personaButtonRef}
-                      type='button'
-                      onClick={togglePersonaMenu}
-                      className={cn(
-                        'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors',
-                        showPersonaMenu
-                          ? 'border-white/30 bg-white/10 text-white/70'
-                          : 'border-white/15 text-white/40 hover:bg-white/[0.08] hover:text-white/70',
-                      )}
+                    <TooltipWhen
+                      when={considerAllPersonas}
+                      tip={'Turn off "Consider All Personas" to tag.'}
                     >
-                      <Users className='h-3 w-3' />
-                      <span>
-                        {selectedPersonas.length > 0
-                          ? `Personas (${selectedPersonas.length})`
-                          : 'Add Personas'}
-                      </span>
-                    </button>
+                      <button
+                        ref={personaButtonRef}
+                        type='button'
+                        onClick={() => {
+                          if (considerAllPersonas) return;
+                          togglePersonaMenu();
+                        }}
+                        aria-disabled={considerAllPersonas}
+                        className={cn(
+                          'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40',
+                          showPersonaMenu
+                            ? 'border-white/30 bg-white/10 text-white/70'
+                            : 'border-white/15 text-white/40 hover:bg-white/[0.08] hover:text-white/70',
+                          considerAllPersonas &&
+                            'cursor-not-allowed opacity-40 hover:bg-transparent hover:text-white/40',
+                        )}
+                      >
+                        <Users className='h-3 w-3' />
+                        <span>
+                          {selectedPersonas.length > 0
+                            ? `Personas (${selectedPersonas.length})`
+                            : 'Add Personas'}
+                        </span>
+                      </button>
+                    </TooltipWhen>
+                  )}
+
+                  {/* Consider All Personas toggle */}
+                  {personaItems.length > 0 && onConsiderAllPersonasChange && (
+                    <TooltipWhen
+                      when={selectedPersonas.length > 0}
+                      tip='Remove tags to enable.'
+                    >
+                      <button
+                        type='button'
+                        role='switch'
+                        aria-checked={considerAllPersonas}
+                        aria-disabled={selectedPersonas.length > 0}
+                        onClick={() => {
+                          if (selectedPersonas.length > 0) return;
+                          onConsiderAllPersonasChange(!considerAllPersonas);
+                        }}
+                        className={cn(
+                          'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40',
+                          considerAllPersonas
+                            ? 'border-purple-400/30 bg-purple-500/20 text-purple-200'
+                            : 'border-white/15 text-white/40 hover:bg-white/[0.08] hover:text-white/70',
+                          selectedPersonas.length > 0 &&
+                            'cursor-not-allowed opacity-40 hover:bg-transparent hover:text-white/40',
+                        )}
+                      >
+                        <span>Consider All Personas</span>
+                      </button>
+                    </TooltipWhen>
                   )}
 
                   {/* Selected persona badges */}

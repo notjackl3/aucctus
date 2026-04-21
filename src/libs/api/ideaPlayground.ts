@@ -57,6 +57,7 @@ export class IdeaPlaygroundApi extends ApiService {
     thoughtText: string,
     files?: File[],
     livingPersonaUuids?: string[],
+    considerAllPersonas?: boolean,
   ): Promise<ICreateSeedResponse> {
     if (files?.length) {
       // Use multipart/form-data for file upload
@@ -69,6 +70,9 @@ export class IdeaPlaygroundApi extends ApiService {
         for (const uuid of livingPersonaUuids) {
           formData.append('living_persona_uuids', uuid);
         }
+      }
+      if (considerAllPersonas) {
+        formData.append('consider_all_personas', 'true');
       }
 
       return this.postFormData<ICreateSeedResponse>(
@@ -83,6 +87,7 @@ export class IdeaPlaygroundApi extends ApiService {
       ...(livingPersonaUuids?.length && {
         living_persona_uuids: livingPersonaUuids,
       }),
+      ...(considerAllPersonas && { consider_all_personas: true }),
     };
     return this.post<ICreateSeedResponse, ICreateSeedRequest>(
       endpoints.ideaPlaygroundSeed,

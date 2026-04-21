@@ -54,6 +54,9 @@ const IdeaPlaygroundQBased: React.FC = () => {
   const [showLogoTitle, setShowLogoTitle] = useState(false);
   // Track selected living personas for tagging
   const [selectedPersonas, setSelectedPersonas] = useState<MentionItem[]>([]);
+  // Opt-in toggle for account-wide persona context. Mutually exclusive with
+  // individual persona tagging — see handleConsiderAllPersonasChange below.
+  const [considerAllPersonas, setConsiderAllPersonas] = useState(false);
 
   // URL parameter handling
   const [searchParams, setSearchParams] = useSearchParams();
@@ -123,10 +126,22 @@ const IdeaPlaygroundQBased: React.FC = () => {
     setSelectedPersonas((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
+  // Mutual exclusivity: enabling "Consider All Personas" clears any individually
+  // tagged personas. Disabling the toggle just leaves selectedPersonas as-is.
+  const handleConsiderAllPersonasChange = useCallback((next: boolean) => {
+    setConsiderAllPersonas(next);
+    if (next) {
+      setSelectedPersonas([]);
+    }
+  }, []);
+
   // Handle persona insight bubble toggled in QuestionCarousel
   const handlePersonaInsightToggled = useCallback(
     (personaUuid: string, included: boolean) => {
       if (included) {
+        // Mutex: when "Consider All Personas" is on, individual tags are not allowed.
+        // Block back-door tag additions so the invariant is preserved.
+        if (considerAllPersonas) return;
         const persona = personaItems.find((p) => p.id === personaUuid);
         if (persona) {
           handlePersonaSelect(persona);
@@ -135,7 +150,12 @@ const IdeaPlaygroundQBased: React.FC = () => {
         handlePersonaRemove(personaUuid);
       }
     },
-    [personaItems, handlePersonaSelect, handlePersonaRemove],
+    [
+      considerAllPersonas,
+      personaItems,
+      handlePersonaSelect,
+      handlePersonaRemove,
+    ],
   );
 
   // Fetch anchor thought for seed restoration (only when seedUuidFromUrl exists)
@@ -221,26 +241,32 @@ const IdeaPlaygroundQBased: React.FC = () => {
         // Let the loading transition check backend flags to determine readiness
         // (isDataReady will be set by PlaygroundLoadingTransition.onReady)
 
-        // Restore implicitly tagged personas from included persona insights
-        const restoredPersonaUuids = new Set<string>();
-        existingQuestions.forEach((q) => {
-          q.insights?.forEach((insight) => {
-            if (
-              insight.sourceType === 'persona' &&
-              insight.personaUuid &&
-              q.includedAnswers?.includes(insight.uuid)
-            ) {
-              restoredPersonaUuids.add(insight.personaUuid);
-            }
+        // Restore the consider-all-personas toggle from the seed payload.
+        if (seedAnchorThought.considerAllPersonas) {
+          setConsiderAllPersonas(true);
+        } else {
+          setConsiderAllPersonas(false);
+          // Restore implicitly tagged personas from included persona insights
+          const restoredPersonaUuids = new Set<string>();
+          existingQuestions.forEach((q) => {
+            q.insights?.forEach((insight) => {
+              if (
+                insight.sourceType === 'persona' &&
+                insight.personaUuid &&
+                q.includedAnswers?.includes(insight.uuid)
+              ) {
+                restoredPersonaUuids.add(insight.personaUuid);
+              }
+            });
           });
-        });
-        if (restoredPersonaUuids.size > 0) {
-          restoredPersonaUuids.forEach((uuid) => {
-            const persona = personaItems.find((p) => p.id === uuid);
-            if (persona) {
-              handlePersonaSelect(persona);
-            }
-          });
+          if (restoredPersonaUuids.size > 0) {
+            restoredPersonaUuids.forEach((uuid) => {
+              const persona = personaItems.find((p) => p.id === uuid);
+              if (persona) {
+                handlePersonaSelect(persona);
+              }
+            });
+          }
         }
 
         telemetry.log('ideaPlayground.session.restored', {
@@ -327,6 +353,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
           selectedPersonas.length > 0
             ? selectedPersonas.map((p) => p.id)
             : undefined,
+        considerAllPersonas,
       });
 
       // Set seed UUID in local state (synchronized with URL)
@@ -372,6 +399,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
           selectedPersonas.length > 0
             ? selectedPersonas.map((p) => p.id)
             : undefined,
+        considerAllPersonas,
       });
 
       // Set seed UUID in local state (synchronized with URL)
@@ -564,6 +592,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
                   selectedPersonas={selectedPersonas}
                   onPersonaSelect={handlePersonaSelect}
                   onPersonaRemove={handlePersonaRemove}
+                  considerAllPersonas={considerAllPersonas}
+                  onConsiderAllPersonasChange={handleConsiderAllPersonasChange}
                 />
               )}
             </AnimatePresence>
@@ -642,7 +672,10 @@ const IdeaPlaygroundQBased: React.FC = () => {
                   ? selectedPersonas.map((p) => p.id)
                   : undefined
               }
-              personaInfos={selectedPersonas.map((p) => ({
+              personaInfos={(considerAllPersonas
+                ? personaItems
+                : selectedPersonas
+              ).map((p) => ({
                 uuid: p.id,
                 name: p.name,
                 segment: p.segment || '',

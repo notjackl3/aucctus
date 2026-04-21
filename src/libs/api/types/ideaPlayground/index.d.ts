@@ -14,6 +14,7 @@ export interface IAnchorThought {
   thought: string;
   title: string;
   createdAt: string;
+  considerAllPersonas: boolean;
 }
 
 /**
@@ -105,6 +106,7 @@ export interface IAnchorThoughtsResponse {
 export interface ICreateSeedRequest {
   thought_text: string;
   living_persona_uuids?: string[];
+  consider_all_personas?: boolean;
 }
 
 /**
@@ -128,6 +130,7 @@ export interface ICreateSeedResponse {
   title?: string;
   files: ISeedFile[];
   livingPersonaUuids?: string[];
+  considerAllPersonas: boolean;
 }
 
 /**

@@ -50,6 +50,7 @@ interface ICreateSeedInput {
   thoughtText: string;
   files?: File[];
   livingPersonaUuids?: string[];
+  considerAllPersonas?: boolean;
 }
 
 /**
@@ -67,6 +68,8 @@ export const useCreateSeed = () => {
       const files = typeof input === 'string' ? undefined : input.files;
       const livingPersonaUuids =
         typeof input === 'string' ? undefined : input.livingPersonaUuids;
+      const considerAllPersonas =
+        typeof input === 'string' ? undefined : input.considerAllPersonas;
 
       if (!thoughtText?.trim()) {
         throw new Error('Thought text is required');
@@ -75,6 +78,7 @@ export const useCreateSeed = () => {
         thoughtText,
         files,
         livingPersonaUuids,
+        considerAllPersonas,
       );
     },
     onSuccess: (data, input) => {
