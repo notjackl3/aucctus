@@ -9,7 +9,6 @@ import { AppPath } from '@routes/routes';
 export const ACCOUNT_LEVEL_SECTIONS = new Set([
   'nucleus',
   'watchtower',
-  'competitor_assessment',
   'idea_playground',
   'innovation_pipeline',
   'concept_bank',
@@ -20,7 +19,6 @@ const SECTION_TO_ROUTE: Record<string, AppPath> = {
   // Account-level pages
   nucleus: AppPath.Nucleus,
   watchtower: AppPath.Watchtower,
-  competitor_assessment: AppPath.CompetitorAssessment,
   idea_playground: AppPath.IdeaPlayground,
   innovation_pipeline: AppPath.InnovationPipeline,
   concept_bank: AppPath.ConceptBank,

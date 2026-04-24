@@ -1033,20 +1033,6 @@ export class Endpoints {
     return `/api/value-discovery/public/${assessmentUuid}/briefing/export`;
   }
 
-  // Competitor Assessment Endpoints
-  static competitorAssessmentDashboard =
-    '/api/v1/competitor-assessment/dashboard';
-  static competitorAssessmentRefresh = '/api/v1/competitor-assessment/refresh';
-  static competitorAssessmentCompetitors =
-    '/api/v1/competitor-assessment/competitors';
-  static competitorAssessmentConfig = '/api/v1/competitor-assessment/config';
-  static competitorAssessmentWhiteSpaces =
-    '/api/v1/competitor-assessment/white-spaces';
-
-  static competitorAssessmentCompetitor(competitorUuid: string) {
-    return `/api/v1/competitor-assessment/competitors/${competitorUuid}`;
-  }
-
   // Portfolio Executive Summary Endpoints
   static portfolioExecutiveSummary = '/api/v1/portfolio/executive-summary';
 

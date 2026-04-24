@@ -51,9 +51,6 @@ export enum AppPath {
   /* Value Discovery */
   Discover = '/discover',
 
-  /* Competitor Assessment */
-  CompetitorAssessment = '/competitor-assessment',
-
   /* Innovation Pipeline */
   InnovationPipeline = '/innovation-pipeline',
 

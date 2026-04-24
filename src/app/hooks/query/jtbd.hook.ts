@@ -2,7 +2,7 @@
  * JTBD Canvas React Query Hooks
  *
  * Provides data fetching, mutation, and WebSocket hooks for the
- * Jobs-To-Be-Done Canvas feature. Follows the competitorAssessment.hook.ts pattern.
+ * Jobs-To-Be-Done Canvas feature.
  */
 
 import { toast } from '@components';

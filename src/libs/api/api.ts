@@ -8,7 +8,6 @@ import { AssumptionsApi } from './assumptions';
 
 import { IApiServiceConfig } from './base/apiService';
 import { ISocketConfig, SocketService } from './base/socketService';
-import { CompetitorAssessmentApi } from './competitorAssessment';
 import { ConceptApi } from './concepts';
 import { DynamicComponentApi } from './dynamicComponent';
 import { SocketEndpoints } from './endpoints';
@@ -65,7 +64,6 @@ export class Api {
   pocPlan!: PocPlanApi;
   property!: PropertyApi;
   watchtower!: WatchtowerApi;
-  competitorAssessment!: CompetitorAssessmentApi;
   valueDiscovery!: ValueDiscoveryApi;
   dynamicComponent!: DynamicComponentApi;
   overseer!: OverseerApi;
@@ -106,7 +104,6 @@ export class Api {
       { key: 'pocPlan', class: PocPlanApi },
       { key: 'property', class: PropertyApi },
       { key: 'watchtower', class: WatchtowerApi },
-      { key: 'competitorAssessment', class: CompetitorAssessmentApi },
       { key: 'valueDiscovery', class: ValueDiscoveryApi },
       { key: 'dynamicComponent', class: DynamicComponentApi },
       { key: 'overseer', class: OverseerApi },
