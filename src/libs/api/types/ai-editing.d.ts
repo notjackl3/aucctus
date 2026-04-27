@@ -87,16 +87,14 @@ export type EditSuggestionKind =
 
 /**
  * Payload for a JTBD monitoring rule edit suggestion.
- * `ruleUuid` required for update/delete/toggle actions.
+ * `ruleUuid` required for update/delete actions.
  * `ruleText` required for add/update actions.
- * `isActive` used for toggle actions (pause/resume without delete).
  */
 export interface IJTBDRuleEditPayload {
   configUuid: string;
-  action: 'add' | 'update' | 'delete' | 'toggle';
+  action: 'add' | 'update' | 'delete';
   ruleUuid?: string;
   ruleText?: string;
-  isActive?: boolean;
 }
 
 /**

@@ -414,7 +414,7 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
 };
 
 /**
- * Render body for a JTBD rule edit suggestion (add / update / delete / toggle).
+ * Render body for a JTBD rule edit suggestion (add / update / delete).
  * Shows the action label, config name context, and proposed rule text when
  * applicable.
  */
@@ -427,14 +427,12 @@ const ACTION_LABELS: Record<IJTBDRuleEditPayload['action'], string> = {
   add: 'Add rule',
   update: 'Update rule',
   delete: 'Delete rule',
-  toggle: 'Toggle rule',
 };
 
 const ACTION_BADGE_CLASSES: Record<IJTBDRuleEditPayload['action'], string> = {
   add: 'border-emerald-400/30 bg-emerald-500/15 text-emerald-200/90',
   update: 'border-sky-400/30 bg-sky-500/15 text-sky-200/90',
   delete: 'border-red-400/30 bg-red-500/15 text-red-200/90',
-  toggle: 'border-amber-400/30 bg-amber-500/15 text-amber-200/90',
 };
 
 const JTBDRuleBody: React.FC<JTBDRuleBodyProps> = ({ payload, configName }) => {
@@ -459,15 +457,6 @@ const JTBDRuleBody: React.FC<JTBDRuleBodyProps> = ({ payload, configName }) => {
             in <span className='text-white/70'>{configName}</span>
           </span>
         )}
-        {payload.action === 'toggle' &&
-          typeof payload.isActive === 'boolean' && (
-            <span className='text-[10px] font-light text-white/50'>
-              →{' '}
-              <span className='text-white/70'>
-                {payload.isActive ? 'active' : 'paused'}
-              </span>
-            </span>
-          )}
       </div>
       {payload.ruleText && (
         <div className='rounded-md border border-white/[0.05] bg-white/[0.03] px-2.5 py-2 text-[11px] font-light leading-relaxed text-white/70'>

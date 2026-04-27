@@ -417,6 +417,20 @@ export interface IUpdateJTBDNotePayload {
   body: string;
 }
 
+/**
+ * Payload for creating a user-authored note on a JTBD job.
+ */
+export interface ICreateJTBDNotePayload {
+  body: string;
+}
+
+/**
+ * Payload for updating an existing user-authored note.
+ */
+export interface IUpdateJTBDNotePayload {
+  body: string;
+}
+
 // ============================================
 // Response Types
 // ============================================

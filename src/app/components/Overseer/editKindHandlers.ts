@@ -47,7 +47,7 @@ export interface EditKindHandlerContext {
   updateJTBDRule: (params: {
     ruleUuid: string;
     configUuid: string;
-    data: { ruleText?: string; isActive?: boolean };
+    data: { ruleText?: string };
   }) => Promise<unknown>;
   deleteJTBDRule: (params: {
     ruleUuid: string;
@@ -162,7 +162,7 @@ const handleJTBDRuleEdit: EditKindHandler = async (suggestion, ctx) => {
   const payload = suggestion.payload;
   if (!payload) return;
 
-  const { configUuid, action, ruleUuid, ruleText, isActive } = payload;
+  const { configUuid, action, ruleUuid, ruleText } = payload;
 
   if (action === 'add') {
     if (!ruleText) return;
@@ -176,16 +176,6 @@ const handleJTBDRuleEdit: EditKindHandler = async (suggestion, ctx) => {
       ruleUuid,
       configUuid,
       data: { ruleText },
-    });
-    return;
-  }
-
-  if (action === 'toggle') {
-    if (!ruleUuid || typeof isActive !== 'boolean') return;
-    await ctx.updateJTBDRule({
-      ruleUuid,
-      configUuid,
-      data: { isActive },
     });
     return;
   }
