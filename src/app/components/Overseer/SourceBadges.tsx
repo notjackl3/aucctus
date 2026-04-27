@@ -1,9 +1,13 @@
+import { SourcePill } from '@pages/JTBD/widgets';
 import React, { useState } from 'react';
 
 export interface Source {
   name: string;
   url?: string;
 }
+
+// Re-export the canonical SourcePill so existing importers keep working.
+export { SourcePill };
 
 const getFaviconUrl = (url?: string): string | null => {
   if (!url) return null;
@@ -13,32 +17,6 @@ const getFaviconUrl = (url?: string): string | null => {
   } catch {
     return null;
   }
-};
-
-const SourcePill: React.FC<{ source: Source }> = ({ source }) => {
-  const favicon = getFaviconUrl(source.url);
-  return (
-    <a
-      href={source.url || '#'}
-      target='_blank'
-      rel='noopener noreferrer'
-      className='inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium !text-white/60 no-underline backdrop-blur-sm transition-colors hover:border-white/15 hover:!text-white/80'
-    >
-      {favicon ? (
-        <img
-          src={favicon}
-          alt=''
-          className='h-3 w-3 rounded-full'
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
-          }}
-        />
-      ) : (
-        <div className='h-3 w-3 rounded-full bg-white/15' />
-      )}
-      {source.name}
-    </a>
-  );
 };
 
 interface SourceBadgesProps {
@@ -55,7 +33,7 @@ const SourceBadges: React.FC<SourceBadgesProps> = ({ sources }) => {
     return (
       <div className='mt-2.5 flex flex-wrap gap-1.5'>
         {sources.map((source, i) => (
-          <SourcePill key={i} source={source} />
+          <SourcePill key={i} source={source.name} url={source.url} />
         ))}
       </div>
     );
@@ -66,7 +44,7 @@ const SourceBadges: React.FC<SourceBadgesProps> = ({ sources }) => {
     return (
       <div className='mt-2.5 flex flex-wrap gap-1.5'>
         {sources.map((source, i) => (
-          <SourcePill key={i} source={source} />
+          <SourcePill key={i} source={source.name} url={source.url} />
         ))}
         <button
           onClick={(e) => {

@@ -1,4 +1,5 @@
 import { toast } from '@components';
+import { dismissConceptWorkflowToastForConcept } from '@hooks/sockets/useUniversalSocketEvents';
 import api from '@libs/api';
 import {
   EditConceptReportRequest,
@@ -6,12 +7,13 @@ import {
   IncubationAnswerUpdateRequest,
   IncubationAnswerUpdateResponse,
 } from '@libs/api/concepts';
-import { dismissConceptWorkflowToastForConcept } from '@hooks/sockets/useUniversalSocketEvents';
 import {
+  ConceptReportStatus,
+  IAssumptionBatchRequest,
   IAssumptionLifecycleAddRequest,
   IAssumptionLifecycleUpdateRequest,
-  IAssumptionBatchRequest,
   IConcept,
+  IConceptPage,
   IConceptQueryOptions,
   IConceptSeed,
   IConceptSeedCreate,
@@ -34,21 +36,19 @@ import {
   ISeedQueryOptions,
   ITrendsAndDrivers,
   IUserJourneyStep,
-  ConceptReportStatus,
-  IConceptPage,
   NotificationSectionKey,
 } from '@libs/api/types';
 import utils from '@libs/utils';
-import useStore from '@stores/store';
 import { normalizeReportSectionKey } from '@libs/utils/concepts';
+import useStore from '@stores/store';
 import { AxiosError } from 'axios';
+import { useEffect, useMemo } from 'react';
 import {
   QueryClient,
   useMutation,
   useQuery,
   useQueryClient,
 } from 'react-query';
-import { useEffect, useMemo } from 'react';
 import { useGenericConceptMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';
 
@@ -1827,10 +1827,6 @@ export const useCustomerJobDelete = () => {
           'jobs',
         ],
       });
-      toast.success(
-        'Job Deleted',
-        'Customer job has been removed successfully',
-      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);

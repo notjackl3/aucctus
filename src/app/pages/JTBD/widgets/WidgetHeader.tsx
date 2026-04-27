@@ -19,64 +19,96 @@ interface WidgetHeaderProps {
   pagination?: PaginationNav;
 }
 
+/**
+ * Slot for parent-injected header actions rendered to the right of the
+ * pagination chevrons (or right-aligned when no pagination is present).
+ *
+ * `WidgetRenderer` uses this context to inject the sparkle (refine) and
+ * trash (delete) buttons directly into each widget's header row, which
+ * eliminates the prior overlap between those buttons and the pagination
+ * chevrons that some widgets render in the same top-right corner.
+ *
+ * Contract: providers MUST render Framer Motion `motion.button` /
+ * accessible buttons. The header itself adds no styling around the slot —
+ * it just places the node after the pagination cluster (or pushes it to
+ * the right with `ml-auto` when pagination is absent).
+ */
+export const WidgetHeaderActionsContext =
+  React.createContext<React.ReactNode>(null);
+
 export const WidgetHeader: React.FC<WidgetHeaderProps> = ({
   icon,
   label,
   description,
   metadata,
   pagination,
-}) => (
-  <div className='mb-3'>
-    <div className='flex items-center gap-2'>
-      <span className='flex h-3.5 w-3.5 items-center justify-center text-white/70'>
-        {icon}
-      </span>
-      <span className='text-[10px] font-medium uppercase tracking-wider text-white/70'>
-        {label}
-      </span>
-      {metadata && (
-        <span className='text-[10px] text-white/30'>{metadata}</span>
-      )}
-      {pagination && pagination.total > 1 && (
-        <div className='ml-auto flex items-center gap-1.5'>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              pagination.onPrev();
-            }}
-            disabled={!pagination.canPrev}
-            className={cn(
-              'flex h-5 w-5 items-center justify-center rounded-full border border-white/[0.1] transition-colors',
-              pagination.canPrev
-                ? 'text-white/50 hover:bg-white/[0.08] hover:text-white/70'
-                : 'cursor-default text-white/15',
-            )}
-          >
-            <ChevronLeft className='h-3 w-3' />
-          </button>
-          <span className='min-w-[24px] text-center text-[10px] tabular-nums text-white/30'>
-            {pagination.currentIndex + 1}/{pagination.total}
-          </span>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              pagination.onNext();
-            }}
-            disabled={!pagination.canNext}
-            className={cn(
-              'flex h-5 w-5 items-center justify-center rounded-full border border-white/[0.1] transition-colors',
-              pagination.canNext
-                ? 'text-white/50 hover:bg-white/[0.08] hover:text-white/70'
-                : 'cursor-default text-white/15',
-            )}
-          >
-            <ChevronRight className='h-3 w-3' />
-          </button>
-        </div>
+}) => {
+  const headerActions = React.useContext(WidgetHeaderActionsContext);
+  const hasPagination = !!pagination && pagination.total > 1;
+  // When there's no pagination we still want the actions cluster to push
+  // to the right edge — apply `ml-auto` to whichever element is the first
+  // right-aligned child.
+  const paginationMlClass = hasPagination ? 'ml-auto' : '';
+  const actionsMlClass = hasPagination ? 'ml-1' : 'ml-auto';
+
+  return (
+    <div className='mb-3'>
+      <div className='flex items-center gap-2'>
+        <span className='flex h-3.5 w-3.5 items-center justify-center text-white/70'>
+          {icon}
+        </span>
+        <span className='text-[10px] font-medium uppercase tracking-wider text-white/70'>
+          {label}
+        </span>
+        {metadata && (
+          <span className='text-[10px] text-white/30'>{metadata}</span>
+        )}
+        {hasPagination && (
+          <div className={cn('flex items-center gap-1.5', paginationMlClass)}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                pagination!.onPrev();
+              }}
+              disabled={!pagination!.canPrev}
+              className={cn(
+                'flex h-5 w-5 items-center justify-center rounded-full border border-white/[0.1] transition-colors',
+                pagination!.canPrev
+                  ? 'text-white/50 hover:bg-white/[0.08] hover:text-white/70'
+                  : 'cursor-default text-white/15',
+              )}
+            >
+              <ChevronLeft className='h-3 w-3' />
+            </button>
+            <span className='min-w-[24px] text-center text-[10px] tabular-nums text-white/30'>
+              {pagination!.currentIndex + 1}/{pagination!.total}
+            </span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                pagination!.onNext();
+              }}
+              disabled={!pagination!.canNext}
+              className={cn(
+                'flex h-5 w-5 items-center justify-center rounded-full border border-white/[0.1] transition-colors',
+                pagination!.canNext
+                  ? 'text-white/50 hover:bg-white/[0.08] hover:text-white/70'
+                  : 'cursor-default text-white/15',
+              )}
+            >
+              <ChevronRight className='h-3 w-3' />
+            </button>
+          </div>
+        )}
+        {headerActions && (
+          <div className={cn('flex items-center gap-1', actionsMlClass)}>
+            {headerActions}
+          </div>
+        )}
+      </div>
+      {description && (
+        <p className='mt-1 text-[11px] text-white/40'>{description}</p>
       )}
     </div>
-    {description && (
-      <p className='mt-1 text-[11px] text-white/40'>{description}</p>
-    )}
-  </div>
-);
+  );
+};

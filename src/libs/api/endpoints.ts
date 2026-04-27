@@ -1169,6 +1169,10 @@ export class Endpoints {
     return `/api/v1/chat/overseer/conversations/${uuid}`;
   }
 
+  static overseerMessageResolution(messageUuid: string) {
+    return `/api/v1/chat/overseer/messages/${messageUuid}/resolution`;
+  }
+
   // ============================================
   // Dynamic Component Endpoints
   // ============================================
@@ -1519,11 +1523,23 @@ export class Endpoints {
     return `/api/v1/jtbd/configs/${configUuid}/current-scan/`;
   }
 
+  static jtbdScan(configUuid: string, scanUuid: string) {
+    return `/api/v1/jtbd/configs/${configUuid}/scans/${scanUuid}/`;
+  }
+
   static jtbdActiveScan(configUuid: string) {
     return `/api/v1/jtbd/configs/${configUuid}/active-scan/`;
   }
 
+  static jtbdJobs(configUuid: string) {
+    return `/api/v1/jtbd/configs/${configUuid}/jobs/`;
+  }
+
   static jtbdJob(jobUuid: string) {
+    return `/api/v1/jtbd/jobs/${jobUuid}/`;
+  }
+
+  static jtbdJobDelete(jobUuid: string) {
     return `/api/v1/jtbd/jobs/${jobUuid}/`;
   }
 
@@ -1531,8 +1547,28 @@ export class Endpoints {
     return `/api/v1/jtbd/jobs/${jobUuid}/ideate/`;
   }
 
+  static jtbdJobEdit(jobUuid: string) {
+    return `/api/v1/jtbd/jobs/${jobUuid}/edit/`;
+  }
+
+  static jtbdJobMerge(primaryUuid: string) {
+    return `/api/v1/jtbd/jobs/${primaryUuid}/merge/`;
+  }
+
   static jtbdEmailWhenReady(configUuid: string) {
     return `/api/v1/jtbd/configs/${configUuid}/email-when-ready/`;
+  }
+
+  // ============================================
+  // JTBD Job Notes (user-authored note widgets)
+  // ============================================
+
+  static jtbdJobNotes(jobUuid: string) {
+    return `/api/v1/jtbd/jobs/${jobUuid}/notes/`;
+  }
+
+  static jtbdNoteItem(itemUuid: string) {
+    return `/api/v1/jtbd/jobs/notes/${itemUuid}/`;
   }
 }
 

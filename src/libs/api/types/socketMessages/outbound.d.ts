@@ -183,6 +183,17 @@ export interface ICustomerProfileOutboundTypingMessage
 // ----------------
 
 /**
+ * Page-specific runtime state sent alongside Overseer messages. Used by the
+ * backend to hydrate page-specific context (e.g. on JTBD: which config is
+ * active, which scans are selected, which job the user is focused on).
+ */
+export interface IOverseerPageMetadata {
+  activeConfigUuid?: string;
+  selectedScanUuids?: string[];
+  selectedJobUuid?: string;
+}
+
+/**
  * Base interface for Overseer messages
  * Supports two modes:
  * 1. Concept mode: conceptUuid is required, accountUuid is optional
@@ -192,7 +203,12 @@ interface BaseOverseerMessage extends BaseSocketEvent {
   conceptUuid?: string;
   accountUuid?: string;
   pageContext: string;
-  mentions?: Array<{ uuid: string; name: string; type: 'concept' | 'persona' }>;
+  mentions?: Array<{
+    uuid: string;
+    name: string;
+    type: 'concept' | 'persona' | 'jtbd_job' | 'jtbd_widget';
+  }>;
+  pageMetadata?: IOverseerPageMetadata;
 }
 
 /**
@@ -284,6 +300,19 @@ export interface IPersonaChatOutboundMessage
 }
 
 // ----------------
+// Heartbeat Messages
+// ----------------
+
+/**
+ * Outbound heartbeat ping. The frontend sends this on an interval to keep the
+ * WebSocket connection alive and to detect silent TCP drops. The backend is
+ * expected to echo a `pong` message in response.
+ */
+export interface IPingMessage extends BaseSocketEvent {
+  type: 'ping';
+}
+
+// ----------------
 // Export Types
 // ----------------
 
@@ -291,6 +320,7 @@ export interface IPersonaChatOutboundMessage
  * Union type of all outbound socket events
  */
 export type OutboundSocketEvent =
+  | IPingMessage
   | IncubationAiSuggestionsRequestEvent
   | IAiEditingConversationStartMessage
   | IAiEditingOutboundChatMessage

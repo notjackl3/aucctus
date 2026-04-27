@@ -58,6 +58,7 @@ export interface IOverseerEditSuggestionMessage {
   timestamp: string;
   applied?: boolean;
   resolution?: 'applied' | 'declined';
+  editResolutions?: Record<number, 'accepted' | 'rejected'>;
 }
 
 /**
@@ -135,12 +136,14 @@ export interface IOverseerQueuedMessage {
 }
 
 /**
- * Mention item for @mentions
+ * Mention item for @mentions.
+ * The `id` is the UUID of the referenced entity; when the mention is
+ * serialized to the wire (outbound socket payload) it's mapped to `uuid`.
  */
 export interface MentionItem {
   id: string;
   name: string;
-  type: 'persona' | 'concept';
+  type: 'persona' | 'concept' | 'jtbd_job' | 'jtbd_widget';
   segment?: string;
   themeColor?: string;
   avatar?: string;
@@ -177,10 +180,19 @@ export interface IOverseerActions {
     images?: IOverseerPendingImage[];
     mentions?: MentionItem[];
   }) => void;
+  openWithPrefill: (params: {
+    message: string;
+    pageContext: string;
+    mention?: MentionItem;
+    contextType?: OverseerContextType;
+    conceptUuid?: string;
+    accountUuid?: string;
+  }) => void;
   openToHistory: () => void;
   close: () => void;
   sendMessage: () => Promise<void>;
   setCurrentMessage: (message: string) => void;
+  syncPageContext: (pageContext: string) => void;
   handleHandshake: (handshake: {
     sessionId: string;
     conceptUuid: string;
@@ -200,6 +212,7 @@ export interface IOverseerActions {
   clearSelectedText: () => void;
   // Dock actions
   setDocked: (value: boolean) => void;
+  setDockedWidth: (width: number) => void;
   // Feature toggle actions
   toggleFeature: (feature: OverseerFeature) => void;
   clearFeatures: () => void;
@@ -241,6 +254,7 @@ export interface IOverseerState extends IOverseerActions {
   isOpen: boolean;
   position: IOverseerPosition;
   isDocked: boolean;
+  dockedWidth: number;
 
   // Selection button state (shown before opening chat)
   showingSelectionButton: boolean;
@@ -306,4 +320,10 @@ export interface IOverseerState extends IOverseerActions {
 
   // Cancel state
   isCancelling: boolean;
+
+  // Prefill nonce — incremented each time `openWithPrefill` is invoked so
+  // consumers (e.g., `OverseerInput`) can detect a new prefill event and
+  // position the textarea caret at the end. Distinct from `currentMessage`
+  // so the caret isn't repositioned on every keystroke.
+  prefillNonce: number;
 }

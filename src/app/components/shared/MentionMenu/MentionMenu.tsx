@@ -1,6 +1,6 @@
 import { cn } from '@libs/utils/react';
 import { MentionItem } from '@stores/overseer/types';
-import { Lightbulb, Users } from 'lucide-react';
+import { Briefcase, Layers, Lightbulb, Users } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 export interface MentionMenuSection {
@@ -135,6 +135,14 @@ const MentionMenu: React.FC<MentionMenuProps> = ({
                       {item.name.charAt(0)}
                     </span>
                   )
+                ) : item.type === 'jtbd_job' ? (
+                  <span className='flex h-5 w-5 items-center justify-center rounded-full bg-sky-500/20'>
+                    <Briefcase className='h-3 w-3 stroke-sky-500' />
+                  </span>
+                ) : item.type === 'jtbd_widget' ? (
+                  <span className='flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20'>
+                    <Layers className='h-3 w-3 stroke-emerald-500' />
+                  </span>
                 ) : (
                   <span className='flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/20'>
                     <Lightbulb className='h-3 w-3 stroke-amber-300' />
@@ -156,13 +164,36 @@ const MentionMenu: React.FC<MentionMenuProps> = ({
 export default MentionMenu;
 
 /**
- * Helper to build standard persona + concept sections.
+ * Helper to build standard mention sections.
+ *
+ * Section order (JTBD-scoped entries first so they surface above the
+ * account-wide lists when the user is on the JTBD canvas):
+ *   Jobs → Widgets → Living Personas → Concept Bank
+ *
+ * `jobs` and `widgets` are optional — outside JTBD pages the caller simply
+ * omits them and the menu falls back to the personas + concepts behavior.
  */
 export function buildMentionSections(
   personas: MentionItem[] = [],
   concepts: MentionItem[] = [],
+  jobs: MentionItem[] = [],
+  widgets: MentionItem[] = [],
 ): MentionMenuSection[] {
   const sections: MentionMenuSection[] = [];
+  if (jobs.length > 0) {
+    sections.push({
+      label: 'Jobs',
+      icon: <Briefcase className='h-3 w-3' />,
+      items: jobs,
+    });
+  }
+  if (widgets.length > 0) {
+    sections.push({
+      label: 'Widgets',
+      icon: <Layers className='h-3 w-3' />,
+      items: widgets,
+    });
+  }
   if (personas.length > 0) {
     sections.push({
       label: 'Living Personas',

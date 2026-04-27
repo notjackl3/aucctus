@@ -1,5 +1,4 @@
 import api from '@libs/api';
-import { SocketService } from '@libs/api/base';
 import { InboundSocketEvent, InboundSocketEventType } from '@libs/api/types';
 import telemetry from '@libs/telemetry';
 import useStore from '@stores/store';
@@ -106,26 +105,4 @@ export function useSocketEvent<
 
     return unsubscribe;
   }, [eventName]);
-}
-
-export function useSocketMaxRetriesExceeded(
-  socketService: SocketService,
-): Error | null {
-  const [error, setError] = React.useState<Error | null>(null);
-
-  React.useEffect(() => {
-    if (!socketService) return;
-
-    const listener = (err: Error) => {
-      setError(err);
-    };
-
-    socketService.addMaxRetriesExceededListener(listener);
-
-    return () => {
-      socketService.removeMaxRetriesExceededListener(listener);
-    };
-  }, [socketService]);
-
-  return error;
 }

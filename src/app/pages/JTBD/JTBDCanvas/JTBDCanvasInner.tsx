@@ -1,16 +1,18 @@
 import { OpportunityMap } from '@components/IdeaPlayground';
 import AgentProgressBar from '@components/Progress/AgentProgressBar';
 import {
+  jtbdKeys,
   useIdeateFromJob,
   useJTBDActiveScan,
   useJTBDConfigs,
-  useJTBDCurrentScan,
+  useJTBDJobs,
   useJTBDScans,
   useJTBDScanSocketEvents,
   useTriggerJTBDScan,
 } from '@hooks/query/jtbd.hook';
 import type { IJTBDJob } from '@libs/api/types/jtbd';
 import { cn } from '@libs/utils/react';
+import useStore from '@stores/store';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, Puzzle, Radar, Search, Send, X } from 'lucide-react';
 import React, {
@@ -20,6 +22,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useQueryClient } from 'react-query';
 import { useSearchParams } from 'react-router-dom';
 
 import CreateJTBDConfigModal from '../CreateJTBDConfigModal';
@@ -31,6 +34,7 @@ import {
   matchesOpportunitySize,
   type JTBDFilters,
 } from '../JTBDFilterBar';
+import JTBDScanMultiSelect from '../JTBDScanMultiSelect';
 import { useJTBDView } from '../JTBDViewContext';
 import EmptyState from './EmptyState';
 import JTBDCardsSection from './JTBDCardsSection';
@@ -45,6 +49,14 @@ interface JTBDCanvasInnerProps {
 const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
   isAdmin = false,
 }) => {
+  // Overseer dock right-offset: when Overseer is docked+open, reserve the
+  // 412px right strip for the dock. The outer PrivateLayout skips its
+  // pr-[412px] on the JTBD route so the playground bg can extend beneath
+  // the dock; this applies the offset to inner content only.
+  const isOverseerOpen = useStore((s) => s.overseer.isOpen);
+  const isOverseerDocked = useStore((s) => s.overseer.isDocked);
+  const isDockActive = isOverseerOpen && isOverseerDocked;
+
   // View context
   const {
     activeConfigUuid,
@@ -53,7 +65,24 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
     setShowCreateModal,
     editConfigUuid,
     setEditConfigUuid,
+    selectedJobUuid,
+    setSelectedJobUuid,
   } = useJTBDView();
+
+  // Zustand bridge: mirror view state so Overseer (rendered outside this
+  // provider tree) can read the active config, selected scans, and selected job.
+  const setActiveConfigInStore = useStore(
+    (s) => s.jtbdActive.setActiveConfigUuid,
+  );
+  const setSelectedScanUuidsInStore = useStore(
+    (s) => s.jtbdActive.setSelectedScanUuids,
+  );
+  const setSelectedJobInStore = useStore(
+    (s) => s.jtbdActive.setSelectedJobUuid,
+  );
+  const resetJtbdActive = useStore((s) => s.jtbdActive.reset);
+
+  const queryClient = useQueryClient();
 
   // Data hooks
   const { configs, isLoading: isLoadingConfigs } = useJTBDConfigs();
@@ -68,9 +97,99 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
   const configUuid = activeConfigUuid ?? configs[0]?.uuid ?? '';
   const activeConfig = configs.find((c) => c.uuid === configUuid) ?? null;
 
-  const { jobs, isLoading: isLoadingScan } = useJTBDCurrentScan(configUuid);
   const { scans, isLoading: isLoadingScans } = useJTBDScans(configUuid);
   useJTBDScanSocketEvents(configUuid);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const selectedScanUuids = useMemo(() => {
+    const raw = searchParams.get('scans');
+    if (!raw) return [] as string[];
+    return raw.split(',').filter(Boolean);
+  }, [searchParams]);
+
+  const completedScanUuids = useMemo(
+    () => scans.filter((s) => s.status === 'completed').map((s) => s.uuid),
+    [scans],
+  );
+
+  const setSelectedScanUuids = useCallback(
+    (next: string[]) => {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next.length === 0) {
+            params.delete('scans');
+          } else {
+            params.set('scans', next.join(','));
+          }
+          return params;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
+  // Track which config we've already auto-seeded for so explicit deselection
+  // (user emptying the dropdown) is respected instead of being re-seeded.
+  const autoSeededConfigRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!configUuid) return;
+    if (completedScanUuids.length === 0) return;
+    if (autoSeededConfigRef.current === configUuid) return;
+
+    // Deep-link with ?scans=... — honor the URL and mark as seeded.
+    if (searchParams.has('scans')) {
+      autoSeededConfigRef.current = configUuid;
+      return;
+    }
+
+    const current =
+      scans.find((s) => s.isCurrent && s.status === 'completed')?.uuid ??
+      completedScanUuids[0];
+    if (current) {
+      setSelectedScanUuids([current]);
+    }
+    autoSeededConfigRef.current = configUuid;
+  }, [
+    configUuid,
+    completedScanUuids,
+    scans,
+    searchParams,
+    setSelectedScanUuids,
+  ]);
+
+  const effectiveSelection = useMemo(
+    () => selectedScanUuids.filter((uuid) => completedScanUuids.includes(uuid)),
+    [selectedScanUuids, completedScanUuids],
+  );
+
+  // Bridge JTBD view state → Zustand so Overseer (rendered above this tree)
+  // can attach pageMetadata to outbound WebSocket messages. Reset on unmount
+  // so stale state doesn't leak across routes (e.g. navigating to Nucleus).
+  useEffect(() => {
+    setActiveConfigInStore(activeConfigUuid ?? null);
+  }, [activeConfigUuid, setActiveConfigInStore]);
+
+  useEffect(() => {
+    setSelectedScanUuidsInStore(effectiveSelection);
+  }, [effectiveSelection, setSelectedScanUuidsInStore]);
+
+  useEffect(() => {
+    setSelectedJobInStore(selectedJobUuid);
+  }, [selectedJobUuid, setSelectedJobInStore]);
+
+  useEffect(() => {
+    return () => {
+      resetJtbdActive();
+    };
+  }, [resetJtbdActive]);
+
+  const { jobs, isLoading: isLoadingScan } = useJTBDJobs(
+    configUuid,
+    effectiveSelection,
+  );
 
   // Fetch active scan for start time (page-refresh resilience)
   const isScanning = !!activeConfig?.isScanning;
@@ -86,8 +205,18 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
 
   const { triggerScan, isTriggering } = useTriggerJTBDScan();
 
+  // Per-config set of jobs currently being edited by Ask Aucctus. Drives the
+  // per-card "Editing…" pill and the rescan-button gate.
+  const editingJobUuidsForConfigList = useStore(
+    (s) => s.jtbdActive.editingJobUuidsByConfig[configUuid],
+  );
+  const editingJobUuidsForConfig = useMemo(
+    () => new Set(editingJobUuidsForConfigList ?? []),
+    [editingJobUuidsForConfigList],
+  );
+  const isAnyEditActive = editingJobUuidsForConfig.size > 0;
+
   const { ideateFromJobAsync } = useIdeateFromJob();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [ideatingJobUuid, setIdeatingJobUuid] = useState<string | null>(null);
   const ideationSeedUuid = searchParams.get('seed') || null;
 
@@ -96,8 +225,13 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
       if (ideatingJobUuid) return;
       setIdeatingJobUuid(job.uuid);
       try {
-        const response = await ideateFromJobAsync(job.uuid);
-        setSearchParams({ mode: 'jtbd', seed: response.seedUuid });
+        const response = await ideateFromJobAsync({ jobUuid: job.uuid });
+        setSearchParams((prev) => {
+          const params = new URLSearchParams(prev);
+          params.set('mode', 'jtbd');
+          params.set('seed', response.seedUuid);
+          return params;
+        });
       } catch {
         // Error toast already shown by the hook
       } finally {
@@ -108,12 +242,16 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
   );
 
   const handleCloseOpportunityMap = useCallback(() => {
-    setSearchParams({ mode: 'jtbd' });
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      params.set('mode', 'jtbd');
+      params.delete('seed');
+      return params;
+    });
   }, [setSearchParams]);
 
   // UI state
   const [searchValue, setSearchValue] = useState('');
-  const [selectedJobUuid, setSelectedJobUuid] = useState<string | null>(null);
   const [filters, setFilters] = useState<JTBDFilters>({
     opportunitySize: 'ALL',
     evidenceStrength: 'ALL',
@@ -127,9 +265,16 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
 
   const isInitialLoad = isLoadingConfigs && configs.length === 0;
 
-  // Reset filters when switching configs
+  // Reset filters when switching configs (NOT on every setSearchParams identity change)
+  const prevConfigUuidRef = useRef<string | undefined>(activeConfigUuid);
   useEffect(() => {
+    if (prevConfigUuidRef.current === activeConfigUuid) return;
+    const isFirstAssignment = prevConfigUuidRef.current === undefined;
+    prevConfigUuidRef.current = activeConfigUuid;
+
     setSearchValue('');
+    // JTBDViewContext also clears selectedJobUuid when activeConfigUuid changes,
+    // but call the setter explicitly so this effect's reset list is self-contained.
     setSelectedJobUuid(null);
     setFailureDismissed(false);
     setFilters({
@@ -137,7 +282,29 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
       evidenceStrength: 'ALL',
       audience: 'ALL',
     });
-  }, [activeConfigUuid]);
+    // Preserve ?scans=... on first assignment (landing with a deep-link) and
+    // only clear it when the user actually switches to a different config.
+    if (!isFirstAssignment) {
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          params.delete('scans');
+          return params;
+        },
+        { replace: true },
+      );
+    }
+
+    // Drop every cached jobs query so `keepPreviousData` on useJTBDJobs can't
+    // leak the prior config's cards into the new config while it fetches
+    // (or stays disabled because the new config has no scans yet).
+    queryClient.removeQueries({ queryKey: [...jtbdKeys.all, 'jobs'] });
+    if (activeConfigUuid) {
+      queryClient.invalidateQueries({
+        queryKey: [...jtbdKeys.all, 'jobs', activeConfigUuid],
+      });
+    }
+  }, [activeConfigUuid, queryClient, setSearchParams, setSelectedJobUuid]);
 
   const showFailureBanner =
     !failureDismissed &&
@@ -157,9 +324,12 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
     return items;
   }, [jobs, filters]);
 
-  const handleCardClick = useCallback((job: IJTBDJob) => {
-    setSelectedJobUuid((prev) => (prev === job.uuid ? null : job.uuid));
-  }, []);
+  const handleCardClick = useCallback(
+    (job: IJTBDJob) => {
+      setSelectedJobUuid((prev) => (prev === job.uuid ? null : job.uuid));
+    },
+    [setSelectedJobUuid],
+  );
 
   const handleTriggerScan = useCallback(() => {
     if (configUuid && isAdmin) {
@@ -239,11 +409,16 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
     }
 
     return (
-      <div className='relative h-full w-full overflow-hidden'>
+      <div
+        className={cn(
+          'relative h-full w-full overflow-hidden transition-[padding] duration-300',
+          isDockActive && 'pr-[412px]',
+        )}
+      >
         {/* Scrollable content with snap */}
         <div
           ref={scrollContainerRef}
-          className='h-full overflow-auto'
+          className='no-scrollbar h-full'
           style={{ scrollSnapType: 'y proximity' }}
         >
           {/* Landing hero section */}
@@ -271,11 +446,18 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
                     {filteredJobs.length !== 1 ? 's' : ''} discovered
                   </p>
                 )}
-                {/* Config dropdown + rescan */}
+                {/* Config dropdown + scan multi-select + rescan */}
                 <div className='flex items-center justify-center gap-3 pt-2'>
                   <JTBDConfigDropdown
                     isAdmin={isAdmin}
                     onNewArea={handleNewArea}
+                  />
+                  <JTBDScanMultiSelect
+                    configUuid={configUuid}
+                    scans={scans}
+                    selectedScanUuids={effectiveSelection}
+                    onChange={setSelectedScanUuids}
+                    isAdmin={isAdmin}
                   />
                   <AnimatePresence>
                     {!isLoadingScans && isAdmin && (
@@ -284,7 +466,7 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.3 }}
                         onClick={handleTriggerScan}
-                        disabled={isTriggering || isScanning}
+                        disabled={isTriggering || isScanning || isAnyEditActive}
                         className='flex items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 transition-all hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50'
                       >
                         <Radar className='h-3.5 w-3.5' />
@@ -292,16 +474,18 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
                           ? 'Starting...'
                           : isScanning
                             ? 'Scanning...'
-                            : scans.length === 0
-                              ? 'Run First Scan'
-                              : 'Rescan'}
+                            : isAnyEditActive
+                              ? 'Ask Aucctus editing — wait…'
+                              : scans.length === 0
+                                ? 'Run First Scan'
+                                : 'Rescan'}
                       </motion.button>
                     )}
                   </AnimatePresence>
                 </div>
                 {/* Scan info */}
                 <div className='flex justify-center pt-1'>
-                  <ScanInfoLine scans={scans} jobCount={filteredJobs.length} />
+                  <ScanInfoLine scans={scans} jobs={filteredJobs} />
                 </div>
 
                 {/* Inline scan progress bar */}
@@ -404,15 +588,28 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
 
           {/* Cards section */}
           <div ref={cardsRef}>
-            <JTBDCardsSection
-              jobs={filteredJobs}
-              isLoading={isLoadingScan && filteredJobs.length === 0}
-              hasScans={scans.length > 0}
-              selectedJobUuid={selectedJobUuid}
-              onCardClick={handleCardClick}
-              onIdeate={handleIdeate}
-              ideatingJobUuid={ideatingJobUuid}
-            />
+            {effectiveSelection.length === 0 &&
+            completedScanUuids.length > 0 ? (
+              <div
+                className='px-8 pb-24 pt-8'
+                style={{ scrollSnapAlign: 'start' }}
+              >
+                <div className='py-20 text-center text-lg text-white/40'>
+                  Select one or more scans to view jobs
+                </div>
+              </div>
+            ) : (
+              <JTBDCardsSection
+                jobs={filteredJobs}
+                isLoading={isLoadingScan && filteredJobs.length === 0}
+                hasScans={scans.length > 0}
+                selectedJobUuid={selectedJobUuid}
+                onCardClick={handleCardClick}
+                onIdeate={handleIdeate}
+                ideatingJobUuid={ideatingJobUuid}
+                editingJobUuids={editingJobUuidsForConfig}
+              />
+            )}
           </div>
         </div>
 

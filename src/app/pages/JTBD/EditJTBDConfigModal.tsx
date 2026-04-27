@@ -26,6 +26,8 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useRef, useState } from 'react';
 
+import { useOverseerDockOffset } from '@hooks/useOverseerDockOffset';
+
 import { useJTBDView } from './JTBDViewContext';
 
 interface EditJTBDConfigModalProps {
@@ -45,6 +47,7 @@ const EditJTBDConfigModal: React.FC<EditJTBDConfigModalProps> = ({
   open,
   onOpenChange,
 }) => {
+  const overlayRightOffset = useOverseerDockOffset();
   const { config, isLoading } = useJTBDConfig(configUuid);
   const { configs } = useJTBDConfigs();
   const { updateConfig } = useUpdateJTBDConfig();
@@ -187,6 +190,7 @@ const EditJTBDConfigModal: React.FC<EditJTBDConfigModalProps> = ({
         titleIcon={<Settings size={18} className='text-white/80' />}
         titleClassName='text-white/80'
         animatedRim
+        rightOffset={overlayRightOffset}
         className='liquid-glass-dark-surface text-white'
       >
         <div className='space-y-4 p-6'>
@@ -211,6 +215,7 @@ const EditJTBDConfigModal: React.FC<EditJTBDConfigModalProps> = ({
         titleIcon={<Settings size={18} className='text-white/60' />}
         titleClassName='text-white'
         animatedRim
+        rightOffset={overlayRightOffset}
         className='liquid-glass-dark-surface'
       >
         <Dialog.Description className='sr-only'>
@@ -504,29 +509,37 @@ const EditJTBDConfigModal: React.FC<EditJTBDConfigModalProps> = ({
         onOpenChange={setShowDeleteConfirm}
       >
         <AlertDialog.Portal>
-          <AlertDialog.Overlay className='fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm' />
-          <AlertDialog.Content className='fixed left-1/2 top-1/2 z-[60] w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/15 bg-black/95 p-6 shadow-2xl backdrop-blur-xl'>
-            <AlertDialog.Title className='text-base font-semibold text-white'>
-              Delete discovery area?
-            </AlertDialog.Title>
-            <AlertDialog.Description className='mt-2 text-sm text-white/50'>
-              &quot;{config.name}&quot; and all its scan data will be
-              permanently removed. This cannot be undone.
-            </AlertDialog.Description>
-            <div className='mt-5 flex justify-end gap-2'>
-              <AlertDialog.Cancel asChild>
-                <button className='rounded-md border border-white/15 px-3 py-1.5 text-sm text-white/60 transition-colors hover:border-white/30 hover:text-white'>
-                  Cancel
-                </button>
-              </AlertDialog.Cancel>
-              <AlertDialog.Action asChild>
-                <button
-                  onClick={handleDelete}
-                  className='rounded-md bg-red-500/80 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-red-500'
-                >
-                  Delete
-                </button>
-              </AlertDialog.Action>
+          <AlertDialog.Overlay
+            className='fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm'
+            style={{ right: overlayRightOffset }}
+          />
+          <AlertDialog.Content
+            className='fixed inset-0 z-[60] flex items-center justify-center p-4'
+            style={{ right: overlayRightOffset }}
+          >
+            <div className='w-full max-w-sm rounded-xl border border-white/15 bg-black/95 p-6 shadow-2xl backdrop-blur-xl'>
+              <AlertDialog.Title className='text-base font-semibold text-white'>
+                Delete discovery area?
+              </AlertDialog.Title>
+              <AlertDialog.Description className='mt-2 text-sm text-white/50'>
+                &quot;{config.name}&quot; and all its scan data will be
+                permanently removed. This cannot be undone.
+              </AlertDialog.Description>
+              <div className='mt-5 flex justify-end gap-2'>
+                <AlertDialog.Cancel asChild>
+                  <button className='rounded-md border border-white/15 px-3 py-1.5 text-sm text-white/60 transition-colors hover:border-white/30 hover:text-white'>
+                    Cancel
+                  </button>
+                </AlertDialog.Cancel>
+                <AlertDialog.Action asChild>
+                  <button
+                    onClick={handleDelete}
+                    className='rounded-md bg-red-500/80 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-red-500'
+                  >
+                    Delete
+                  </button>
+                </AlertDialog.Action>
+              </div>
             </div>
           </AlertDialog.Content>
         </AlertDialog.Portal>

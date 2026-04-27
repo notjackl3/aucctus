@@ -42,7 +42,8 @@ export type JTBDWidgetType =
   | 'social_post'
   | 'survey'
   | 'sparkline_stat'
-  | 'market_sizing';
+  | 'market_sizing'
+  | 'note';
 
 export type JTBDChartType = 'bar' | 'pie';
 
@@ -191,6 +192,23 @@ export interface IJTBDMarketSizingItem {
   displayOrder: number;
 }
 
+/**
+ * User-authored note attached to a JTBD job.
+ * Notes live on a `note`-type widget; they are NOT AI-authored and survive
+ * job re-assessment / cumulative-merge job supersession on the backend.
+ */
+export interface IJTBDNoteItem {
+  uuid: string;
+  body: string;
+  /** UUID of the user who created the note (null if the user was removed). */
+  createdByUuid: string | null;
+  /** Display name of the author, resolved server-side. */
+  createdByName: string | null;
+  createdAt: string;
+  updatedAt: string;
+  displayOrder: number;
+}
+
 // ============================================
 // Custom Widget Type (flat polymorphic)
 // ============================================
@@ -213,6 +231,7 @@ export interface IJTBDCustomWidget {
   surveyItems: IJTBDSurveyItem[];
   sparklineStatItems: IJTBDSparklineStatItem[];
   marketSizingItems: IJTBDMarketSizingItem[];
+  noteItems: IJTBDNoteItem[];
 }
 
 // ============================================
@@ -223,7 +242,8 @@ export interface IJTBDConstraintSource {
   sourceLabel: string;
   sourceUrl: string;
   sourceType?: string;
-  field: string;
+  field: 'root_constraint' | 'solution_landscape' | 'capability_fit' | 'widget';
+  snippet?: string;
 }
 
 // ============================================
@@ -265,6 +285,7 @@ export interface IJTBDJob {
   createdAt: string;
   agentLastUpdated: string | null;
   mergedFromScanUuid: string | null;
+  mergeRationale: string | null;
 
   // Video
   videoUrl: string | null;
@@ -287,6 +308,7 @@ export interface IJTBDScan {
   jobsDiscovered: number;
   scannedAt: string;
   completedAt: string | null;
+  jobCount?: number;
 }
 
 export interface IJTBDScanDetail extends IJTBDScan {
@@ -326,6 +348,13 @@ export interface IJTBDConfigList {
   isScanning: boolean;
   lastScanStatus?: JTBDScanStatus;
   lastScanError?: string;
+  /**
+   * Job UUIDs with an Ask Aucctus edit currently in flight for this config.
+   * Populated from backend Redis-backed edit tracking; hydrates the per-job
+   * editing badge + rescan-button gate after a page refresh and carries
+   * cross-client state alongside the WS event stream.
+   */
+  activeEditJobUuids: string[];
 }
 
 export interface IJTBDConfigDetail {
@@ -341,6 +370,11 @@ export interface IJTBDConfigDetail {
   isScanning: boolean;
   lastScanStatus?: JTBDScanStatus;
   lastScanError?: string;
+  /**
+   * Job UUIDs with an Ask Aucctus edit currently in flight for this config.
+   * See `IJTBDConfigList.activeEditJobUuids` — identical semantics.
+   */
+  activeEditJobUuids: string[];
 }
 
 // ============================================
@@ -366,6 +400,21 @@ export interface IAddJTBDRulePayload {
 
 export interface IUpdateJTBDRulePayload {
   ruleText?: string;
+  isActive?: boolean;
+}
+
+/**
+ * Payload for creating a user-authored note on a JTBD job.
+ */
+export interface ICreateJTBDNotePayload {
+  body: string;
+}
+
+/**
+ * Payload for updating an existing user-authored note.
+ */
+export interface IUpdateJTBDNotePayload {
+  body: string;
 }
 
 // ============================================
@@ -398,4 +447,85 @@ export interface IJTBDGeneratedRule {
 export interface IJTBDRuleGenerationResponse {
   taskId: string;
   message: string;
+}
+
+// ============================================
+// Unified Job Edit Types
+// ============================================
+
+/**
+ * Scope discriminator for the unified `POST /jtbd/jobs/{uuid}/edit/` endpoint.
+ * Mirrors the carousel-level `IJTBDJobEditScope` in `ai-editing.d.ts` but
+ * lives here for API-layer consumers that don't want to depend on the
+ * carousel types module.
+ */
+export type IJTBDEditJobScope =
+  | { kind: 'widget'; widgetUuid: string }
+  | { kind: 'job' }
+  | { kind: 'widget_add' }
+  | {
+      kind: 'constraint_field';
+      field: 'root_constraint' | 'solution_landscape';
+    };
+
+/**
+ * Request body for the unified job-edit endpoint. `userMessage` is the raw
+ * user text (as surfaced in the Overseer chat) while
+ * `agentImplementationInstructions` is the agent-authored, actionable
+ * restatement used by the downstream research agent.
+ */
+export interface IJTBDEditJobRequest {
+  userMessage: string;
+  agentImplementationInstructions: string;
+  scope: IJTBDEditJobScope;
+}
+
+/**
+ * 202 response — the request was queued. The refreshed job arrives later
+ * via the `jtbd.job.edited.account` WebSocket event.
+ */
+export interface IJTBDEditJobResponse {
+  taskId: string;
+  jobUuid: string;
+}
+
+// ============================================
+// Unified Job Merge Types
+// ============================================
+
+/**
+ * Request body for `POST /jtbd/jobs/{primary_uuid}/merge/`.
+ * `userMessage` is the user-facing description (as shown on the carousel
+ * card); `mergeInstructions` is the optional agent-authored guidance for the
+ * merge pipeline; `secondaryJobUuids` lists the jobs to merge into the
+ * primary (1-4 secondaries). Either text field may be empty/null.
+ */
+export interface IJTBDMergeJobsRequest {
+  userMessage: string;
+  mergeInstructions: string | null;
+  secondaryJobUuids: string[];
+}
+
+/**
+ * 202 response — the merge pipeline was queued. The refreshed primary job
+ * arrives later via the `jtbd.jobs.merged.account` WebSocket event; the
+ * secondary jobs are deleted once the merge completes.
+ */
+export interface IJTBDMergeJobsAccepted {
+  taskId: string;
+  primaryJobUuid: string;
+  secondaryJobUuids: string[];
+}
+
+// ============================================
+// Ideation Types
+// ============================================
+
+/**
+ * Wire-level payload for `POST /jtbd/jobs/{job_uuid}/ideate/`. Distinct from
+ * the carousel-level `IJTBDIdeatePayload` in `ai-editing.d.ts`, which carries
+ * the target `jobUuid` alongside the instructions.
+ */
+export interface IJTBDIdeateRequest {
+  generationInstructions?: string;
 }

@@ -14,7 +14,7 @@ For enforced type checking and linting workflows, use the frontend output style:
 - Enforces `npm run type-check` after code changes
 - Requires `npm run lint` to pass
 - Mandates iterative fixing until all checks pass
-- Emphasizes Framer Motion animations and Radix UI usage
+- Emphasizes Framer Motion animations and native React portal implementations
 - Makes validation a core part of the development workflow
 
 **How to activate:**
@@ -189,31 +189,22 @@ import { motion } from 'framer-motion';
 ))}
 ```
 
-### Radix UI (Accessible Primitives)
-**Comprehensive collection of unstyled, accessible UI primitives.** Available components:
-- `@radix-ui/react-dialog` - Modal dialogs
-- `@radix-ui/react-dropdown-menu` - Dropdown menus
-- `@radix-ui/react-popover` - Popovers
-- `@radix-ui/react-tooltip` - Tooltips
-- `@radix-ui/react-accordion` - Accordions
-- `@radix-ui/react-tabs` - Tab navigation
-- `@radix-ui/react-select` - Select inputs
-- `@radix-ui/react-checkbox` - Checkboxes
-- `@radix-ui/react-switch` - Toggle switches
-- `@radix-ui/react-slider` - Range sliders
-- `@radix-ui/react-progress` - Progress bars
-- `@radix-ui/react-toast` - Toast notifications
-- `@radix-ui/react-toggle` - Toggle buttons
-- `@radix-ui/react-toggle-group` - Toggle button groups
-- `@radix-ui/react-separator` - Dividers
-- `@radix-ui/react-navigation-menu` - Navigation menus
-- `@radix-ui/react-context-menu` - Context menus
-- `@radix-ui/react-hover-card` - Hover cards
-- `@radix-ui/react-label` - Form labels
-- `@radix-ui/react-alert-dialog` - Alert dialogs
-- `@radix-ui/react-aspect-ratio` - Aspect ratio containers
+### No Radix UI — Use React Portals and Native Implementations
 
-Use Radix primitives for accessible, keyboard-friendly components, then style with Aucctus theme classes.
+**Radix UI is disallowed in this codebase.** Do not import from `@radix-ui/*`. For overlay/popover/menu/dialog behavior, build native implementations using:
+
+- `createPortal` from `react-dom` to escape stacking/overflow contexts (render into `document.body`)
+- Native `<button>`, `<dialog>`, and semantic HTML as triggers/containers
+- Refs + `getBoundingClientRect` for positioning anchored overlays
+- `useEffect` listeners for outside-click dismissal (`mousedown`) and Escape-to-close (`keydown`)
+- ARIA attributes applied directly: `role="menu"` / `role="menuitemcheckbox"` / `aria-checked` / `aria-expanded` / `aria-haspopup` / `aria-label`
+- Framer Motion's `AnimatePresence` + `motion.div` for enter/exit animations
+
+Reference implementations already in the codebase:
+- `src/app/pages/JTBD/JTBDCard.tsx` (expanded-card overlay via `createPortal(..., document.body)`)
+- `src/app/pages/JTBD/JTBDScanMultiSelect.tsx` (portal-based dropdown menu with outside-click, Escape, and role-based a11y)
+
+Rationale: keep the dependency surface small, keep styling 100% under Aucctus theme control, and avoid Radix's ref-forwarding / `asChild` idioms that conflict with Framer Motion's `motion.button`.
 
 ## Feature Flags
 Defined in `vite.config.mts` and `.env`:

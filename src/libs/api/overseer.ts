@@ -34,4 +34,18 @@ export class OverseerApi extends ApiService {
       endpoints.overseerConversationDetail(uuid),
     );
   }
+
+  /**
+   * Set the resolution (applied/declined) on an edit-suggestion message.
+   */
+  setMessageResolution(
+    messageUuid: string,
+    resolution: 'applied' | 'declined',
+    editResolutions?: Record<number, 'accepted' | 'rejected'>,
+  ) {
+    return this.patch(endpoints.overseerMessageResolution(messageUuid), {
+      resolution,
+      ...(editResolutions ? { editResolutions } : {}),
+    });
+  }
 }

@@ -23,6 +23,13 @@ interface OverseerInputProps {
   personaItems?: MentionItem[];
   isThinking?: boolean;
   onCancel?: () => void;
+  /**
+   * Monotonically-increasing counter from the Overseer store. Each invocation
+   * of `openWithPrefill` bumps this value; the input watches it and moves the
+   * caret to the end of the prefilled text (instead of the default index 0
+   * that results from focusing a textarea with existing content).
+   */
+  prefillNonce?: number;
 }
 
 /**
@@ -47,6 +54,7 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
   personaItems,
   isThinking = false,
   onCancel,
+  prefillNonce,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,6 +84,21 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
     textarea.style.height = 'auto';
     textarea.style.height = `${Math.min(textarea.scrollHeight, 72)}px`;
   }, [value]);
+
+  // Move the caret to the end whenever the Overseer store signals a fresh
+  // prefill. The nonce changes once per `openWithPrefill` call, so this does
+  // not interfere with normal typing (which only mutates `value`). Skipping
+  // when there's no content avoids a redundant focus on empty prefills.
+  useEffect(() => {
+    if (prefillNonce === undefined) return;
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    const end = textarea.value.length;
+    if (end === 0) return;
+    textarea.focus();
+    textarea.setSelectionRange(end, end);
+    textarea.scrollTop = textarea.scrollHeight;
+  }, [prefillNonce]);
 
   const handleSubmit = useCallback(() => {
     if (value.trim() || pendingImages.length > 0 || isThinking) {

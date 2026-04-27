@@ -2,6 +2,7 @@ export { CardListWidget } from './CardListWidget';
 export { ItemSources } from './ItemSources';
 export { MarketSizingWidget } from './MarketSizingWidget';
 export { MetricChartWidget } from './MetricChartWidget';
+export { NoteWidget } from './NoteWidget';
 export { SocialPostWidget } from './SocialPostWidget';
 export { SourcePill } from './SourcePill';
 export { SparklineStatWidget } from './SparklineStatWidget';

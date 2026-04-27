@@ -6,8 +6,14 @@ import type {
   IJTBDConfigDetail,
   IJTBDConfigDocument,
   IJTBDConfigList,
+  IJTBDCustomWidget,
+  IJTBDEditJobRequest,
+  IJTBDEditJobResponse,
+  IJTBDIdeateRequest,
   IJTBDIdeateResponse,
   IJTBDJob,
+  IJTBDMergeJobsAccepted,
+  IJTBDMergeJobsRequest,
   IJTBDMessageResponse,
   IJTBDRefreshResponse,
   IJTBDRule,
@@ -15,7 +21,9 @@ import type {
   IJTBDScan,
   IJTBDScanDetail,
   ICreateJTBDConfigPayload,
+  ICreateJTBDNotePayload,
   IUpdateJTBDConfigPayload,
+  IUpdateJTBDNotePayload,
   IAddJTBDRulePayload,
   IUpdateJTBDRulePayload,
 } from './types/jtbd';
@@ -99,9 +107,15 @@ export class JtbdApi extends ApiService {
 
   /**
    * Clone a JTBD config (creates a duplicate with all rules and documents).
+   * Accepts an optional `newName` body that overrides the backend's default
+   * clone naming policy ("{original} (copy)"). Sent as a partial payload so
+   * callers that want the default can invoke with no arguments.
    */
-  cloneConfig(configUuid: string) {
-    return this.post<IJTBDConfigDetail>(endpoints.jtbdConfigClone(configUuid));
+  cloneConfig(configUuid: string, body?: { newName?: string | null }) {
+    return this.post<IJTBDConfigDetail, { newName?: string | null }>(
+      endpoints.jtbdConfigClone(configUuid),
+      body ?? {},
+    );
   }
 
   // ============================================
@@ -205,9 +219,33 @@ export class JtbdApi extends ApiService {
     return this.get<IJTBDActiveScan>(endpoints.jtbdActiveScan(configUuid));
   }
 
+  /**
+   * Delete a completed or failed (non-current) scan and its jobs.
+   * 409 if the scan is current or still running.
+   */
+  deleteScan(configUuid: string, scanUuid: string) {
+    return this.delete<IJTBDMessageResponse>(
+      endpoints.jtbdScan(configUuid, scanUuid),
+    );
+  }
+
   // ============================================
   // Jobs
   // ============================================
+
+  /**
+   * List jobs for a config. When `scanUuids` is provided, returns the union
+   * of jobs across those scans; otherwise returns the current scan's jobs.
+   */
+  listJobs(configUuid: string, scanUuids?: string[]) {
+    const params = new URLSearchParams();
+    scanUuids?.forEach((uuid) => params.append('scan_uuids', uuid));
+    const query = params.toString();
+    const url = query
+      ? `${endpoints.jtbdJobs(configUuid)}?${query}`
+      : endpoints.jtbdJobs(configUuid);
+    return this.get<IJTBDJob[]>(url);
+  }
 
   /**
    * Get a single JTBD job with nested widgets, items, and sources.
@@ -217,11 +255,54 @@ export class JtbdApi extends ApiService {
   }
 
   /**
+   * Permanently delete a JTBD job and all of its widgets. Returns 204 with no
+   * body on success. A 409 response with `code: "locked"` indicates the job is
+   * currently being edited or merged (see `details.lockedJobUuid`).
+   */
+  deleteJob(jobUuid: string) {
+    return this.delete<void>(endpoints.jtbdJobDelete(jobUuid));
+  }
+
+  /**
    * Trigger concept ideation from a JTBD job.
    * Creates a Seed + AnchorThought and dispatches the ideation pipeline.
+   * Accepts an optional `generationInstructions` string (capped at 2000 chars
+   * by the backend) that is piped into the concept ideation agent as free-form
+   * user guidance.
    */
-  ideateFromJob(jobUuid: string) {
-    return this.post<IJTBDIdeateResponse>(endpoints.jtbdIdeateFromJob(jobUuid));
+  ideateFromJob(jobUuid: string, payload?: IJTBDIdeateRequest) {
+    return this.post<IJTBDIdeateResponse, IJTBDIdeateRequest>(
+      endpoints.jtbdIdeateFromJob(jobUuid),
+      payload ?? {},
+    );
+  }
+
+  /**
+   * Unified JTBD job-edit entry point. A single call whose `scope`
+   * discriminates widget-edit / whole-job-edit / widget-add semantics.
+   * Returns 202 with a task ID; the refreshed job arrives via the
+   * `jtbd.job.edited.account` WebSocket event. Backend responds 409
+   * (`job_edit_in_progress`) if an edit is already running for this job.
+   */
+  editJob(jobUuid: string, body: IJTBDEditJobRequest) {
+    return this.post<IJTBDEditJobResponse, IJTBDEditJobRequest>(
+      endpoints.jtbdJobEdit(jobUuid),
+      body,
+    );
+  }
+
+  /**
+   * User-initiated merge of JTBD jobs. The secondaries are deleted and their
+   * notes are migrated to the primary; the refreshed primary arrives via
+   * the `jtbd.jobs.merged.account` WebSocket event. Returns 202 with a task
+   * ID. A 409 response with `error: "locked"` indicates one of the jobs is
+   * already being edited/merged (see `details.lockedJobUuid`).
+   */
+  mergeJobs(primaryUuid: string, body: IJTBDMergeJobsRequest) {
+    return this.post<IJTBDMergeJobsAccepted, IJTBDMergeJobsRequest>(
+      endpoints.jtbdJobMerge(primaryUuid),
+      body,
+    );
   }
 
   /**
@@ -232,5 +313,38 @@ export class JtbdApi extends ApiService {
     return this.post<IJTBDMessageResponse>(
       endpoints.jtbdEmailWhenReady(configUuid),
     );
+  }
+
+  // ============================================
+  // User-authored Notes
+  // ============================================
+
+  /**
+   * Create a user-authored note on a JTBD job. Returns the full widget payload
+   * (a `note`-type `IJTBDCustomWidget`) so the caller can splice it directly
+   * into the job's widgets list.
+   */
+  createNote(jobUuid: string, payload: ICreateJTBDNotePayload) {
+    return this.post<IJTBDCustomWidget, ICreateJTBDNotePayload>(
+      endpoints.jtbdJobNotes(jobUuid),
+      payload,
+    );
+  }
+
+  /**
+   * Update the body of an existing note item.
+   */
+  updateNote(itemUuid: string, payload: IUpdateJTBDNotePayload) {
+    return this.put<IJTBDMessageResponse, IUpdateJTBDNotePayload>(
+      endpoints.jtbdNoteItem(itemUuid),
+      payload,
+    );
+  }
+
+  /**
+   * Delete a note item (and its parent widget when it's the last note).
+   */
+  deleteNote(itemUuid: string) {
+    return this.delete<IJTBDMessageResponse>(endpoints.jtbdNoteItem(itemUuid));
   }
 }

@@ -22,6 +22,8 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useOverseerDockOffset } from '@hooks/useOverseerDockOffset';
+
 import { useJTBDView } from './JTBDViewContext';
 
 type Step = 'loading' | 'review' | 'success';
@@ -63,6 +65,7 @@ const CreateJTBDConfigModal: React.FC<CreateJTBDConfigModalProps> = ({
   onCreated,
   initialDescription,
 }) => {
+  const overlayRightOffset = useOverseerDockOffset();
   const [step, setStep] = useState<Step>('loading');
   const [description, setDescription] = useState('');
   const [viewName, setViewName] = useState('');
@@ -338,10 +341,14 @@ const CreateJTBDConfigModal: React.FC<CreateJTBDConfigModalProps> = ({
             transition={{ duration: 0.2, ease: 'easeOut' }}
             onClick={handleClose}
             className='glass-modal-overlay fixed inset-0 z-50'
+            style={{ right: overlayRightOffset }}
           />
 
           {/* Modal */}
-          <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
+          <div
+            className='fixed inset-0 z-50 flex items-center justify-center p-4'
+            style={{ right: overlayRightOffset }}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}

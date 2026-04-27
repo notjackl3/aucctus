@@ -2,6 +2,16 @@
 
 Use this checklist to systematically evaluate UI/UX quality.
 
+## Step 0 — Identify the Surface
+
+Every Aucctus page is one of three surface types. Audit criteria differ by surface.
+
+- [ ] **Surface 1 — Light Report** (Concepts list, Concept Report, Nucleus, Settings): near-white bg, dark text, rectangular cards, no glass
+- [ ] **Surface 2 — Dark Glass Canvas** (Idea Playground, JTBD, Watchtower): dark gradient bg, floating `.liquid-glass-dark` cards, white text
+- [ ] **Surface 3 — Glass Rim Modal** (any `<LiquidGlassModal>`): blurred overlay, rim-shell-surface modal
+
+If the page doesn't fit any of these, flag it — it may be introducing a new surface type that needs design alignment.
+
 ## Visual Hierarchy
 
 - [ ] Primary content is immediately visible
@@ -158,6 +168,38 @@ Use this checklist to systematically evaluate UI/UX quality.
 - [ ] Animations smooth (60fps)
 - [ ] No unnecessary re-renders
 
+## Glassmorphic System (Surface 2 and Surface 3)
+
+Apply these checks **in addition** to the sections above when auditing dark canvas or modal surfaces. See `AUCCTUS-THEME.md` for the class reference.
+
+### Dark Canvas Surface (Surface 2)
+
+- [ ] Background is a deep gradient (not a flat color); confirm the radial/linear gradient is defined at the page-level container, not inherited accidentally
+- [ ] Cards use a named `.liquid-glass-*` class (preferred `.liquid-glass-dark`) rather than hand-rolled `bg-white/10 border backdrop-blur` combos
+- [ ] Text is white or `white/90`; sub-text uses `white/70` or `white/60`
+- [ ] Glass contrast holds across the entire gradient — sample the card against both the darkest and lightest region of the bg
+- [ ] No glass-on-glass stacking: one glass layer per depth
+- [ ] Hover state is a visible opacity bump (e.g. `bg-white/10` → `bg-white/15`) and a border shift, not nothing
+- [ ] `overflow: hidden` is preserved on glass containers — the rim/chromatic `::before` overlays depend on it
+- [ ] No heavy solid shadows on glass cards — rely on the inner-glow / rim for separation
+
+### Glass Rim Modal (Surface 3)
+
+- [ ] Modal is a `<LiquidGlassModal>` (or a legacy modal that still applies `.liquid-glass-modal-shell` + `.liquid-glass-modal-rim`) — not a raw `Dialog.Content`
+- [ ] The rim is visible around all four sides — if the content pushes flush to the edge, the rim is broken
+- [ ] Overlay uses `.glass-modal-overlay` (blurred, slightly dark) — not a raw `bg-black/50`
+- [ ] Size token (`sm` / `md` / `lg` / `xl`) matches content density
+- [ ] Destructive actions use `variant="danger"` (red rim) — not a default rim with a red button
+- [ ] `animatedRim` is used sparingly (Create Persona, Overseer) — default rim everywhere else
+- [ ] Close button is present unless intentionally hidden (`hideCloseButton`)
+- [ ] Focus is trapped inside the modal; Escape closes it (Radix handles this — confirm by tabbing)
+- [ ] Content inside the modal uses the light-surface theme classes (`aucctus-text-primary`, `aucctus-bg-primary`, etc.) — the rim provides the glass, the surface stays readable
+
+### CSS Variables
+
+- [ ] No direct override of `--glass-*` variables at the component level unless intentional; prefer composing the provided classes
+- [ ] `--persona-color` is set on the parent when using `.liquid-glass-persona`
+
 ## Common Anti-Patterns to Fix
 
 1. **Hardcoded colors**: Replace with `aucctus-*` classes
@@ -167,3 +209,7 @@ Use this checklist to systematically evaluate UI/UX quality.
 5. **Missing states**: Add hover, focus, disabled, loading states
 6. **Raw Tailwind colors**: Use semantic theme colors
 7. **Fixed pixel values**: Use responsive/relative units
+8. **Hand-rolled glass**: Replace `bg-white/10 border border-white/20 backdrop-blur-md` chains with the matching `.liquid-glass-*` class
+9. **Raw Radix `<Dialog.Content>`**: Replace with `<LiquidGlassModal>` so the rim + overlay apply
+10. **Glass on light surfaces**: Don't use `.liquid-glass-dark` on a white report page — either switch the surface to dark canvas or drop the glass
+11. **Missing rim**: A flat dark panel on a dark overlay is almost always a `<LiquidGlassModal>` regression — grep the component and restore the wrapper

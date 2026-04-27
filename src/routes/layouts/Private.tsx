@@ -4,6 +4,7 @@ import { FloatingSearchBar } from '@components/Overseer/FloatingSearchBar';
 import { OverseerProvider } from '@context/OverseerProvider';
 import { useAccountBranding } from '@hooks/query/accountBranding.hook';
 import { useConcepts } from '@hooks/query/concepts.hook';
+import { useJTBDJobs } from '@hooks/query/jtbd.hook';
 import { usePersonas } from '@hooks/query/persona.hook';
 import { useOverseerRouteConfig } from '@hooks/useOverseerRouteConfig';
 import { cn } from '@libs/utils/react';
@@ -16,7 +17,12 @@ import type {
 } from '@stores/overseer/types';
 import useStore from '@stores/store';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import {
+  Navigate,
+  Outlet,
+  useLocation,
+  useSearchParams,
+} from 'react-router-dom';
 
 const PrivateLayout = () => {
   const account = useStore((state) => state.auth.account);
@@ -31,6 +37,7 @@ const PrivateLayout = () => {
   const sendMessage = useStore((state) => state.overseer.sendMessage);
 
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { isEnabled, pageContext } = useOverseerRouteConfig();
   const isOverseerEnabled = isEnabled;
 
@@ -39,6 +46,7 @@ const PrivateLayout = () => {
   const highlightedSectionId = useStore(
     (state) => state.overseer.highlightedSectionId,
   );
+  const syncPageContext = useStore((state) => state.overseer.syncPageContext);
   const prevPageContext = useRef(pageContext);
   useEffect(() => {
     if (
@@ -52,6 +60,12 @@ const PrivateLayout = () => {
     prevPageContext.current = pageContext;
   }, [pageContext, isOpen, closeOverseer, highlightedSectionId]);
 
+  useEffect(() => {
+    if (pageContext) {
+      syncPageContext(pageContext);
+    }
+  }, [pageContext, syncPageContext]);
+
   const shouldApplyDockPadding = isOverseerEnabled && isOpen && isDocked;
 
   // Hide search bar during persona widget layout editing
@@ -60,13 +74,32 @@ const PrivateLayout = () => {
   // Hide search bar during first-run initiation screens
   const isShowingInitiation = useInitiationStore((s) => s.isShowingInitiation);
 
-  // Floating search bar visibility — shown on all pages except excluded routes
+  // Floating search bar visibility — shown on all pages except excluded routes.
+  // `/playground` normally hides the bar (ideation has its own search UI), but
+  // when users switch to JTBD mode (`?mode=jtbd`) we surface the bar so
+  // Overseer is available on the JTBD canvas.
+  const isPlaygroundJtbdMode =
+    location.pathname.startsWith('/playground') &&
+    searchParams.get('mode') === 'jtbd';
+
+  // JTBD renders its own full-viewport background inside the playground route;
+  // skip the layout-level right dock padding so the bg extends under the
+  // Overseer dock. JTBD content applies the offset internally instead.
+  const shouldApplyLayoutDockPadding =
+    shouldApplyDockPadding && !isPlaygroundJtbdMode;
+  const isPlaygroundBlocked =
+    location.pathname.startsWith('/playground') && !isPlaygroundJtbdMode;
   const isSearchBarVisible =
-    !location.pathname.startsWith('/playground') &&
+    !isPlaygroundBlocked &&
     !location.pathname.startsWith('/concept/incubate') &&
     !isOpen &&
     !isEditingLayout &&
     !isShowingInitiation;
+
+  // Playground/JTBD owns its own full-viewport background and already reserves
+  // bottom space internally (JTBDCardsSection pb-24), so skip the layout-level
+  // pb-20 to avoid revealing the outer bg behind the search bar.
+  const shouldApplyBottomPadding = isSearchBarVisible && !isPlaygroundJtbdMode;
 
   // Fetch branding for floating search bar orb colors
   const { branding } = useAccountBranding();
@@ -100,6 +133,51 @@ const PrivateLayout = () => {
       avatar: p.avatar,
     }));
   }, [personaList]);
+
+  // JTBD mention items — surface jobs on the active canvas and widgets on the
+  // currently-expanded job. Only populated on the JTBD canvas (pageContext ===
+  // 'jtbd') so other routes pay no cost and retain the existing mention menu
+  // behavior (personas + concepts only).
+  const jtbdActiveConfigUuid = useStore(
+    (state) => state.jtbdActive.activeConfigUuid,
+  );
+  const jtbdSelectedScanUuids = useStore(
+    (state) => state.jtbdActive.selectedScanUuids,
+  );
+  const jtbdSelectedJobUuid = useStore(
+    (state) => state.jtbdActive.selectedJobUuid,
+  );
+  const isOnJtbdCanvas = pageContext === 'jtbd';
+  // `useJTBDJobs` shares its React Query cache with `JTBDCanvasInner`'s call,
+  // so this mirrors exactly what the user sees on the canvas. Internally gated
+  // on `configUuid && scanUuids.length > 0`, so it's a no-op when those are
+  // empty (e.g. off the canvas).
+  const { jobs: jtbdJobs } = useJTBDJobs(
+    isOnJtbdCanvas ? (jtbdActiveConfigUuid ?? '') : '',
+    isOnJtbdCanvas ? jtbdSelectedScanUuids : [],
+  );
+  const jtbdJobItems: MentionItem[] = useMemo(() => {
+    if (!isOnJtbdCanvas || jtbdJobs.length === 0) return [];
+    return jtbdJobs.map((j) => ({
+      id: j.uuid,
+      name: j.jtbdTitle?.trim() || 'Untitled job',
+      type: 'jtbd_job' as const,
+    }));
+  }, [isOnJtbdCanvas, jtbdJobs]);
+  const jtbdWidgetItems: MentionItem[] = useMemo(() => {
+    if (!isOnJtbdCanvas || !jtbdSelectedJobUuid) return [];
+    const selectedJob = jtbdJobs.find((j) => j.uuid === jtbdSelectedJobUuid);
+    if (!selectedJob) return [];
+    return selectedJob.customWidgets.map((w) => ({
+      id: w.uuid,
+      name:
+        w.title?.trim() ||
+        w.widgetType
+          .replace(/_/g, ' ')
+          .replace(/\b\w/g, (c) => c.toUpperCase()),
+      type: 'jtbd_widget' as const,
+    }));
+  }, [isOnJtbdCanvas, jtbdSelectedJobUuid, jtbdJobs]);
 
   // Floating search bar submit handler — always starts a fresh conversation
   const handleSearchSubmit = useCallback(
@@ -140,8 +218,8 @@ const PrivateLayout = () => {
               'ml-[6rem]': navCollapsed,
               'w-[calc(100vw-15.5rem)]': !navCollapsed,
               'ml-[15.5rem]': !navCollapsed,
-              'pr-[412px]': shouldApplyDockPadding,
-              'pb-20': isSearchBarVisible,
+              'pr-[412px]': shouldApplyLayoutDockPadding,
+              'pb-20': shouldApplyBottomPadding,
             },
           )}
         >
@@ -160,6 +238,8 @@ const PrivateLayout = () => {
           rightOffset={dockWidth}
           conceptItems={conceptItems}
           personaItems={personaItems}
+          jtbdJobItems={jtbdJobItems}
+          jtbdWidgetItems={jtbdWidgetItems}
           brandColors={branding?.colors}
         />
       </div>

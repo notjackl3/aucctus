@@ -1,14 +1,42 @@
 import api from '@libs/api';
-import { IAiEditingSuggestion, IConceptReportEdit } from '@libs/api/types';
+import {
+  IAiEditingSuggestion,
+  IConceptReportEdit,
+  IJTBDNoteAddPayload,
+} from '@libs/api/types';
+import type { IJTBDConfigDetail, IJTBDConfigList } from '@libs/api/types/jtbd';
+import { EDIT_KIND_HANDLERS, EditKindHandlerContext } from './editKindHandlers';
 import { isAucctusAdmin } from '@libs/utils/account';
 import { cn } from '@libs/utils/react';
 import useStore from '@stores/store';
-import { MentionItem, OverseerFeature } from '@stores/overseer/types';
+import {
+  IOverseerState,
+  MentionItem,
+  OverseerFeature,
+} from '@stores/overseer/types';
+import { produce } from 'immer';
 import {
   markConceptSectionsPending,
   useConceptAiEditing,
   useConcepts,
 } from '@hooks/query/concepts.hook';
+import {
+  jtbdKeys,
+  useAddJTBDRule,
+  useCloneJTBDConfig,
+  useDeleteJTBDConfig,
+  useDeleteJTBDJob,
+  useDeleteJTBDNoteByUuid,
+  useDeleteJTBDRule,
+  useDeleteJTBDScan,
+  useIdeateFromJob,
+  useJobEdit,
+  useMergeJTBDJobs,
+  useTriggerJTBDScan,
+  useUpdateJTBDConfig,
+  useUpdateJTBDNoteByUuid,
+  useUpdateJTBDRule,
+} from '@hooks/query/jtbd.hook';
 import { useRimOrbStyles } from '@hooks/useRimOrbStyles';
 import { usePersonas } from '@hooks/query/persona.hook';
 import { useOverseerConversationsInfinite } from '@hooks/query/overseerHistory.hook';
@@ -21,7 +49,7 @@ import React, {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from 'react-query';
 import { v4 as uuidv4 } from 'uuid';
 import OverseerChat from './OverseerChat';
@@ -41,18 +69,20 @@ import {
   X,
 } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
-import { Badge } from '@components';
+import { Badge, toast } from '@components';
 import { clearHighlight } from './OverseerSelectionButton';
 
 // Panel dimension constants
 const DEFAULT_PANEL_WIDTH = 400;
-const DOCKED_PANEL_WIDTH = 400;
 const COMPACT_PANEL_HEIGHT = 500;
 const EXPANDED_PANEL_HEIGHT = 500;
 const MIN_PANEL_WIDTH = 320;
-const MAX_PANEL_WIDTH = 600;
+const MAX_PANEL_WIDTH = 900;
 const MIN_PANEL_HEIGHT = 280;
-const MAX_PANEL_HEIGHT = 700;
+const MAX_PANEL_HEIGHT = 1000;
+// Docked-mode width bounds (width is the only docked dimension; height = 100vh)
+const MIN_DOCKED_WIDTH = 320;
+const MAX_DOCKED_WIDTH = 900;
 const VIEWPORT_PADDING = 12;
 
 type ResizeDirection = 'nw' | 'ne' | 'sw' | 'se' | 'n' | 's' | 'e' | 'w';
@@ -90,6 +120,8 @@ const OverseerPopup: React.FC = () => {
   const isOpen = useStore((state) => state.overseer.isOpen);
   const position = useStore((state) => state.overseer.position);
   const isDocked = useStore((state) => state.overseer.isDocked);
+  const dockedWidth = useStore((state) => state.overseer.dockedWidth);
+  const setDockedWidth = useStore((state) => state.overseer.setDockedWidth);
   const selectedText = useStore((state) => state.overseer.selectedText);
   const messages = useStore((state) => state.overseer.messages);
   const suggestedQuestions = useStore(
@@ -103,6 +135,7 @@ const OverseerPopup: React.FC = () => {
     (state) => state.overseer.navigateSuggestion,
   );
   const currentMessage = useStore((state) => state.overseer.currentMessage);
+  const prefillNonce = useStore((state) => state.overseer.prefillNonce);
   const isThinking = useStore((state) => state.overseer.isThinking);
   const hasError = useStore((state) => state.overseer.hasError);
   const conceptUuid = useStore((state) => state.overseer.conceptUuid);
@@ -156,8 +189,64 @@ const OverseerPopup: React.FC = () => {
   const queryClient = useQueryClient();
   const { id: conceptIdentifier } = useParams();
 
-  const { mutate: aiEditConcept, isLoading: isApplyingEdits } =
+  const { mutate: aiEditConcept, isLoading: isApplyingConceptEdits } =
     useConceptAiEditing();
+
+  // JTBD mutation hooks — used when confirming jtbd_rule / jtbd_scan suggestions.
+  // All four hooks already invalidate the appropriate jtbdKeys on success, so
+  // the canvas reflects the mutation automatically (no extra skeleton helper
+  // needed for this phase).
+  const { addRuleAsync, isAdding: isAddingJTBDRule } = useAddJTBDRule();
+  const { updateRuleAsync, isUpdating: isUpdatingJTBDRule } =
+    useUpdateJTBDRule();
+  const { deleteRuleAsync, isDeleting: isDeletingJTBDRule } =
+    useDeleteJTBDRule();
+  const { triggerScanAsync, isTriggering: isTriggeringJTBDScan } =
+    useTriggerJTBDScan();
+  const { editJobAsync, isEditing: isEditingJTBDJob } = useJobEdit();
+  const { mergeJobsAsync, isMerging: isMergingJTBDJobs } = useMergeJTBDJobs();
+  const { ideateFromJobAsync, isIdeating: isIdeatingJTBDJob } =
+    useIdeateFromJob();
+  const { deleteScanAsync, isDeleting: isDeletingJTBDScan } =
+    useDeleteJTBDScan();
+  const { updateConfigAsync, isUpdating: isUpdatingJTBDConfig } =
+    useUpdateJTBDConfig();
+  const { cloneConfigAsync, isCloning: isCloningJTBDConfig } =
+    useCloneJTBDConfig();
+  const { deleteConfigAsync, isDeleting: isDeletingJTBDConfig } =
+    useDeleteJTBDConfig();
+  const { updateNoteAsync, isUpdating: isUpdatingJTBDNote } =
+    useUpdateJTBDNoteByUuid();
+  const { deleteNoteAsync, isDeleting: isDeletingJTBDNote } =
+    useDeleteJTBDNoteByUuid();
+  const { deleteJobAsync, isDeleting: isDeletingJTBDJob } = useDeleteJTBDJob();
+
+  const navigate = useNavigate();
+
+  // `useCreateJTBDNote` is job-scoped (requires a fixed jobUuid) but the
+  // Overseer edit-suggestion carousel can target arbitrary jobs, so we drive
+  // the note-add flow via `api.jtbd.createNote` directly + manual cache
+  // invalidation here. Tracks its own in-flight flag so `isApplyingEdits`
+  // disables the carousel Apply button while the POST is pending.
+  const [isAddingJTBDNote, setIsAddingJTBDNote] = useState(false);
+
+  const isApplyingEdits =
+    isApplyingConceptEdits ||
+    isAddingJTBDRule ||
+    isUpdatingJTBDRule ||
+    isDeletingJTBDRule ||
+    isTriggeringJTBDScan ||
+    isEditingJTBDJob ||
+    isMergingJTBDJobs ||
+    isAddingJTBDNote ||
+    isIdeatingJTBDJob ||
+    isDeletingJTBDScan ||
+    isUpdatingJTBDConfig ||
+    isCloningJTBDConfig ||
+    isDeletingJTBDConfig ||
+    isUpdatingJTBDNote ||
+    isDeletingJTBDNote ||
+    isDeletingJTBDJob;
 
   // Fetch global conversation history for the current user (infinite pagination)
   const {
@@ -351,14 +440,44 @@ const OverseerPopup: React.FC = () => {
     [setCurrentMessage, sendMessage],
   );
 
-  const handleConfirmEdits = useCallback(
-    (selectedEdits: IAiEditingSuggestion[]) => {
-      if (!editSuggestions || !conceptUuid || !sessionId || isApplyingEdits)
-        return;
+  /**
+   * Apply a JTBD note-add suggestion — posts a user-authored note widget onto
+   * the targeted job via the REST endpoint. Caches are invalidated so the
+   * canvas / expanded card picks up the new note. Invoked through the
+   * registry context (notes are job-scoped and don't have a popup-level
+   * mutation hook).
+   */
+  const applyJTBDNoteAdd = useCallback(
+    async (payload: IJTBDNoteAddPayload): Promise<void> => {
+      if (!payload.jobUuid || !payload.body?.trim()) return;
+      await api.jtbd.createNote(payload.jobUuid, {
+        body: payload.body.trim(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: jtbdKeys.job(payload.jobUuid),
+      });
+      queryClient.invalidateQueries({
+        queryKey: [...jtbdKeys.all, 'jobs'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [...jtbdKeys.all, 'currentScan'],
+      });
+    },
+    [queryClient],
+  );
+
+  /**
+   * Apply the concept-edit suggestions via the legacy AI editing route.
+   * Preserves the original behavior: session-scoped, marks sections pending
+   * for skeletons, and surfaces an assistant confirmation message.
+   */
+  const applyConceptEdits = useCallback(
+    (conceptEdits: IAiEditingSuggestion[]) => {
+      if (!editSuggestions || !conceptUuid || !sessionId) return;
 
       const payload: IConceptReportEdit = {
         ...editSuggestions,
-        edits: selectedEdits,
+        edits: conceptEdits,
         uuid: editSuggestions.uuid || uuidv4(),
       } as IConceptReportEdit;
 
@@ -370,9 +489,8 @@ const OverseerPopup: React.FC = () => {
         },
         {
           onSuccess: () => {
-            // Mark affected sections as pending → triggers skeleton loading
             if (conceptIdentifier) {
-              const sectionKeys = selectedEdits.map((e) => e.section);
+              const sectionKeys = conceptEdits.map((e) => e.section);
               markConceptSectionsPending(
                 queryClient,
                 conceptIdentifier,
@@ -398,12 +516,189 @@ const OverseerPopup: React.FC = () => {
       editSuggestions,
       conceptUuid,
       sessionId,
-      isApplyingEdits,
-      clearEditSuggestions,
-      setHighlightedSection,
       aiEditConcept,
       queryClient,
       conceptIdentifier,
+      clearEditSuggestions,
+      setHighlightedSection,
+    ],
+  );
+
+  const editResolutionsRef = useRef<Record<number, 'accepted' | 'rejected'>>(
+    {},
+  );
+
+  const handleConfirmEdits = useCallback(
+    (selectedEdits: IAiEditingSuggestion[]) => {
+      if (!editSuggestions || isApplyingEdits || selectedEdits.length === 0)
+        return;
+
+      // Split concept edits out — they're batch-applied via the legacy
+      // AI-editing route (a single call with shared session_id + concept_uuid)
+      // so they bypass the per-suggestion registry dispatch.
+      const conceptEdits: IAiEditingSuggestion[] = [];
+      const jtbdEdits: IAiEditingSuggestion[] = [];
+
+      for (const edit of selectedEdits) {
+        const kind = edit.kind ?? 'concept';
+        if (kind === 'concept') conceptEdits.push(edit);
+        else jtbdEdits.push(edit);
+      }
+
+      const hasNoteAdd = jtbdEdits.some((e) => e.kind === 'jtbd_note_add');
+      const msgUuid = editSuggestions.uuid;
+
+      // Build the handler-context bundle once per dispatch — registry
+      // handlers receive it and stay pure with respect to React state.
+      const ctx: EditKindHandlerContext = {
+        queryClient,
+        addJTBDRule: (params) => addRuleAsync(params),
+        updateJTBDRule: (params) => updateRuleAsync(params),
+        deleteJTBDRule: (params) => deleteRuleAsync(params),
+        triggerJTBDScan: (configUuid) => triggerScanAsync(configUuid),
+        editJTBDJob: (params) => editJobAsync(params),
+        mergeJTBDJobs: (primaryJobUuid, body) =>
+          mergeJobsAsync({ primaryJobUuid, body }),
+        addJTBDNote: (payload) => applyJTBDNoteAdd(payload),
+        ideateFromJTBDJob: (params) => ideateFromJobAsync(params),
+        deleteJTBDScan: (params) => deleteScanAsync(params),
+        updateJTBDConfig: (params) =>
+          updateConfigAsync({
+            configUuid: params.configUuid,
+            data: params.data,
+          }),
+        cloneJTBDConfig: (params) =>
+          cloneConfigAsync({
+            configUuid: params.configUuid,
+            newName: params.newName ?? undefined,
+          }),
+        deleteJTBDConfig: (configUuid) => deleteConfigAsync(configUuid),
+        updateJTBDNote: (params) => updateNoteAsync(params),
+        deleteJTBDNote: (params) => deleteNoteAsync(params),
+        deleteJTBDJob: (jobUuid) => deleteJobAsync(jobUuid),
+        resolveConfigPersonaUuids: (configUuid) => {
+          // Prefer the single-config detail (most specific / freshest), fall
+          // back to the list view, return null when neither is cached so the
+          // handler can decide whether to send a diff-less payload.
+          const detail = queryClient.getQueryData<IJTBDConfigDetail>(
+            jtbdKeys.config(configUuid),
+          );
+          if (detail?.personaUuids) return detail.personaUuids;
+          const list = queryClient.getQueryData<IJTBDConfigList[]>(
+            jtbdKeys.configs(),
+          );
+          const match = list?.find((c) => c.uuid === configUuid);
+          return match?.personaUuids ?? null;
+        },
+        applyConceptEdits,
+        navigateTo: (path) => navigate(path),
+        closeOverseer: () => close(),
+      };
+
+      // Single point where we persist resolution='applied' to the server
+      // after all dispatches for this batch have settled. Uses the
+      // accumulator populated by per-edit accept/reject clicks so the
+      // backend gets the full per-edit resolution map in one PATCH.
+      const finalizeAppliedResolution = () => {
+        if (!msgUuid) {
+          editResolutionsRef.current = {};
+          return;
+        }
+        const perEditResolutions = { ...editResolutionsRef.current };
+        api.overseer
+          .setMessageResolution(
+            msgUuid,
+            'applied',
+            Object.keys(perEditResolutions).length > 0
+              ? perEditResolutions
+              : undefined,
+          )
+          .catch(() => {
+            toast.error(
+              'Applied your edits, but failed to save resolution state. Reloading this chat may show them as pending.',
+            );
+          });
+        editResolutionsRef.current = {};
+      };
+
+      // Dispatch JTBD suggestions in parallel via the handler registry. Each
+      // handler targets disjoint resources so concurrent runs are safe.
+      if (jtbdEdits.length > 0) {
+        // Note-add path bypasses a hook with its own loading flag, so track
+        // pending state locally to keep the carousel Apply button disabled.
+        if (hasNoteAdd) setIsAddingJTBDNote(true);
+
+        const promises = jtbdEdits.map((edit) => {
+          const kind = edit.kind ?? 'concept';
+          const handler = EDIT_KIND_HANDLERS[kind];
+          if (!handler) return Promise.resolve();
+          return handler(edit, ctx).catch(() => {
+            // Individual mutation errors are already surfaced via their hooks'
+            // `onError` toasts; swallow here so `Promise.allSettled` completes.
+          });
+        });
+
+        Promise.allSettled(promises).then(() => {
+          if (hasNoteAdd) setIsAddingJTBDNote(false);
+
+          // Each JTBD mutation hook invalidates its own jtbdKeys on success;
+          // additionally invalidate the configs list to cover the case where
+          // multiple configs were touched in one batch.
+          queryClient.invalidateQueries({ queryKey: jtbdKeys.configs() });
+
+          setHighlightedSection(null);
+          finalizeAppliedResolution();
+          clearEditSuggestions();
+          useStore.getState().overseer.addAssistantMessage({
+            uuid: uuidv4(),
+            role: 'assistant',
+            content:
+              'Done! Those JTBD changes have been applied. The canvas will reflect the updates shortly.',
+            name: 'assistant',
+            timestamp: new Date().toISOString(),
+          });
+        });
+      }
+
+      // Concept edits still require conceptUuid + sessionId. If they are
+      // absent (e.g. the Overseer is scoped to an account page with only
+      // JTBD edits), we silently skip — this matches the pre-existing guard.
+      if (conceptEdits.length > 0) {
+        applyConceptEdits(conceptEdits);
+        // Concept edits are dispatched fire-and-forget via the legacy
+        // `aiEditConcept` mutation; there's no awaitable join point for
+        // them here. If this path runs without JTBD edits, persist the
+        // applied resolution immediately so the server record matches
+        // the user's Apply click.
+        if (jtbdEdits.length === 0) {
+          finalizeAppliedResolution();
+        }
+      }
+    },
+    [
+      editSuggestions,
+      isApplyingEdits,
+      queryClient,
+      addRuleAsync,
+      updateRuleAsync,
+      deleteRuleAsync,
+      triggerScanAsync,
+      editJobAsync,
+      mergeJobsAsync,
+      applyJTBDNoteAdd,
+      ideateFromJobAsync,
+      deleteScanAsync,
+      updateConfigAsync,
+      cloneConfigAsync,
+      deleteConfigAsync,
+      updateNoteAsync,
+      deleteNoteAsync,
+      deleteJobAsync,
+      applyConceptEdits,
+      navigate,
+      close,
+      clearEditSuggestions,
+      setHighlightedSection,
     ],
   );
 
@@ -414,12 +709,67 @@ const OverseerPopup: React.FC = () => {
     [setHighlightedSection],
   );
 
-  const handleCancelEdits = useCallback(() => {
-    setHighlightedSection(null);
-    clearEditSuggestions();
-  }, [clearEditSuggestions, setHighlightedSection]);
+  const handleCancelEdits = useCallback(
+    (editStatuses?: Record<number, string>) => {
+      setHighlightedSection(null);
+      if (editSuggestions && editSuggestions.edits.length > 0) {
+        const msgUuid = editSuggestions.uuid || uuidv4();
+        // Merge the accumulator (populated by per-edit clicks during this
+        // turn) with the carousel's snapshot argument. The carousel is the
+        // source of truth at cancel time, so its values win on conflict.
+        const merged: Record<number, 'accepted' | 'rejected'> = {
+          ...editResolutionsRef.current,
+        };
+        if (editStatuses) {
+          for (const [k, v] of Object.entries(editStatuses)) {
+            if (v === 'accepted' || v === 'rejected') {
+              merged[Number(k)] = v;
+            }
+          }
+        }
+        const perEditResolutions =
+          Object.keys(merged).length > 0 ? merged : undefined;
+        useStore.setState(
+          produce((state: { overseer: IOverseerState }) => {
+            state.overseer.messages.push({
+              uuid: msgUuid,
+              role: 'edit_suggestion' as const,
+              editSuggestions: { ...editSuggestions },
+              timestamp: new Date().toISOString(),
+              resolution: 'declined' as const,
+            });
+          }),
+        );
+        api.overseer
+          .setMessageResolution(msgUuid, 'declined', perEditResolutions)
+          .catch(() => {
+            toast.error(
+              'Dismissed the edits, but failed to save resolution state. Reloading this chat may show them as pending.',
+            );
+          });
+        editResolutionsRef.current = {};
+      }
+      clearEditSuggestions();
+    },
+    [clearEditSuggestions, setHighlightedSection, editSuggestions],
+  );
+
+  // Per-edit accept/reject clicks accumulate into `editResolutionsRef`. We
+  // intentionally DO NOT PATCH the server here — that would prematurely mark
+  // the message as declined before the user has confirmed the batch. The
+  // accumulator is flushed once, with the correct `applied`/`declined`
+  // resolution, from `handleConfirmEdits` or `handleCancelEdits`.
+  const handleEditStatusChange = useCallback(
+    (index: number, status: string) => {
+      if (status === 'accepted' || status === 'rejected') {
+        editResolutionsRef.current[index] = status;
+      }
+    },
+    [],
+  );
 
   const handleSubmitMessage = useCallback(() => {
+    editResolutionsRef.current = {};
     sendMessage();
   }, [sendMessage]);
 
@@ -478,15 +828,16 @@ const OverseerPopup: React.FC = () => {
     };
   }, [isDragging, setPosition, panelWidth, panelHeight]);
 
-  // Resize handlers (only in floating mode)
+  // Resize handlers — floating mode uses all 8 directions; docked mode uses 'w' only
   const handleResizeStart = useCallback(
     (e: React.MouseEvent, direction: ResizeDirection) => {
-      if (isDocked) return;
+      // In docked mode, only the left edge ('w') is resizable (panel is anchored to the right)
+      if (isDocked && direction !== 'w') return;
       e.preventDefault();
       e.stopPropagation();
       setIsResizing(true);
       resizeStartRef.current = {
-        width: panelWidth,
+        width: isDocked ? dockedWidth : panelWidth,
         height: panelHeight,
         x: position.x,
         y: position.y,
@@ -495,7 +846,7 @@ const OverseerPopup: React.FC = () => {
         direction,
       };
     },
-    [isDocked, panelWidth, panelHeight, position.x, position.y],
+    [isDocked, panelWidth, dockedWidth, panelHeight, position.x, position.y],
   );
 
   useEffect(() => {
@@ -508,6 +859,21 @@ const OverseerPopup: React.FC = () => {
         resizeStartRef.current;
       const deltaX = e.clientX - mouseX;
       const deltaY = e.clientY - mouseY;
+
+      // Docked mode: only width changes, anchored to the right edge.
+      // Dragging left (negative deltaX) increases width.
+      if (isDocked) {
+        const maxDockedForViewport = Math.max(
+          MIN_DOCKED_WIDTH,
+          window.innerWidth - VIEWPORT_PADDING * 2,
+        );
+        const newDockedWidth = Math.min(
+          Math.max(width - deltaX, MIN_DOCKED_WIDTH),
+          Math.min(MAX_DOCKED_WIDTH, maxDockedForViewport),
+        );
+        setDockedWidth(newDockedWidth);
+        return;
+      }
 
       let newWidth = width;
       let newHeight = height;
@@ -575,7 +941,7 @@ const OverseerPopup: React.FC = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isResizing, setPosition]);
+  }, [isResizing, setPosition, isDocked, setDockedWidth]);
 
   // Clamp to viewport helper for undock repositioning
   const clampToViewport = useCallback(
@@ -633,7 +999,7 @@ const OverseerPopup: React.FC = () => {
           )}
           style={
             isDocked
-              ? { width: DOCKED_PANEL_WIDTH }
+              ? { width: dockedWidth }
               : {
                   left: position.x,
                   top: position.y,
@@ -642,52 +1008,58 @@ const OverseerPopup: React.FC = () => {
                 }
           }
         >
-          {/* Resize handles (only when floating) */}
+          {/* Docked mode: single west-edge resize handle (panel is anchored to the right) */}
+          {isDocked && (
+            <div
+              onMouseDown={(e) => handleResizeStart(e, 'w')}
+              className='absolute bottom-0 left-0 top-0 z-20 w-2 cursor-ew-resize transition-colors hover:bg-white/10'
+            />
+          )}
+
+          {/* Resize handles (only when floating) — entire rim is resize */}
           {!isDocked && (
             <>
               <div
                 onMouseDown={(e) => handleResizeStart(e, 'w')}
-                className='absolute bottom-2 left-0 top-2 z-20 w-1.5 cursor-ew-resize rounded-full transition-colors hover:bg-white/10'
+                className='absolute bottom-4 left-0 top-4 z-20 w-2 cursor-ew-resize transition-colors hover:bg-white/10'
               />
               <div
                 onMouseDown={(e) => handleResizeStart(e, 'e')}
-                className='absolute bottom-2 right-0 top-2 z-20 w-1.5 cursor-ew-resize rounded-full transition-colors hover:bg-white/10'
+                className='absolute bottom-4 right-0 top-4 z-20 w-2 cursor-ew-resize transition-colors hover:bg-white/10'
               />
               <div
                 onMouseDown={(e) => handleResizeStart(e, 'n')}
-                className='absolute left-2 right-2 top-0 z-20 h-1.5 cursor-ns-resize rounded-full transition-colors hover:bg-white/10'
+                className='absolute left-4 right-4 top-0 z-20 h-2 cursor-ns-resize transition-colors hover:bg-white/10'
               />
               <div
                 onMouseDown={(e) => handleResizeStart(e, 's')}
-                className='absolute bottom-0 left-2 right-2 z-20 h-1.5 cursor-ns-resize rounded-full transition-colors hover:bg-white/10'
+                className='absolute bottom-0 left-4 right-4 z-20 h-2 cursor-ns-resize transition-colors hover:bg-white/10'
               />
               <div
                 onMouseDown={(e) => handleResizeStart(e, 'nw')}
-                className='absolute left-0 top-0 z-30 h-3 w-3 cursor-nwse-resize'
+                className='absolute left-0 top-0 z-30 h-4 w-4 cursor-nwse-resize'
               />
               <div
                 onMouseDown={(e) => handleResizeStart(e, 'ne')}
-                className='absolute right-0 top-0 z-30 h-3 w-3 cursor-nesw-resize'
+                className='absolute right-0 top-0 z-30 h-4 w-4 cursor-nesw-resize'
               />
               <div
                 onMouseDown={(e) => handleResizeStart(e, 'sw')}
-                className='absolute bottom-0 left-0 z-30 h-3 w-3 cursor-nesw-resize'
+                className='absolute bottom-0 left-0 z-30 h-4 w-4 cursor-nesw-resize'
               />
               <div
                 onMouseDown={(e) => handleResizeStart(e, 'se')}
-                className='absolute bottom-0 right-0 z-30 h-3 w-3 cursor-nwse-resize'
+                className='absolute bottom-0 right-0 z-30 h-4 w-4 cursor-nwse-resize'
               />
             </>
           )}
 
-          {/* Glass Shell — rim area is draggable */}
+          {/* Glass Shell — drag is delegated to the header only */}
           <div
             className={cn(
               'liquid-glass-modal-shell h-full',
               isDocked && '!rounded-none',
-              !isDocked && 'cursor-grab active:cursor-grabbing',
             )}
-            onMouseDown={handleDragStart}
           >
             {/* Animated Overseer Rim with floating gradient orbs */}
             <div
@@ -717,25 +1089,24 @@ const OverseerPopup: React.FC = () => {
                     className='flex flex-1 flex-col overflow-hidden'
                     style={{ background: 'rgba(18,18,18,0.95)' }}
                   >
-                    {/* History header */}
+                    {/* History header — entire bar is drag zone; buttons stop propagation to take precedence */}
                     <div
-                      className='flex items-center justify-between px-3 py-1.5'
+                      className={cn(
+                        'flex items-center justify-between border-b border-white/40 px-3 py-1.5',
+                        !isDocked && 'cursor-grab active:cursor-grabbing',
+                      )}
                       style={{ background: 'rgba(255,255,255,0.04)' }}
+                      onMouseDown={handleDragStart}
                     >
                       <button
                         onClick={() => setShowHistory(false)}
+                        onMouseDown={(e) => e.stopPropagation()}
                         className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                         title='Back to chat'
                       >
                         <ChevronLeft size={14} className='stroke-current' />
                       </button>
-                      <div
-                        className={cn(
-                          'h-3 flex-1',
-                          !isDocked && 'cursor-grab active:cursor-grabbing',
-                        )}
-                        onMouseDown={handleDragStart}
-                      />
+                      <div className='h-3 flex-1' />
                       <div className='flex items-center'>
                         {isDocked ? (
                           <button
@@ -747,6 +1118,7 @@ const OverseerPopup: React.FC = () => {
                               );
                               setPosition(pos);
                             }}
+                            onMouseDown={(e) => e.stopPropagation()}
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Undock panel'
                           >
@@ -758,6 +1130,7 @@ const OverseerPopup: React.FC = () => {
                         ) : (
                           <button
                             onClick={() => setDocked(true)}
+                            onMouseDown={(e) => e.stopPropagation()}
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Anchor to side panel'
                           >
@@ -769,6 +1142,7 @@ const OverseerPopup: React.FC = () => {
                         )}
                         <button
                           onClick={handleClose}
+                          onMouseDown={(e) => e.stopPropagation()}
                           className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                           title='Close panel'
                         >
@@ -866,11 +1240,18 @@ const OverseerPopup: React.FC = () => {
                 ) : (
                   /* ======== Main chat view ======== */
                   <>
-                    {/* Header — matches Lovable: history (left), drag area (center), dock (right) */}
-                    <div className='flex items-center justify-between px-3 py-1.5'>
+                    {/* Header — entire bar is the drag zone; buttons stop propagation so clicks take precedence */}
+                    <div
+                      className={cn(
+                        'flex items-center justify-between border-b border-white/40 px-3 py-1.5',
+                        !isDocked && 'cursor-grab active:cursor-grabbing',
+                      )}
+                      onMouseDown={handleDragStart}
+                    >
                       <div className='flex items-center'>
                         <button
                           onClick={() => setShowHistory(true)}
+                          onMouseDown={(e) => e.stopPropagation()}
                           className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                           title='Chat history'
                         >
@@ -879,6 +1260,7 @@ const OverseerPopup: React.FC = () => {
                         {messages.length > 0 && (
                           <button
                             onClick={clearConversation}
+                            onMouseDown={(e) => e.stopPropagation()}
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='New chat'
                           >
@@ -909,14 +1291,8 @@ const OverseerPopup: React.FC = () => {
                           })()}
                       </div>
 
-                      {/* Drag handle area — invisible, full width */}
-                      <div
-                        className={cn(
-                          'h-3 flex-1',
-                          !isDocked && 'cursor-grab active:cursor-grabbing',
-                        )}
-                        onMouseDown={handleDragStart}
-                      />
+                      {/* Flex spacer — header-wide drag handled by parent */}
+                      <div className='h-3 flex-1' />
 
                       <div className='flex items-center'>
                         {isDocked ? (
@@ -929,6 +1305,7 @@ const OverseerPopup: React.FC = () => {
                               );
                               setPosition(pos);
                             }}
+                            onMouseDown={(e) => e.stopPropagation()}
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Undock panel'
                           >
@@ -940,6 +1317,7 @@ const OverseerPopup: React.FC = () => {
                         ) : (
                           <button
                             onClick={() => setDocked(true)}
+                            onMouseDown={(e) => e.stopPropagation()}
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Anchor to side panel'
                           >
@@ -951,6 +1329,7 @@ const OverseerPopup: React.FC = () => {
                         )}
                         <button
                           onClick={handleClose}
+                          onMouseDown={(e) => e.stopPropagation()}
                           className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                           title='Close panel'
                         >
@@ -971,6 +1350,7 @@ const OverseerPopup: React.FC = () => {
                       isThinking={isThinking}
                       toolActivitySteps={toolActivitySteps}
                       onActiveEditChange={handleActiveEditChange}
+                      onEditStatusChange={handleEditStatusChange}
                     />
 
                     {/* Follow-up suggestions */}
@@ -1086,6 +1466,7 @@ const OverseerPopup: React.FC = () => {
                       disabled={hasEditSuggestions}
                       isThinking={isThinking}
                       onCancel={cancelCurrentRun}
+                      prefillNonce={prefillNonce}
                       mentions={mentions}
                       onMentionSelect={addMention}
                       onMentionRemove={removeMention}

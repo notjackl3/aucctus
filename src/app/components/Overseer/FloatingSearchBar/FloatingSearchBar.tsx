@@ -25,6 +25,16 @@ interface FloatingSearchBarProps {
   rightOffset?: number;
   conceptItems?: MentionItem[];
   personaItems?: MentionItem[];
+  /**
+   * JTBD jobs currently visible on the active canvas view. Populated only on
+   * JTBD pages; omit on other routes.
+   */
+  jtbdJobItems?: MentionItem[];
+  /**
+   * Widgets attached to the currently-selected (expanded) JTBD job. Omitted
+   * when no job is selected or outside JTBD pages.
+   */
+  jtbdWidgetItems?: MentionItem[];
   brandColors?: string[];
 }
 
@@ -36,6 +46,8 @@ const FloatingSearchBar = ({
   rightOffset = 0,
   conceptItems,
   personaItems,
+  jtbdJobItems,
+  jtbdWidgetItems,
   brandColors,
 }: FloatingSearchBarProps) => {
   const [query, setQuery] = useState('');
@@ -65,8 +77,14 @@ const FloatingSearchBar = ({
   }, [mentionState.active]);
 
   const mentionSections = useMemo(
-    () => buildMentionSections(personaItems, conceptItems),
-    [personaItems, conceptItems],
+    () =>
+      buildMentionSections(
+        personaItems,
+        conceptItems,
+        jtbdJobItems,
+        jtbdWidgetItems,
+      ),
+    [personaItems, conceptItems, jtbdJobItems, jtbdWidgetItems],
   );
 
   const addImageFile = useCallback(
@@ -264,9 +282,14 @@ const FloatingSearchBar = ({
                               key={m.id}
                               className={cn(
                                 'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium',
-                                m.type === 'persona'
-                                  ? 'border-purple-400/30 bg-purple-500/10 text-purple-700'
-                                  : 'border-amber-400/30 bg-amber-500/10 text-amber-700',
+                                m.type === 'persona' &&
+                                  'border-purple-400/30 bg-purple-500/10 text-purple-700',
+                                m.type === 'jtbd_job' &&
+                                  'border-sky-400/30 bg-sky-500/10 text-sky-700',
+                                m.type === 'jtbd_widget' &&
+                                  'border-emerald-400/30 bg-emerald-500/10 text-emerald-700',
+                                m.type === 'concept' &&
+                                  'border-amber-400/30 bg-amber-500/10 text-amber-700',
                               )}
                             >
                               @{m.name}

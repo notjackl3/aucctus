@@ -5,6 +5,7 @@ import type {
   IOverseerOutboundChatMessage,
 } from '@libs/api/types';
 import type { Mimetype } from '@libs/api/types/osiris';
+import type { IOverseerPageMetadata } from '@libs/api/types/socketMessages/outbound';
 import type {
   IOverseerConversation,
   IOverseerConversationDetail,
@@ -53,6 +54,36 @@ function tryProcessNextQueued(
  */
 function isAccountLevelPage(pageContext: string): boolean {
   return ACCOUNT_LEVEL_PAGE_CONTEXTS.has(pageContext);
+}
+
+/**
+ * Build the optional `pageMetadata` payload for outbound Overseer messages.
+ *
+ * Reads the JTBD active-view Zustand slice when the current page context is
+ * `jtbd`. Returns undefined when no metadata is populated so the wire payload
+ * stays clean for non-JTBD pages (or JTBD pages where nothing is selected).
+ */
+function buildPageMetadata(
+  pageContext: string,
+  storeApi: IStoreApi<IOverseerState>['storeApi'],
+): IOverseerPageMetadata | undefined {
+  if (pageContext !== 'jtbd') return undefined;
+
+  // Defensive: the JTBD slice may not be initialized if something imports this
+  // module before the store has hydrated.
+  const jtbdActive = storeApi.getState().jtbdActive;
+  if (!jtbdActive) return undefined;
+
+  const { activeConfigUuid, selectedScanUuids, selectedJobUuid } = jtbdActive;
+
+  const metadata: IOverseerPageMetadata = {};
+  if (activeConfigUuid) metadata.activeConfigUuid = activeConfigUuid;
+  if (selectedScanUuids && selectedScanUuids.length > 0) {
+    metadata.selectedScanUuids = selectedScanUuids;
+  }
+  if (selectedJobUuid) metadata.selectedJobUuid = selectedJobUuid;
+
+  return Object.keys(metadata).length > 0 ? metadata : undefined;
 }
 
 /**
@@ -281,18 +312,101 @@ export function openFromSearchBar(
 }
 
 /**
+ * Open the Overseer panel with a pre-filled message and an optional mention.
+ * Used by per-widget/per-job "Refine" and "Re-assess" buttons in the JTBD canvas
+ * to seed the conversation with a targeted prompt without invoking the floating
+ * search bar. Opens docked so the target UI remains visible.
+ */
+export function openWithPrefill(
+  this: IStoreApi<IOverseerState>,
+  params: {
+    message: string;
+    pageContext: string;
+    mention?: MentionItem;
+    contextType?: OverseerContextType;
+    conceptUuid?: string;
+    accountUuid?: string;
+  },
+) {
+  const { set, storeApi } = this;
+
+  let contextType: OverseerContextType =
+    params.contextType ||
+    (isAccountLevelPage(params.pageContext) ? 'account' : 'concept');
+
+  const conceptUuid: string | undefined =
+    params.conceptUuid || storeApi.getState().conceptReport.conceptUuid;
+  const accountUuid: string | undefined =
+    params.accountUuid || storeApi.getState().auth.account?.uuid;
+
+  // Fall back to account mode if concept mode was desired but no conceptUuid is available
+  if (contextType === 'concept' && !conceptUuid) {
+    contextType = 'account';
+  }
+
+  if (contextType === 'account' && !accountUuid) {
+    telemetry.error('Overseer: Cannot open prefill without account UUID');
+    return;
+  }
+
+  set(
+    produce((state: IOverseerState) => {
+      state.isOpen = true;
+      state.isDocked = true;
+      state.selectedText = '';
+      state.expandedText = '';
+      state.pageContext = params.pageContext;
+      state.position = { x: 0, y: 0 };
+      state.contextType = contextType;
+      state.conceptUuid = conceptUuid;
+      state.accountUuid = accountUuid;
+      state.currentMessage = params.message;
+      // Reset conversation state
+      state.sessionId = undefined;
+      state.messages = [];
+      state.suggestedQuestions = [];
+      state.editSuggestions = null;
+      state.navigateSuggestion = null;
+      state.highlightedSectionId = null;
+      state.isThinking = false;
+      state.thinkingMessage = undefined;
+      state.currentError = undefined;
+      state.hasError = false;
+      state.activeFeatures = new Set();
+      state.mentions = params.mention ? [params.mention] : [];
+      state.toolActivitySteps = [];
+      state.historyItems = [];
+      state.showHistory = false;
+      state.pendingImages = [];
+      state.messageQueue = [];
+      state.isQueuePaused = false;
+      state.isCancelling = false;
+      // Bump the nonce so the textarea moves the caret to the end of
+      // the freshly-prefilled message instead of leaving it at index 0.
+      state.prefillNonce = state.prefillNonce + 1;
+    }),
+  );
+}
+
+/**
  * Open the Overseer panel docked with history view visible.
  * Used by the floating search bar's history button.
  */
 export function openToHistory(this: IStoreApi<IOverseerState>) {
   const { set, storeApi } = this;
 
-  const conceptUuid: string | undefined =
-    storeApi.getState().conceptReport.conceptUuid;
+  const currentPageContext =
+    storeApi.getState().overseer.pageContext || 'general';
+  const conceptUuid: string | undefined = isAccountLevelPage(currentPageContext)
+    ? undefined
+    : storeApi.getState().conceptReport.conceptUuid;
   const accountUuid: string | undefined =
     storeApi.getState().auth.account?.uuid;
 
-  let contextType: OverseerContextType = conceptUuid ? 'concept' : 'account';
+  const contextType: OverseerContextType =
+    isAccountLevelPage(currentPageContext) || !conceptUuid
+      ? 'account'
+      : 'concept';
 
   if (contextType === 'account' && !accountUuid) {
     telemetry.error('Overseer: Cannot open history without account UUID');
@@ -306,7 +420,7 @@ export function openToHistory(this: IStoreApi<IOverseerState>) {
       state.showHistory = true;
       state.selectedText = '';
       state.expandedText = '';
-      state.pageContext = 'general';
+      state.pageContext = currentPageContext;
       state.position = { x: 0, y: 0 };
       state.contextType = contextType;
       state.conceptUuid = conceptUuid;
@@ -440,7 +554,7 @@ export function cancelCurrentRun(this: IStoreApi<IOverseerState>) {
  * Respects isQueuePaused — does nothing when paused.
  */
 export function processQueuedMessage(this: IStoreApi<IOverseerState>) {
-  const { get, set } = this;
+  const { get, set, storeApi } = this;
   const {
     messageQueue,
     isQueuePaused,
@@ -498,9 +612,11 @@ export function processQueuedMessage(this: IStoreApi<IOverseerState>) {
       : undefined;
 
   // Build mention payload
-  const mentionPayload = nextMessage.mentions
-    .filter((m) => m.type === 'concept' || m.type === 'persona')
-    .map((m) => ({ uuid: m.id, name: m.name, type: m.type }));
+  const mentionPayload = nextMessage.mentions.map((m) => ({
+    uuid: m.id,
+    name: m.name,
+    type: m.type,
+  }));
 
   const userMessage: IOverseerUserMessage = {
     uuid: messageUuid,
@@ -526,6 +642,8 @@ export function processQueuedMessage(this: IStoreApi<IOverseerState>) {
     }),
   );
 
+  const pageMetadata = buildPageMetadata(pageContext, storeApi);
+
   if (isInitialMessage) {
     api.aucctusSocket.send({
       type: 'overseer.conversation.start',
@@ -538,6 +656,7 @@ export function processQueuedMessage(this: IStoreApi<IOverseerState>) {
       expandedText: expandedText,
       images: mediaMessages,
       mentions: mentionPayload.length > 0 ? mentionPayload : undefined,
+      pageMetadata,
     } as IOverseerConversationStartMessage);
   } else {
     api.aucctusSocket.send({
@@ -551,6 +670,7 @@ export function processQueuedMessage(this: IStoreApi<IOverseerState>) {
       images: mediaMessages,
       selectedText: selectedText,
       mentions: mentionPayload.length > 0 ? mentionPayload : undefined,
+      pageMetadata,
     } as IOverseerOutboundChatMessage);
   }
 }
@@ -707,9 +827,11 @@ export async function sendMessage(this: IStoreApi<IOverseerState>) {
       : undefined;
 
   // Build mention payload for WebSocket
-  const mentionPayload = storeMentions
-    .filter((m) => m.type === 'concept' || m.type === 'persona')
-    .map((m) => ({ uuid: m.id, name: m.name, type: m.type }));
+  const mentionPayload = storeMentions.map((m) => ({
+    uuid: m.id,
+    name: m.name,
+    type: m.type,
+  }));
 
   const userMessage: IOverseerUserMessage = {
     uuid: messageUuid,
@@ -744,6 +866,8 @@ export async function sendMessage(this: IStoreApi<IOverseerState>) {
     }),
   );
 
+  const pageMetadata = buildPageMetadata(pageContext, storeApi);
+
   if (isInitialMessage) {
     api.aucctusSocket.send({
       type: 'overseer.conversation.start',
@@ -756,6 +880,7 @@ export async function sendMessage(this: IStoreApi<IOverseerState>) {
       expandedText: expandedText,
       images: mediaMessages,
       mentions: mentionPayload.length > 0 ? mentionPayload : undefined,
+      pageMetadata,
     } as IOverseerConversationStartMessage);
     telemetry.debug('Overseer: Started conversation', {
       identifier,
@@ -773,6 +898,7 @@ export async function sendMessage(this: IStoreApi<IOverseerState>) {
       images: mediaMessages,
       selectedText: selectedText,
       mentions: mentionPayload.length > 0 ? mentionPayload : undefined,
+      pageMetadata,
     } as IOverseerOutboundChatMessage);
     telemetry.debug('Overseer: Sent follow-up message', {
       identifier,
@@ -784,6 +910,24 @@ export async function sendMessage(this: IStoreApi<IOverseerState>) {
 /**
  * Update the current draft message
  */
+export function syncPageContext(
+  this: IStoreApi<IOverseerState>,
+  pageContext: string,
+) {
+  const { set } = this;
+
+  set(
+    produce((state: IOverseerState) => {
+      if (!state.sessionId) {
+        state.pageContext = pageContext;
+        state.contextType = isAccountLevelPage(pageContext)
+          ? 'account'
+          : 'concept';
+      }
+    }),
+  );
+}
+
 export function setCurrentMessage(
   this: IStoreApi<IOverseerState>,
   message: string,
@@ -1396,6 +1540,9 @@ export function loadConversation(
                 return [];
               }
 
+              const editResolutions = msg.metadata?.editResolutions as
+                | Record<number, 'accepted' | 'rejected'>
+                | undefined;
               return [
                 {
                   uuid: msg.uuid,
@@ -1404,6 +1551,7 @@ export function loadConversation(
                   timestamp: msg.createdAt,
                   applied: resolution === 'applied',
                   resolution,
+                  editResolutions,
                 } as IOverseerEditSuggestionMessage,
               ];
             } catch {

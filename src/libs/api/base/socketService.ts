@@ -38,20 +38,26 @@ export interface ISocketConfig {
   reconnectInterval?: number; // milliseconds to wait before reconnecting
   debug?: boolean;
   maxRetries?: number; // maximum number of reconnect attempts before giving up
+  heartbeatInterval?: number; // milliseconds between outbound ping frames
+  heartbeatTimeout?: number; // milliseconds to wait for a pong before forcing reconnect
 }
 
 export class SocketService {
   protected _ws: WebSocket | null = null;
-  protected _accessToken?: string;
-  protected config: ISocketConfig & { maxRetries: number };
+  protected config: ISocketConfig & {
+    maxRetries: number;
+    heartbeatInterval: number;
+    heartbeatTimeout: number;
+  };
   protected reconnectInterval: number;
   protected shouldReconnect: boolean = true;
   protected currentRetryCount: number = 0;
   protected deferredConnect: Promise<void> | undefined;
   protected _isConnected: boolean = false;
 
-  // Listeners for when max retries are exceeded
-  protected maxRetriesExceededListeners: Array<(error: Error) => void> = [];
+  // Heartbeat timers — set on open, cleared on close/disconnect.
+  private _pingIntervalTimer: ReturnType<typeof setInterval> | null = null;
+  private _pongTimeoutTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Authentication event listeners
   protected authErrorListeners: Array<
@@ -71,15 +77,22 @@ export class SocketService {
     protected api: Api,
     config: ISocketConfig,
   ) {
-    // Legacy JWT token support maintained for backward compatibility
-    // Primary authentication now uses Clerk tokens via api.getToken()
-    this._accessToken = undefined;
-    // Default max retries to 5 if not provided
-    this.config = Object.assign({ maxRetries: 5 }, config);
+    // Default max retries to 5 and heartbeat timers to 30s / 10s if not provided
+    this.config = Object.assign(
+      { maxRetries: 5, heartbeatInterval: 30000, heartbeatTimeout: 10000 },
+      config,
+    );
     this.reconnectInterval = config.reconnectInterval ?? 3000;
     this._isConnected = false;
 
     this.addAuthErrorListener(this._handleRefreshToken);
+
+    // Subscribe to pong frames so any inbound pong clears the outstanding
+    // pong timeout. The subscription persists across reconnects because
+    // messageHandlers lives on the service, not on the WebSocket instance.
+    this.subscribe('pong', () => {
+      this._clearPongTimeout();
+    });
 
     // Log socket service initialization
     telemetry.log('websocket.service.initialized', {
@@ -87,56 +100,9 @@ export class SocketService {
       autoConnect: config.autoConnect,
       maxRetries: this.config.maxRetries,
       reconnectInterval: this.reconnectInterval,
+      heartbeatInterval: this.config.heartbeatInterval,
+      heartbeatTimeout: this.config.heartbeatTimeout,
     });
-  }
-
-  public set accessToken(token: string | undefined) {
-    if (token === this._accessToken) {
-      return;
-    }
-
-    const previousToken = this._accessToken;
-    const previousConnectionState = this._isConnected;
-    this._accessToken = token;
-
-    // Log token update
-    telemetry.log('websocket.token.updated', {
-      hadPreviousToken: !!previousToken,
-      hasNewToken: !!token,
-      wasConnected: previousConnectionState,
-      willReconnect:
-        !!token && (!this._ws || this._ws.readyState === WebSocket.CLOSED),
-      willDisconnect: !token && this._ws?.readyState === WebSocket.OPEN,
-    });
-
-    (async () => {
-      if (this.deferredConnect) {
-        await this.deferredConnect;
-      }
-
-      if (this._ws?.readyState === WebSocket.OPEN) {
-        telemetry.log('websocket.token.change.closing_existing', {
-          baseUrl: this.config.baseUrl,
-          hadToken: !!previousToken,
-          hasNewToken: !!token,
-        });
-        this._ws.close();
-      } else if (
-        token &&
-        (!this._ws || this._ws.readyState === WebSocket.CLOSED)
-      ) {
-        telemetry.log('websocket.token.change.connecting', {
-          baseUrl: this.config.baseUrl,
-          previousState: this._ws?.readyState,
-        });
-        this.deferredConnect = this.connect();
-        await this.deferredConnect;
-      }
-    })();
-  }
-
-  public get accessToken() {
-    return this._accessToken;
   }
 
   public get ws() {
@@ -159,7 +125,7 @@ export class SocketService {
       return;
     }
 
-    // Get Clerk token from API instance
+    // Get Clerk token from API instance — Clerk is the sole auth path.
     let clerkToken: string | undefined;
     try {
       clerkToken = await this.api.getToken();
@@ -167,26 +133,24 @@ export class SocketService {
       analytics.error('Failed to get Clerk token for WebSocket', error);
     }
 
-    // Use Clerk token if available, otherwise fall back to legacy token
-    const tokenToUse = clerkToken || this._accessToken;
-
-    if (!tokenToUse) {
+    if (!clerkToken) {
       telemetry.log('websocket.connection.attempt.no_token', {
         baseUrl: this.config.baseUrl,
         retryCount: this.currentRetryCount,
-        hasClerkToken: !!clerkToken,
-        hasLegacyToken: !!this._accessToken,
+        hasClerkToken: false,
       });
       return;
     }
+
+    const tokenToUse = clerkToken;
 
     // Log connection attempt
     telemetry.log('websocket.connection.attempt', {
       baseUrl: this.config.baseUrl,
       retryCount: this.currentRetryCount,
       maxRetries: this.config.maxRetries,
-      hasToken: !!tokenToUse,
-      tokenType: clerkToken ? 'clerk' : 'legacy',
+      hasToken: true,
+      tokenType: 'clerk',
     });
 
     // Build the URL by appending the token as a query parameter.
@@ -216,6 +180,10 @@ export class SocketService {
       // Attach central message dispatcher for subscribe/unsubscribe pattern
       this.attachMessageDispatcher();
 
+      // Start the heartbeat once the dispatcher is wired up — the pong
+      // handler is registered inside attachMessageDispatcher.
+      this._startHeartbeat();
+
       // Log successful connection
       telemetry.log('websocket.connection.established', {
         baseUrl: this.config.baseUrl,
@@ -240,6 +208,10 @@ export class SocketService {
     };
 
     this._ws.onclose = async (closeEvent: CloseEvent) => {
+      // Always clear heartbeat timers on close, before any early-return
+      // paths, so timers cannot outlive the underlying socket.
+      this._stopHeartbeat();
+
       if (!this._isConnected) {
         telemetry.log('websocket.connection.onclose.not_connected', {
           baseUrl: this.config.baseUrl,
@@ -334,22 +306,14 @@ export class SocketService {
 
       if (shouldAttemptReconnect) {
         if (this.currentRetryCount >= this.config.maxRetries) {
-          // Maximum retry limit reached—notify all listeners.
-          const error = new Error(
-            `Max reconnect attempts (${this.config.maxRetries}) reached`,
-          );
-
-          // Log max retries exceeded
+          // Maximum retry limit reached — log and stop. No external listeners
+          // currently consume this event.
           telemetry.log('websocket.reconnect.max_retries_exceeded', {
             baseUrl: this.config.baseUrl,
             maxRetries: this.config.maxRetries,
             finalCloseCode: closeEvent.code,
             finalCloseReason: closeEvent.reason,
           });
-
-          this.maxRetriesExceededListeners.forEach((listener) =>
-            listener(error),
-          );
         } else {
           this.currentRetryCount++;
 
@@ -445,6 +409,10 @@ export class SocketService {
       wasConnected: this._isConnected,
     });
 
+    // Stop the heartbeat before tearing the socket down to avoid a pong
+    // timeout firing mid-close and triggering a spurious reconnect.
+    this._stopHeartbeat();
+
     this._isConnected = false;
     this._ws?.close();
   }
@@ -507,20 +475,9 @@ export class SocketService {
     }
   }
 
-  // Listener registration methods for max retries exceeded.
-  public addMaxRetriesExceededListener(listener: (error: Error) => void): void {
-    this.maxRetriesExceededListeners.push(listener);
-  }
-
-  public removeMaxRetriesExceededListener(
-    listener: (error: Error) => void,
-  ): void {
-    this.maxRetriesExceededListeners = this.maxRetriesExceededListeners.filter(
-      (l) => l !== listener,
-    );
-  }
-
-  private async _handleRefreshToken(code: WebSocketCloseCode) {
+  private _handleRefreshToken = async (
+    code: WebSocketCloseCode,
+  ): Promise<boolean> => {
     if (
       [
         WebSocketCloseCode.INVALID_TOKEN,
@@ -565,7 +522,7 @@ export class SocketService {
     }
 
     return false;
-  }
+  };
 
   /**
    * Register an authentication error handler to process token refresh logic
@@ -725,5 +682,56 @@ export class SocketService {
       this._ws.removeEventListener('message', this.boundMessageHandler);
     }
     this.boundMessageHandler = null;
+  }
+
+  /**
+   * Start the heartbeat loop: emit a ping every `heartbeatInterval` ms and
+   * arm a pong-timeout. If no pong arrives within `heartbeatTimeout` ms the
+   * socket is force-closed with code 4000 and the existing reconnect logic
+   * takes over.
+   */
+  private _startHeartbeat(): void {
+    this._stopHeartbeat();
+
+    this._pingIntervalTimer = setInterval(() => {
+      if (!this._ws || this._ws.readyState !== WebSocket.OPEN) {
+        return;
+      }
+
+      this.send({ type: 'ping' });
+      this._armPongTimeout();
+    }, this.config.heartbeatInterval);
+  }
+
+  private _armPongTimeout(): void {
+    this._clearPongTimeout();
+
+    this._pongTimeoutTimer = setTimeout(() => {
+      telemetry.log('websocket.heartbeat.pong_timeout', {
+        baseUrl: this.config.baseUrl,
+        heartbeatTimeout: this.config.heartbeatTimeout,
+      });
+
+      // Force a close — onclose will clear timers and schedule a reconnect.
+      this._ws?.close(4000, 'heartbeat timeout');
+    }, this.config.heartbeatTimeout);
+  }
+
+  private _clearPongTimeout(): void {
+    if (this._pongTimeoutTimer !== null) {
+      clearTimeout(this._pongTimeoutTimer);
+      this._pongTimeoutTimer = null;
+    }
+  }
+
+  /**
+   * Stop both the ping interval and any in-flight pong timeout. Idempotent.
+   */
+  private _stopHeartbeat(): void {
+    if (this._pingIntervalTimer !== null) {
+      clearInterval(this._pingIntervalTimer);
+      this._pingIntervalTimer = null;
+    }
+    this._clearPongTimeout();
   }
 }

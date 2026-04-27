@@ -293,3 +293,133 @@ import { cn } from '@libs/utils';
   <Icon variant="clipboard" className="aucctus-stroke-secondary h-4 w-4" />
 </button>
 ```
+
+## Glassmorphic System (`.liquid-glass-*`)
+
+Aucctus's dark canvas surfaces (Idea Playground, JTBD, Watchtower, and all modals) use a dedicated glassmorphic layer defined in `aucctus/src/app/assets/styles/global.scss`. These classes compose `backdrop-filter: blur()`, translucent fills, border highlights, and inner shadows to produce refractive glass.
+
+**Do not compose these by hand from Tailwind utilities.** Always use the named classes or the React wrappers in `src/app/components/ui/` (`LiquidGlass.tsx`, `LiquidGlassModal.tsx`, `LiquidGlassDropdown.tsx`, `GlassSurface.tsx`, `ChromaticGlass.tsx`).
+
+### CSS variables (defined at `:root` and overridden in `.dark`)
+
+| Variable | Light | Dark | Purpose |
+|---|---|---|---|
+| `--glass-background` | `rgba(255,255,255,0.7)` | `rgba(255,255,255,0.05)` | Default surface fill |
+| `--glass-background-elevated` | `rgba(255,255,255,0.55)` | `rgba(255,255,255,0.08)` | Elevated surfaces |
+| `--glass-border` | `rgba(0,0,0,0.06)` | `rgba(255,255,255,0.1)` | Border ring |
+| `--glass-border-subtle` | `rgba(0,0,0,0.06)` | `rgba(255,255,255,0.04)` | Subtle border |
+| `--glass-shadow` | `0 1px 3px rgba(0,0,0,0.04)` | `0 8px 32px rgba(0,0,0,0.4)` | Resting shadow |
+| `--glass-shadow-elevated` | — | — | Hover/elevated shadow |
+| `--glass-blur` | `16px` | `16px` | Backdrop blur radius |
+| `--glass-inner-glow` | — | — | `inset` highlight |
+
+Chromatic tint variables (`--glass-chromatic-primary`, `-secondary`, `-tertiary`, `-accent`, `-intensity`) drive the prismatic highlights on modal rims and `ChromaticGlass`.
+
+### Surface classes
+
+| Class | Use for |
+|---|---|
+| `.liquid-glass` | Default glass card |
+| `.liquid-glass-elevated` | Raised / popover glass with stronger shadow |
+| `.liquid-glass-vibrant` | Higher-contrast hero surfaces |
+| `.liquid-glass-vibrant-selected` | Selected state for vibrant |
+| `.liquid-glass-contextual` | Neutral white glass for content areas |
+| `.liquid-glass-persona` | Glass tinted by `--persona-color` CSS var |
+| `.liquid-glass-persona-active` | Selected persona glass |
+| `.liquid-glass-dark` | Floating cards on dark canvas (JTBD cards, Playground tiles) |
+| `.liquid-glass-dark-selected` | Selected dark card |
+| `.liquid-glass-light` | Dark-canvas chips with a lighter fill |
+| `.liquid-glass-light-selected` | Selected light chip |
+| `.liquid-glass-clean` | Minimal-chrome glass (tabs, toolbars) |
+| `.liquid-glass-clean-selected` | Selected clean |
+| `.liquid-glass-minimal` | Lightweight glass for nested/secondary elements |
+| `.liquid-glass-chromatic` | Glass with brand-color gradient overlay |
+| `.liquid-glass-immersive` | Full-depth glass for hero layers |
+| `.liquid-glass-animate` | Adds the 8s shimmer keyframe |
+
+### Modal architecture
+
+Modals are composed of four layers. The rim is the visible "glass edge" users mean when they say "glass rim":
+
+```
+glass-modal-overlay       // blurred dark wash over the page
+ └─ liquid-glass-modal-shell      // outer geometry, padding, lift shadow
+     └─ liquid-glass-modal-rim    // frosted refractive ring (the "rim")
+         └─ <content>             // bright inner surface
+```
+
+| Class | Purpose |
+|---|---|
+| `.glass-modal-overlay` | Radix overlay — `blur(6–8px)` + dark wash |
+| `.liquid-glass-modal-shell` / `.liquid-glass-modal` | Outer geometry, `border-radius: 18px`, lift shadow, padding = rim thickness |
+| `.liquid-glass-modal-rim` | Frosted ring: `blur(30px) saturate(2.2)`, prismatic `::before` tint, top-edge specular `::after` |
+| `.liquid-glass-modal-rim-danger` | Red-tinted rim for destructive dialogs |
+| `.liquid-glass-modal-rim-animated` | Slowly rotating conic gradient — use sparingly (Create Persona, Overseer) |
+
+Rim-level CSS variables (set on the shell, cascade to the rim):
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `--lg-modal-radius` | `18px` | Modal corner radius |
+| `--lg-rim` | `clamp(10px, 1.1vw + 8px, 14px)` | Rim thickness |
+| `--lg-rim-blur` | `30px` | Rim backdrop-filter blur |
+| `--lg-rim-saturate` | `2.2` | Rim saturation |
+| `--lg-rim-alpha` | `0.12` light / `0.10` dark | Rim fill opacity |
+| `--lg-surface-alpha` | `0.90` light / `0.78` dark | Inner surface opacity |
+
+### The canonical modal wrapper — `<LiquidGlassModal>`
+
+```tsx
+import { LiquidGlassModal } from '@components/ui/LiquidGlassModal';
+
+<LiquidGlassModal
+  open={open}
+  onOpenChange={setOpen}
+  size="md"                     // 'sm' | 'md' | 'lg' | 'xl'
+  variant="default"             // 'default' | 'danger'
+  title="Rename Persona"
+  description="This only affects the display name."
+  animatedRim={false}           // true = rotating-conic rim
+  hideCloseButton={false}
+>
+  {/* content */}
+</LiquidGlassModal>
+```
+
+Sizes: `sm` 400px, `md` 560px, `lg` 720px, `xl` 900px — pick by content density, not viewport.
+
+**Do not mount Radix `<Dialog.Content>` directly** — the rim and overlay won't apply. Always compose through `<LiquidGlassModal>`.
+
+### Dark-canvas primitives you'll reach for
+
+```tsx
+// Floating card on a dark gradient
+<div className="liquid-glass-dark rounded-xl p-4">…</div>
+
+// Segmented glass pill (Idea Mode / Jobs to Be Done)
+<div className="flex items-center gap-0.5 rounded-full border border-white/20 bg-white/10 p-1 backdrop-blur-md">
+  <button className="rounded-full border border-white/40 bg-white/20 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-md shadow-lg">
+    Idea Mode
+  </button>
+</div>
+
+// Hero search (don't roll your own — use the composed shell + rim)
+<div className="liquid-glass-search-shell">
+  <div className="liquid-glass-search-rim" />
+  <input className="…" />
+</div>
+```
+
+### Glass do's and don'ts
+
+**Do**
+- Use a named `.liquid-glass-*` class or a wrapper component
+- Keep glass layered exactly once over a contrasting base (dark gradient or modal overlay)
+- Let the rim do the work for separation — avoid adding hard `border` on top of it
+- Test hover states visually — opacity bumps are easy to make too subtle
+
+**Don't**
+- Stack glass on glass on glass (produces mud)
+- Apply `backdrop-blur-*` utilities directly when a named class already covers the pattern
+- Remove `overflow: hidden` from the shell — the rim's `::before` gradient depends on it
+- Use glass on pages that are already light surfaces (Concepts list, Settings, Nucleus cards) — those should stay flat

@@ -19,11 +19,12 @@ interface OverseerChatProps {
   editSuggestions?: IOverseerEditSuggestions | null;
   navigateSuggestion?: IOverseerNavigateSuggestion | null;
   onConfirmEdits?: (selectedEdits: IAiEditingSuggestion[]) => void;
-  onCancelEdits?: () => void;
+  onCancelEdits?: (editStatuses?: Record<number, string>) => void;
   isApplyingEdits?: boolean;
   isThinking?: boolean;
   toolActivitySteps?: AgentStep[];
   onActiveEditChange?: (edit: IAiEditingSuggestion) => void;
+  onEditStatusChange?: (index: number, status: string) => void;
 }
 
 /**
@@ -41,6 +42,7 @@ const OverseerChat: React.FC<OverseerChatProps> = ({
   isThinking,
   toolActivitySteps,
   onActiveEditChange,
+  onEditStatusChange,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -79,6 +81,7 @@ const OverseerChat: React.FC<OverseerChatProps> = ({
               reply={editSuggestionMessage.editSuggestions.reply}
               readOnly
               resolutionStatus={resolutionStatus}
+              editResolutions={editSuggestionMessage.editResolutions}
             />
           );
         }
@@ -123,6 +126,7 @@ const OverseerChat: React.FC<OverseerChatProps> = ({
           onCancel={onCancelEdits}
           isLoading={isApplyingEdits}
           onActiveEditChange={onActiveEditChange}
+          onEditStatusChange={onEditStatusChange}
         />
       )}
 

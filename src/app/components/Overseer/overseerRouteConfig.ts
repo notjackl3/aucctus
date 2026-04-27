@@ -111,6 +111,18 @@ export const OVERSEER_ROUTE_REGISTRY: Partial<
     pageContext: 'submissions',
     contextLevel: 'account',
   },
+
+  // Idea Playground + JTBD share the `/playground` route. JTBD mode is a
+  // `?mode=jtbd` sub-view with its own page context; without the param we
+  // fall back to the idea_playground context.
+  [AppPath.IdeaPlayground]: {
+    pageContext: 'idea_playground',
+    contextLevel: 'account',
+    editingEnabled: true,
+    resolvePageContext: (_pathname, searchParams) =>
+      searchParams.get('mode') === 'jtbd' ? 'jtbd' : 'idea_playground',
+    resolvedContexts: ['jtbd', 'idea_playground'],
+  },
 };
 
 /**

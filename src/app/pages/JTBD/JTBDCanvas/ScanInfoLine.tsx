@@ -1,5 +1,5 @@
-import type { IJTBDScan } from '@libs/api/types/jtbd';
-import { Calendar } from 'lucide-react';
+import type { IJTBDJob, IJTBDScan } from '@libs/api/types/jtbd';
+import { Calendar, GitMerge } from 'lucide-react';
 import React from 'react';
 
 export const formatScanDate = (dateStr: string): string => {
@@ -15,12 +15,28 @@ export const formatScanDate = (dateStr: string): string => {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
+const pluralize = (n: number, word: string): string =>
+  `${n} ${word}${n !== 1 ? 's' : ''}`;
+
 const ScanInfoLine: React.FC<{
   scans: IJTBDScan[];
-  jobCount: number;
-}> = ({ scans, jobCount }) => {
+  jobs: IJTBDJob[];
+}> = ({ scans, jobs }) => {
   const currentScan = scans.find((s) => s.isCurrent);
   if (!currentScan) return null;
+
+  const total = jobs.length;
+  const mergedCount = jobs.filter((j) => j.mergedFromScanUuid).length;
+  const newCount = total - mergedCount;
+
+  const countLabel =
+    total === 0
+      ? 'no jobs on canvas'
+      : mergedCount === 0
+        ? `${pluralize(total, 'job')} discovered`
+        : newCount === 0
+          ? `${pluralize(total, 'job')} merged from prior scan`
+          : `${newCount} new · ${mergedCount} merged from prior scan`;
 
   return (
     <div className='flex items-center gap-3 text-[11px] text-white/40'>
@@ -29,9 +45,10 @@ const ScanInfoLine: React.FC<{
         <span>Scanned {formatScanDate(currentScan.scannedAt)}</span>
       </div>
       <span className='text-white/20'>·</span>
-      <span>
-        {jobCount} job{jobCount !== 1 ? 's' : ''} discovered
-      </span>
+      <div className='flex items-center gap-1.5'>
+        {mergedCount > 0 && <GitMerge className='h-3 w-3' />}
+        <span>{countLabel}</span>
+      </div>
     </div>
   );
 };

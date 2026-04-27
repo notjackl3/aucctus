@@ -33,11 +33,13 @@ import {
   loadConversation,
   open,
   openFromSearchBar,
+  openWithPrefill,
   removeImage,
   removeMention,
   sendMessage,
   setAccountContext,
   setCurrentMessage,
+  syncPageContext,
   setDocked,
   setEditSuggestions,
   setHistoryItems,
@@ -87,6 +89,7 @@ export const initialOverseerState = {
   isOpen: false,
   position: { x: 0, y: 0 } as IOverseerPosition,
   isDocked: false,
+  dockedWidth: 400,
   showingSelectionButton: false,
   pendingSelection: undefined as IOverseerPendingSelection | undefined,
   selectedText: '',
@@ -116,6 +119,7 @@ export const initialOverseerState = {
   messageQueue: [] as IOverseerQueuedMessage[],
   isQueuePaused: false,
   isCancelling: false,
+  prefillNonce: 0,
 };
 
 const overseerSlice: Lens<IOverseerState, IAppStore> = (set, get, storeApi) => {
@@ -126,6 +130,7 @@ const overseerSlice: Lens<IOverseerState, IAppStore> = (set, get, storeApi) => {
     isOpen: false,
     position: { x: 0, y: 0 },
     isDocked: false,
+    dockedWidth: 400,
     showingSelectionButton: false,
     pendingSelection: undefined,
     selectedText: '',
@@ -155,6 +160,7 @@ const overseerSlice: Lens<IOverseerState, IAppStore> = (set, get, storeApi) => {
     messageQueue: [],
     isQueuePaused: false,
     isCancelling: false,
+    prefillNonce: 0,
 
     // Actions
     showSelectionButton: showSelectionButton.bind(actionContext),
@@ -162,6 +168,7 @@ const overseerSlice: Lens<IOverseerState, IAppStore> = (set, get, storeApi) => {
     confirmSelection: confirmSelection.bind(actionContext),
     open: open.bind(actionContext),
     openFromSearchBar: openFromSearchBar.bind(actionContext),
+    openWithPrefill: openWithPrefill.bind(actionContext),
     openToHistory: openToHistory.bind(actionContext),
     close: close.bind(actionContext),
     cancelCurrentRun: cancelCurrentRun.bind(actionContext),
@@ -170,6 +177,7 @@ const overseerSlice: Lens<IOverseerState, IAppStore> = (set, get, storeApi) => {
     toggleQueuePaused: toggleQueuePaused.bind(actionContext),
     sendMessage: sendMessage.bind(actionContext),
     setCurrentMessage: setCurrentMessage.bind(actionContext),
+    syncPageContext: syncPageContext.bind(actionContext),
     handleHandshake: handleHandshake.bind(actionContext),
     addAssistantMessage: addAssistantMessage.bind(actionContext),
     handleSuggestedQuestions: handleSuggestedQuestions.bind(actionContext),
@@ -220,6 +228,13 @@ const overseerSlice: Lens<IOverseerState, IAppStore> = (set, get, storeApi) => {
       set(
         produce((state: IOverseerState) => {
           state.position = position;
+        }),
+      );
+    },
+    setDockedWidth: (width: number) => {
+      set(
+        produce((state: IOverseerState) => {
+          state.dockedWidth = width;
         }),
       );
     },

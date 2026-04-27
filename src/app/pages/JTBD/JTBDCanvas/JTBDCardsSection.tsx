@@ -12,6 +12,7 @@ const JTBDCardsSection: React.FC<{
   onCardClick: (job: IJTBDJob) => void;
   onIdeate: (job: IJTBDJob) => Promise<void>;
   ideatingJobUuid: string | null;
+  editingJobUuids: ReadonlySet<string>;
 }> = ({
   jobs,
   isLoading,
@@ -20,6 +21,7 @@ const JTBDCardsSection: React.FC<{
   onCardClick,
   onIdeate,
   ideatingJobUuid,
+  editingJobUuids,
 }) => {
   return (
     <div className='px-8 pb-24 pt-8' style={{ scrollSnapAlign: 'start' }}>
@@ -47,6 +49,7 @@ const JTBDCardsSection: React.FC<{
               onCardClick={onCardClick}
               onIdeate={onIdeate}
               ideatingJobUuid={ideatingJobUuid}
+              editingJobUuids={editingJobUuids}
             />
             {jobs.length === 0 && (
               <div className='py-20 text-center text-lg text-white/40'>

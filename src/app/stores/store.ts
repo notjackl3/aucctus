@@ -41,6 +41,10 @@ import ideaPlaygroundSlice, {
   IIdeaPlaygroundState,
   initialIdeaPlaygroundState,
 } from './idea-playground/store';
+import jtbdActiveSlice, {
+  IJtbdActiveState,
+  initialJtbdActiveState,
+} from './jtbd/activeStore';
 import queryInvalidationSlice, {
   IQueryInvalidationState,
   initialQueryInvalidationState,
@@ -71,6 +75,7 @@ export interface IAppStore {
   nucleusAnswer: INucleusAnswerState;
   magicShare: IMagicShareState;
   ideaPlayground: IIdeaPlaygroundState;
+  jtbdActive: IJtbdActiveState;
   queryInvalidation: IQueryInvalidationState;
   syntheticTesting: ISyntheticTestingState;
   overseer: IOverseerState;
@@ -98,6 +103,7 @@ const useStore = create<IAppStore>()(
         nucleusAnswer: nucleusAnswerSlice,
         magicShare: magicShareSlice,
         ideaPlayground: ideaPlaygroundSlice,
+        jtbdActive: jtbdActiveSlice,
         queryInvalidation: queryInvalidationSlice,
         syntheticTesting: syntheticTestingSlice,
         overseer: overseerSlice,
@@ -187,6 +193,7 @@ const getInitialState = (): IAppStore => {
     magicShare: initialMagicShareState as unknown as IMagicShareState,
     ideaPlayground:
       initialIdeaPlaygroundState as unknown as IIdeaPlaygroundState,
+    jtbdActive: initialJtbdActiveState as unknown as IJtbdActiveState,
     queryInvalidation:
       initialQueryInvalidationState as unknown as IQueryInvalidationState,
     syntheticTesting:

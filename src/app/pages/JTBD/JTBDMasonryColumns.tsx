@@ -14,6 +14,11 @@ interface JTBDMasonryColumnsProps {
   onCardClick: (job: IJTBDJob) => void;
   onIdeate?: (job: IJTBDJob) => void;
   ideatingJobUuid?: string | null;
+  /**
+   * UUIDs of jobs that currently have an Ask Aucctus edit in flight. Used
+   * to surface a per-card loading badge. Pass a `Set` for O(1) lookups.
+   */
+  editingJobUuids?: ReadonlySet<string>;
 }
 
 // ============================================
@@ -137,6 +142,7 @@ export const JTBDMasonryColumns: React.FC<JTBDMasonryColumnsProps> = ({
   onCardClick,
   onIdeate,
   ideatingJobUuid,
+  editingJobUuids,
 }) => {
   const columnCount = useColumnCount();
   const isScrolling = useIsScrolling();
@@ -147,9 +153,9 @@ export const JTBDMasonryColumns: React.FC<JTBDMasonryColumnsProps> = ({
   );
 
   return (
-    <div className='flex gap-6'>
+    <div className='flex w-full gap-6'>
       {columns.map((column, colIndex) => (
-        <div key={colIndex} className='flex flex-1 flex-col gap-6'>
+        <div key={colIndex} className='flex min-w-0 flex-1 flex-col gap-6'>
           {column.map(({ job, originalIndex }) => (
             <motion.div
               key={job.uuid}
@@ -169,6 +175,7 @@ export const JTBDMasonryColumns: React.FC<JTBDMasonryColumnsProps> = ({
                 onClick={onCardClick}
                 onIdeate={onIdeate}
                 isIdeating={ideatingJobUuid === job.uuid}
+                isEditing={editingJobUuids?.has(job.uuid) ?? false}
               />
             </motion.div>
           ))}

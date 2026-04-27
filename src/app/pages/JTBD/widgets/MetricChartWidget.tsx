@@ -103,8 +103,18 @@ export const MetricChartWidget: React.FC<MetricChartWidgetProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className='flex flex-col items-center gap-4'
+        className='flex flex-col gap-4'
       >
+        <WidgetHeader
+          icon={
+            <DynamicIcon
+              variant={widget.icon || 'pie-chart'}
+              className='h-3.5 w-3.5'
+            />
+          }
+          label={widget.title || 'Metrics'}
+          description={widget.description}
+        />
         <ResponsiveContainer width='100%' height={200}>
           <PieChart>
             <Pie

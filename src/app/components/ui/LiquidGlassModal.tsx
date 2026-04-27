@@ -69,6 +69,11 @@ interface LiquidGlassModalProps {
    * Additional CSS classes for the title section
    */
   titleClassName?: string;
+  /**
+   * Right offset in pixels applied to both the overlay and content container.
+   * Used to shift the modal left when the Overseer dock panel is open.
+   */
+  rightOffset?: number;
 }
 
 /**
@@ -160,6 +165,7 @@ const LiquidGlassModal: React.FC<LiquidGlassModalProps> = ({
   titleIcon,
   animatedRim = true,
   titleClassName,
+  rightOffset,
 }) => {
   const styles = variantStyles[variant];
   const distortionId = React.useId().replace(/:/g, '');
@@ -178,12 +184,16 @@ const LiquidGlassModal: React.FC<LiquidGlassModalProps> = ({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2, ease: 'easeOut' }}
                 className='glass-modal-overlay fixed inset-0 z-50'
+                style={rightOffset ? { right: rightOffset } : undefined}
               />
             </Dialog.Overlay>
 
             {/* Modal content with shell-rim-surface architecture */}
             <Dialog.Content asChild>
-              <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
+              <div
+                className='fixed inset-0 z-50 flex items-center justify-center p-4'
+                style={rightOffset ? { right: rightOffset } : undefined}
+              >
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}

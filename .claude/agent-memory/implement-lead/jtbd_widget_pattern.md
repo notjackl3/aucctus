@@ -1,8 +1,8 @@
 ---
 name: JTBD Widget System Pattern
-description: Full-stack pattern for adding new widget types to the JTBD canvas - backend (enum, model, migration, Pydantic, prompt, service, prefetch, schema, route) and frontend (types, component, renderer, index, COL_SPAN)
+description: Full-stack pattern for adding new widget types to the JTBD canvas - backend (enum, model, migration, Pydantic, prompt, service, prefetch, schema, route) and frontend (types, component, renderer, index, COL_SPAN). User-authored `note` variant sidesteps the AI extraction path.
 type: project
-last_modified: 2026-04-10
+last_modified: 2026-04-20
 ---
 
 ## Backend (8 touch points)
@@ -69,4 +69,19 @@ Adding a new JTBD widget type on the backend requires changes in 8 files:
 
 **Why:** The widget system is flat-polymorphic (all item arrays on every widget, only matching one populated). This avoids discriminated unions in favor of simpler serialization from the backend.
 
-**How to apply:** Follow this checklist for any future widget type additions. As of 2026-04-10 there are 8 widget types: metric_chart, trend_chart, card_list, stat_list, social_post, survey, sparkline_stat, market_sizing.
+**How to apply:** Follow this checklist for any future widget type additions. As of 2026-04-20 there are 9 widget types: metric_chart, trend_chart, card_list, stat_list, social_post, survey, sparkline_stat, market_sizing, note.
+
+## User-authored notes (`note` widget type)
+
+Notes diverge from the AI-authored widget pattern in a few places — remember:
+
+1. **No evidence-extraction hooks.** Skip the Pydantic output class, the prompt section, and the agent's `item_lists` updates. The backend skips these too.
+2. **REST CRUD, not AI generation.** Endpoints:
+   - `POST /api/v1/jtbd/jobs/{jobUuid}/notes/` body `{ body }` → 201 returns the full `IJTBDCustomWidget`
+   - `PUT /api/v1/jtbd/jobs/notes/{itemUuid}/` body `{ body }` → 200
+   - `DELETE /api/v1/jtbd/jobs/notes/{itemUuid}/` → 204
+3. **WidgetRenderer gates the sparkle "Refine" button** on `widget.widgetType !== 'note'` — user-authored widgets don't reassess. `NoteWidget` requires `jobUuid` to render (edit/delete mutations need it).
+4. **JTBDCard has a third section: Notes.** The expanded card splits `customWidgets` into `marketSizingWidgets` / `evidenceWidgets` / `noteWidgets`; notes render in their own `CollapsibleSection` with an inline add-note form at the bottom.
+5. **`IJTBDNoteItem` shape:** `{ uuid, body, createdBy: string | null, createdAt, updatedAt }` — no `sources` or `displayOrder` fields.
+6. **Hooks are in jtbd.hook.ts:** `useCreateJTBDNote(jobUuid)` (job-scoped), `useUpdateJTBDNote()` + `useDeleteJTBDNote()` (take `{ itemUuid, jobUuid }` mutation vars). All invalidate `jtbdKeys.job(jobUuid)` + `jtbdKeys.all/jobs` + `jtbdKeys.all/currentScan` via a shared `invalidateJobCaches` helper.
+7. **Overseer integration:** `'jtbd_note_add'` edit-suggestion kind with `{ jobUuid, body }` payload. `OverseerPopup.applyJTBDNoteAdd` calls `api.jtbd.createNote` directly (not the hook) because the hook is job-scoped and the carousel can target arbitrary jobs — manual cache invalidation after the POST. Tracks its own `isAddingJTBDNote` flag folded into `isApplyingEdits`.

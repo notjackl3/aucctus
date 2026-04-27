@@ -193,14 +193,11 @@ export const useDynamicComponentSocketEvents = (conceptUuid: string) => {
   const [progress, setProgress] =
     useState<DynamicComponentProgress>(DEFAULT_PROGRESS);
 
-  // Listen for progress events
-  // Cast to 'any' since the socket event type might not be in the registry yet
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  useSocketEvent<any>(
-    'dynamic_component.progress.account' as any,
+  // Listen for progress events — typed via the InboundSocketEvent union.
+  useSocketEvent(
+    'dynamic_component.progress.account',
     useCallback(
-      (data: unknown) => {
-        const message = data as IDynamicComponentProgressMessage;
+      (message: IDynamicComponentProgressMessage) => {
         // Only handle events for this concept
         if (message.conceptUuid !== conceptUuid) return;
 

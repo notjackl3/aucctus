@@ -13,6 +13,10 @@ interface JTBDViewContextValue {
   setShowCreateModal: (show: boolean) => void;
   editConfigUuid: string | undefined;
   setEditConfigUuid: (uuid: string | undefined) => void;
+  selectedJobUuid: string | null;
+  setSelectedJobUuid: (
+    uuid: string | null | ((prev: string | null) => string | null),
+  ) => void;
 }
 
 const JTBDViewContext = createContext<JTBDViewContextValue | null>(null);
@@ -35,9 +39,12 @@ export const JTBDViewProvider: React.FC<{ children: React.ReactNode }> = ({
   const [editConfigUuid, setEditConfigUuid] = useState<string | undefined>(
     undefined,
   );
-  // Clear edit config when switching configs
+  const [selectedJobUuid, setSelectedJobUuid] = useState<string | null>(null);
+
+  // Clear edit config and selected job when switching configs
   useEffect(() => {
     setEditConfigUuid(undefined);
+    setSelectedJobUuid(null);
   }, [activeConfigUuid]);
 
   const value = useMemo(
@@ -48,8 +55,10 @@ export const JTBDViewProvider: React.FC<{ children: React.ReactNode }> = ({
       setShowCreateModal,
       editConfigUuid,
       setEditConfigUuid,
+      selectedJobUuid,
+      setSelectedJobUuid,
     }),
-    [activeConfigUuid, showCreateModal, editConfigUuid],
+    [activeConfigUuid, showCreateModal, editConfigUuid, selectedJobUuid],
   );
 
   return (

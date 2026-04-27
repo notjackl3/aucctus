@@ -1,5 +1,6 @@
 import { IAiEditingContext, IConceptReportEdit } from '../ai-editing';
 import { IBaseMessage } from '../chat';
+import { IDynamicComponentProgressMessage } from '../dynamicComponent';
 import {
   IConceptGenerationContext,
   IGeneratedConceptList,
@@ -1168,6 +1169,14 @@ export interface IWatchtowerRuleGenerationErrorMessage extends BaseSocketEvent {
 // JTBD Canvas Scan Messages
 // ==========================================
 
+export interface IJTBDScanStartedMessage extends BaseSocketEvent {
+  type: 'jtbd.scan.started.account';
+  accountUuid: string;
+  configUuid: string;
+  /** May be absent if the scan row is created later by the worker. */
+  scanUuid?: string;
+}
+
 export interface IJTBDScanCompletedMessage extends BaseSocketEvent {
   type: 'jtbd.scan.completed.account';
   accountUuid: string;
@@ -1191,6 +1200,64 @@ export interface IJTBDVideoReadyMessage extends BaseSocketEvent {
   configUuid: string;
   jobUuid: string;
   message: string;
+}
+
+// ==========================================
+// JTBD Unified Job Edit Messages
+// ==========================================
+
+export interface IJTBDJobEditStartedMessage extends BaseSocketEvent {
+  type: 'jtbd.job.edit.started.account';
+  accountUuid: string;
+  jobUuid: string;
+  configUuid: string;
+}
+
+export interface IJTBDJobEditedMessage extends BaseSocketEvent {
+  type: 'jtbd.job.edited.account';
+  accountUuid: string;
+  jobUuid: string;
+  configUuid: string;
+  scanUuid: string;
+  taskId: string;
+  job: import('../jtbd').IJTBDJob;
+  message: string;
+}
+
+export interface IJTBDJobEditErrorMessage extends BaseSocketEvent {
+  type: 'jtbd.job.edit.error.account';
+  accountUuid: string;
+  jobUuid: string;
+  taskId: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
+// ==========================================
+// JTBD Unified Job Merge Messages
+// ==========================================
+
+export interface IJTBDJobsMergedMessage extends BaseSocketEvent {
+  type: 'jtbd.jobs.merged.account';
+  accountUuid: string;
+  primaryJobUuid: string;
+  secondaryJobUuids: string[];
+  configUuid: string;
+  scanUuid: string;
+  taskId: string;
+  job: import('../jtbd').IJTBDJob;
+  message: string;
+}
+
+export interface IJTBDJobsMergeErrorMessage extends BaseSocketEvent {
+  type: 'jtbd.jobs.merge.error.account';
+  accountUuid: string;
+  primaryJobUuid: string;
+  secondaryJobUuids: string[];
+  error: string;
+  message: string;
+  details?: { refusalReason?: string; [key: string]: unknown };
 }
 
 // ==========================================
@@ -1351,7 +1418,17 @@ export interface IPortfolioSummaryMessage extends BaseSocketEvent {
   horizonBreakdown: IHorizonBreakdown;
 }
 
+/**
+ * Inbound heartbeat pong. Sent by the backend in response to an outbound
+ * `ping`. Its arrival is used purely to clear the pending pong-timeout on the
+ * frontend — it carries no payload.
+ */
+export interface IPongMessage extends BaseSocketEvent {
+  type: 'pong';
+}
+
 export type InboundSocketEvent<C = {}> =
+  | IPongMessage
   | ErrorEvent
   | ChatStreamEvent<C>
   | AISuggestionsStreamEvent
@@ -1386,7 +1463,6 @@ export type InboundSocketEvent<C = {}> =
   | ITestGenerationProgressMessage
   | ITestGenerationCompletedMessage
   | ITestGenerationErrorMessage
-  | IConceptWorkflowMessage
   | ISyntheticExecutionProgressMessage
   | ISyntheticExecutionCompletedMessage
   | ISyntheticExecutionErrorMessage
@@ -1472,15 +1548,22 @@ export type InboundSocketEvent<C = {}> =
   | IPersonaChatTypingMessage
   | IPersonaChatErrorMessage
   | IPersonaChatToolActivityMessage
+  | IJTBDScanStartedMessage
   | IJTBDScanCompletedMessage
   | IJTBDScanErrorMessage
   | IJTBDVideoReadyMessage
+  | IJTBDJobEditStartedMessage
+  | IJTBDJobEditedMessage
+  | IJTBDJobEditErrorMessage
+  | IJTBDJobsMergedMessage
+  | IJTBDJobsMergeErrorMessage
   | IJTBDRuleGenerationCompletedMessage
   | IJTBDRuleGenerationErrorMessage
   | IConceptDocumentProcessingProgressMessage
   | IConceptDocumentProcessingCompletedMessage
   | IConceptDocumentProcessingErrorMessage
-  | IConceptEvidenceDiscoveredMessage;
+  | IConceptEvidenceDiscoveredMessage
+  | IDynamicComponentProgressMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];
 
