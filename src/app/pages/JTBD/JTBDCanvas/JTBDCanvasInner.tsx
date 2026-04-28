@@ -12,6 +12,7 @@ import {
 } from '@hooks/query/jtbd.hook';
 import type { IJTBDJob } from '@libs/api/types/jtbd';
 import { cn } from '@libs/utils/react';
+import { useInitiationStore } from '@stores/initiation.store';
 import useStore from '@stores/store';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, Puzzle, Radar, Search, Send, X } from 'lucide-react';
@@ -369,6 +370,17 @@ const JTBDCanvasInner: React.FC<JTBDCanvasInnerProps> = ({
   );
 
   const isEmptyState = !isLoadingConfigs && !activeConfig;
+
+  // Hide the floating "Ask Aucctus" search bar while the JTBD init/empty
+  // state is on screen — it has its own search input and CTA, and the bar
+  // would compete visually.
+  const setShowingInitiation = useInitiationStore(
+    (s) => s.setShowingInitiation,
+  );
+  useEffect(() => {
+    setShowingInitiation(isEmptyState);
+    return () => setShowingInitiation(false);
+  }, [isEmptyState, setShowingInitiation]);
 
   // Determine which content to render
   const renderContent = (): React.ReactNode => {
