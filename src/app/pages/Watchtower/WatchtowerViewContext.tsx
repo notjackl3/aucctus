@@ -3,6 +3,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -40,10 +41,22 @@ export const WatchtowerViewProvider: React.FC<{
   );
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Reset selected scan when switching towers since scan UUIDs
-  // belong to a specific config and are not interchangeable.
+  // Reset selected scan when *switching* towers (i.e. transitioning between
+  // two distinct defined configs). Skip the reset on initial transitions
+  // from `undefined` so that cold-load deep-links like /watchtower?scan=<uuid>
+  // — which set selectedScanUuid via useWatchtowerUrlSync before the active
+  // config has been resolved — don't get wiped when the config arrives.
+  const prevActiveConfigRef = useRef<string | undefined>(undefined);
   useEffect(() => {
-    setSelectedScanUuid(undefined);
+    const prev = prevActiveConfigRef.current;
+    prevActiveConfigRef.current = activeWatchtowerConfigUuid;
+    if (
+      prev !== undefined &&
+      activeWatchtowerConfigUuid !== undefined &&
+      prev !== activeWatchtowerConfigUuid
+    ) {
+      setSelectedScanUuid(undefined);
+    }
   }, [activeWatchtowerConfigUuid]);
 
   const value = useMemo(

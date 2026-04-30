@@ -36,6 +36,7 @@ import { NucleusInitiation } from '../NucleusInitiation';
 import StatusBadge from '../StatusBadge';
 import { CategoryState, QuestionState } from '../StatusDropdown';
 import { AlertCircle, AlertTriangle, Lock, Sparkles } from 'lucide-react';
+import { useNucleusUrlSync } from './useNucleusUrlSync';
 
 const NucleusPage: React.FC = () => {
   // Track page time for analytics
@@ -87,6 +88,13 @@ const NucleusPage: React.FC = () => {
 
   // Handle URL query param for tabs and scoring config
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Bind aucctus:// internal-citation deep-link params (`?document=<uuid>`).
+  // The param is plumbed through; document-tile highlight is a Phase 2
+  // concern — for v1 the deep-link lands on the page and the param is
+  // available for downstream consumers.
+  const { documentUuid: _deepLinkedDocumentUuid } = useNucleusUrlSync();
+  void _deepLinkedDocumentUuid;
 
   // Tab state - persists in URL params
   type NucleusTab = 'company-context' | 'living-personas' | 'decision-making';

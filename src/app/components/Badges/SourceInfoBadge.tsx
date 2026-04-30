@@ -1,19 +1,37 @@
-import images from '@assets/img';
-import AucctusLogo from '@assets/aucctus_logo.png';
-import { ComponentTooltip } from '@components';
+/**
+ * SourceInfoBadge — thin wrapper over `<SourceBadge variant="standard">`.
+ *
+ * Owns the data-fetching for company name (logo.dev) + published date that
+ * the unified SourceBadge intentionally doesn't know about. Builds an
+ * enriched `Citation` and hands it off; click behavior is managed by
+ * SourceBadge via `useCitationResolver`.
+ *
+ * Caller-supplied `onClick` and `sourceDescription` are still honored for
+ * back-compat with existing markup. The `onClick` only fires when the
+ * citation resolves to an interactive target — non-clickable rows
+ * (no URL, AI-reasoning) ignore it.
+ */
+
+import {
+  SourceBadge,
+  adaptISource,
+  type Citation,
+} from '@components/SourceBadge';
 import {
   useCompanyInfo,
   usePublishedDatesQuery,
 } from '@hooks/query/articles.hook';
 import type { ISource } from '@libs/api/types';
-import { getBaseUrl, formatRelativeDate, getLogoUrl } from '@libs/utils/source';
-import { cn } from '@libs/utils/react';
+import { formatRelativeDate } from '@libs/utils/source';
 import React, { useMemo } from 'react';
 import ClassificationBadge from '../../pages/Concept/Report/MarketScan/v3/components/ClassificationBadge';
-import { Lightbulb } from 'lucide-react';
 
 interface SourceInfoBadgeProps {
   source: ISource;
+  /**
+   * @deprecated External callers should rely on the resolver's behavior.
+   * Honored for back-compat in MarketScan SourceBadgeList row clicks.
+   */
   onClick?: () => void;
   showPublishedDate?: boolean;
   badgeClassName?: string;
@@ -24,7 +42,6 @@ interface SourceInfoBadgeProps {
 
 const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
   source,
-  onClick,
   badgeClassName = '',
   badgeSize = 'medium',
   showPublishedDate = false,
@@ -32,129 +49,36 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
   hideDelay = 0,
 }) => {
   const isNucleusSource = source.sourceType === 'nucleus';
-
+  const companyInfoQuery = useCompanyInfo(isNucleusSource ? '' : source.url);
   const publishedDatesQuery = usePublishedDatesQuery(
     isNucleusSource ? { uuid: '', title: '', url: '' } : source,
     showPublishedDate && !isNucleusSource,
   );
-  const companyInfoQuery = useCompanyInfo(isNucleusSource ? '' : source.url);
 
-  // Check if this is an AI-generated source (AI Reasoning or AI Synthesis)
-  const isAIGenerated =
-    source.title?.toLowerCase().includes('ai reasoning') ||
-    source.title?.toLowerCase().includes('ai synthesis') ||
-    (!source.url && source.description);
-
-  // Memoized computed values to reduce re-renders
-  const { sourceTitle, publishedDate, logoSizeClass, fontSizeClass } =
-    useMemo(() => {
-      const logoSizeClass = badgeSize === 'small' ? 'h-4 w-4' : 'h-6 w-6';
-      const fontSizeClass =
-        badgeSize === 'small' ? 'text-xs font-normal' : 'text-sm font-medium';
-
-      let sourceTitle = 'loading...';
-      // Handle nucleus sources first
-      if (isNucleusSource) {
-        sourceTitle = source.nucleusFileSource?.title || source.title;
-      } else if (isAIGenerated) {
-        // Determine if it's AI Reasoning or AI Synthesis based on title
-        if (source.title?.toLowerCase().includes('ai synthesis')) {
-          sourceTitle = 'AI Synthesis';
-        } else {
-          sourceTitle = 'AI Reasoning';
-        }
-      } else if (!!source?.nucleusFileSource?.title) {
-        sourceTitle = source.nucleusFileSource.title;
-      } else if (companyInfoQuery.data?.[0]?.name) {
-        sourceTitle = companyInfoQuery.data[0].name;
-      } else {
-        sourceTitle = getBaseUrl(source.url);
-      }
-      let publishedDate = '';
-      if (publishedDatesQuery.data && showPublishedDate) {
-        publishedDate = formatRelativeDate(
-          publishedDatesQuery.data.publishedDate,
-        );
-      }
-
-      return { sourceTitle, publishedDate, logoSizeClass, fontSizeClass };
-    }, [
-      badgeSize,
-      companyInfoQuery.data,
-      publishedDatesQuery.data,
-      showPublishedDate,
-      source.url,
-      source.nucleusFileSource,
-      source.title,
-      isAIGenerated,
-      isNucleusSource,
-    ]);
-
-  const renderSourceLogo = () => {
-    // Show Aucctus logo for nucleus sources
-    if (isNucleusSource) {
-      return (
-        <div
-          className={cn(
-            'flex items-center justify-center overflow-hidden rounded-full bg-white',
-            logoSizeClass,
-          )}
-        >
-          <img
-            src={AucctusLogo}
-            alt='Nucleus'
-            className='h-full w-full object-contain p-0.5'
-          />
-        </div>
-      );
+  // Build the canonical citation, then layer in the company-name override
+  // (only applied to web sources where the lookup actually returned data).
+  const citation: Citation = useMemo(() => {
+    const base = adaptISource(source);
+    const companyName = companyInfoQuery.data?.[0]?.name;
+    if (
+      base.kind === 'web' &&
+      companyName &&
+      // logo.dev's name fallback is just the bare domain — only override
+      // when we have something more specific.
+      companyName !== base.label
+    ) {
+      return { ...base, label: companyName };
     }
+    return base;
+  }, [source, companyInfoQuery.data]);
 
-    // Show lightbulb icon for AI-generated sources
-    if (isAIGenerated) {
-      return (
-        <div
-          className={cn(
-            'aucctus-border-primary flex h-fit w-fit items-center justify-center overflow-hidden rounded-full',
-          )}
-        >
-          <Lightbulb
-            className={cn('aucctus-stroke-quaternary', logoSizeClass)}
-          />
-        </div>
-      );
-    }
+  const publishedDate =
+    publishedDatesQuery.data && showPublishedDate
+      ? formatRelativeDate(publishedDatesQuery.data.publishedDate)
+      : '';
 
-    const sourceBaseUrl = source.url ? getBaseUrl(source.url) : null;
-
-    return (
-      <div
-        className={cn(
-          'flex items-center justify-center overflow-hidden rounded-full border border-transparent',
-          logoSizeClass,
-        )}
-      >
-        {sourceBaseUrl ? (
-          <img
-            className='h-full w-full object-contain'
-            alt='source-logo'
-            src={getLogoUrl(sourceBaseUrl)}
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = images.link;
-            }}
-          />
-        ) : (
-          // Show document icon for nucleus file sources (user uploaded files)
-          <img
-            className='h-full w-full object-contain'
-            alt='document-icon'
-            src={images.link} // or use a document-specific icon if available
-          />
-        )}
-      </div>
-    );
-  };
-
-  const renderTooltipContent = () => (
+  // Custom tooltip that includes the optional ClassificationBadge.
+  const tooltip = (
     <div
       className='aucctus-bg-primary aucctus-border-secondary max-w-xs overflow-y-auto overscroll-contain rounded-xl border p-4 shadow-lg'
       style={{
@@ -162,62 +86,39 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
           '0 0 15px rgba(0, 0, 0, 0.075), 0 8px 15px rgba(0, 0, 0, 0.15)',
       }}
     >
-      {/* Top row with circular icon and classification badge */}
-      <div className='mb-3 flex items-start justify-between'>
-        {/* Circular icon at top left */}
-        <div className='aucctus-bg-secondary rounded-full border border-transparent p-1'>
-          {renderSourceLogo()}
-        </div>
-
-        {/* Classification badge in top right */}
-        {source.classification && (
+      {source.classification && (
+        <div className='mb-3 flex justify-end'>
           <ClassificationBadge
             classification={source.classification}
             size='small'
           />
-        )}
-      </div>
-
+        </div>
+      )}
       <div className='aucctus-text-sm-semibold aucctus-text-primary mb-2'>
         {source.title}
       </div>
       <div className='aucctus-text-xs aucctus-text-secondary'>
-        {sourceDescription ||
-          source.description ||
-          (source.url ? getBaseUrl(source.url) : 'User uploaded document')}
+        {sourceDescription || source.description || citation.label}
       </div>
     </div>
   );
 
-  const displayTitle =
-    sourceTitle && sourceTitle.length > 25
-      ? `${sourceTitle.slice(0, 25)}...`
-      : sourceTitle || 'Unknown Source';
-
   return (
-    <ComponentTooltip tip={renderTooltipContent()} hideDelay={hideDelay}>
-      <div className='flex flex-row items-center gap-2'>
-        <div
-          onClick={!isAIGenerated && !isNucleusSource ? onClick : undefined}
-          className={cn(
-            'aucctus-border-primary flex items-center gap-2 rounded-full border p-1',
-            badgeClassName,
-            onClick &&
-              !isAIGenerated &&
-              !isNucleusSource &&
-              'aucctus-bg-primary-hover cursor-pointer transition-all !duration-200',
-          )}
-        >
-          {renderSourceLogo()}
-          <span className={cn('pr-2', fontSizeClass)}>{displayTitle}</span>
-        </div>
-        {showPublishedDate && publishedDate && (
-          <span className='aucctus-text-secondary aucctus-text-xs items-center whitespace-nowrap'>
-            {publishedDate}
-          </span>
-        )}
-      </div>
-    </ComponentTooltip>
+    <div className='flex flex-row items-center gap-2'>
+      <SourceBadge
+        citation={citation}
+        variant='standard'
+        size={badgeSize === 'small' ? 'sm' : 'md'}
+        className={badgeClassName}
+        hideDelay={hideDelay}
+        tooltip={tooltip}
+      />
+      {showPublishedDate && publishedDate && (
+        <span className='aucctus-text-secondary aucctus-text-xs items-center whitespace-nowrap'>
+          {publishedDate}
+        </span>
+      )}
+    </div>
   );
 };
 

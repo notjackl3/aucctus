@@ -57,10 +57,17 @@ const OVERSEER_ALLOWED_ATTR = [
   'rowspan',
 ];
 
+// Allow internal aucctus:// citation URIs alongside standard schemes.
+// DOMPurify defaults strip non-http(s)/mailto/tel hrefs, which would erase
+// the URI before nodeToReact swaps <a> for SourcePill.
+const ALLOWED_URI_REGEXP =
+  /^(?:(?:https?|mailto|tel|aucctus):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i;
+
 function sanitizeAssistantHtml(raw: string): string {
   return DOMPurify.sanitize(raw, {
     ALLOWED_TAGS: OVERSEER_ALLOWED_TAGS,
     ALLOWED_ATTR: OVERSEER_ALLOWED_ATTR,
+    ALLOWED_URI_REGEXP,
   });
 }
 

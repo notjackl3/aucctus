@@ -39,14 +39,23 @@ export const searchCompanyLogo = async (
 };
 
 /**
- * Extracts the base URL from a full URL
+ * Extracts the base hostname from an http(s) URL.
+ *
+ * Returns `''` for internal `aucctus://` URIs (the URI's feature segment
+ * "nucleus" / "watchtower" / "concept" is NOT a real hostname and must
+ * not be displayed or fed to favicon lookup). Returns `''` for malformed
+ * or absent URLs. Callers should treat the empty return as "no domain"
+ * and render an alternate label / icon — most existing callers already
+ * use the `domain || fallback` pattern.
  */
-export const getBaseUrl = (url: string): string => {
+export const getBaseUrl = (url: string | null | undefined): string => {
+  if (!url) return '';
+  if (url.startsWith('aucctus://')) return '';
   try {
     const urlObject = new URL(url);
     return urlObject.hostname.replace(/^www\./, '');
   } catch (e) {
-    return url;
+    return '';
   }
 };
 

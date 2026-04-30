@@ -31,6 +31,7 @@ import {
   WatchtowerViewProvider,
   useWatchtowerView,
 } from './WatchtowerViewContext';
+import { useWatchtowerUrlSync } from './hooks/useWatchtowerUrlSync';
 
 import {
   useAddWatchtowerConfigRule,
@@ -548,6 +549,16 @@ const WatchtowerPageContent: React.FC = () => {
     showCreateModal,
     setShowCreateModal,
   } = useWatchtowerView();
+
+  // Bind aucctus:// internal-citation deep-link params (`?scan=`, `?signal=`,
+  // `?pattern=`). The hook syncs `?scan=` into WatchtowerViewContext on
+  // mount; signal/pattern are plumbed for downstream UI.
+  const {
+    signalUuid: _deepLinkedSignalUuid,
+    patternUuid: _deepLinkedPatternUuid,
+  } = useWatchtowerUrlSync();
+  void _deepLinkedSignalUuid;
+  void _deepLinkedPatternUuid;
 
   // Check if current user is admin
   const { user } = useStore((state: any) => state.auth);
