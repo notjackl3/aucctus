@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { Badge } from '@components';
+import { SourceBadge, adaptNucleusAnswerSource } from '@components/SourceBadge';
 import { cn } from '@libs/utils/react';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { NucleusReportAnswer, NucleusAnswerSource } from '@libs/api/types';
@@ -120,16 +121,12 @@ const AnswerCard: React.FC<AnswerCardProps> = ({
                 return source.url || source.nucleusFileSource || source.title;
               })
               .map((source: NucleusAnswerSource) => (
-                <Badge.NucleusSource
+                <SourceBadge
                   key={source.uuid}
-                  source={source}
-                  size='small'
+                  citation={adaptNucleusAnswerSource(source)}
+                  variant='standard'
+                  size='sm'
                   className='aucctus-text-primary whitespace-nowrap'
-                  onClick={
-                    source.url
-                      ? () => window.open(source.url!, '_blank')
-                      : undefined
-                  }
                 />
               ))}
         </div>

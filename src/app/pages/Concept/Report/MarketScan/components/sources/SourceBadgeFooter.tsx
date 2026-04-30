@@ -1,4 +1,5 @@
-import { Badge, Card, ComponentTooltip } from '@components';
+import { Card, ComponentTooltip } from '@components';
+import { SourceBadge, adaptISource } from '@components/SourceBadge';
 import { cn } from '@libs/utils/react';
 import { debounce } from '@libs/utils/source';
 import React, {
@@ -16,14 +17,13 @@ const renderSourceCard = (
   source: ISource,
   cardClassName?: string,
   onClick?: () => void,
-  showPublishedDate: boolean = true,
 ) => {
   const renderSourceHeader = () => (
     <div className='flex w-full'>
-      <Badge.SourceInfo
-        source={source}
-        onClick={() => window.open(source.url, '_blank')}
-        showPublishedDate={showPublishedDate}
+      <SourceBadge
+        citation={adaptISource(source)}
+        variant='standard'
+        size='md'
       />
     </div>
   );
@@ -59,36 +59,31 @@ interface SourceBadgeFooterProps {
   parentContainerRef: React.RefObject<HTMLDivElement>;
   sources: ISource[];
   className?: string;
+  /**
+   * @deprecated Retained for caller back-compat; the unified SourceBadge
+   * does not surface published dates. The prop is accepted but ignored.
+   */
   showPublishedDate?: boolean;
 }
 
 interface SourceBadgesProps {
   sources: ISource[];
-  showPublishedDate?: boolean;
 }
 
-const SourceBadges: FunctionComponent<SourceBadgesProps> = ({
-  sources,
-  showPublishedDate = true,
-}) => {
+const SourceBadges: FunctionComponent<SourceBadgesProps> = ({ sources }) => {
   return (
     <>
       {sources.map((source) => (
         <ComponentTooltip
-          tip={renderSourceCard(
-            source,
-            undefined,
-            undefined,
-            showPublishedDate,
-          )}
+          tip={renderSourceCard(source, undefined, undefined)}
           key={source.uuid}
           hideDelay={300}
         >
-          <Badge.SourceInfo
-            badgeSize='small'
-            badgeClassName='aucctus-text-primary whitespace-nowrap'
-            source={source}
-            onClick={() => window.open(source.url, '_blank')}
+          <SourceBadge
+            citation={adaptISource(source)}
+            variant='standard'
+            size='sm'
+            className='aucctus-text-primary whitespace-nowrap'
           />
         </ComponentTooltip>
       ))}
@@ -99,7 +94,6 @@ const SourceBadges: FunctionComponent<SourceBadgesProps> = ({
 const SourceBadgeFooter: FunctionComponent<SourceBadgeFooterProps> = ({
   sources,
   className = '',
-  showPublishedDate = true,
 }) => {
   const footerRef = useRef<HTMLDivElement>(null);
   const badgesRef = useRef<HTMLDivElement>(null);
@@ -163,10 +157,7 @@ const SourceBadgeFooter: FunctionComponent<SourceBadgeFooterProps> = ({
       ref={footerRef}
     >
       <div ref={badgesRef} className='flex flex-row gap-2'>
-        <SourceBadges
-          sources={visibleSources}
-          showPublishedDate={showPublishedDate}
-        />
+        <SourceBadges sources={visibleSources} />
         {/* {overflowingSources.length > 0 && (
           <ComponentTooltip
             hideDelay={300}

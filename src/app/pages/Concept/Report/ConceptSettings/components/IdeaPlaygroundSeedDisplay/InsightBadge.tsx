@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ComponentTooltip } from '@components';
+import { SourceBadge, adaptSourcePillProps } from '@components/SourceBadge';
 import type { ISavedResearchInsight } from '@libs/api/types';
 import { getBaseUrl, getLogoUrl } from '@libs/utils/source';
 import { cn } from '@libs/utils/react';
@@ -32,13 +32,6 @@ export const InsightBadge: React.FC<InsightBadgeProps> = ({ insight }) => {
     return title;
   }, [insight.source?.title, sourceBaseUrl]);
 
-  const handleSourceClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (insight.source?.url) {
-      window.open(insight.source.url, '_blank', 'noopener,noreferrer');
-    }
-  };
-
   const renderSourceLogo = () => {
     if (!sourceBaseUrl && !insight.source?.url) {
       return <Link size={16} className='aucctus-stroke-tertiary' />;
@@ -56,7 +49,7 @@ export const InsightBadge: React.FC<InsightBadgeProps> = ({ insight }) => {
     );
   };
 
-  const renderTooltipContent = () => (
+  const tooltipContent = (
     <div
       className='aucctus-bg-primary aucctus-border-secondary max-w-xs overflow-y-auto overscroll-contain rounded-xl border p-4 shadow-lg'
       style={{
@@ -82,6 +75,11 @@ export const InsightBadge: React.FC<InsightBadgeProps> = ({ insight }) => {
     </div>
   );
 
+  const citation = adaptSourcePillProps({
+    source: insight.source?.title || sourceBaseUrl || 'Source',
+    url: insight.source?.url,
+  });
+
   return (
     <div
       className={cn(
@@ -99,28 +97,12 @@ export const InsightBadge: React.FC<InsightBadgeProps> = ({ insight }) => {
         {/* Footer with source info */}
         <div className='flex items-center justify-between gap-3'>
           {/* Source badge with tooltip */}
-          <ComponentTooltip tip={renderTooltipContent()}>
-            <button
-              onClick={handleSourceClick}
-              disabled={!insight.source?.url}
-              className={cn(
-                'aucctus-border-primary flex items-center gap-2 rounded-full border p-1 transition-all duration-200',
-                {
-                  'aucctus-bg-primary-hover cursor-pointer':
-                    insight.source?.url,
-                  'cursor-default': !insight.source?.url,
-                },
-              )}
-            >
-              {/* Source logo */}
-              <div className='flex h-4 w-4 items-center justify-center overflow-hidden rounded-full border border-transparent'>
-                {renderSourceLogo()}
-              </div>
-              <span className='aucctus-text-xs pr-2 font-medium'>
-                {displayTitle}
-              </span>
-            </button>
-          </ComponentTooltip>
+          <SourceBadge
+            citation={citation}
+            variant='standard'
+            size='sm'
+            tooltip={tooltipContent}
+          />
 
           {/* Right side: expand button */}
           <div className='flex items-center gap-2'>

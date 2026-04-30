@@ -1,4 +1,5 @@
-import { Badge } from '@components';
+import { SourceBadge, adaptISource } from '@components/SourceBadge';
+import { useCitationResolver } from '@hooks/useCitationResolver';
 import { IInsight, ISource } from '@libs/api/types';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -8,25 +9,39 @@ interface SourceCardProps {
   source: ISource;
 }
 
-const SourceCard: React.FC<SourceCardProps> = ({ source }) => {
-  const renderLinkButton = (source: ISource) => {
-    return (
-      <div
-        className='cursor-pointer items-center rounded-lg px-2.5
-      py-2.5 transition-all !duration-200 hover:scale-105 hover:bg-gray-200 hover:bg-opacity-75'
-        onClick={() => window.open(source.url, '_blank')}
-      >
-        <ExternalLink />
-      </div>
-    );
+const LinkButton: React.FC<{ source: ISource }> = ({ source }) => {
+  const resolved = useCitationResolver(source.url);
+  if (resolved.kind === 'noop') return null;
+  const handleClick = (e: React.MouseEvent) => {
+    if (resolved.kind === 'external') {
+      window.open(resolved.href, resolved.target, 'noopener,noreferrer');
+    } else {
+      resolved.onClick(e);
+    }
   };
+  return (
+    <div
+      className='cursor-pointer items-center rounded-lg px-2.5
+      py-2.5 transition-all !duration-200 hover:scale-105 hover:bg-gray-200 hover:bg-opacity-75'
+      onClick={handleClick}
+    >
+      <ExternalLink />
+    </div>
+  );
+};
 
+const SourceCard: React.FC<SourceCardProps> = ({ source }) => {
   return (
     <div className='flex w-full flex-col gap-2 self-stretch rounded-lg p-2'>
       <div className='flex'>
-        <Badge.SourceInfo source={source} badgeClassName='!border-none' />
+        <SourceBadge
+          citation={adaptISource(source)}
+          variant='standard'
+          size='md'
+          className='!border-none'
+        />
         <span className='flex-1'></span>
-        {renderLinkButton(source)}
+        <LinkButton source={source} />
       </div>
       <div className='aucctus-text-tertiary aucctus-text-sm break-words'>
         {source.description}

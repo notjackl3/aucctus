@@ -6,6 +6,7 @@ import {
   useIncludeAnswerLight,
   useExcludeAnswerLight,
 } from '@hooks/query/ideaPlayground.hook';
+import { useCitationResolver } from '@hooks/useCitationResolver';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { useDebouncedInvalidation } from '@hooks/query/useDebouncedInvalidation';
 import AucctusLogo from '@assets/aucctus_logo.png';
@@ -113,6 +114,8 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
     onDoubleClick();
   };
 
+  const resolved = useCitationResolver(card.url);
+
   const handleSourceClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -127,8 +130,10 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
       onDoubleClick();
       return;
     }
-    if (card.url) {
-      window.open(card.url, '_blank', 'noopener,noreferrer');
+    if (resolved.kind === 'external') {
+      window.open(resolved.href, resolved.target, 'noopener,noreferrer');
+    } else if (resolved.kind === 'internal') {
+      resolved.onClick(e);
     }
   };
 

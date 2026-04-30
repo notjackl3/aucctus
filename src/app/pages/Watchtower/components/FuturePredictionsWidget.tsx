@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
-import { ComponentCarousel, Badge } from '@components';
+import { ComponentCarousel } from '@components';
+import { SourceBadge, adaptISource } from '@components/SourceBadge';
 import { useWatchtowerPredictions } from '@hooks/query/watchtower.hook';
 import type { ISource } from '@libs/api/types';
 import type { PredictionSource } from '../types';
@@ -156,22 +157,38 @@ const FuturePredictionsWidget: React.FC = () => {
                 <div className='mt-4 flex flex-wrap items-center gap-1.5'>
                   {prediction.sources
                     .filter((source) => source.url) // Only show sources with URLs
-                    .map((source) => (
-                      <Badge.SourceInfo
-                        key={source.uuid}
-                        source={toISource(source)}
-                        badgeSize='small'
-                        badgeClassName='aucctus-text-primary whitespace-nowrap'
-                        onClick={() =>
-                          source.url && window.open(source.url, '_blank')
-                        }
-                        showPublishedDate={false}
-                        sourceDescription={createSourceDescriptionWithCitations(
-                          source,
-                        )}
-                        hideDelay={0}
-                      />
-                    ))}
+                    .map((source) => {
+                      const iSource = toISource(source);
+                      const description =
+                        createSourceDescriptionWithCitations(source);
+                      const tooltip = (
+                        <div
+                          className='aucctus-bg-primary aucctus-border-secondary max-w-xs overflow-y-auto overscroll-contain rounded-xl border p-4 shadow-lg'
+                          style={{
+                            boxShadow:
+                              '0 0 15px rgba(0, 0, 0, 0.075), 0 8px 15px rgba(0, 0, 0, 0.15)',
+                          }}
+                        >
+                          {iSource.title && (
+                            <div className='aucctus-text-sm-semibold aucctus-text-primary mb-2 break-words'>
+                              {iSource.title}
+                            </div>
+                          )}
+                          {description}
+                        </div>
+                      );
+                      return (
+                        <SourceBadge
+                          key={source.uuid}
+                          citation={adaptISource(iSource)}
+                          variant='standard'
+                          size='sm'
+                          className='aucctus-text-primary whitespace-nowrap'
+                          tooltip={tooltip}
+                          hideDelay={0}
+                        />
+                      );
+                    })}
                   {prediction.hasAiReasoning && (
                     <div className='aucctus-border-primary flex items-center gap-2 rounded-full border p-1'>
                       <Sparkles className='aucctus-stroke-secondary h-4 w-4' />

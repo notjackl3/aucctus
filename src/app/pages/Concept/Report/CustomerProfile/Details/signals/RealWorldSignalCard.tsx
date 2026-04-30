@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import { Badge, Modal } from '@components';
+import { SourceBadge, adaptISource } from '@components/SourceBadge';
 import { ICustomerProfileRealWorldSignal } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
@@ -140,16 +141,28 @@ const RealWorldSignalCard: React.FC<RealWorldSignalCardProps> = ({
       <div className='flex flex-col gap-2'>
         {sources.map((source, index) => (
           <div key={source.url || index} className='flex flex-col gap-1'>
-            <Badge.SourceInfo
-              source={source}
-              badgeSize='small'
-              badgeClassName='aucctus-text-primary'
-              onClick={() => window.open(source.url, '_blank')}
-              showPublishedDate={false}
-              sourceDescription={
+            <SourceBadge
+              citation={adaptISource(source)}
+              variant='standard'
+              size='sm'
+              className='aucctus-text-primary'
+              tooltip={
                 index === 0 ? (
-                  <div className='aucctus-text-xs aucctus-text-secondary'>
-                    {signal.sourceCategory}
+                  <div
+                    className='aucctus-bg-primary aucctus-border-secondary max-w-xs overflow-y-auto overscroll-contain rounded-xl border p-4 shadow-lg'
+                    style={{
+                      boxShadow:
+                        '0 0 15px rgba(0, 0, 0, 0.075), 0 8px 15px rgba(0, 0, 0, 0.15)',
+                    }}
+                  >
+                    {source.title && (
+                      <div className='aucctus-text-sm-semibold aucctus-text-primary mb-2'>
+                        {source.title}
+                      </div>
+                    )}
+                    <div className='aucctus-text-xs aucctus-text-secondary'>
+                      {signal.sourceCategory}
+                    </div>
                   </div>
                 ) : undefined
               }

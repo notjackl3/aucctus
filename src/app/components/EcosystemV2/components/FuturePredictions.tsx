@@ -1,4 +1,6 @@
-import { Badge, Button, ComponentTooltip } from '@components';
+import { Button, ComponentTooltip } from '@components';
+import { SourceBadge, adaptISource } from '@components/SourceBadge';
+import { useCitationResolver } from '@hooks/useCitationResolver';
 import type { ISource } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import React, { useCallback, useRef } from 'react';
@@ -12,6 +14,50 @@ import { ChevronLeft, ChevronRight, Telescope } from 'lucide-react';
 interface FuturePredictionsProps {
   predictions: FuturePrediction[];
 }
+
+/**
+ * Click-through wrapper for the multi-source-tooltip rows. Routes clicks
+ * through `useCitationResolver` so internal aucctus:// URIs navigate
+ * in-app and external URLs open in a new tab.
+ */
+const ResolvedSourceRow: React.FC<{
+  source: ISource;
+  isLast: boolean;
+  description: React.ReactNode;
+}> = ({ source, isLast, description }) => {
+  const resolved = useCitationResolver(source.url);
+  const isInteractive = resolved.kind !== 'noop';
+  const handleClick = (e: React.MouseEvent) => {
+    if (resolved.kind === 'external') {
+      window.open(resolved.href, resolved.target, 'noopener,noreferrer');
+    } else if (resolved.kind === 'internal') {
+      resolved.onClick(e);
+    }
+  };
+  return (
+    <div
+      className={cn(
+        'flex flex-col gap-2 p-3 transition-colors',
+        isInteractive && 'cursor-pointer hover:bg-gray-50',
+        !isLast && 'aucctus-border-secondary border-b',
+      )}
+      onClick={isInteractive ? handleClick : undefined}
+    >
+      <div className='pointer-events-none'>
+        <SourceBadge
+          citation={adaptISource(source)}
+          variant='standard'
+          size='sm'
+          className='aucctus-text-primary whitespace-nowrap'
+        />
+      </div>
+      <div className='aucctus-text-xs-semibold aucctus-text-primary'>
+        {source.title}
+      </div>
+      {description}
+    </div>
+  );
+};
 
 const FuturePredictions: React.FC<FuturePredictionsProps> = ({
   predictions,
@@ -61,6 +107,33 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
     [],
   );
 
+  // Build a citation-aware tooltip body that includes title + description + citations.
+  const renderTooltip = useCallback(
+    (source: ISource, prediction: FuturePrediction) => {
+      const description = createSourceDescriptionWithCitations(
+        source,
+        prediction,
+      );
+      return (
+        <div
+          className='aucctus-bg-primary aucctus-border-secondary max-w-xs overflow-y-auto overscroll-contain rounded-xl border p-4 shadow-lg'
+          style={{
+            boxShadow:
+              '0 0 15px rgba(0, 0, 0, 0.075), 0 8px 15px rgba(0, 0, 0, 0.15)',
+          }}
+        >
+          {source.title && (
+            <div className='aucctus-text-sm-semibold aucctus-text-primary mb-2 break-words'>
+              {source.title}
+            </div>
+          )}
+          {description}
+        </div>
+      );
+    },
+    [createSourceDescriptionWithCitations],
+  );
+
   // Render source badges with "more sources" functionality
   const renderSourceBadges = useCallback(
     (sources: ISource[], prediction: FuturePrediction) => {
@@ -74,43 +147,27 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
         ? maxVisibleSources - 1
         : sources.length;
 
+      const renderBadge = (source: ISource, index: number) => (
+        <SourceBadge
+          key={`${source.uuid || 'source'}-${index}`}
+          citation={adaptISource(source)}
+          variant='standard'
+          size='sm'
+          className='aucctus-text-primary whitespace-nowrap'
+          tooltip={renderTooltip(source, prediction)}
+          hideDelay={0}
+        />
+      );
+
       return (
         <div className='mt-1 flex flex-wrap items-center gap-2'>
           {sources.length <= maxVisibleSources ? (
-            // Show all sources if <= maxVisibleSources
-            sources.map((source, index) => (
-              <Badge.SourceInfo
-                key={`${source.uuid || 'source'}-${index}`}
-                badgeSize='small'
-                badgeClassName='aucctus-text-primary whitespace-nowrap'
-                source={source}
-                onClick={() => window.open(source.url, '_blank')}
-                showPublishedDate={false}
-                sourceDescription={createSourceDescriptionWithCitations(
-                  source,
-                  prediction,
-                )}
-                hideDelay={0}
-              />
-            ))
+            sources.map((source, index) => renderBadge(source, index))
           ) : (
-            // Show first (maxVisibleSources - 1) sources + MultiSourceBadge for the rest
             <>
-              {sources.slice(0, visibleCount).map((source, index) => (
-                <Badge.SourceInfo
-                  key={`${source.uuid || 'source'}-${index}`}
-                  badgeSize='small'
-                  badgeClassName='aucctus-text-primary whitespace-nowrap'
-                  source={source}
-                  onClick={() => window.open(source.url, '_blank')}
-                  showPublishedDate={false}
-                  sourceDescription={createSourceDescriptionWithCitations(
-                    source,
-                    prediction,
-                  )}
-                  hideDelay={0}
-                />
-              ))}
+              {sources
+                .slice(0, visibleCount)
+                .map((source, index) => renderBadge(source, index))}
 
               {/* Remaining sources - MultiSourceBadge with tooltip */}
               <ComponentTooltip
@@ -122,32 +179,16 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
                         '0 0 15px rgba(0, 0, 0, 0.075), 0 8px 15px rgba(0, 0, 0, 0.15)',
                     }}
                   >
-                    {sources.slice(visibleCount).map((source, index) => (
-                      <div
+                    {sources.slice(visibleCount).map((source, index, arr) => (
+                      <ResolvedSourceRow
                         key={`${source.uuid || 'source'}-${index}`}
-                        className={cn(
-                          'flex cursor-pointer flex-col gap-2 p-3 transition-colors hover:bg-gray-50',
-                          index < sources.slice(visibleCount).length - 1 &&
-                            'aucctus-border-secondary border-b',
-                        )}
-                        onClick={() => window.open(source.url, '_blank')}
-                      >
-                        <div className='pointer-events-none'>
-                          <Badge.SourceInfo
-                            badgeSize='small'
-                            badgeClassName='aucctus-text-primary whitespace-nowrap'
-                            source={source}
-                            showPublishedDate={false}
-                          />
-                        </div>
-                        <div className='aucctus-text-xs-semibold aucctus-text-primary'>
-                          {source.title}
-                        </div>
-                        {createSourceDescriptionWithCitations(
+                        source={source}
+                        isLast={index === arr.length - 1}
+                        description={createSourceDescriptionWithCitations(
                           source,
                           prediction,
                         )}
-                      </div>
+                      />
                     ))}
                   </div>
                 }
@@ -165,7 +206,7 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
         </div>
       );
     },
-    [createSourceDescriptionWithCitations],
+    [createSourceDescriptionWithCitations, renderTooltip],
   );
 
   if (!predictions || predictions.length === 0) {
