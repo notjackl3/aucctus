@@ -5,11 +5,6 @@
  * the unified SourceBadge intentionally doesn't know about. Builds an
  * enriched `Citation` and hands it off; click behavior is managed by
  * SourceBadge via `useCitationResolver`.
- *
- * Caller-supplied `onClick` and `sourceDescription` are still honored for
- * back-compat with existing markup. The `onClick` only fires when the
- * citation resolves to an interactive target — non-clickable rows
- * (no URL, AI-reasoning) ignore it.
  */
 
 import {
@@ -28,11 +23,6 @@ import ClassificationBadge from '../../pages/Concept/Report/MarketScan/v3/compon
 
 interface SourceInfoBadgeProps {
   source: ISource;
-  /**
-   * @deprecated External callers should rely on the resolver's behavior.
-   * Honored for back-compat in MarketScan SourceBadgeList row clicks.
-   */
-  onClick?: () => void;
   showPublishedDate?: boolean;
   badgeClassName?: string;
   badgeSize?: 'small' | 'medium';

@@ -1,34 +1,12 @@
 import { SourceBadge, adaptISource } from '@components/SourceBadge';
-import { useCitationResolver } from '@hooks/useCitationResolver';
+import LinkButton from '@components/SourceBadge/LinkButton';
 import { IInsight, ISource } from '@libs/api/types';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { ExternalLink } from 'lucide-react';
 
 interface SourceCardProps {
   source: ISource;
 }
-
-const LinkButton: React.FC<{ source: ISource }> = ({ source }) => {
-  const resolved = useCitationResolver(source.url);
-  if (resolved.kind === 'noop') return null;
-  const handleClick = (e: React.MouseEvent) => {
-    if (resolved.kind === 'external') {
-      window.open(resolved.href, resolved.target, 'noopener,noreferrer');
-    } else {
-      resolved.onClick(e);
-    }
-  };
-  return (
-    <div
-      className='cursor-pointer items-center rounded-lg px-2.5
-      py-2.5 transition-all !duration-200 hover:scale-105 hover:bg-gray-200 hover:bg-opacity-75'
-      onClick={handleClick}
-    >
-      <ExternalLink />
-    </div>
-  );
-};
 
 const SourceCard: React.FC<SourceCardProps> = ({ source }) => {
   return (

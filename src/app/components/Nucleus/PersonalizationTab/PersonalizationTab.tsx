@@ -10,12 +10,16 @@
 
 import {
   useAccountBranding,
+  useDeleteLogoVariant,
   useUpdateBranding,
   useUploadHqImage,
-  useUploadLogo,
+  useUploadLogoVariant,
 } from '@hooks/query/accountBranding.hook';
 import { useUpdateAccount } from '@hooks/query/account.hook';
-import { useAccountLogo } from '@hooks/query/admin.hook';
+import type {
+  IAccountLogos,
+  LogoVariantName,
+} from '@libs/api/types/accountBranding';
 import useStore from '@stores/store';
 import { cn } from '@libs/utils/react';
 import {
@@ -42,6 +46,7 @@ import {
   Palette,
   Pencil,
   Plus,
+  Trash2,
   Upload,
   X,
 } from 'lucide-react';
@@ -110,19 +115,173 @@ const SortableColorSwatch: React.FC<{
 };
 
 /* ------------------------------------------------------------------ */
+/* Logo variant slot                                                   */
+/* ------------------------------------------------------------------ */
+
+interface LogoVariantSlotConfig {
+  variant: LogoVariantName;
+  label: string;
+  description: string;
+  previewBgClass: string;
+}
+
+const LOGO_VARIANT_SLOTS: LogoVariantSlotConfig[] = [
+  {
+    variant: 'color',
+    label: 'Original',
+    description: 'Full-colour logo. Used wherever it has enough contrast.',
+    previewBgClass: 'bg-neutral-200',
+  },
+  {
+    variant: 'light',
+    label: 'Light',
+    description: 'Light-coloured (often white) logo for dark surfaces.',
+    previewBgClass: 'bg-neutral-900',
+  },
+  {
+    variant: 'dark',
+    label: 'Dark',
+    description: 'Dark-coloured (often black) logo for light surfaces.',
+    previewBgClass: 'bg-white',
+  },
+];
+
+const LogoVariantSlot: React.FC<{
+  config: LogoVariantSlotConfig;
+  url: string | null | undefined;
+  isUploading: boolean;
+  onUpload: (file: File) => void;
+  onRemove: () => void;
+}> = ({ config, url, isUploading, onUpload, onRemove }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleFile = useCallback(
+    (file: File | undefined) => {
+      if (file && file.type.startsWith('image/')) {
+        onUpload(file);
+      }
+    },
+    [onUpload],
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+      handleFile(e.dataTransfer.files[0]);
+    },
+    [handleFile],
+  );
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      handleFile(e.target.files?.[0]);
+      e.target.value = '';
+    },
+    [handleFile],
+  );
+
+  const handleRemove = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onRemove();
+    },
+    [onRemove],
+  );
+
+  return (
+    <div className='border-border/40 bg-muted/20 flex flex-col rounded-xl border p-4 backdrop-blur-xl'>
+      <div className='mb-2 flex items-center justify-between'>
+        <span className='aucctus-text-tertiary text-[10px] uppercase tracking-wider'>
+          {config.label}
+        </span>
+        {url && (
+          <button
+            type='button'
+            onClick={handleRemove}
+            disabled={isUploading}
+            className='aucctus-text-tertiary transition-colors hover:text-red-400 disabled:opacity-50'
+            aria-label={`Remove ${config.label} logo`}
+          >
+            <Trash2 className='h-3.5 w-3.5' />
+          </button>
+        )}
+      </div>
+      <p className='aucctus-text-secondary mb-3 text-xs'>
+        {config.description}
+      </p>
+      <div
+        className={cn(
+          'relative flex h-32 cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-all duration-300',
+          isDragging
+            ? 'border-primary scale-[1.01]'
+            : 'border-border/60 hover:border-border',
+          url ? config.previewBgClass : 'bg-black/10',
+        )}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onClick={() => inputRef.current?.click()}
+      >
+        <input
+          ref={inputRef}
+          type='file'
+          accept='image/*'
+          className='hidden'
+          onChange={handleSelect}
+        />
+        {url ? (
+          <div className='group relative h-full w-full'>
+            <img
+              src={url}
+              alt={`${config.label} logo`}
+              className='h-full w-full object-contain p-3'
+            />
+            <div className='absolute inset-0 flex items-center justify-center rounded-lg bg-black/50 opacity-0 transition-opacity group-hover:opacity-100'>
+              <span className='text-xs font-medium text-white'>
+                Click to replace
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className='aucctus-text-tertiary flex flex-col items-center gap-2'>
+            <Upload className='h-5 w-5' />
+            <span className='text-xs'>Drop logo or click to browse</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
 /* Main component                                                      */
 /* ------------------------------------------------------------------ */
 
 const PersonalizationTab: React.FC = () => {
   const account = useStore((state) => state.auth.account);
   const { branding } = useAccountBranding();
-  const { logoUrl: accountLogoUrl } = useAccountLogo();
   const updateMutation = useUpdateBranding();
   const updateAccountMutation = useUpdateAccount();
-  const uploadLogoMutation = useUploadLogo();
+  const uploadLogoVariantMutation = useUploadLogoVariant();
+  const deleteLogoVariantMutation = useDeleteLogoVariant();
   const uploadHqMutation = useUploadHqImage();
 
-  const [isDraggingLogo, setIsDraggingLogo] = useState(false);
+  const logos: IAccountLogos = useMemo(
+    () => branding?.logos ?? {},
+    [branding?.logos],
+  );
+
   const [isDraggingHQ, setIsDraggingHQ] = useState(false);
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [newColor, setNewColor] = useState('#6366F1');
@@ -172,7 +331,6 @@ const PersonalizationTab: React.FC = () => {
   }, [editDomain, account?.domain, updateAccountMutation]);
 
   const addColorBtnRef = useRef<HTMLButtonElement>(null);
-  const logoInputRef = useRef<HTMLInputElement>(null);
   const hqInputRef = useRef<HTMLInputElement>(null);
 
   // Brand colors as ordered list
@@ -209,18 +367,6 @@ const PersonalizationTab: React.FC = () => {
     setDragging(false);
   }, []);
 
-  const handleLogoDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDraggingLogo(false);
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        uploadLogoMutation.mutate(file);
-      }
-    },
-    [uploadLogoMutation],
-  );
-
   const handleHqDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
@@ -231,16 +377,6 @@ const PersonalizationTab: React.FC = () => {
       }
     },
     [uploadHqMutation],
-  );
-
-  const handleLogoSelect = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file && file.type.startsWith('image/')) {
-        uploadLogoMutation.mutate(file);
-      }
-    },
-    [uploadLogoMutation],
   );
 
   const handleHqSelect = useCallback(
@@ -478,54 +614,36 @@ const PersonalizationTab: React.FC = () => {
 
         {/* Right Column */}
         <div className='flex-1 space-y-4'>
-          {/* Logo Upload */}
+          {/* Logo Variants */}
           <motion.div
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className='border-border/40 bg-muted/20 rounded-xl border p-4 backdrop-blur-xl'
           >
             <span className='aucctus-text-tertiary mb-3 block text-[10px] uppercase tracking-wider'>
-              Company Logo
+              Company Logos
             </span>
-            <div
-              className={cn(
-                'relative flex h-32 cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-all duration-300',
-                isDraggingLogo
-                  ? 'border-primary bg-primary/5 scale-[1.01]'
-                  : 'border-border/60 hover:border-border bg-black/10',
-              )}
-              onDragOver={(e) => handleDragOver(e, setIsDraggingLogo)}
-              onDragLeave={() => handleDragLeave(setIsDraggingLogo)}
-              onDrop={handleLogoDrop}
-              onClick={() => logoInputRef.current?.click()}
-            >
-              <input
-                ref={logoInputRef}
-                type='file'
-                accept='image/*'
-                className='hidden'
-                onChange={handleLogoSelect}
-              />
-              {accountLogoUrl ? (
-                <div className='group relative h-full w-full'>
-                  <img
-                    src={accountLogoUrl}
-                    alt='Company logo'
-                    className='h-full w-full object-contain p-3'
-                  />
-                  <div className='absolute inset-0 flex items-center justify-center rounded-lg bg-black/50 opacity-0 transition-opacity group-hover:opacity-100'>
-                    <span className='text-xs font-medium text-white'>
-                      Click to replace
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <div className='aucctus-text-tertiary flex flex-col items-center gap-2'>
-                  <Upload className='h-5 w-5' />
-                  <span className='text-xs'>Drop logo or click to browse</span>
-                </div>
-              )}
+            <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+              {LOGO_VARIANT_SLOTS.map((slot) => (
+                <LogoVariantSlot
+                  key={slot.variant}
+                  config={slot}
+                  url={logos[slot.variant]?.url ?? null}
+                  isUploading={
+                    uploadLogoVariantMutation.isLoading ||
+                    deleteLogoVariantMutation.isLoading
+                  }
+                  onUpload={(file) =>
+                    uploadLogoVariantMutation.mutate({
+                      variant: slot.variant,
+                      file,
+                    })
+                  }
+                  onRemove={() =>
+                    deleteLogoVariantMutation.mutate(slot.variant)
+                  }
+                />
+              ))}
             </div>
           </motion.div>
 

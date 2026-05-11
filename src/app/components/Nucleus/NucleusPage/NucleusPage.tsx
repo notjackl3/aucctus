@@ -89,12 +89,19 @@ const NucleusPage: React.FC = () => {
   // Handle URL query param for tabs and scoring config
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Bind aucctus:// internal-citation deep-link params (`?document=<uuid>`).
-  // The param is plumbed through; document-tile highlight is a Phase 2
-  // concern — for v1 the deep-link lands on the page and the param is
-  // available for downstream consumers.
-  const { documentUuid: _deepLinkedDocumentUuid } = useNucleusUrlSync();
+  // Bind aucctus:// internal-citation deep-link params.
+  // `documentUuid` — Phase 2 concern (document-tile highlight).
+  // `nucleusSectionUuid` — drives the scroll+highlight effect below.
+  const {
+    documentUuid: _deepLinkedDocumentUuid,
+    nucleusSectionUuid,
+    setNucleusSection,
+  } = useNucleusUrlSync();
   void _deepLinkedDocumentUuid;
+
+  const setHighlightedSection = useStore(
+    (state: any) => state.overseer.setHighlightedSection,
+  );
 
   // Tab state - persists in URL params
   type NucleusTab = 'company-context' | 'living-personas' | 'decision-making';
@@ -144,6 +151,66 @@ const NucleusPage: React.FC = () => {
       setSearchParams(searchParams, { replace: true });
     }
   }, [searchParams, setSearchParams]);
+
+  // Deep-link: scroll to + highlight a nucleus section when ?nucleusSection=<uuid> is present
+  useEffect(() => {
+    if (!nucleusSectionUuid || !nucleusReport) return;
+
+    // Ensure company-context tab + intelligence section are active.
+    // The resolver already sets ?section=intelligence in the URL, but
+    // guard against the case where the user is on a different tab/section.
+    const params = new URLSearchParams(searchParams);
+    let needsUpdate = false;
+    if (params.get('tab') !== null) {
+      params.delete('tab'); // company-context is the default (no param)
+      needsUpdate = true;
+    }
+    if (params.get('section') !== 'intelligence') {
+      params.set('section', 'intelligence');
+      needsUpdate = true;
+    }
+    if (needsUpdate) {
+      setSearchParams(params, { replace: true });
+    }
+
+    // Clear any stale highlight so the later set() is always a state
+    // transition (uuid → null → uuid). Without this, Zustand+Immer detect
+    // no change when useCitationResolver already set the same sectionId
+    // during the click handler — subscribers never re-fire and the glow
+    // never appears.
+    setHighlightedSection(null);
+
+    // Poll for the target element using RAF (bounded)
+    let attempts = 0;
+    const maxAttempts = 60; // ~1s at 60fps
+    let rafId = 0;
+
+    const poll = () => {
+      const el = document.querySelector(
+        `[data-section-id="${nucleusSectionUuid}"]`,
+      );
+      if (el) {
+        setHighlightedSection(nucleusSectionUuid);
+        setNucleusSection(null);
+        return;
+      }
+      attempts++;
+      if (attempts < maxAttempts) {
+        rafId = requestAnimationFrame(poll);
+      } else {
+        // Max attempts reached — clear the param so it doesn't linger
+        setNucleusSection(null);
+      }
+    };
+
+    // Start polling after a microtask to let React flush the param-driven re-render
+    rafId = requestAnimationFrame(poll);
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nucleusSectionUuid, nucleusReport]);
 
   // Mapping from section type to display name for pills
   const sectionTypeDisplayNames = useMemo(

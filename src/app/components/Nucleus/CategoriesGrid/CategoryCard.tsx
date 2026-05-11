@@ -180,6 +180,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
     <div
       key={category.sectionType}
       id={`category-${category.sectionType}`}
+      data-section-id={category.uuid}
       className={cn('transition-all duration-300 ease-in-out', {
         'lg:col-span-2': isExpanded,
       })}

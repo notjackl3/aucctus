@@ -4,6 +4,7 @@ import { Endpoints as endpoints } from './endpoints';
 import type {
   IAccountBranding,
   IUpdateAccountBrandingPayload,
+  LogoVariantName,
 } from './types/accountBranding';
 
 /**
@@ -59,8 +60,9 @@ export class AccountBrandingApi extends ApiService {
   }
 
   /**
+   * @deprecated Use `uploadLogoVariant('color', file)` instead.
    * Upload a logo for the account.
-   * Accepts image files up to 5MB.
+   * Accepts image files up to 5MB. Writes to the `color` variant.
    */
   uploadLogo(file: File) {
     const formData = new FormData();
@@ -68,6 +70,28 @@ export class AccountBrandingApi extends ApiService {
     return this.postFormData<IAccountBranding>(
       endpoints.accountBrandingLogo,
       formData,
+    );
+  }
+
+  /**
+   * Upload a logo for a specific variant (color, light, or dark).
+   * Accepts image files up to 5MB.
+   */
+  uploadLogoVariant(variant: LogoVariantName, file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.postFormData<IAccountBranding>(
+      endpoints.accountBrandingLogoVariant(variant),
+      formData,
+    );
+  }
+
+  /**
+   * Remove a logo variant (color, light, or dark).
+   */
+  deleteLogoVariant(variant: LogoVariantName) {
+    return this.delete<IAccountBranding>(
+      endpoints.accountBrandingLogoVariant(variant),
     );
   }
 }

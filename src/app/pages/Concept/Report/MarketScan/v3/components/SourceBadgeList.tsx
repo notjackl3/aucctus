@@ -1,7 +1,7 @@
 import React from 'react';
-import { Badge, ComponentTooltip } from '@components';
-import { useCitationResolver } from '@hooks/useCitationResolver';
-import { cn } from '@libs/utils/react';
+import { ComponentTooltip } from '@components';
+import { SourceBadge, adaptISource } from '@components/SourceBadge';
+import ResolvedSourceRow from '@components/SourceBadge/ResolvedSourceRow';
 import MultiSourceBadge from '../../components/sources/MultiSourceBadge';
 import type { ISource } from '@libs/api/types';
 
@@ -12,50 +12,33 @@ interface SourceBadgeListProps {
 }
 
 /**
- * Click-through wrapper for the multi-source-tooltip rows. The inner
- * Badge.SourceInfo has `pointer-events-none` so the entire row acts as a
- * single click target — the wrapper resolves the source URL and forwards
- * navigation. Behavior is intentionally identical to clicking the badge
- * itself; this wrapper exists only to enlarge the click surface.
+ * Build a styled tooltip node for a source badge. When the caller's
+ * `createSourceDescription` returns content, wrap it in the standard
+ * tooltip container with the source title. When it returns null, return
+ * undefined so SourceBadge falls back to its built-in tooltip.
  */
-const ResolvedSourceRow: React.FC<{
-  source: ISource;
-  isLast: boolean;
-  description: React.ReactNode;
-}> = ({ source, isLast, description }) => {
-  const resolved = useCitationResolver(source.url);
-  const isInteractive = resolved.kind !== 'noop';
-  const handleClick = (e: React.MouseEvent) => {
-    if (resolved.kind === 'external') {
-      window.open(resolved.href, resolved.target, 'noopener,noreferrer');
-    } else if (resolved.kind === 'internal') {
-      resolved.onClick(e);
-    }
-  };
+function buildTooltip(
+  source: ISource,
+  descriptionContent: React.ReactNode,
+): React.ReactNode | undefined {
+  if (!descriptionContent) return undefined;
   return (
     <div
-      className={cn(
-        'flex flex-col gap-2 p-3 transition-colors',
-        isInteractive && 'cursor-pointer hover:bg-gray-50',
-        !isLast && 'aucctus-border-secondary border-b',
-      )}
-      onClick={isInteractive ? handleClick : undefined}
+      className='aucctus-bg-primary aucctus-border-secondary max-w-xs overflow-y-auto overscroll-contain rounded-xl border p-4 shadow-lg'
+      style={{
+        boxShadow:
+          '0 0 15px rgba(0, 0, 0, 0.075), 0 8px 15px rgba(0, 0, 0, 0.15)',
+      }}
     >
-      <div className='pointer-events-none'>
-        <Badge.SourceInfo
-          badgeSize='small'
-          badgeClassName='aucctus-text-primary whitespace-nowrap'
-          source={source}
-          showPublishedDate={false}
-        />
-      </div>
-      <div className='aucctus-text-xs-semibold aucctus-text-primary'>
-        {source.title}
-      </div>
-      {description}
+      {source.title && (
+        <div className='aucctus-text-sm-semibold aucctus-text-primary mb-2 break-words'>
+          {source.title}
+        </div>
+      )}
+      {descriptionContent}
     </div>
   );
-};
+}
 
 const SourceBadgeList: React.FC<SourceBadgeListProps> = ({
   sources,
@@ -73,24 +56,26 @@ const SourceBadgeList: React.FC<SourceBadgeListProps> = ({
     <div className='mt-1 flex flex-wrap items-center gap-2'>
       {sources.length <= maxVisibleSources ? (
         sources.map((source) => (
-          <Badge.SourceInfo
+          <SourceBadge
             key={source.uuid}
-            badgeSize='small'
-            badgeClassName='aucctus-text-primary whitespace-nowrap'
-            source={source}
-            sourceDescription={createSourceDescription(source)}
+            citation={adaptISource(source)}
+            variant='standard'
+            size='sm'
+            className='aucctus-text-primary whitespace-nowrap'
+            tooltip={buildTooltip(source, createSourceDescription(source))}
             hideDelay={0}
           />
         ))
       ) : (
         <>
           {sources.slice(0, visibleCount).map((source) => (
-            <Badge.SourceInfo
+            <SourceBadge
               key={source.uuid}
-              badgeSize='small'
-              badgeClassName='aucctus-text-primary whitespace-nowrap'
-              source={source}
-              sourceDescription={createSourceDescription(source)}
+              citation={adaptISource(source)}
+              variant='standard'
+              size='sm'
+              className='aucctus-text-primary whitespace-nowrap'
+              tooltip={buildTooltip(source, createSourceDescription(source))}
               hideDelay={0}
             />
           ))}

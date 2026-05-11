@@ -19,6 +19,7 @@ import {
   Eye,
   EyeOff,
   LockKeyhole,
+  X,
 } from 'lucide-react';
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
@@ -67,6 +68,16 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
 
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Close on Escape key
+  useEffect(() => {
+    if (embedded) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [embedded, onClose]);
 
   // Auto-generate slug from title
   useEffect(() => {
@@ -255,6 +266,16 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
           backgroundPosition: 'center',
         }}
       >
+        {/* Close Button */}
+        <button
+          type='button'
+          onClick={onClose}
+          aria-label='Close'
+          className='absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-white/60 transition-colors hover:bg-white/10 hover:text-white'
+        >
+          <X className='h-4 w-4' />
+        </button>
+
         {/* Back Button (when onBack is provided) */}
         {onBack && !isEditing && (
           <button
@@ -519,7 +540,12 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
 
   // Standalone mode with glass overlay
   return (
-    <div className='glass-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4'>
+    <div
+      className='glass-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4'
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className='relative w-full max-w-xl'>
         <div className='liquid-glass-modal-shell'>
           <div

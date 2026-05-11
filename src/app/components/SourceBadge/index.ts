@@ -12,3 +12,5 @@ export {
   adaptJtbdItemSource,
   adaptSourcePillProps,
 } from './adapters';
+export { default as ResolvedSourceRow } from './ResolvedSourceRow';
+export { default as LinkButton } from './LinkButton';

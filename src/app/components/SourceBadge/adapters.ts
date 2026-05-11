@@ -19,8 +19,10 @@ const truncate = (s: string, max = 25): string =>
 
 /**
  * Inlined to avoid pulling `@libs/api` into the test bundle (transitive
- * abort-controller resolution fails under vitest's deps optimizer). This
- * mirrors `getBaseUrl` in `@libs/utils/source` exactly — keep them in sync.
+ * abort-controller resolution fails under vitest's deps optimizer).
+ *
+ * SYNC: canonical implementation is `getBaseUrl` in `src/libs/utils/source.ts`.
+ * If you change this function, update the canonical version too (and vice-versa).
  */
 const getBaseDomain = (url: string | null | undefined): string => {
   if (!url) return '';

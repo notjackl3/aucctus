@@ -43,7 +43,7 @@ describe('resolveCitationShape', () => {
       resolveCitationShape(`aucctus://nucleus/sections/${VALID_UUID}`),
     ).toEqual({
       kind: 'internal',
-      href: `/nucleus?tab=company-context&nucleusSection=${VALID_UUID}`,
+      href: `/nucleus?section=intelligence&nucleusSection=${VALID_UUID}`,
       sectionId: VALID_UUID,
     });
 

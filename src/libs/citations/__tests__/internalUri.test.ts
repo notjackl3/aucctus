@@ -143,7 +143,7 @@ describe('resolveInternalUri', () => {
     });
     expect(resolved).toEqual({
       path: '/nucleus',
-      search: `?tab=company-context&nucleusSection=${VALID_UUID}`,
+      search: `?section=intelligence&nucleusSection=${VALID_UUID}`,
       sectionId: VALID_UUID,
     });
   });

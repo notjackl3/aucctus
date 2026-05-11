@@ -10,6 +10,7 @@ import api from '@libs/api';
 import type {
   IAccountBranding,
   IUpdateAccountBrandingPayload,
+  LogoVariantName,
 } from '@libs/api/types/accountBranding';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
@@ -131,6 +132,7 @@ export const useUploadHqImage = () => {
 };
 
 /**
+ * @deprecated Use `useUploadLogoVariant` with `{ variant: 'color', file }` instead.
  * Upload a logo for the account.
  */
 export const useUploadLogo = () => {
@@ -150,6 +152,59 @@ export const useUploadLogo = () => {
       toast.error(
         'Upload Failed',
         message || 'Unable to upload logo. Please try again',
+      );
+    },
+  });
+};
+
+/**
+ * Upload a logo for a specific variant (color, light, or dark).
+ */
+export const useUploadLogoVariant = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: { variant: LogoVariantName; file: File }) => {
+      return await api.accountBranding.uploadLogoVariant(
+        params.variant,
+        params.file,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(accountBrandingKeys.all);
+      queryClient.invalidateQueries([AucctusQueryKeys.accountLogo]);
+      toast.success('Logo Uploaded', 'Your logo has been updated.');
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Upload Failed',
+        message || 'Unable to upload logo. Please try again',
+      );
+    },
+  });
+};
+
+/**
+ * Remove a logo variant (color, light, or dark).
+ */
+export const useDeleteLogoVariant = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (variant: LogoVariantName) => {
+      return await api.accountBranding.deleteLogoVariant(variant);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(accountBrandingKeys.all);
+      queryClient.invalidateQueries([AucctusQueryKeys.accountLogo]);
+      toast.success('Logo Removed', 'The logo variant has been removed.');
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Remove Failed',
+        message || 'Unable to remove logo. Please try again',
       );
     },
   });

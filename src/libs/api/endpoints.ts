@@ -864,7 +864,12 @@ export class Endpoints {
   // Account Branding Endpoints
   static accountBranding = '/api/v1/account/branding';
   static accountBrandingHqImage = '/api/v1/account/branding/hq-image';
+  /** @deprecated Use `accountBrandingLogoVariant('color')` instead. Backend keeps this as an alias for the `color` variant. */
   static accountBrandingLogo = '/api/v1/account/branding/logo';
+
+  static accountBrandingLogoVariant(variant: 'color' | 'light' | 'dark') {
+    return `/api/v1/account/branding/logos/${variant}`;
+  }
 
   // Admin Metrics Endpoints (now under analytics)
   static adminMetrics = '/api/v1/analytics/metrics';

@@ -93,7 +93,7 @@ const ID_VALIDATORS: Record<string, (id: string) => boolean> = {
  * back to the no-op contract.
  *
  * v1 registry (Phase 1):
- * - nucleus/sections   → /nucleus?tab=company-context&nucleusSection=<uuid>
+ * - nucleus/sections   → /nucleus?section=intelligence&nucleusSection=<uuid>
  *   (deliberately NOT ?section= — that param is reserved for the
  *   ContextSection literal {'overview'|'intelligence'|'data-uploads'|
  *   'personalization'} read by CompanyContextTab. A UUID there breaks
@@ -121,7 +121,7 @@ const RESOLVERS: Record<string, (identifier: string) => ResolvedInternalRoute> =
   {
     'nucleus/sections': (id: string): ResolvedInternalRoute => ({
       path: '/nucleus',
-      search: `?tab=company-context&nucleusSection=${encodeURIComponent(id)}`,
+      search: `?section=intelligence&nucleusSection=${encodeURIComponent(id)}`,
       sectionId: id,
     }),
     'nucleus/documents': (id: string): ResolvedInternalRoute => ({
