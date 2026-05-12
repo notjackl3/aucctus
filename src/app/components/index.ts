@@ -57,6 +57,10 @@ export * from './Scoring';
 // Score Gauge
 export { ScoreGauge } from './ScoreGauge';
 
+// Brand Logo
+export { BrandLogo } from './BrandLogo';
+export type { BrandLogoProps, BrandLogoSurface } from './BrandLogo';
+
 // Concept Overview Components
 import ConceptOverview from './ConceptOverview';
 

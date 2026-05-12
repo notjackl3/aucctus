@@ -121,7 +121,6 @@ const SortableColorSwatch: React.FC<{
 interface LogoVariantSlotConfig {
   variant: LogoVariantName;
   label: string;
-  description: string;
   previewBgClass: string;
 }
 
@@ -129,19 +128,16 @@ const LOGO_VARIANT_SLOTS: LogoVariantSlotConfig[] = [
   {
     variant: 'color',
     label: 'Original',
-    description: 'Full-colour logo. Used wherever it has enough contrast.',
     previewBgClass: 'bg-neutral-200',
   },
   {
     variant: 'light',
     label: 'Light',
-    description: 'Light-coloured (often white) logo for dark surfaces.',
     previewBgClass: 'bg-neutral-900',
   },
   {
     variant: 'dark',
     label: 'Dark',
-    description: 'Dark-coloured (often black) logo for light surfaces.',
     previewBgClass: 'bg-white',
   },
 ];
@@ -217,12 +213,9 @@ const LogoVariantSlot: React.FC<{
           </button>
         )}
       </div>
-      <p className='aucctus-text-secondary mb-3 text-xs'>
-        {config.description}
-      </p>
       <div
         className={cn(
-          'relative flex h-32 cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-all duration-300',
+          'relative flex h-24 cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-all duration-300',
           isDragging
             ? 'border-primary scale-[1.01]'
             : 'border-border/60 hover:border-border',

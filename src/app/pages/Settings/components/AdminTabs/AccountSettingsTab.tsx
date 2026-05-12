@@ -4,7 +4,9 @@ import {
   useGenerateNucleusReport,
   useGenerateNucleusVideo,
 } from '@hooks/query/nucleus.hook';
-import { useAccountLogo, useUploadAccountLogo } from '@hooks/query/admin.hook';
+import { useUploadAccountLogo } from '@hooks/query/admin.hook';
+import { useAccountBranding } from '@hooks/query/accountBranding.hook';
+import { BrandLogo } from '@components';
 import { cn } from '@libs/utils/react';
 import { ProcessingStatus } from '@libs/api/types';
 import {
@@ -67,8 +69,14 @@ const getStatusConfig = (status: ProcessingStatus | undefined) => {
 };
 
 const AccountSettingsTab: FunctionComponent = () => {
-  // Fetch account logo from dedicated endpoint
-  const { logoUrl: existingLogoUrl } = useAccountLogo();
+  // Fetch account branding (includes logo variants)
+  const { branding } = useAccountBranding();
+  const existingLogoUrl =
+    branding?.logos?.color?.url ||
+    branding?.logos?.light?.url ||
+    branding?.logos?.dark?.url ||
+    branding?.logoUrl ||
+    null;
 
   // Fetch nucleus report status
   const { nucleusReport, isLoading, isNoReportFound } =
@@ -397,14 +405,19 @@ const AccountSettingsTab: FunctionComponent = () => {
                   Current Logo
                 </label>
                 <div className='inline-flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 p-4'>
-                  <img
-                    src={currentLogoUrl}
-                    alt='Account logo'
-                    className='h-16 max-w-[200px] object-contain'
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
+                  {uploadedLogoUrl ? (
+                    <img
+                      src={uploadedLogoUrl}
+                      alt='Account logo'
+                      className='h-16 max-w-[200px] object-contain'
+                    />
+                  ) : (
+                    <BrandLogo
+                      surface='dark'
+                      alt='Account logo'
+                      className='h-16 max-w-[200px] object-contain'
+                    />
+                  )}
                 </div>
               </div>
             )}

@@ -10,7 +10,7 @@
  * - Dynamic color theming based on selected persona's avatar
  */
 
-import { ComponentTooltip, GlassSurface, toast } from '@components';
+import { BrandLogo, ComponentTooltip, GlassSurface, toast } from '@components';
 import { useAccountBranding } from '@hooks/query/accountBranding.hook';
 import { usePersonas, personaKeys } from '@hooks/query/persona.hook';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
@@ -865,11 +865,11 @@ const LivingPersonasTab: React.FC<LivingPersonasTabProps> = ({
                       </motion.div>
 
                       {/* Brand logo or name badge — staggered mount */}
-                      {branding?.logoUrl ? (
-                        <motion.img
-                          src={branding.logoUrl}
-                          alt={branding.brandName}
-                          className='mb-4 h-8 object-contain'
+                      {branding?.logos?.color?.url ||
+                      branding?.logos?.light?.url ||
+                      branding?.logos?.dark?.url ||
+                      branding?.logoUrl ? (
+                        <motion.div
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 0.5 }}
                           transition={{
@@ -877,11 +877,14 @@ const LivingPersonasTab: React.FC<LivingPersonasTabProps> = ({
                             delay: 0.3,
                             ease: 'easeOut',
                           }}
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display =
-                              'none';
-                          }}
-                        />
+                          className='mb-4'
+                        >
+                          <BrandLogo
+                            surface='auto'
+                            alt={branding?.brandName ?? 'Account logo'}
+                            className='h-8 object-contain'
+                          />
+                        </motion.div>
                       ) : branding?.brandName ? (
                         <motion.span
                           className='aucctus-text-xs-bold aucctus-text-tertiary mb-4 uppercase tracking-widest'

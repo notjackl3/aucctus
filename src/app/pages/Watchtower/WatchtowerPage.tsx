@@ -1,6 +1,5 @@
 import images from '@assets/img';
-import { ConceptReportSkeletons, Loading } from '@components';
-import { useAccountLogo } from '@hooks/query/admin.hook';
+import { BrandLogo, ConceptReportSkeletons, Loading } from '@components';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, {
@@ -110,7 +109,6 @@ const SignalRadar: React.FC<{
   categoryFilter: 'all' | SignalCategory;
   height?: number;
   introComplete?: boolean;
-  companyLogoUrl?: string;
 }> = ({
   signals,
   selectedSignal,
@@ -119,7 +117,6 @@ const SignalRadar: React.FC<{
   categoryFilter,
   height: containerHeight = 480,
   introComplete = true,
-  companyLogoUrl,
 }) => {
   const [staggerComplete, setStaggerComplete] = useState(false);
 
@@ -374,25 +371,20 @@ const SignalRadar: React.FC<{
 
         {/* Company logo centered in the hub */}
         <foreignObject
-          x={centerX - hubRadius * 0.7}
-          y={centerY - hubRadius * 0.85}
-          width={hubRadius * 1.4}
-          height={hubRadius * 0.8}
+          x={centerX - hubRadius * 0.55}
+          y={centerY - hubRadius * 0.775}
+          width={hubRadius * 1.1}
+          height={hubRadius * 0.65}
         >
           <div
             className='flex h-full w-full items-center justify-center'
             style={{ backgroundColor: 'transparent' }}
           >
-            {companyLogoUrl && (
-              <img
-                src={companyLogoUrl}
-                alt='Client Logo'
-                className='h-full w-auto max-w-full object-contain'
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            )}
+            <BrandLogo
+              surface='light'
+              alt='Client Logo'
+              className='h-full w-auto max-w-full object-contain'
+            />
           </div>
         </foreignObject>
 
@@ -563,10 +555,6 @@ const WatchtowerPageContent: React.FC = () => {
   // Check if current user is admin
   const { user } = useStore((state: any) => state.auth);
   const isAdmin = user?.role?.toLowerCase() === 'admin';
-
-  // Get account logo from dedicated API endpoint
-  const { logoUrl } = useAccountLogo();
-  const companyLogoUrl = logoUrl || undefined;
 
   // Fetch watchtower configs for the account
   const { watchtowerConfigs } = useWatchtowerConfigs();
@@ -915,7 +903,6 @@ const WatchtowerPageContent: React.FC = () => {
                 filter='all'
                 categoryFilter='all'
                 height={radarHeight}
-                companyLogoUrl={companyLogoUrl}
               />
             </div>
           </div>
@@ -1136,7 +1123,6 @@ const WatchtowerPageContent: React.FC = () => {
                 filter={filter}
                 categoryFilter={categoryFilter}
                 height={radarHeight}
-                companyLogoUrl={companyLogoUrl}
               />
             </div>
 

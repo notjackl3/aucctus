@@ -1,5 +1,6 @@
-import { LiquidGlassTabs, NucleusLoadingState } from '@components';
+import { BrandLogo, LiquidGlassTabs, NucleusLoadingState } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
+import { useAccountBranding } from '@hooks/query/accountBranding.hook';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import {
   AssessmentStatus,
@@ -14,7 +15,6 @@ import { Building2, Scale, Users } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useSearchParams } from 'react-router-dom';
-import { useAccountLogo } from '../../../hooks/query/admin.hook';
 import {
   useGenerateNucleusReport,
   useNucleusReportLatest,
@@ -82,9 +82,13 @@ const NucleusPage: React.FC = () => {
 
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
-  // Company logo - fetch from dedicated endpoint
-  const { logoUrl: companyLogoUrl } = useAccountLogo();
-  const [logoFailed, setLogoFailed] = useState(false);
+  const { branding } = useAccountBranding();
+  const hasAccountLogo = !!(
+    branding?.logos?.color?.url ||
+    branding?.logos?.light?.url ||
+    branding?.logos?.dark?.url ||
+    branding?.logoUrl
+  );
 
   // Handle URL query param for tabs and scoring config
   const [searchParams, setSearchParams] = useSearchParams();
@@ -652,18 +656,17 @@ const NucleusPage: React.FC = () => {
           {/* Header Content */}
           <div className='relative z-10 flex h-full flex-col items-center justify-center px-6 py-8'>
             {/* Logo in top-right corner */}
-            {companyLogoUrl && !logoFailed && (
+            {hasAccountLogo && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className='absolute right-4 top-4 flex items-center justify-center rounded-md bg-white/30 p-2 backdrop-blur-sm'
+                className='absolute right-4 top-4 flex items-center justify-center'
               >
-                <img
-                  src={companyLogoUrl}
+                <BrandLogo
+                  surface='light'
                   alt={companyName}
                   className='h-10 w-auto max-w-[120px] object-contain drop-shadow-lg'
-                  onError={() => setLogoFailed(true)}
                 />
               </motion.div>
             )}
